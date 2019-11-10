@@ -1,4 +1,4 @@
-name: "Test typescript-action"
+name: "Test ocaml-action"
 on:
   pull_request:
   push:
@@ -16,5 +16,5 @@ jobs:
     - run: npm run build
     - run: npm test
     - uses: ./
-      with: 
-        milliseconds: 1000
+      with:
+        ocaml-version: 4.09.0

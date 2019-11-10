@@ -1,10 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: Setup OCaml
+description: Set up an OCaml and opam environment and add to PATH
+author: Anil Madhavapeddy
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  ocaml-version:
+    description: Version of the OCaml compiler to initialise
+    default: 4.08.1
 runs:
   using: 'node12'
-  main: 'lib/main.js'
+  main: 'lib/setup-ocaml.js'
