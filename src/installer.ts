@@ -48,7 +48,7 @@ async function acquireOpamLinux(version: string): Promise<void> {
   fs.chmodSync(downloadPath, '755');
   let toolPath : string = await tc.cacheFile(downloadPath, 'opam', 'opam', opamVersion);
   core.addPath(toolPath);
-  await exec.exec("sudo apt-get -y install bubblewrap");
+  await exec.exec("sudo apt-get -y install bubblewrap ocaml-native-compilers ocaml-compiler-libs");
   await exec.exec(`"${toolPath}/opam"`, ["init", "-yav"]);
   await exec.exec(path.join(__dirname, 'install-ocaml-unix.sh'),[version]);
   await exec.exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
