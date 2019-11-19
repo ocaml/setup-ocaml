@@ -1,5 +1,7 @@
 # Create an OCaml Action using TypeScript
 
+**Status: Experimental**
+
 Use this template to bootstrap the creation of an OCaml action.:rocket:
 
 This template installs the [opam](https://opam.ocaml.org) on Ubuntu Linux,
@@ -7,7 +9,7 @@ macOS and Windows (using the
 [fdopen](https://fdopen.github.io/opam-repository-mingw/installation/) fork). 
 
 If you are new, there's also a simpler introduction.  See the [Hello World
-OCaml Action](https://github.com/avsm/hello-world-ocaml-action) that uses Dune
+OCaml Action](https://github.com/avsm/setup-ocaml/tree/hello-world) that uses Dune
 and opam to build a simple library.
 
 ## Create an action from this template
