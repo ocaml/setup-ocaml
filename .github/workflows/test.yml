@@ -13,9 +13,10 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: [ubuntu-latest, macos-latest, windows-latest]
+        ocaml-version: ['4.08.1','4.05.0']
     steps:
     - uses: actions/checkout@v1
     - uses: ./
       with:
-        ocaml-version: 4.08.1
+        ocaml-version: ${{ matrix.ocaml-version }}
     - run: opam depext -iyv yaml

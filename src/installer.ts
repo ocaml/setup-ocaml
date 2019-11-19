@@ -10,6 +10,7 @@ let osPlat: string = os.platform();
 let osArch: string = os.arch();
 
 export async function getOpam(version: string): Promise <void> {
+  core.exportVariable('OPAMYES', '1');
   if (osPlat == "win32")
     return acquireOpamWindows(version);
   else if (osPlat == "darwin")
@@ -31,7 +32,6 @@ async function acquireOpamWindows(version: string): Promise<void> {
   await exec.exec(path.join(__dirname, 'install-ocaml-windows.cmd'),[toolPath, version]);
   core.addPath("c:\\cygwin\\bin");
   core.addPath("c:\\cygwin\\wrapperbin");
-  core.exportVariable('OPAMYES', '1');
 }
 
 async function acquireOpamLinux(version: string): Promise<void> {
@@ -49,13 +49,15 @@ async function acquireOpamLinux(version: string): Promise<void> {
   let toolPath : string = await tc.cacheFile(downloadPath, 'opam', 'opam', opamVersion);
   core.addPath(toolPath);
   await exec.exec("sudo apt-get -y install bubblewrap");
-  await exec.exec(`"${toolPath}/opam"`, ["init", "-yav", "-c", version]);
+  await exec.exec(`"${toolPath}/opam"`, ["init", "-yav"]);
+  await exec.exec(path.join(__dirname, 'install-ocaml-unix.sh'),[version]);
   await exec.exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
 }
 
 async function acquireOpamDarwin(version: string): Promise<void> {
   await exec.exec ("brew install ocaml opam");
   await exec.exec("opam", ["init", "-yav"]);
+  await exec.exec(path.join(__dirname, 'install-ocaml-unix.sh'),[version]);
   await exec.exec("opam", ["install", "-y", "depext"]);
 }
 
