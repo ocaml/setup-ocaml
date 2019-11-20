@@ -7,7 +7,7 @@ macOS and Windows (using the
 [fdopen](https://fdopen.github.io/opam-repository-mingw/installation/) fork). 
 
 If you are new, there's also a simpler introduction.  See the [Hello World
-OCaml Action](https://github.com/avsm/setup-ocaml/tree/hello-world) that uses Dune
+OCaml Action](https://github.com/avsm/hello-world-ocaml-action) that uses Dune
 and opam to build a simple library.
 
 ## Inputs
