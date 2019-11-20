@@ -1,6 +1,9 @@
 name: Setup OCaml
 description: Set up an OCaml and opam environment and add to PATH
 author: Anil Madhavapeddy
+branding:
+  icon: 'package'
+  color: 'orange'
 inputs:
   ocaml-version:
     description: Version of the OCaml compiler to initialise
