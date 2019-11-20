@@ -38,3 +38,9 @@ jobs:
     - run: opam exec -- dune build
     - run: opam exec -- dune runtest
 ```
+
+## Roadmap
+
+This action aims to provide an OS-neutral interface to `opam`, and so
+will not add features that only work on one operating system.  It will
+also track the latest stable release of opam.
