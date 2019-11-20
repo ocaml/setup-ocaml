@@ -14,7 +14,7 @@ and opam to build a simple library.
 
 - `ocaml-version`: the full version of the OCaml compiler (default 4.08.1)
 
-## Action
+## Action
 
 The action does the following:
 
