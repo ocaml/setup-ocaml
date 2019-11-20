@@ -29,7 +29,7 @@ async function acquireOpamWindows(version: string): Promise<void> {
     throw `Failed to download cygwin: ${error}`;
   }
   toolPath = await tc.cacheFile(downloadPath, 'setup-x86_64.exe', 'cygwin', "1.0");
-  await exec.exec(path.join(__dirname, 'install-ocaml-windows.cmd'),[toolPath, version]);
+  await exec.exec(path.join(__dirname, 'install-ocaml-windows.cmd'),[__dirname, toolPath, version]);
   core.addPath("c:\\cygwin\\bin");
   core.addPath("c:\\cygwin\\wrapperbin");
 }
