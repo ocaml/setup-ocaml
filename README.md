@@ -14,6 +14,20 @@ and opam to build a simple library.
 
 - `ocaml-version`: the full version of the OCaml compiler (default 4.08.1)
 
+## Action
+
+The action does the following:
+
+- *Ubuntu:* Installs the latest opam with sandboxing active
+- *macOS:* Installs the latest opam from Homebrew with sandboxing active
+- *Windows:* Installs Cygwin and the [fdopen fork](https://fdopen.github.io/opam-repository-mingw/) with mingw64c
+
+The repository is initialised to the default one, and then the following plugins are installed:
+- `opam-depext`
+
+The `opam` binary is added to the `PATH` for subsequent actions, so that
+executing `opam` commands will just work after that.
+
 ## Example workflow
 
 
