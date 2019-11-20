@@ -3,8 +3,7 @@
 Use this template to bootstrap the creation of an OCaml action.:rocket:
 
 This template installs the [opam](https://opam.ocaml.org) on Ubuntu Linux,
-macOS and Windows (using the
-[fdopen](https://fdopen.github.io/opam-repository-mingw/installation/) fork). 
+macOS and Windows for use with GitHub Actions.
 
 If you are new, there's also a simpler introduction.  See the [Hello World
 OCaml Action](https://github.com/avsm/hello-world-ocaml-action) that uses Dune
