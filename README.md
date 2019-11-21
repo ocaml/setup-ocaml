@@ -6,7 +6,7 @@ This template installs the [opam](https://opam.ocaml.org) on Ubuntu Linux,
 macOS and Windows for use with GitHub Actions.
 
 If you are new, there's also a simpler introduction.  See the [Hello World
-OCaml Action](https://github.com/avsm/hello-world-ocaml-action) that uses Dune
+OCaml Action](https://github.com/avsm/hello-world-action-ocaml) that uses Dune
 and opam to build a simple library.
 
 ## Inputs
