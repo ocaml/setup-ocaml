@@ -1,4 +1,4 @@
-# Create an OCaml Action using TypeScript
+# Create an OCaml Action 
 
 Use this template to bootstrap the creation of an OCaml action.:rocket:
 
@@ -58,3 +58,5 @@ jobs:
 This action aims to provide an OS-neutral interface to `opam`, and so
 will not add features that only work on one operating system.  It will
 also track the latest stable release of opam.
+
+Discussions: https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745
