@@ -49,14 +49,14 @@ async function acquireOpamLinux(version: string): Promise<void> {
   let toolPath : string = await tc.cacheFile(downloadPath, 'opam', 'opam', opamVersion);
   core.addPath(toolPath);
   await exec.exec("sudo apt-get -y install bubblewrap ocaml-native-compilers ocaml-compiler-libs musl-tools");
-  await exec.exec(`"${toolPath}/opam"`, ["init", "-yav"]);
+  await exec.exec(`"${toolPath}/opam"`, ["init", "-yav", "https://github.com/ocaml/opam-repository.git"]);
   await exec.exec(path.join(__dirname, 'install-ocaml-unix.sh'),[version]);
   await exec.exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
 }
 
 async function acquireOpamDarwin(version: string): Promise<void> {
   await exec.exec ("brew install ocaml opam");
-  await exec.exec("opam", ["init", "-yav"]);
+  await exec.exec("opam", ["init", "-yav", "https://github.com/ocaml/opam-repository.git"]);
   await exec.exec(path.join(__dirname, 'install-ocaml-unix.sh'),[version]);
   await exec.exec("opam", ["install", "-y", "depext"]);
 }
