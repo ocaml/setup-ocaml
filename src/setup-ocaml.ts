@@ -7,7 +7,7 @@ async function run() {
     let ocaml_version = core.getInput('ocaml-version');
     await installer.getOpam(ocaml_version);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error.toString());
   }
 }
 
