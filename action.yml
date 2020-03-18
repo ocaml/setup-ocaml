@@ -10,4 +10,4 @@ inputs:
     default: 4.08.1
 runs:
   using: 'node12'
-  main: 'lib/setup-ocaml.js'
+  main: 'lib/index.js'
