@@ -6,7 +6,7 @@
   "main": "lib/main.js",
   "scripts": {
     "test": "jest",
-    "build:copy": "mkdir -p lib && cp src/{install-*,opam.bat} lib/",
+    "build:copy": "mkdir -p lib && cp -a src/{install-*,opam.bat} lib/",
     "build:setup-ocaml": "ncc build src/setup-ocaml.ts -o lib",
     "build": "npm-run-all -p build:*"
   },
