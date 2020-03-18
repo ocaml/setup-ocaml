@@ -5,8 +5,10 @@
   "description": "TypeScript template action",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc && cp src/install-* lib/ && cp src/opam.bat lib/",
-    "test": "jest"
+    "test": "jest",
+    "build:copy": "mkdir -p lib && cp src/{install-*,opam.bat} lib/",
+    "build:setup-ocaml": "ncc build src/setup-ocaml.ts -o lib",
+    "build": "npm-run-all -p build:*"
   },
   "repository": {
     "type": "git",
@@ -26,8 +28,10 @@
   "devDependencies": {
     "@types/jest": "^24.0.13",
     "@types/node": "^12.0.4",
+    "@zeit/ncc": "^0.21.1",
     "jest": "^24.8.0",
     "jest-circus": "^24.7.1",
+    "npm-run-all": "^4.1.5",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.1"
   }
