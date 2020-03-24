@@ -1,22 +1,29 @@
-name: "Test ocaml-action"
+name: Test ocaml-action
+
 on:
-  pull_request:
   push:
     branches:
-      - master
-      - 'releases/*'
+      - "master"
+      - "releases/*"
+  pull_request:
 
 jobs:
-  init:
-    runs-on: ${{ matrix.operating-system }}
+  test:
     strategy:
       fail-fast: false
       matrix:
-        operating-system: [ubuntu-latest, macos-latest, windows-latest]
-        ocaml-version: ['4.08.1','4.05.0']
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        ocaml-version: ["4.08.1", "4.05.0"]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
-    - uses: actions/checkout@v2
-    - uses: ./
-      with:
-        ocaml-version: ${{ matrix.ocaml-version }}
-    - run: opam depext -iyv yaml
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: ./
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - run: opam depext -iyv yaml
