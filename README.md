@@ -32,25 +32,28 @@ executing `opam` commands will just work after that.
 
 ```
 name: Build Hello World executable
-on: [push]
+on: [push, pull_request]
 jobs:
   run:
     name: Build
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: [macos-latest, ubuntu-latest, windows-latest]
-        ocaml-version: [ '4.09.0', '4.08.1' ]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        ocaml-version: ["4.09.0", "4.08.1"]
     steps:
-    - uses: actions/checkout@master
-    - uses: avsm/setup-ocaml@master
-      with:
-        ocaml-version: ${{ matrix.ocaml-version }}
-    - run: opam pin add hello.dev -n .
-    - run: opam depext -yt hello
-    - run: opam install -t . --deps-only
-    - run: opam exec -- dune build
-    - run: opam exec -- dune runtest
+      - name: Checkout code
+        uses: actions/checkout@v2.0.0
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1.0
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+      - run: opam pin add hello.dev -n .
+      - run: opam depext -yt hello
+      - run: opam install -t . --deps-only
+      - run: opam exec -- dune build
+      - run: opam exec -- dune runtest
 ```
 
 ## Roadmap
