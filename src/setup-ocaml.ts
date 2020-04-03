@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import * as installer from "./installer";
-import * as path from "path";
 
 async function run() {
   try {

@@ -1,8 +1,8 @@
 import * as core from "@actions/core";
-import * as tc from "@actions/tool-cache";
-import * as os from "os";
-import * as fs from "fs";
 import * as exec from "@actions/exec";
+import * as tc from "@actions/tool-cache";
+import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as util from "util";
 
