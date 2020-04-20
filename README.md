@@ -44,7 +44,7 @@ jobs:
         ocaml-version: ["4.09.0", "4.08.1"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.0.0
+        uses: actions/checkout@v2.1.0
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1.0
         with:
