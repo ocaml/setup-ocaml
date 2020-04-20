@@ -6,7 +6,7 @@
   "main": "lib/main.js",
   "scripts": {
     "test": "jest",
-    "build:copy": "mkdir -p lib && cp -a src/{install-*,opam.bat} lib/",
+    "build:copy": "mkdir -p lib && shx cp src/*.{bat,cmd,sh} lib/",
     "build:setup-ocaml": "ncc build src/setup-ocaml.ts -o lib",
     "build": "npm-run-all -p build:*"
   },
@@ -32,6 +32,7 @@
     "jest": "25.2.7",
     "jest-circus": "25.2.7",
     "npm-run-all": "4.1.5",
+    "shx": "0.3.2",
     "ts-jest": "25.3.1",
     "typescript": "3.8.3"
   }
