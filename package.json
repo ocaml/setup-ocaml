@@ -1,26 +1,11 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
-  "main": "lib/main.js",
   "scripts": {
     "test": "jest",
     "build:copy": "mkdir -p lib && shx cp src/*.{bat,cmd,sh} lib/",
     "build:setup-ocaml": "ncc build src/setup-ocaml.ts -o lib",
     "build": "npm-run-all -p build:*"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
-  },
-  "keywords": [
-    "actions",
-    "node",
-    "setup"
-  ],
-  "author": "YourNameOrOrganization",
-  "license": "MIT",
   "dependencies": {
     "@actions/core": "1.2.3",
     "@actions/tool-cache": "1.3.3"
