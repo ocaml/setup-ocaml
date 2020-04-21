@@ -2,12 +2,12 @@ name: Set up OCaml
 description: Set up an OCaml and opam environment and add to PATH
 author: Anil Madhavapeddy
 branding:
-  icon: 'package'
-  color: 'orange'
+  icon: "package"
+  color: "orange"
 inputs:
   ocaml-version:
     description: Version of the OCaml compiler to initialise
     default: 4.08.1
 runs:
-  using: 'node12'
-  main: 'lib/index.js'
+  using: "node12"
+  main: "lib/index.js"

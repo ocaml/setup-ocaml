@@ -1,11 +1,11 @@
-# Create an OCaml Action 
+# Create an OCaml Action
 
 Use this template to bootstrap the creation of an OCaml action.:rocket:
 
 This template installs the [opam](https://opam.ocaml.org) on Ubuntu Linux,
 macOS and Windows for use with GitHub Actions.
 
-If you are new, there's also a simpler introduction.  See the [Hello World
+If you are new, there's also a simpler introduction. See the [Hello World
 OCaml Action](https://github.com/avsm/hello-world-action-ocaml) that uses Dune
 and opam to build a simple library.
 
@@ -17,18 +17,18 @@ and opam to build a simple library.
 
 The action does the following:
 
-- *Ubuntu:* Installs the latest opam with sandboxing active
-- *macOS:* Installs the latest opam from Homebrew with sandboxing active
-- *Windows:* Installs Cygwin and the [fdopen fork](https://fdopen.github.io/opam-repository-mingw/) with mingw64c
+- _Ubuntu:_ Installs the latest opam with sandboxing active
+- _macOS:_ Installs the latest opam from Homebrew with sandboxing active
+- _Windows:_ Installs Cygwin and the [fdopen fork](https://fdopen.github.io/opam-repository-mingw/) with mingw64c
 
 The repository is initialised to the default one, and then the following plugins are installed:
+
 - `opam-depext`
 
 The `opam` binary is added to the `PATH` for subsequent actions, so that
 executing `opam` commands will just work after that.
 
 ## Example workflow
-
 
 ```
 name: Build Hello World executable
@@ -59,7 +59,7 @@ jobs:
 ## Roadmap
 
 This action aims to provide an OS-neutral interface to `opam`, and so
-will not add features that only work on one operating system.  It will
+will not add features that only work on one operating system. It will
 also track the latest stable release of opam.
 
 Discussions: https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745
