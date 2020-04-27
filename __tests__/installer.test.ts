@@ -1,5 +1,6 @@
 import * as io from "@actions/io";
 import * as path from "path";
+
 import * as installer from "../src/installer";
 
 const toolDir = path.join(__dirname, "runner", "tools");
