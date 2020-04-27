@@ -23,28 +23,31 @@ tar -xf "${OPAM_ARCH}.tar.xz"
 # environment first
 case "$SWITCH" in
   *msvc32)
-      eval $(ocaml-env cygwin --ms=vs2015 --no-opam --32) ;;
+    eval "$(ocaml-env cygwin --ms=vs2015 --no-opam --32)"
+    ;;
   *msvc64)
-      eval $(ocaml-env cygwin --ms=vs2015 --no-opam --64) ;;
+    eval "$(ocaml-env cygwin --ms=vs2015 --no-opam --64)"
+    ;;
 esac
 opam init -c "ocaml-variants.${SWITCH}" --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "https://github.com/fdopen/opam-repository-mingw.git#opam2"
 opam config set jobs "$OPAMJOBS"
 opam update
 is_msvc=0
 case "$SWITCH" in
-    *msvc*)
-        is_msvc=1
-        eval $(ocaml-env cygwin --ms=vs2015)
-        ;;
-    *mingw*)
-        eval $(ocaml-env cygwin)
-        ;;
-    *)
-        echo "ocamlc reports a dubious system: ${ocaml_system}. Good luck!" >&2
-        eval $(opam env)
+  *msvc*)
+    is_msvc=1
+    eval "$(ocaml-env cygwin --ms=vs2015)"
+    ;;
+  *mingw*)
+    eval "$(ocaml-env cygwin)"
+    ;;
+  *)
+    echo "ocamlc reports a dubious system: ${ocaml_system}. Good luck!" >&2
+    eval "$(opam env)"
+    ;;
 esac
 if [ $is_msvc -eq 0 ]; then
-    opam install depext-cygwinports depext
+  opam install depext-cygwinports depext
 else
-    opam install depext
+  opam install depext
 fi
