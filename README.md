@@ -64,7 +64,9 @@ jobs:
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
-      - run: opam pin . --no-action
+      - run: opam pin add hello.dev . --no-action
+
+      - run: opam depext hello --yes --with-test
 
       - run: opam install . --deps-only --with-doc --with-test
 
