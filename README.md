@@ -40,8 +40,6 @@ on:
 
 jobs:
   build:
-    name: Build
-
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +48,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-version:
-          - 4.09.0
+          - 4.09.1
           - 4.08.1
 
     runs-on: ${{ matrix.os }}
