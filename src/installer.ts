@@ -79,7 +79,7 @@ async function acquireOpamLinux(version: string) {
 }
 
 async function acquireOpamDarwin(version: string) {
-  await exec("brew install ocaml opam");
+  await exec("brew", ["install", "opam"]);
   await exec("opam", [
     "init",
     "-yav",
