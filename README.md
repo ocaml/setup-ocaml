@@ -21,14 +21,16 @@ specify the version of the action _itself_.
     ocaml-version: ${{ matrix.ocaml-version }}
 ```
 
-We recommend that you include the version of the action by specifying a git ref,
-or sha. If you don't, it could break your workflows when we publish an update.
+We recommend that you include the version of the action. We adhere to
+[semantic versioning](https://semver.org), it's safe to use the major version
+(`v1`) in your workflow. If you use the master branch, this could break your
+workflow when we publish a breaking update and increase the major version.
 
 ```yml
 steps:
   # Reference a specific commit
   - uses: avsm/setup-ocaml@ab6ba4d
-  # Reference the major version of a release
+  # Reference the major version of a release (recommended)
   - uses: avsm/setup-ocaml@v1
   # Reference a semver version of a release
   - uses: avsm/setup-ocaml@v1.0.1
