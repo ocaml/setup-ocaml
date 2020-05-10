@@ -42,6 +42,17 @@ jobs:
       - name: Check formatting
         run: yarn fmt:check
 
+      - name: Ensure lib directory is up-to-date
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          yarn build
+          if [ "$(git status --porcelain | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff
+            exit 1
+          fi
+
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: ./
         with:
