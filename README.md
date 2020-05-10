@@ -28,13 +28,13 @@ workflow when we publish a breaking update and increase the major version.
 
 ```yml
 steps:
-  # Reference a specific commit
-  - uses: avsm/setup-ocaml@ab6ba4d
-  # Reference the major version of a release (recommended)
+  # Reference the major version of a release (most recommended)
   - uses: avsm/setup-ocaml@v1
-  # Reference a semver version of a release
+  # Reference a specific commit (most strict)
+  - uses: avsm/setup-ocaml@ab6ba4d
+  # Reference a semver version of a release (not recommended)
   - uses: avsm/setup-ocaml@v1.0.1
-  # Reference a branch
+  # Reference a branch (most dangerous)
   - uses: avsm/setup-ocaml@master
 ```
 
