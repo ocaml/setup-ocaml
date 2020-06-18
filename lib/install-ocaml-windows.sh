@@ -8,6 +8,7 @@ if [ "$1" = "" ]; then
 else
   OCAML_VERSION="$1"
 fi
+OPAM_REPOSITORY="$2"
 SWITCH="${OCAML_VERSION}+mingw64c"
 OPAM_DL_SUB_LINK=0.0.0.2
 OPAM_URL="https://github.com/fdopen/opam-repository-mingw/releases/download/${OPAM_DL_SUB_LINK}/opam64.tar.xz"
@@ -29,7 +30,7 @@ case "$SWITCH" in
     eval "$(ocaml-env cygwin --ms=vs2015 --no-opam --64)"
     ;;
 esac
-opam init -c "ocaml-variants.${SWITCH}" --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "https://github.com/fdopen/opam-repository-mingw.git#opam2"
+opam init -c "ocaml-variants.${SWITCH}" --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "$OPAM_REPOSITORY"
 opam config set jobs "$OPAMJOBS"
 opam update
 is_msvc=0

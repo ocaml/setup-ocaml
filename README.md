@@ -101,6 +101,10 @@ packages' external dependencies for such opam packages.
 ## Inputs
 
 - `ocaml-version`: the full version of the OCaml compiler (default 4.08.1)
+- `opam-repository`: the URL of the repository opam will use for installing
+  packages. The default "" will select
+  `https://github.com/ocaml/opam-repository.git` for Ubuntu and macOS and
+  `https://github.com/fdopen/opam-repository-mingw.git#opam2` for Windows.
 
 ## Action
 
@@ -118,6 +122,72 @@ are installed:
 
 The `opam` binary is added to the `PATH` for subsequent actions, so that
 executing `opam` commands will just work after that.
+
+## Advanced Configurations
+
+It is possible to feed different values to `opam-repository` depending on the
+platform of the runner. The syntax of Github's workflows is flexible enough to
+offer several methods to do this.
+
+For example, using the strategy matrix:
+
+```yml
+runs-on: ${{ matrix.os }}
+strategy:
+  matrix:
+    os: [macos-latest, windows-latest, ubuntu-latest]
+    include:
+      - os: macos-latest
+         opam-repo: https://github.com/ocaml/opam-repository.git
+      - os: ubuntu-latest
+         opam-repo: https://github.com/ocaml/opam-repository.git
+      - os: windows-latest
+         opam-repo: https://github.com/fdopen/opam-repository-mingw.git#opam2
+steps
+    - name: Use OCaml with repo ${{ matrix.opam-repo }}
+      uses: avsm/setup-ocaml@v1
+      with:
+        opam-repository: ${{ matrix.opam-repo }}
+```
+
+Using a custom step to choose between the values:
+
+```yml
+jobs:
+  build:
+    runs-on: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+      - id: repo
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ] ; then
+            echo "::set-output name=url::https://github.com/fdopen/opam-repository-mingw.git#opam2"
+          elif [ "$RUNNER_OS" == "macOS" ] ; then
+            echo "::set-output name=url::https://github.com/custom/opam-repository-mingw.git#macOS"
+          else
+            echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
+          fi
+        shell: bash
+      - name: Use OCaml with repo ${{ steps.repo.url }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          opam-repository: ${{ steps.repo.url }}
+```
+
+Using several conditional setup steps:
+
+```yml
+steps:
+  - name: Use OCaml on windows
+    uses: avsm/setup-ocaml@v1
+    if: ${{ runner.os == 'Windows' }}
+    with:
+      ocaml-repository: "https://github.com/fdopen/opam-repository-mingw.git#opam2"
+  - name: Use OCaml on unix
+    uses: avsm/setup-ocaml@v1
+    if: ${{ runner.os != 'Windows' }}
+    with:
+      opam-repository: "https://github.com/ocaml/opam-repository.git"
+```
 
 ## Roadmap
 

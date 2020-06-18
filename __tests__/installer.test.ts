@@ -25,6 +25,13 @@ describe("installer tests", () => {
   }, 100000);
 
   it("Acquires opam source", async () => {
-    await installer.getOpam("2.0.5");
+    await installer.getOpam("2.0.5", "");
+  }, 1000000);
+
+  it("Acquires opam source and uses custom repository", async () => {
+    await installer.getOpam(
+      "2.0.5",
+      "https://github.com/ocaml/opam-repository.git#master"
+    );
   }, 1000000);
 });
