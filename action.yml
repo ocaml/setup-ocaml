@@ -8,6 +8,9 @@ inputs:
   ocaml-version:
     description: Version of the OCaml compiler to initialise
     default: 4.08.1
+  opam-repository:
+    description: URL of the repository to fetch packages from
+    default: ""
 runs:
   using: "node12"
   main: "lib/index.js"
