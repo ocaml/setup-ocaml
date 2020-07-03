@@ -24,11 +24,11 @@ function getOpamDownloadUrl(version: string, filename: string) {
   );
 }
 
-async function acquireOpamWindows(version: string, custom_repository: string) {
+async function acquireOpamWindows(version: string, customRepository: string) {
   const repository =
-    custom_repository === ""
+    customRepository === ""
       ? "https://github.com/fdopen/opam-repository-mingw.git#opam2"
-      : custom_repository;
+      : customRepository;
   let downloadPath;
   try {
     downloadPath = await tc.downloadTool("https://cygwin.com/setup-x86_64.exe");
@@ -52,14 +52,14 @@ async function acquireOpamWindows(version: string, custom_repository: string) {
   core.addPath("c:\\cygwin\\wrapperbin");
 }
 
-async function acquireOpamLinux(version: string, custom_repository: string) {
+async function acquireOpamLinux(version: string, customRepository: string) {
   const opamVersion = "2.0.5";
   const fileName = getOpamFileName(opamVersion);
   const downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
   const repository =
-    custom_repository === ""
+    customRepository === ""
       ? "https://github.com/ocaml/opam-repository.git"
-      : custom_repository;
+      : customRepository;
   let downloadPath;
   try {
     downloadPath = await tc.downloadTool(downloadUrl);
@@ -83,11 +83,11 @@ async function acquireOpamLinux(version: string, custom_repository: string) {
   await exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
 }
 
-async function acquireOpamDarwin(version: string, custom_repository: string) {
+async function acquireOpamDarwin(version: string, customRepository: string) {
   const repository =
-    custom_repository === ""
+    customRepository === ""
       ? "https://github.com/ocaml/opam-repository.git"
-      : custom_repository;
+      : customRepository;
   await exec("brew", ["install", "opam"]);
   await exec("opam", ["init", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
