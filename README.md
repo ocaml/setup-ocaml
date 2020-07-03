@@ -132,61 +132,65 @@ offer several methods to do this.
 For example, using the strategy matrix:
 
 ```yml
-runs-on: ${{ matrix.os }}
 strategy:
   matrix:
-    os: [macos-latest, windows-latest, ubuntu-latest]
+    os:
+      - macos-latest
+      - ubuntu-latest
+      - windows-latest
     include:
       - os: macos-latest
-         opam-repo: https://github.com/ocaml/opam-repository.git
+        opam-repo: https://github.com/ocaml/opam-repository.git
       - os: ubuntu-latest
-         opam-repo: https://github.com/ocaml/opam-repository.git
+        opam-repo: https://github.com/ocaml/opam-repository.git
       - os: windows-latest
-         opam-repo: https://github.com/fdopen/opam-repository-mingw.git#opam2
-steps
-    - name: Use OCaml with repo ${{ matrix.opam-repo }}
-      uses: avsm/setup-ocaml@v1
-      with:
-        opam-repository: ${{ matrix.opam-repo }}
+        opam-repo: https://github.com/fdopen/opam-repository-mingw.git#opam2
+
+runs-on: ${{ matrix.os }}
+
+steps:
+  - name: Use OCaml with repo ${{ matrix.opam-repo }}
+    uses: avsm/setup-ocaml@v1
+    with:
+      opam-repository: ${{ matrix.opam-repo }}
 ```
 
 Using a custom step to choose between the values:
 
 ```yml
-jobs:
-  build:
-    runs-on: [macos-latest, windows-latest, ubuntu-latest]
-    steps:
-      - id: repo
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ] ; then
-            echo "::set-output name=url::https://github.com/fdopen/opam-repository-mingw.git#opam2"
-          elif [ "$RUNNER_OS" == "macOS" ] ; then
-            echo "::set-output name=url::https://github.com/custom/opam-repository-mingw.git#macOS"
-          else
-            echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
-          fi
-        shell: bash
-      - name: Use OCaml with repo ${{ steps.repo.url }}
-        uses: avsm/setup-ocaml@v1
-        with:
-          opam-repository: ${{ steps.repo.url }}
+steps:
+  - id: repo
+    shell: bash
+    run: |
+      if [ "$RUNNER_OS" == "Windows" ]; then
+        echo "::set-output name=url::https://github.com/fdopen/opam-repository-mingw.git#opam2"
+      elif [ "$RUNNER_OS" == "macOS" ]; then
+        echo "::set-output name=url::https://github.com/custom/opam-repository-mingw.git#macOS"
+      else
+        echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
+      fi
+
+  - name: Use OCaml with repo ${{ steps.repo.url }}
+    uses: avsm/setup-ocaml@v1
+    with:
+      opam-repository: ${{ steps.repo.url }}
 ```
 
 Using several conditional setup steps:
 
 ```yml
 steps:
-  - name: Use OCaml on windows
+  - name: Use OCaml on Windows
     uses: avsm/setup-ocaml@v1
     if: ${{ runner.os == 'Windows' }}
     with:
-      ocaml-repository: "https://github.com/fdopen/opam-repository-mingw.git#opam2"
-  - name: Use OCaml on unix
+      ocaml-repository: https://github.com/fdopen/opam-repository-mingw.git#opam2
+
+  - name: Use OCaml on Unix
     uses: avsm/setup-ocaml@v1
     if: ${{ runner.os != 'Windows' }}
     with:
-      opam-repository: "https://github.com/ocaml/opam-repository.git"
+      opam-repository: https://github.com/ocaml/opam-repository.git
 ```
 
 ## Roadmap
