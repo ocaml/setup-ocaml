@@ -53,7 +53,7 @@ async function acquireOpamWindows(version: string, customRepository: string) {
 }
 
 async function acquireOpamLinux(version: string, customRepository: string) {
-  const opamVersion = "2.0.5";
+  const opamVersion = "2.0.7";
   const fileName = getOpamFileName(opamVersion);
   const downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
   const repository =
