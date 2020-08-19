@@ -92,7 +92,10 @@ async function acquireOpamDarwin(version: string, customRepository: string) {
   await exec("opam", ["install", "-y", "depext"]);
 }
 
-export async function getOpam(version: string, repository: string) {
+export async function getOpam(
+  version: string,
+  repository: string
+): Promise<void> {
   core.exportVariable("OPAMYES", "1");
   if (osPlat === "win32") return acquireOpamWindows(version, repository);
   else if (osPlat === "darwin") return acquireOpamDarwin(version, repository);
