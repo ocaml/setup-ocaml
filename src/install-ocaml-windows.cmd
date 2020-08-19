@@ -3,6 +3,7 @@ set CYGWIN_ROOT=c:\cygwin
 set PATH=%CYGWIN_ROOT%\wrapperbin;%CYGWIN_ROOT%\bin;%PATH%
 dos2unix %1\install-ocaml-windows.sh
 bash -l %1\install-ocaml-windows.sh %3 %4
+@if %ERRORLEVEL% neq 0 exit /b 1
 unix2dos %1\opam.bat
 mkdir %CYGWIN_ROOT%\wrapperbin
 copy %1\opam.bat %CYGWIN_ROOT%\wrapperbin\opam.bat
