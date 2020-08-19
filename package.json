@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "fmt": "prettier --end-of-line auto --write .",
-    "fmt:check": "prettier --end-of-line auto --check .",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
     "lint": "eslint \"**/*.ts\" --cache",
     "test": "jest",
     "build:copy": "mkdir -p lib && shx cp src/*.{bat,cmd,sh} lib/",
