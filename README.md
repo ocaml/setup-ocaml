@@ -48,8 +48,8 @@ that uses Dune and opam to build a simple library.
 name: Main workflow
 
 on:
-  - push
   - pull_request
+  - push
 
 jobs:
   build:
@@ -61,7 +61,8 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-version:
-          - 4.10.0
+          - 4.11.0
+          - 4.10.1
           - 4.09.1
           - 4.08.1
 
@@ -133,6 +134,7 @@ For example, using the strategy matrix:
 
 ```yml
 strategy:
+  fail-fast: false
   matrix:
     os:
       - macos-latest
@@ -165,7 +167,7 @@ steps:
       if [ "$RUNNER_OS" == "Windows" ]; then
         echo "::set-output name=url::https://github.com/fdopen/opam-repository-mingw.git#opam2"
       elif [ "$RUNNER_OS" == "macOS" ]; then
-        echo "::set-output name=url::https://github.com/custom/opam-repository-mingw.git#macOS"
+        echo "::set-output name=url::https://github.com/custom/opam-repository.git#macOS"
       else
         echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
       fi
@@ -182,13 +184,13 @@ Using several conditional setup steps:
 steps:
   - name: Use OCaml on Windows
     uses: avsm/setup-ocaml@v1
-    if: ${{ runner.os == 'Windows' }}
+    if: runner.os == 'Windows'
     with:
       ocaml-repository: https://github.com/fdopen/opam-repository-mingw.git#opam2
 
   - name: Use OCaml on Unix
     uses: avsm/setup-ocaml@v1
-    if: ${{ runner.os != 'Windows' }}
+    if: runner.os != 'Windows'
     with:
       opam-repository: https://github.com/ocaml/opam-repository.git
 ```
