@@ -6,10 +6,8 @@ set -ex
 # the right version from the system compiler
 
 CURRENT_OCAML=$(opam info -f version ocaml --color=never)
+SWITCHES=$(opam switch list)
 
-opam switch list | $1
-STATUS=$?
-
-if [ "$CURRENT_OCAML" != "$1" ] && [ $STATUS -ne 0 ]; then
+if [ "$CURRENT_OCAML" != "$1" ] && [ "$SWITCHES" != *"$1"* ]; then
   opam switch create "$1" "$1"
 fi
