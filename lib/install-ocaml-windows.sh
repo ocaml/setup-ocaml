@@ -3,13 +3,22 @@ export OPAMYES=1
 export OPAMJOBS=3
 set -ex
 echo Preparing Cygwin environment
-if [ "$1" = "" ]; then
-  OCAML_VERSION="4.07.1"
-else
-  OCAML_VERSION="$1"
-fi
+
+OCAML_VERSION="$1"
 OPAM_REPOSITORY="$2"
-SWITCH="${OCAML_VERSION}+mingw64c"
+OCAML_VARIANT="$3" ## may be empty/missing/null => last parameter
+
+if [ "$OCAML_VERSION" = "" ]; then
+  OCAML_VERSION="4.07.1" ## default to "4.07.1" OCaml version
+fi
+if [ "$OCAML_VARIANT" = "" ]; then
+  OCAML_VARIANT="mingw64c" ## default to MinGW 64-bit pre-compiled compiler variant
+fi
+
+OCAML_VV="$OCAML_VERSION"
+if [ "$OCAML_VARIANT" != "" ]; then OCAML_VV="$OCAML_VERSION+$OCAML_VARIANT" ; fi
+
+SWITCH="${OCAML_VV}"
 OPAM_DL_SUB_LINK=0.0.0.2
 OPAM_URL="https://github.com/fdopen/opam-repository-mingw/releases/download/${OPAM_DL_SUB_LINK}/opam64.tar.xz"
 OPAM_ARCH=opam64

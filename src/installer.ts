@@ -24,7 +24,11 @@ function getOpamDownloadUrl(version: string, filename: string) {
   );
 }
 
-async function acquireOpamWindows(version: string, customRepository: string) {
+async function acquireOpamWindows(
+  version: string,
+  variant: string,
+  customRepository: string
+) {
   const repository =
     customRepository ||
     "https://github.com/fdopen/opam-repository-mingw.git#opam2";
@@ -47,12 +51,17 @@ async function acquireOpamWindows(version: string, customRepository: string) {
     toolPath,
     version,
     repository,
+    variant, // may be empty/missing/null => last parameter
   ]);
   core.addPath("c:\\cygwin\\bin");
   core.addPath("c:\\cygwin\\wrapperbin");
 }
 
-async function acquireOpamLinux(version: string, customRepository: string) {
+async function acquireOpamLinux(
+  version: string,
+  variant: string,
+  customRepository: string
+) {
   const opamVersion = "2.0.7";
   const fileName = getOpamFileName(opamVersion);
   const downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
@@ -78,17 +87,21 @@ async function acquireOpamLinux(version: string, customRepository: string) {
     "sudo apt-get -y install bubblewrap ocaml-native-compilers ocaml-compiler-libs musl-tools"
   );
   await exec(`"${toolPath}/opam"`, ["init", "-yav", repository]);
-  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
+  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version, variant]);
   await exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
 }
 
-async function acquireOpamDarwin(version: string, customRepository: string) {
+async function acquireOpamDarwin(
+  version: string,
+  variant: string,
+  customRepository: string
+) {
   const repository =
     customRepository || "https://github.com/ocaml/opam-repository.git";
 
   await exec("brew", ["install", "opam"]);
   await exec("opam", ["init", "-yav", repository]);
-  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
+  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version, variant]);
   await exec("opam", ["install", "-y", "depext"]);
 }
 
@@ -96,8 +109,14 @@ export async function getOpam(
   version: string,
   repository: string
 ): Promise<void> {
+  const versionParts = version.split("+");
+  const variant = versionParts.slice(1).join("+");
+  version = versionParts[0];
   core.exportVariable("OPAMYES", "1");
-  if (osPlat === "win32") return acquireOpamWindows(version, repository);
-  else if (osPlat === "darwin") return acquireOpamDarwin(version, repository);
-  else if (osPlat === "linux") return acquireOpamLinux(version, repository);
+  if (osPlat === "win32")
+    return acquireOpamWindows(version, variant, repository);
+  else if (osPlat === "darwin")
+    return acquireOpamDarwin(version, variant, repository);
+  else if (osPlat === "linux")
+    return acquireOpamLinux(version, variant, repository);
 }
