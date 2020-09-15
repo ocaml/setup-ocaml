@@ -14,5 +14,5 @@ CURRENT_OCAML=$(opam list ocaml-variants --installed --columns version --short -
 if [ -z "$CURRENT_OCAML" ]; then CURRENT_OCAML=$(opam info ocaml --field=version --color=never) ; fi
 
 if [ "$CURRENT_OCAML" != "$OCAML_VV" ]; then
-  opam switch set "$OCAML_VV" || opam switch create "$OCAML_VV" "$OCAML_VV"
+  opam switch set "$OCAML_VV" 2>/dev/null || opam switch create "$OCAML_VV" "$OCAML_VV"
 fi
