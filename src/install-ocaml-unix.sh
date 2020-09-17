@@ -13,6 +13,15 @@ if [ "$OCAML_VARIANT" != "" ]; then OCAML_VV="$OCAML_VERSION+$OCAML_VARIANT" ; f
 CURRENT_OCAML=$(opam list ocaml-variants --installed --columns version --short --color=never)
 if [ -z "$CURRENT_OCAML" ]; then CURRENT_OCAML=$(opam info ocaml --field=version --color=never) ; fi
 
+OS_ID=$(eval echo $(cat /etc/os-release | grep -Po "(?<=^ID=)(.*)$"))
+OS_VERSION=$(eval echo $(cat /etc/os-release | grep -Po "(?<=^VERSION_ID=)(.*)$"))
+
+# fix musl-tools bug in ubuntu 18.04; ref: <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
+if [ "$OS_ID $OS_VERSION" = "ubuntu 18.04" ]; then
+    /usr/bin/sudo add-apt-repository -y ppa:avsm/musl
+    /usr/bin/sudo apt-get -y install musl-tools
+fi
+
 if [ "$CURRENT_OCAML" != "$OCAML_VV" ]; then
-  opam switch set "$OCAML_VV" 2>/dev/null || opam switch create "$OCAML_VV" "$OCAML_VV"
+    opam switch set "$OCAML_VV" 2>/dev/null || opam switch create "$OCAML_VV" "$OCAML_VV"
 fi
