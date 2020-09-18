@@ -81,8 +81,10 @@ jobs:
         id: vars
         shell: bash
         run: |
+          outputs() { for var in "$@" ; do echo steps.vars.outputs.${var}="${!var}"; echo ::set-output name=${var}::${!var}; done; }
+          MINGW_ARCH='x86_64'; case '${{ matrix.job.ocaml-version }}' in *+mingw32*) MINGW_ARCH='i686' ;; *+mingw64*) MINGW_ARCH='x86_64' ;; esac
           MSVC_ARCH=''; case '${{ matrix.job.ocaml-version }}' in *+msvc32*) MSVC_ARCH='x86' ;; *+msvc64*) MSVC_ARCH='x64' ;; esac
-          echo ::set-output name=MSVC_ARCH::${MSVC_ARCH}
+          outputs MINGW_ARCH MSVC_ARCH
 
       - name: Use OCaml ${{ matrix.job.ocaml-version }}
         uses: ./
@@ -102,3 +104,43 @@ jobs:
       - run: opam depext yaml --install --verbose --yes
         ## [2020-09] non-working/unavailable for MSVC OCaml variants
         if: ${{ !contains(matrix.job.ocaml-version, '+msvc') }}
+
+      - name: (lablgtk) extra 'MacOS' setup ${{ matrix.ocaml-version }}
+        if: runner.os == 'macOS'
+        shell:
+          bash --norc --noprofile -e -o pipefail -c "dos2unix '{0}' 2>/dev/null
+          ; source '{0}' ;"
+        run: |
+          brew install gtk+
+      - name: (lablgtk) extra 'Linux' setup ${{ matrix.ocaml-version }}
+        if: runner.os == 'Linux'
+        shell:
+          bash --norc --noprofile -e -o pipefail -c "dos2unix '{0}' 2>/dev/null
+          ; source '{0}' ;"
+        run: |
+          sudo apt-get install -qq -yy libexpat1-dev libgtk2.0-dev
+      - name:
+          (lablgtk) extra 'Windows [non-MSVC]' setup ${{ matrix.ocaml-version }}
+        if:
+          (runner.os == 'Windows' && !contains(matrix.job.ocaml-version,
+          '+msvc'))
+        shell:
+          bash --login --norc --noprofile -e -o pipefail -c "dos2unix '{0}'
+          2>/dev/null ; source '{0}' ;"
+        run: |
+          # ref: <https://www.reddit.com/r/ocaml/comments/5rt3gh/installing_lablgtk_on_windows> @@ <https://archive.is/6GSXF>
+          # * `cygwin-dl` and `cygwin-install` are from the 'depext-cygwinports' opam package (<https://github.com/fdopen/depext-cygwinports>)
+          eval "$(opam env)"
+          cygwin-dl --wait --quiet-mode --no-admin --no-desktop --packages mingw64-${{ steps.vars.outputs.MINGW_ARCH }}-glib2.0,mingw64-${{ steps.vars.outputs.MINGW_ARCH }}-gtk2.0,mingw64-${{ steps.vars.outputs.MINGW_ARCH }}-pango1.0,libgtk2.0_0,libgtk2.0_devel
+      - name: lablgtk install
+        ## [2020-09] non-working/unavailable for MSVC or musl OCaml variants
+        if:
+          ${{ !(contains(matrix.job.ocaml-version, '+msvc') ||
+          contains(matrix.job.ocaml-version, '+musl')) }}
+        shell:
+          bash --login --norc --noprofile -e -o pipefail -c "dos2unix '{0}'
+          2>/dev/null ; source '{0}' ;"
+        run: |
+          ocaml-env-exec () { ocaml-env >/dev/null 2>&1 && ocaml-env exec -- $* || $* ; } ## `ocaml-env` is not available for all ocaml switches
+          eval "$(opam env)"
+          ocaml-env-exec opam depext --install --verbose --yes lablgtk
