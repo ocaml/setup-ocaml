@@ -29,7 +29,7 @@ copy %toolPath%\setup-x86_64.exe %CYGWIN_ROOT%
 >>>>>>> ba59f81 (Change ~ don't install a user-accessible copy of the Cygwin setup program)
 set PATH=%CYGWIN_ROOT%\wrapperbin;%CYGWIN_ROOT%\bin;%PATH%
 dos2unix %__dirname%\install-ocaml-windows.sh
-bash -l %__dirname%\install-ocaml-windows.sh %version% %repository% %variant%
+bash --login %__dirname%\install-ocaml-windows.sh %version% %repository% %variant%
 @if %ERRORLEVEL% neq 0 exit /b 1
 unix2dos %__dirname%\opam.bat
 mkdir %CYGWIN_ROOT%\wrapperbin
