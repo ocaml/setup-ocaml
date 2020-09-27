@@ -16,6 +16,9 @@ if [ -z "$CURRENT_OCAML" ]; then CURRENT_OCAML=$(opam info ocaml --field=version
 OS_ID=$(eval echo $(cat /etc/os-release | grep -Po "(?<=^ID=)(.*)$"))
 OS_VERSION=$(eval echo $(cat /etc/os-release | grep -Po "(?<=^VERSION_ID=)(.*)$"))
 
+# add gcc/g++ multilib for '32bit' variants
+case "$OCAML_VARIANT" in *32bit*) /usr/bin/sudo apt-get -y install gcc-multilib g++-multilib ;; esac
+
 # fix musl-tools bug in ubuntu 18.04; ref: <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
 if [ "$OS_ID $OS_VERSION" = "ubuntu 18.04" ]; then
     /usr/bin/sudo add-apt-repository -y ppa:avsm/musl
