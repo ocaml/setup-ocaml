@@ -60,6 +60,7 @@ jobs:
           - { os: ubuntu-20.04, ocaml-version: "4.07.1+musl+flambda" }
           - { os: ubuntu-20.04, ocaml-version: 4.08.1 }
           - { os: ubuntu-20.04, ocaml-version: "4.08.1+musl+flambda" }
+          - { os: ubuntu-20.04, ocaml-version: "4.10.0+32bit" }
           - { os: ubuntu-20.04, ocaml-version: "4.10.1+fp+flambda" }
           - { os: ubuntu-20.04, ocaml-version: "4.10.1+musl+flambda" }
           - { os: ubuntu-20.04, ocaml-version: "4.10.1+musl+static+flambda" }
@@ -134,9 +135,11 @@ jobs:
           cygwin-dl --wait --quiet-mode --no-admin --no-desktop --packages mingw64-${{ steps.vars.outputs.MINGW_ARCH }}-glib2.0,mingw64-${{ steps.vars.outputs.MINGW_ARCH }}-gtk2.0,mingw64-${{ steps.vars.outputs.MINGW_ARCH }}-pango1.0,libgtk2.0_0,libgtk2.0_devel
       - name: lablgtk install
         ## [2020-09] non-working/unavailable for MSVC or musl OCaml variants
+        ## [2020-09] non-working for 32bit variant (see [GH:garrigue/lablgtk#64](https://github.com/garrigue/lablgtk/issues/64))
         if:
-          ${{ !(contains(matrix.job.ocaml-version, '+msvc') ||
-          contains(matrix.job.ocaml-version, '+musl')) }}
+          ${{ !( contains(matrix.job.ocaml-version, '+msvc') ||
+          contains(matrix.job.ocaml-version, '+musl') ||
+          contains(matrix.job.ocaml-version, '+32bit') ) }}
         shell:
           bash --login --norc --noprofile -e -o pipefail -c "dos2unix '{0}'
           2>/dev/null ; source '{0}' ;"
