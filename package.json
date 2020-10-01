@@ -10,7 +10,7 @@
     "build": "npm-run-all -p build:*"
   },
   "dependencies": {
-    "@actions/core": "1.2.5",
+    "@actions/core": "1.2.6",
     "@actions/tool-cache": "1.6.0"
   },
   "devDependencies": {
