@@ -1,6 +1,7 @@
 # Set up OCaml
 
 [![Main workflow](https://github.com/avsm/setup-ocaml/workflows/Main%20workflow/badge.svg?branch=master)](https://github.com/avsm/setup-ocaml/actions)
+[![CodeQL](https://github.com/avsm/setup-ocaml/workflows/CodeQL/badge.svg?branch=master)](https://github.com/avsm/setup-ocaml/actions)
 
 Set up an OCaml and opam environment and add to PATH.
 
