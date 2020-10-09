@@ -44,6 +44,12 @@ jobs:
       - name: Check formatting
         run: yarn fmt:check
 
+      - name: Check lint
+        run: yarn lint
+
+      - name: Check type
+        run: yarn typecheck
+
       - name: Ensure lib directory is up-to-date
         if: runner.os == 'Linux'
         shell: bash
