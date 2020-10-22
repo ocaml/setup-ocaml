@@ -13,6 +13,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Checkout the head of the pull request instead
+        run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
@@ -20,5 +26,5 @@ jobs:
       - name: Autobuild
         uses: github/codeql-action/autobuild@v1
 
-      - name: Perform CodeQL Analysis
+      - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v1
