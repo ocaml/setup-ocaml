@@ -49,7 +49,6 @@ async function acquireOpamWindows(version: string, customRepository: string) {
     repository,
   ]);
   core.addPath("c:\\cygwin\\bin");
-  core.addPath("c:\\cygwin\\usr\\x86_64-w64-mingw32\\sys-root\\mingw\\bin");
   core.addPath("c:\\cygwin\\wrapperbin");
 }
 
