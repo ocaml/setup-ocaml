@@ -17,11 +17,11 @@
     "import/extensions": [".ts"]
   },
   "rules": {
-    "@typescript-eslint/explicit-function-return-type": "off",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "sort-imports": "off",
     "import/first": "error",
     "import/newline-after-import": "error",
-    "import/no-duplicates": "error",
-    "simple-import-sort/sort": "error",
-    "sort-imports": "off"
+    "import/no-duplicates": "error"
   }
 }
