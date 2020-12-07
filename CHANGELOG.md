@@ -17,7 +17,8 @@ that require it.
 
 ### Security
 
-- Update the `@actions/core` package to address CVE-2020-15228.
+- Update the `@actions/core` package to address
+  [CVE-2020-15228](https://github.com/advisories/GHSA-mfwh-5m23-j46w).
 
 ## [1.1.2] - 2020-09-10
 
