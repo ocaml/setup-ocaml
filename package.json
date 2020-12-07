@@ -6,7 +6,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.ts\" --cache",
     "test": "jest",
-    "build:copy": "mkdir -p lib && shx cp src/*.{bat,cmd,sh} lib/",
+    "build:copy": "shx mkdir -p lib && shx cp src/*.{bat,cmd,sh} lib/",
     "build:setup-ocaml": "esbuild src/setup-ocaml.ts --bundle --outdir=lib --target=node12 --platform=node",
     "build": "npm-run-all -p build:*"
   },
