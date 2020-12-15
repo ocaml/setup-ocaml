@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+Reduce build time by exporting modified `OPAMJOBS` environment variable.
+
 ## [1.1.4] - 2020-12-07
 
 ### Changed
