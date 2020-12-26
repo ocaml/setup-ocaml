@@ -13,4 +13,4 @@ inputs:
     default: ""
 runs:
   using: node12
-  main: lib/setup-ocaml.js
+  main: dist/index.js

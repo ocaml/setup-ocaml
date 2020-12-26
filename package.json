@@ -6,20 +6,20 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.ts\" --cache",
     "test": "jest",
-    "build:copy": "mkdir -p lib && shx cp src/*.{bat,cmd,sh} lib/",
-    "build:setup-ocaml": "esbuild src/setup-ocaml.ts --bundle --outdir=lib --target=node12 --platform=node",
+    "build:copy": "mkdir -p dist && shx cp src/*.{bat,cmd,sh} dist/",
+    "build:setup-ocaml": "ncc build src/setup-ocaml.ts --out=dist --license=LICENSE.txt --v8-cache",
     "build": "npm-run-all -p build:*"
   },
   "dependencies": {
     "@actions/core": "1.2.6",
-    "@actions/tool-cache": "1.6.1"
+    "@actions/tool-cache": "1.6.1",
+    "@vercel/ncc": "0.26.1"
   },
   "devDependencies": {
     "@types/jest": "26.0.16",
     "@types/node": "14.14.10",
     "@typescript-eslint/eslint-plugin": "4.9.0",
     "@typescript-eslint/parser": "4.9.0",
-    "esbuild": "0.8.20",
     "eslint": "7.15.0",
     "eslint-config-prettier": "7.0.0",
     "eslint-plugin-import": "2.22.1",

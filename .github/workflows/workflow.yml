@@ -40,12 +40,12 @@ jobs:
       - name: Check type
         run: yarn typecheck
 
-      - name: Ensure lib directory is up-to-date
+      - name: Ensure dist directory is up-to-date
         if: runner.os == 'Linux'
         shell: bash
         run: |
           yarn build
-          if [ "$(git status lib --porcelain | wc -l)" -gt "0" ]; then
+          if [ "$(git status dist/*.js --porcelain | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
             exit 1
