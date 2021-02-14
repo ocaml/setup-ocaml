@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Ubuntu and macOS runners no longer display "No switch is currently installed."
+  before building the compiler.
+
 ## [1.1.6]
 
 ### Changed
