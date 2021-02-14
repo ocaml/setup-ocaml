@@ -74,10 +74,8 @@ async function acquireOpamLinux(version: string, customRepository: string) {
     opamVersion
   );
   core.addPath(toolPath);
-  await exec(
-    "sudo apt-get -y install bubblewrap ocaml-native-compilers ocaml-compiler-libs musl-tools"
-  );
-  await exec(`"${toolPath}/opam"`, ["init", "-yav", repository]);
+  await exec("sudo apt-get -y install bubblewrap musl-tools");
+  await exec(`"${toolPath}/opam"`, ["init", "--bare", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
   await exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
 }
@@ -87,7 +85,7 @@ async function acquireOpamDarwin(version: string, customRepository: string) {
     customRepository || "https://github.com/ocaml/opam-repository.git";
 
   await exec("brew", ["install", "opam"]);
-  await exec("opam", ["init", "-yav", repository]);
+  await exec("opam", ["init", "--bare", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
   await exec("opam", ["install", "-y", "depext"]);
 }
