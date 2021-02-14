@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Windows installs Cygwin to D:\cygwin, using faster Azure temporary storage.
+
 ## [1.1.5] - 2020-12-15
 
 ### Changed
