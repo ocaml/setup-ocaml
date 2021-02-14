@@ -75,7 +75,7 @@ async function acquireOpamLinux(version: string, customRepository: string) {
   );
   core.addPath(toolPath);
   await exec(
-    "sudo apt-get -y install bubblewrap ocaml-native-compilers ocaml-compiler-libs musl-tools"
+    "sudo apt-get -y install bubblewrap musl-tools"
   );
   await exec(`"${toolPath}/opam"`, ["init", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);

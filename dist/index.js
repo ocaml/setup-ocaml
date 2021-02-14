@@ -5055,7 +5055,7 @@ function acquireOpamLinux(version, customRepository) {
                 case 5:
                     toolPath = _a.sent();
                     core.addPath(toolPath);
-                    return [4 /*yield*/, exec_1.exec("sudo apt-get -y install bubblewrap ocaml-native-compilers ocaml-compiler-libs musl-tools")];
+                    return [4 /*yield*/, exec_1.exec("sudo apt-get -y install bubblewrap musl-tools")];
                 case 6:
                     _a.sent();
                     return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "-yav", repository])];
