@@ -5021,8 +5021,8 @@ function acquireOpamWindows(version, customRepository) {
                         ])];
                 case 6:
                     _a.sent();
-                    core.addPath("c:\\cygwin\\bin");
-                    core.addPath("c:\\cygwin\\wrapperbin");
+                    core.addPath("D:\\cygwin\\bin");
+                    core.addPath("D:\\cygwin\\wrapperbin");
                     return [2 /*return*/];
             }
         });

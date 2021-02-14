@@ -48,8 +48,8 @@ async function acquireOpamWindows(version: string, customRepository: string) {
     version,
     repository,
   ]);
-  core.addPath("c:\\cygwin\\bin");
-  core.addPath("c:\\cygwin\\wrapperbin");
+  core.addPath("D:\\cygwin\\bin");
+  core.addPath("D:\\cygwin\\wrapperbin");
 }
 
 async function acquireOpamLinux(version: string, customRepository: string) {
