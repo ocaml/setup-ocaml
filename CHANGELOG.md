@@ -14,6 +14,7 @@ and this project adheres to
   before building the compiler.
 - Ubuntu no longer installs the system ocaml packages.
 - macOS no longer builds two compilers on every run.
+- Upgrade opam to 2.0.8 for Linux VMs.
 
 ## [1.1.6]
 

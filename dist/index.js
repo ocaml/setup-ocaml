@@ -5034,7 +5034,7 @@ function acquireOpamLinux(version, customRepository) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    opamVersion = "2.0.7";
+                    opamVersion = "2.0.8";
                     fileName = getOpamFileName(opamVersion);
                     downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
                     repository = customRepository || "https://github.com/ocaml/opam-repository.git";
@@ -5050,7 +5050,7 @@ function acquireOpamLinux(version, customRepository) {
                     core.debug(error_2);
                     throw "Failed to download version " + opamVersion + ": " + error_2;
                 case 4:
-                    fs.chmodSync(downloadPath, "755");
+                    fs.chmodSync(downloadPath, 493);
                     return [4 /*yield*/, tc.cacheFile(downloadPath, "opam", "opam", opamVersion)];
                 case 5:
                     toolPath = _a.sent();

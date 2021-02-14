@@ -53,7 +53,7 @@ async function acquireOpamWindows(version: string, customRepository: string) {
 }
 
 async function acquireOpamLinux(version: string, customRepository: string) {
-  const opamVersion = "2.0.7";
+  const opamVersion = "2.0.8";
   const fileName = getOpamFileName(opamVersion);
   const downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
   const repository =
@@ -66,7 +66,7 @@ async function acquireOpamLinux(version: string, customRepository: string) {
     core.debug(error);
     throw `Failed to download version ${opamVersion}: ${error}`;
   }
-  fs.chmodSync(downloadPath, "755");
+  fs.chmodSync(downloadPath, 0o755);
   const toolPath: string = await tc.cacheFile(
     downloadPath,
     "opam",
