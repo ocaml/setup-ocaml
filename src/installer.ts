@@ -74,9 +74,7 @@ async function acquireOpamLinux(version: string, customRepository: string) {
     opamVersion
   );
   core.addPath(toolPath);
-  await exec(
-    "sudo apt-get -y install bubblewrap musl-tools"
-  );
+  await exec("sudo apt-get -y install bubblewrap musl-tools");
   await exec(`"${toolPath}/opam"`, ["init", "--bare", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
   await exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
