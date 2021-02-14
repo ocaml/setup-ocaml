@@ -45,7 +45,6 @@ jobs:
         shell: bash
         run: |
           yarn build
-          git update-index --assume-unchanged dist/index.js.cache
           if [ "$(git status dist --porcelain | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
