@@ -14,6 +14,7 @@ and this project adheres to
   before building the compiler.
 
 - Ubuntu no longer installs the system ocaml packages.
+- macOS no longer builds two compilers on every run.
 
 ## [1.1.6]
 

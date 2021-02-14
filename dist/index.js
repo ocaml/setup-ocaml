@@ -5058,7 +5058,7 @@ function acquireOpamLinux(version, customRepository) {
                     return [4 /*yield*/, exec_1.exec("sudo apt-get -y install bubblewrap musl-tools")];
                 case 6:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "-yav", repository])];
+                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "--bare", "-yav", repository])];
                 case 7:
                     _a.sent();
                     return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
@@ -5082,7 +5082,7 @@ function acquireOpamDarwin(version, customRepository) {
                     return [4 /*yield*/, exec_1.exec("brew", ["install", "opam"])];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["init", "-yav", repository])];
+                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-yav", repository])];
                 case 2:
                     _a.sent();
                     return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
