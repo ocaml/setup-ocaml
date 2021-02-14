@@ -12,7 +12,6 @@ and this project adheres to
 
 - Ubuntu and macOS runners no longer display "No switch is currently installed."
   before building the compiler.
-
 - Ubuntu no longer installs the system ocaml packages.
 - macOS no longer builds two compilers on every run.
 
