@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.7]
+
 ### Changed
 
 - Ubuntu and macOS runners no longer display "No switch is currently installed."
@@ -85,7 +87,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.6...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...HEAD
+[1.1.7]: https://github.com/avsm/setup-ocaml/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/avsm/setup-ocaml/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/avsm/setup-ocaml/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/avsm/setup-ocaml/compare/v1.1.3...v1.1.4
