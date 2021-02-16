@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.8]
+
 ### Changed
 
 - The Windows opam wrapper is fractionally less-archaically named opam.cmd, with
@@ -100,7 +102,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...HEAD
+[1.1.8]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...v1.1.8
 [1.1.7]: https://github.com/avsm/setup-ocaml/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/avsm/setup-ocaml/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/avsm/setup-ocaml/compare/v1.1.4...v1.1.5
