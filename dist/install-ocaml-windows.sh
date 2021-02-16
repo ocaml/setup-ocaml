@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export OPAMYES=1
 export OPAMJOBS=3
-set -ex
+set -eu
 echo Preparing Cygwin environment
 OPAM_REPOSITORY="$1"
 OPAM_DL_SUB_LINK=0.0.0.2
