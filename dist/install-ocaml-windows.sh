@@ -30,9 +30,10 @@ case "$SWITCH" in
     eval "$(ocaml-env cygwin --ms=vs2015 --no-opam --64)"
     ;;
 esac
-opam init -c "ocaml-variants.${SWITCH}" --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "$OPAM_REPOSITORY"
-opam config set jobs "$OPAMJOBS"
+opam init --bare --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "$OPAM_REPOSITORY"
 opam update
+opam switch set build 2>/dev/null || opam switch create build "ocaml-variants.${SWITCH}"
+opam config set jobs "$OPAMJOBS"
 is_msvc=0
 case "$SWITCH" in
   *msvc*)

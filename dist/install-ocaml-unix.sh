@@ -2,4 +2,4 @@
 
 set -ex
 
-opam switch set "$1" 2>/dev/null || opam switch create "$1" "$1"
+opam switch set build 2>/dev/null || opam switch create build "$1"
