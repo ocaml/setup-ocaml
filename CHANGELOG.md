@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- The Windows opam wrapper is fractionally less-archaically named opam.cmd, with
+  no loss in arcaneness.
+
 ## [1.1.7]
 
 ### Changed
