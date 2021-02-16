@@ -8,6 +8,7 @@
     "test": "jest",
     "build:copy": "mkdir -p dist && shx cp src/*.{bat,cmd,sh} dist/",
     "build:setup-ocaml": "ncc build src/setup-ocaml.ts --out=dist --license=LICENSE.txt",
+    "build:post": "ncc build src/post.ts --out=dist/post --license=LICENSE.txt",
     "build": "npm-run-all -p build:*"
   },
   "dependencies": {
