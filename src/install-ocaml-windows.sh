@@ -20,6 +20,7 @@ set -eu
 curl -fsSL -o "${OPAM_ARCH}.tar.xz" "${OPAM_URL}"
 tar -xf "${OPAM_ARCH}.tar.xz"
 "${OPAM_ARCH}/install.sh" --quiet --prefix=/usr
+rm -rf "${OPAM_ARCH}" "${OPAM_ARCH}.tar.xz"
 # if a msvc compiler must be compiled from source, we have to modify the
 # environment first
 case "$SWITCH" in
