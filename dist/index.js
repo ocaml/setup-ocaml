@@ -5023,7 +5023,6 @@ function acquireOpamWindows(version, customRepository) {
                         ])];
                 case 6:
                     _a.sent();
-                    core.addPath(path.join(cygwinRoot, "bin"));
                     core.addPath(path.join(cygwinRoot, "wrapperbin"));
                     return [2 /*return*/];
             }

@@ -15,6 +15,7 @@ and this project adheres to
 - Export `CYGWIN_ROOT` on the Windows runners, allowing bash to be invoked as
   `%CYGWIN_ROOT%\bin\bash`/`$env:CYGWIN_ROOT\bin\bash` (and similarly for Cygwin
   `setup-x86_64.exe`).
+- The Windows runner no longer prepends `%CYGWIN_ROOT%\bin` to `PATH`.
 
 ## [1.1.7]
 

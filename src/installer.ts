@@ -50,7 +50,6 @@ async function acquireOpamWindows(version: string, customRepository: string) {
     version,
     repository,
   ]);
-  core.addPath(path.join(cygwinRoot, "bin"));
   core.addPath(path.join(cygwinRoot, "wrapperbin"));
 }
 
