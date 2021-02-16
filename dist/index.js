@@ -4993,10 +4993,11 @@ function getOpamDownloadUrl(version, filename) {
 }
 function acquireOpamWindows(version, customRepository) {
     return __awaiter(this, void 0, void 0, function () {
-        var repository, downloadPath, error_1, toolPath;
+        var cygwinRoot, repository, downloadPath, error_1, toolPath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    cygwinRoot = "D:\\cygwin";
                     repository = customRepository ||
                         "https://github.com/fdopen/opam-repository-mingw.git#opam2";
                     _a.label = 1;
@@ -5013,6 +5014,7 @@ function acquireOpamWindows(version, customRepository) {
                 case 4: return [4 /*yield*/, tc.cacheFile(downloadPath, "setup-x86_64.exe", "cygwin", "1.0")];
                 case 5:
                     toolPath = _a.sent();
+                    core.exportVariable("CYGWIN_ROOT", cygwinRoot);
                     return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-windows.cmd", [
                             __dirname,
                             toolPath,
@@ -5021,8 +5023,8 @@ function acquireOpamWindows(version, customRepository) {
                         ])];
                 case 6:
                     _a.sent();
-                    core.addPath("D:\\cygwin\\bin");
-                    core.addPath("D:\\cygwin\\wrapperbin");
+                    core.addPath(path.join(cygwinRoot, "bin"));
+                    core.addPath(path.join(cygwinRoot, "wrapperbin"));
                     return [2 /*return*/];
             }
         });

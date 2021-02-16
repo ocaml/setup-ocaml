@@ -12,6 +12,9 @@ and this project adheres to
 
 - The Windows opam wrapper is fractionally less-archaically named opam.cmd, with
   no loss in arcaneness.
+- Export `CYGWIN_ROOT` on the Windows runners, allowing bash to be invoked as
+  `%CYGWIN_ROOT%\bin\bash`/`$env:CYGWIN_ROOT\bin\bash` (and similarly for Cygwin
+  `setup-x86_64.exe`).
 
 ## [1.1.7]
 
