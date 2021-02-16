@@ -31,12 +31,6 @@ jobs:
       - name: Install npm packages
         run: yarn --frozen-lockfile
 
-      - name: Check formatting
-        run: yarn fmt:check
-
-      - name: Check lint
-        run: yarn lint
-
       - name: Check type
         run: yarn typecheck
 
@@ -57,3 +51,11 @@ jobs:
           ocaml-version: ${{ matrix.ocaml-version }}
 
       - run: opam depext yaml --install --verbose --yes
+
+      - name: Check formatting
+        run: yarn fmt:check
+        if: always()
+
+      - name: Check lint
+        run: yarn lint
+        if: always()
