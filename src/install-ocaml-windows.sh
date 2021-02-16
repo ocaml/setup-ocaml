@@ -3,13 +3,7 @@ export OPAMYES=1
 export OPAMJOBS=3
 set -ex
 echo Preparing Cygwin environment
-if [ "$1" = "" ]; then
-  OCAML_VERSION="4.07.1"
-else
-  OCAML_VERSION="$1"
-fi
-OPAM_REPOSITORY="$2"
-SWITCH="${OCAML_VERSION}+mingw64c"
+OPAM_REPOSITORY="$1"
 OPAM_DL_SUB_LINK=0.0.0.2
 OPAM_URL="https://github.com/fdopen/opam-repository-mingw/releases/download/${OPAM_DL_SUB_LINK}/opam64.tar.xz"
 OPAM_ARCH=opam64
@@ -21,35 +15,4 @@ curl -fsSL -o "${OPAM_ARCH}.tar.xz" "${OPAM_URL}"
 tar -xf "${OPAM_ARCH}.tar.xz"
 "${OPAM_ARCH}/install.sh" --quiet --prefix=/usr
 rm -rf "${OPAM_ARCH}" "${OPAM_ARCH}.tar.xz"
-# if a msvc compiler must be compiled from source, we have to modify the
-# environment first
-case "$SWITCH" in
-  *msvc32)
-    eval "$(ocaml-env cygwin --ms=vs2015 --no-opam --32)"
-    ;;
-  *msvc64)
-    eval "$(ocaml-env cygwin --ms=vs2015 --no-opam --64)"
-    ;;
-esac
 opam init --bare --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "$OPAM_REPOSITORY"
-opam switch set build 2>/dev/null || opam switch create build "ocaml-variants.${SWITCH}"
-opam config set jobs "$OPAMJOBS"
-is_msvc=0
-case "$SWITCH" in
-  *msvc*)
-    is_msvc=1
-    eval "$(ocaml-env cygwin --ms=vs2015)"
-    ;;
-  *mingw*)
-    eval "$(ocaml-env cygwin)"
-    ;;
-  *)
-    echo "ocamlc reports a dubious system: ${ocaml_system}. Good luck!" >&2
-    eval "$(opam env)"
-    ;;
-esac
-if [ $is_msvc -eq 0 ]; then
-  opam install depext-cygwinports depext
-else
-  opam install depext
-fi

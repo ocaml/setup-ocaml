@@ -4930,6 +4930,18 @@ module.exports = v4;
 
 /***/ }),
 
+/***/ 42:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+exports.__esModule = true;
+exports.CYGWIN_ROOT = void 0;
+exports.CYGWIN_ROOT = "D:\\cygwin";
+
+
+/***/ }),
+
 /***/ 574:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -4980,6 +4992,7 @@ var fs = __nccwpck_require__(747);
 var os = __nccwpck_require__(87);
 var path = __nccwpck_require__(622);
 var util = __nccwpck_require__(669);
+var constants_1 = __nccwpck_require__(42);
 var osPlat = os.platform();
 var osArch = os.arch();
 function getOpamFileName(version) {
@@ -4991,13 +5004,12 @@ function getOpamFileName(version) {
 function getOpamDownloadUrl(version, filename) {
     return util.format("https://github.com/ocaml/opam/releases/download/%s/%s", version, filename);
 }
-function acquireOpamWindows(version, customRepository) {
+function acquireOpamWindows(customRepository) {
     return __awaiter(this, void 0, void 0, function () {
-        var cygwinRoot, repository, downloadPath, error_1, toolPath;
+        var repository, downloadPath, error_1, toolPath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    cygwinRoot = "D:\\cygwin";
                     repository = customRepository ||
                         "https://github.com/fdopen/opam-repository-mingw.git#opam2";
                     _a.label = 1;
@@ -5014,22 +5026,21 @@ function acquireOpamWindows(version, customRepository) {
                 case 4: return [4 /*yield*/, tc.cacheFile(downloadPath, "setup-x86_64.exe", "cygwin", "1.0")];
                 case 5:
                     toolPath = _a.sent();
-                    core.exportVariable("CYGWIN_ROOT", cygwinRoot);
+                    core.exportVariable("CYGWIN_ROOT", constants_1.CYGWIN_ROOT);
                     return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-windows.cmd", [
                             __dirname,
                             toolPath,
-                            version,
                             repository,
                         ])];
                 case 6:
                     _a.sent();
-                    core.addPath(path.join(cygwinRoot, "wrapperbin"));
+                    core.addPath(path.join(constants_1.CYGWIN_ROOT, "wrapperbin"));
                     return [2 /*return*/];
             }
         });
     });
 }
-function acquireOpamLinux(version, customRepository) {
+function acquireOpamLinux(customRepository) {
     return __awaiter(this, void 0, void 0, function () {
         var opamVersion, fileName, downloadUrl, repository, downloadPath, error_2, toolPath;
         return __generator(this, function (_a) {
@@ -5062,18 +5073,12 @@ function acquireOpamLinux(version, customRepository) {
                     return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "--bare", "-yav", repository])];
                 case 7:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
-                case 8:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["install", "-y", "depext"])];
-                case 9:
-                    _a.sent();
                     return [2 /*return*/];
             }
         });
     });
 }
-function acquireOpamDarwin(version, customRepository) {
+function acquireOpamDarwin(customRepository) {
     return __awaiter(this, void 0, void 0, function () {
         var repository;
         return __generator(this, function (_a) {
@@ -5086,27 +5091,21 @@ function acquireOpamDarwin(version, customRepository) {
                     return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-yav", repository])];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
-                case 3:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["install", "-y", "depext"])];
-                case 4:
-                    _a.sent();
                     return [2 /*return*/];
             }
         });
     });
 }
-function getOpam(version, repository) {
+function getOpam(repository) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             core.exportVariable("OPAMYES", "1");
             if (osPlat === "win32")
-                return [2 /*return*/, acquireOpamWindows(version, repository)];
+                return [2 /*return*/, acquireOpamWindows(repository)];
             else if (osPlat === "darwin")
-                return [2 /*return*/, acquireOpamDarwin(version, repository)];
-            else if (osPlat === "linux")
-                return [2 /*return*/, acquireOpamLinux(version, repository)];
+                return [2 /*return*/, acquireOpamDarwin(repository)];
+            /*if (osPlat === "linux")*/ else
+                return [2 /*return*/, acquireOpamLinux(repository)];
             return [2 /*return*/];
         });
     });
@@ -5159,29 +5158,51 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var core = __nccwpck_require__(186);
+var exec_1 = __nccwpck_require__(514);
 var os = __nccwpck_require__(87);
+var path = __nccwpck_require__(622);
+var constants_1 = __nccwpck_require__(42);
 var installer = __nccwpck_require__(574);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var numberOfProcessors, jobs, ocamlVersion, opamRepository, error_1;
+        var numberOfProcessors, jobs, ocamlVersion, opamRepository, installScript, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
+                    _a.trys.push([0, 7, , 8]);
                     numberOfProcessors = os.cpus().length;
                     jobs = numberOfProcessors + 2;
                     core.exportVariable("OPAMJOBS", jobs);
                     ocamlVersion = core.getInput("ocaml-version");
                     opamRepository = core.getInput("opam-repository");
-                    return [4 /*yield*/, installer.getOpam(ocamlVersion, opamRepository)];
+                    installScript = __nccwpck_require__.ab + "install-ocaml.sh";
+                    return [4 /*yield*/, installer.getOpam(opamRepository)];
                 case 1:
                     _a.sent();
-                    return [3 /*break*/, 3];
+                    if (!(os.platform() === "win32")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, exec_1.exec(path.join(constants_1.CYGWIN_ROOT, "bin", "bash"), [
+                            "-l",
+                            installScript,
+                            ocamlVersion,
+                        ])];
                 case 2:
+                    _a.sent();
+                    return [3 /*break*/, 5];
+                case 3: return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml.sh", [ocamlVersion])];
+                case 4:
+                    _a.sent();
+                    _a.label = 5;
+                case 5: return [4 /*yield*/, exec_1.exec("opam", ["install", "-y"].concat(os.platform() === "win32"
+                        ? ["depext-cygwinports", "depext"]
+                        : ["depext"]))];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 8];
+                case 7:
                     error_1 = _a.sent();
                     core.setFailed(error_1.toString());
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
             }
         });
     });

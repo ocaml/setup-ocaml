@@ -1,6 +1,9 @@
 import * as core from "@actions/core";
+import { exec } from "@actions/exec";
 import * as os from "os";
+import * as path from "path";
 
+import { CYGWIN_ROOT } from "./constants";
 import * as installer from "./installer";
 
 async function run() {
@@ -10,7 +13,25 @@ async function run() {
     core.exportVariable("OPAMJOBS", jobs);
     const ocamlVersion = core.getInput("ocaml-version");
     const opamRepository = core.getInput("opam-repository");
-    await installer.getOpam(ocamlVersion, opamRepository);
+    const installScript = path.join(__dirname, "install-ocaml.sh");
+    await installer.getOpam(opamRepository);
+    if (os.platform() === "win32") {
+      await exec(path.join(CYGWIN_ROOT, "bin", "bash"), [
+        "-l",
+        installScript,
+        ocamlVersion,
+      ]);
+    } else {
+      await exec(installScript, [ocamlVersion]);
+    }
+    await exec(
+      "opam",
+      ["install", "-y"].concat(
+        os.platform() === "win32"
+          ? ["depext-cygwinports", "depext"]
+          : ["depext"]
+      )
+    );
   } catch (error) {
     core.setFailed(error.toString());
   }
