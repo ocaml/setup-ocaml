@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+## Fixed
+
+- Further fix to switch initialisation
+
 ## [1.1.8]
 
 ### Changed
