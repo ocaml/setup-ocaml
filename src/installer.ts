@@ -25,6 +25,7 @@ function getOpamDownloadUrl(version: string, filename: string) {
 }
 
 async function acquireOpamWindows(version: string, customRepository: string) {
+  const cygwinRoot = "D:\\cygwin";
   const repository =
     customRepository ||
     "https://github.com/fdopen/opam-repository-mingw.git#opam2";
@@ -42,14 +43,14 @@ async function acquireOpamWindows(version: string, customRepository: string) {
     "cygwin",
     "1.0"
   );
+  core.exportVariable("CYGWIN_ROOT", cygwinRoot);
   await exec(path.join(__dirname, "install-ocaml-windows.cmd"), [
     __dirname,
     toolPath,
     version,
     repository,
   ]);
-  core.addPath("D:\\cygwin\\bin");
-  core.addPath("D:\\cygwin\\wrapperbin");
+  core.addPath(path.join(cygwinRoot, "wrapperbin"));
 }
 
 async function acquireOpamLinux(version: string, customRepository: string) {
