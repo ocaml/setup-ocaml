@@ -5070,7 +5070,7 @@ function acquireOpamLinux(customRepository) {
                     return [4 /*yield*/, exec_1.exec("sudo apt-get -y install bubblewrap musl-tools")];
                 case 6:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "--bare", "-yav", repository])];
+                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "--bare", "-ya", repository])];
                 case 7:
                     _a.sent();
                     return [2 /*return*/];
@@ -5088,7 +5088,7 @@ function acquireOpamDarwin(customRepository) {
                     return [4 /*yield*/, exec_1.exec("brew", ["install", "opam"])];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-yav", repository])];
+                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-ya", repository])];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
