@@ -1,4 +1,4 @@
 * text=auto
 *.sh text eol=lf
 *.cmd text eol=crlf
-lib/* linguist-generated
+dist/** -diff linguist-generated
