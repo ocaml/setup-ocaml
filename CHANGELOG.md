@@ -17,6 +17,10 @@ and this project adheres to
   `setup-x86_64.exe`).
 - The Windows runner no longer prepends `%CYGWIN_ROOT%\bin` to `PATH`.
 
+### Fixed
+
+- Switches in Unix are now properly initialized before running depext.
+
 ## [1.1.7]
 
 ### Changed
