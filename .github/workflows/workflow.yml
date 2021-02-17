@@ -1,8 +1,11 @@
 name: Main workflow
 
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+  # Prime the caches every Monday
+  schedule:
+    - cron: "14 3 * * MON"
 
 jobs:
   build:
@@ -44,6 +47,36 @@ jobs:
             git diff
             exit 1
           fi
+
+      - name: Generate date-based cache key
+        id: key
+        run: |
+          # Put year and week number in steps.key.outputs.week
+          # This command "works" for both PowerShell and POSIX shell
+          echo ":$(Write-Output ':')set-output name=week::$(Get-Date -UFormat '%Y-%W')-"
+          echo ":`echo :`set-output name=week::`date -u '+%Y-%W'`-"
+
+      - name: opam Cache
+        uses: actions/cache@v2
+        with:
+          path: .github/caches/opam
+          key: ${{ runner.os }}-${{ steps.key.outputs.week }}1
+
+      - name: compiler Cache
+        uses: actions/cache@v2
+        with:
+          path: .github/caches/compiler
+          key:
+            ${{ runner.os }}-${{ matrix.ocaml-version }}-${{
+            steps.key.outputs.week }}1
+
+      - name: build Cache
+        uses: actions/cache@v2
+        with:
+          path: .github/caches/build
+          key:
+            ${{ runner.os }}-${{ matrix.ocaml-version }}-${{
+            steps.key.outputs.week }}1-build
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: ./

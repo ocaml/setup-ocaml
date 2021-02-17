@@ -76,7 +76,7 @@ async function acquireOpamLinux(customRepository: string) {
   );
   core.addPath(toolPath);
   await exec("sudo apt-get -y install bubblewrap musl-tools");
-  await exec(`"${toolPath}/opam"`, ["init", "--bare", "-ya", repository]);
+  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [repository]);
 }
 
 async function acquireOpamDarwin(customRepository: string) {
@@ -84,7 +84,7 @@ async function acquireOpamDarwin(customRepository: string) {
     customRepository || "https://github.com/ocaml/opam-repository.git";
 
   await exec("brew", ["install", "opam"]);
-  await exec("opam", ["init", "--bare", "-ya", repository]);
+  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [repository]);
 }
 
 export async function getOpam(repository: string): Promise<void> {

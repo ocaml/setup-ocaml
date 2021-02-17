@@ -4937,6 +4937,7 @@ module.exports = v4;
 
 exports.__esModule = true;
 exports.CYGWIN_ROOT = void 0;
+/* This value must be kept in sync with install-ocaml-windows.cmd */
 exports.CYGWIN_ROOT = "D:\\cygwin";
 
 
@@ -5070,7 +5071,7 @@ function acquireOpamLinux(customRepository) {
                     return [4 /*yield*/, exec_1.exec("sudo apt-get -y install bubblewrap musl-tools")];
                 case 6:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "--bare", "-ya", repository])];
+                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [repository])];
                 case 7:
                     _a.sent();
                     return [2 /*return*/];
@@ -5088,7 +5089,7 @@ function acquireOpamDarwin(customRepository) {
                     return [4 /*yield*/, exec_1.exec("brew", ["install", "opam"])];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-ya", repository])];
+                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [repository])];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -5165,17 +5166,18 @@ var constants_1 = __nccwpck_require__(42);
 var installer = __nccwpck_require__(574);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var numberOfProcessors, jobs, ocamlVersion, opamRepository, installScript, error_1;
+        var numberOfProcessors, jobs, ocamlVersion, opamRepository, installScript, updateScript, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 7, , 8]);
+                    _a.trys.push([0, 11, , 12]);
                     numberOfProcessors = os.cpus().length;
                     jobs = numberOfProcessors + 2;
                     core.exportVariable("OPAMJOBS", jobs);
                     ocamlVersion = core.getInput("ocaml-version");
                     opamRepository = core.getInput("opam-repository");
                     installScript = __nccwpck_require__.ab + "install-ocaml.sh";
+                    updateScript = __nccwpck_require__.ab + "update-build-cache.sh";
                     return [4 /*yield*/, installer.getOpam(opamRepository)];
                 case 1:
                     _a.sent();
@@ -5197,12 +5199,25 @@ function run() {
                         : ["depext"]))];
                 case 6:
                     _a.sent();
-                    return [3 /*break*/, 8];
+                    if (!(os.platform() === "win32")) return [3 /*break*/, 8];
+                    return [4 /*yield*/, exec_1.exec(path.join(constants_1.CYGWIN_ROOT, "bin", "bash"), [
+                            "-l",
+                            updateScript,
+                            "compiler",
+                        ])];
                 case 7:
+                    _a.sent();
+                    return [3 /*break*/, 10];
+                case 8: return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "update-build-cache.sh", ["compiler"])];
+                case 9:
+                    _a.sent();
+                    _a.label = 10;
+                case 10: return [3 /*break*/, 12];
+                case 11:
                     error_1 = _a.sent();
                     core.setFailed(error_1.toString());
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 12];
+                case 12: return [2 /*return*/];
             }
         });
     });

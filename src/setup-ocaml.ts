@@ -14,6 +14,7 @@ async function run() {
     const ocamlVersion = core.getInput("ocaml-version");
     const opamRepository = core.getInput("opam-repository");
     const installScript = path.join(__dirname, "install-ocaml.sh");
+    const updateScript = path.join(__dirname, "update-build-cache.sh");
     await installer.getOpam(opamRepository);
     if (os.platform() === "win32") {
       await exec(path.join(CYGWIN_ROOT, "bin", "bash"), [
@@ -32,6 +33,16 @@ async function run() {
           : ["depext"]
       )
     );
+    /* XXX Platform-independent function for invoking a shell script */
+    if (os.platform() === "win32") {
+      await exec(path.join(CYGWIN_ROOT, "bin", "bash"), [
+        "-l",
+        updateScript,
+        "compiler",
+      ]);
+    } else {
+      await exec(updateScript, ["compiler"]);
+    }
   } catch (error) {
     core.setFailed(error.toString());
   }
