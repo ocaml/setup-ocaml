@@ -8,9 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.9]
+
 ## Fixed
 
-- Further fix to switch initialisation
+- Further fix to switch initialisation.
 
 ## [1.1.8]
 
@@ -106,7 +108,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...HEAD
+[1.1.9]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...v1.1.9
 [1.1.8]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...v1.1.8
 [1.1.7]: https://github.com/avsm/setup-ocaml/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/avsm/setup-ocaml/compare/v1.1.5...v1.1.6
