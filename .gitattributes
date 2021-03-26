@@ -1,4 +1,0 @@
-* text=auto
-*.sh text eol=lf
-*.cmd text eol=crlf
-dist/** -diff linguist-generated

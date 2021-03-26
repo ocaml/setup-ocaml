@@ -10,47 +10,76 @@ Set up an OCaml and opam environment in
 
 The action does the following:
 
-- **Ubuntu**: Installs the latest opam with sandboxing active
-- **macOS**: Installs the latest opam from Homebrew with sandboxing active
-- **Windows**: Installs Cygwin and the
-  [fdopen fork](https://fdopen.github.io/opam-repository-mingw) with mingw64c
+#### Main
 
-The repository is initialised to the default one, and then the following plugins
-are installed:
+1. Change the file system behavioral parameters
+   - **Windows only**
+1. Retrieve the Cygwin cache
+   - **Windows only**
+   - If the cache already exists
+1. Retrieve the opam cache
+   - If the cache already exists
+1. Prepare the Cygwin environment
+   - **Windows only**
+1. Save the Cygwin cache
+   - **Windows only**
+1. Install opam
+1. Initialise the opam state
+1. Install the OCaml compiler
+   - If the opam cache was not hit
+1. Save the opam cache
+   - If the opam cache was not hit
+1. Retrieve the opam download cache
+1. Install depext
+   - On Windows, not only `opam-depext` is installed, but `depext-cygwinports`
+     is installed as well
+1. Retrieve the dune cache
+   - If the dune cache feature is enabled
+   - If the cache already exists
+1. Install the latest dune and enable the dune cache feature
+   - If the dune cache feature is enabled
+1. Pin the opam files, if they exist
+   - If the opam pin feature is not disabled
+   - If there is an opam file in the workspace that matches the glob pattern
+1. Install the system dependencies required by the opam files via depext
+   - If the opam depext feature is enabled
+   - If there is an opam file in the workspace that matches the glob pattern
 
-- `opam-depext`
+#### Post
 
-The `opam` binary is added to the `PATH` for subsequent actions, so that
-executing `opam` commands will just work after that.
+The reason for not caching opam stuff in the post stage (more precisely, why you
+can't) is due to the size of the cache and repeatability. They should be cached
+immediately after initialisation to minimize the size of the cache.
+
+1. Remove oldest dune cache files to free space
+   - If the dune cache feature is enabled
+1. Save the dune cache
+   - If the dune cache feature is enabled
+1. Save the opam download cache
 
 ## Usage
 
-### How to specify the version of the Action
-
-There is a point that is particularly easy to misunderstand. It's where you
-specify the version of the action _itself_.
+We adhere to [semantic versioning](https://semver.org), it's safe to use the
+major version (`v2`) in your workflow. If you use the master branch, this could
+break your workflow when we publish a breaking update and increase the major
+version.
 
 ```yml
-- name: Use OCaml ${{ matrix.ocaml-version }}
-  uses: ocaml/setup-ocaml@v1
+- name: Use OCaml ${{ matrix.ocaml-compiler }}
+  uses: ocaml/setup-ocaml@v2
   #                     ^^^
   with:
-    ocaml-version: ${{ matrix.ocaml-version }}
+    ocaml-compiler: ${{ matrix.ocaml-compiler }}
 ```
-
-We recommend that you include the version of the action. We adhere to
-[semantic versioning](https://semver.org), it's safe to use the major version
-(`v1`) in your workflow. If you use the master branch, this could break your
-workflow when we publish a breaking update and increase the major version.
 
 ```yml
 steps:
   # Reference the major version of a release (most recommended)
-  - uses: ocaml/setup-ocaml@v1
+  - uses: ocaml/setup-ocaml@v2
   # Reference a specific commit (most strict)
-  - uses: ocaml/setup-ocaml@ab6ba4d
+  - uses: ocaml/setup-ocaml@<SHA>
   # Reference a semver version of a release (not recommended)
-  - uses: ocaml/setup-ocaml@v1.0.1
+  - uses: ocaml/setup-ocaml@v2.0.0
   # Reference a branch (most dangerous)
   - uses: ocaml/setup-ocaml@master
 ```
@@ -58,8 +87,12 @@ steps:
 ### Example workflow
 
 See the
-[Hello World OCaml Action](https://github.com/ocaml/hello-world-action-ocaml)
+[Hello World OCaml Action](https://github.com/avsm/hello-world-action-ocaml)
 that uses Dune and opam to build a simple library.
+
+It's possible to feed different values to the input depending on the platform of
+the runner. The syntax of GitHub's workflows is flexible enough to offer several
+methods to do this.
 
 ```yml
 name: Main workflow
@@ -77,11 +110,8 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-        ocaml-version:
-          - 4.11.0
-          - 4.10.1
-          - 4.09.1
-          - 4.08.1
+        ocaml-compiler:
+          - 4.12.x
 
     runs-on: ${{ matrix.os }}
 
@@ -89,111 +119,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use OCaml ${{ matrix.ocaml-version }}
-        uses: ocaml/setup-ocaml@v1
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - run: opam pin add hello.dev . --no-action
-
-      - run: opam depext hello --yes --with-doc --with-test
-
-      - run: opam install . --deps-only --with-doc --with-test
+      - run: opam install . --deps-only
 
       - run: opam exec -- dune build
 
       - run: opam exec -- dune runtest
 ```
 
-### What is the difference between opam dependencies and depext dependencies?
+#### What is the difference between opam dependencies and depext dependencies?
 
 - opam dependencies: opam packages installed by `opam install`.
-- depext dependencies: System packages installed by `apt install`,
+- depext dependencies: System packages installed by `apt-get install`,
   `yum install`, `brew install`, etc.
-
-For example, the opam package called
-[ocurl](https://opam.ocaml.org/packages/ocurl) requires `libcurl4-gnutls-dev` on
-the Ubuntu VM, and depext handles the distribution-specific installation of opam
-packages' external dependencies for such opam packages.
-
-## Inputs
-
-- `ocaml-version`: the full version of the OCaml compiler (default 4.08.1)
-- `opam-repository`: the URL of the repository opam will use for installing
-  packages. The default "" will select
-  `https://github.com/ocaml/opam-repository.git` for Ubuntu and macOS and
-  `https://github.com/fdopen/opam-repository-mingw.git#opam2` for Windows.
 
 ## Advanced Configurations
 
-It is possible to feed different values to `opam-repository` depending on the
-platform of the runner. The syntax of Github's workflows is flexible enough to
-offer several methods to do this.
+See [Examples](examples.md) for more complex patterns.
 
-For example, using the strategy matrix:
+## Inputs
 
-```yml
-strategy:
-  fail-fast: false
-  matrix:
-    os:
-      - macos-latest
-      - ubuntu-latest
-      - windows-latest
-    include:
-      - os: macos-latest
-        opam-repo: https://github.com/ocaml/opam-repository.git
-      - os: ubuntu-latest
-        opam-repo: https://github.com/ocaml/opam-repository.git
-      - os: windows-latest
-        opam-repo: https://github.com/fdopen/opam-repository-mingw.git#opam2
-
-runs-on: ${{ matrix.os }}
-
-steps:
-  - name: Use OCaml with repo ${{ matrix.opam-repo }}
-    uses: ocaml/setup-ocaml@v1
-    with:
-      opam-repository: ${{ matrix.opam-repo }}
-```
-
-Using a custom step to choose between the values:
-
-```yml
-steps:
-  - id: repo
-    shell: bash
-    run: |
-      if [ "$RUNNER_OS" == "Windows" ]; then
-        echo "::set-output name=url::https://github.com/fdopen/opam-repository-mingw.git#opam2"
-      elif [ "$RUNNER_OS" == "macOS" ]; then
-        echo "::set-output name=url::https://github.com/custom/opam-repository.git#macOS"
-      else
-        echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
-      fi
-
-  - name: Use OCaml with repo ${{ steps.repo.url }}
-    uses: ocaml/setup-ocaml@v1
-    with:
-      opam-repository: ${{ steps.repo.url }}
-```
-
-Using several conditional setup steps:
-
-```yml
-steps:
-  - name: Use OCaml on Windows
-    uses: ocaml/setup-ocaml@v1
-    if: runner.os == 'Windows'
-    with:
-      ocaml-repository: https://github.com/fdopen/opam-repository-mingw.git#opam2
-
-  - name: Use OCaml on Unix
-    uses: ocaml/setup-ocaml@v1
-    if: runner.os != 'Windows'
-    with:
-      opam-repository: https://github.com/ocaml/opam-repository.git
-```
+| Name                      | Required | Description                                                                                                                                                             | Type   | Default  |
+| ------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
+| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma.                                                                                 | string |          |
+| `opam-repository`         | No       | The URL of the repository to fetch the packages from.                                                                                                                   | string |          |
+| `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                             | bool   | `true`   |
+| `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                          | bool   | `true`   |
+| `opam-depext-flags`       | No       | The flags for the opam depext command. The flags must be separated by the comma.                                                                                        | string |          |
+| `opam-local-packages`     | No       | The local packages to be used by `opam-pin` or `opam-depext`. See [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob) for supported patterns. | string | `*.opam` |
+| `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                    | bool   | `false`  |
+| `dune-cache`              | No       | Enable the dune cache feature.                                                                                                                                          | bool   | `false`  |
+| `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                           | string | `v1`     |
 
 ## Roadmap
 

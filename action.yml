@@ -5,12 +5,47 @@ branding:
   icon: package
   color: orange
 inputs:
-  ocaml-version:
-    description: Version of the OCaml compiler to initialise
-    default: 4.08.1
+  ocaml-compiler:
+    description: The OCaml compiler packages to initialise.
+    required: true
   opam-repository:
-    description: URL of the repository to fetch packages from
-    default: ""
+    description: The URL of the repository to fetch the packages from.
+    required: false
+    default:
+  opam-pin:
+    description: Enable the automation feature for opam pin.
+    required: false
+    default: true
+  opam-depext:
+    description: Enable the automation feature for opam depext.
+    required: false
+    default: true
+  opam-depext-flags:
+    description: The flags for the opam depext command.
+    required: false
+    default:
+  opam-local-packages:
+    description: The local packages to be used by `opam-pin` or `opam-depext`.
+    required: false
+    default: "*.opam"
+  opam-disable-sandboxing:
+    description: Disable the opam sandboxing feature.
+    required: false
+    default: false
+  dune-cache:
+    description: Enable the dune cache feature.
+    required: false
+    default: false
+  cache-prefix:
+    description: The prefix of the cache keys.
+    required: false
+    default: v1
+  github-token:
+    description: DO NOT SET THIS.
+    required: false
+    default: ${{ github.token }}
 runs:
   using: node12
   main: dist/index.js
+  post: dist/post/index.js
+  post-if: success()

@@ -8,6 +8,68 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Added semver style version matching support.
+- Added `ocaml-compiler` input instead of `ocaml-version`.
+- Cache opam root (`~/.opam` on Unix, `D:\.opam` on Windows), opam
+  download-cache (`~/.opam/download-cache` on Unix, `D:\.opam\download-cache` on
+  Windows), and opam local switch (`_opam`).
+- If `dune-cache` enabled, install dune, automatically configure the dune cache
+  for the most efficient use in CI (exports `DUNE_CACHE=enabled`,
+  `DUNE_CACHE_TRANSPORT=direct`. TRANSPORT must be `direct`, not `daemon`, to
+  speed up the opam install process and to support Windows:
+  https://github.com/ocaml/dune/issues/4166,
+  https://github.com/ocaml/dune/issues/4167), and share the dune cache directory
+  for each run.
+- If `opam-pin` is enabled, pin the local packages specified by
+  `opam-local-packages`.
+- If `opam-depext` is enabled, install the system dependencies specified by
+  `opam-local-packages` via depext
+- If `opam-disable-sandboxing` is enabled, sandboxing is disabled for all
+  platforms except Windows. (Sandboxing is always disabled on the Windows
+  runners due to limitations of opam.)
+- The profiling functionality allows us to check the duration of each group if
+  debug mode is enabled.
+  (https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging)
+
+### Changed
+
+- Clean the log output by grouping some operations.
+- The compiler will be initialised in all platforms with an opam local switch to
+  eliminate differences between platforms and prepare for full dependency
+  caching in the future.
+- The macOS and Ubuntu runners install and cache opam from the GitHub release
+  directly without the system package manager.
+- The macOS and Ubuntu runners install `darcs` and `mercurial`.
+- The Windows runners install `mercurial`.
+- Export `OPAMCOLOR=always`.
+- Export `OPAMERRLOGLEN=0`.
+- Export `OPAMPRECISETRACKING=1`.
+- Export `OPAMSOLVERTIMEOUT=500`.
+- Export `OPAMROOT=D:\.opam` on the Windows runners.
+- Export `OPAMVERBOSE=true` if the actions debug mode is enabled.
+  (https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging)
+- Export `MSYS=winsymlinks:native` for `@actions/cache` on the Windows runners.
+- Export `HOME=%USERPROFILE%` for opam on the Windows runners.
+
+### Removed
+
+- The `ocaml-version` input has been removed. Use the `ocaml-compiler` instead.
+- The simplified version specifying scheme (e.g. `4.12.0`) support has been
+  removed.
+
+### Fixed
+
+- Use the appropriate file system behavior parameters on the Windows runners.
+  (`R2L:1`, `R2R:1`)
+- Add `ppa: avsm/musl` on 18.04 and older Ubuntu runners.
+- Do not install `bubblewrap` on the Ubuntu 16.04 runner to avoid the failure.
+- Pass `--enable-shell-hook` to `opam init` fixes a bug that must be run via
+  opam exec in subsequent steps.
+- The Ubuntu runners install `gcc-multilib`, `g++-multilib` for
+  `ocaml-option-32bit`.
+
 ## [1.1.11]
 
 ### Changed
@@ -23,7 +85,7 @@ and this project adheres to
 
 ## [1.1.9]
 
-## Fixed
+### Fixed
 
 - Further fix to switch initialisation.
 
