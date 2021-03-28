@@ -124,7 +124,7 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - run: opam install . --deps-only
+      - run: opam install . --deps-only --with-test
 
       - run: opam exec -- dune build
 
