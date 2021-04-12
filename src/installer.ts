@@ -85,6 +85,7 @@ async function acquireOpamDarwin(version: string, customRepository: string) {
   const repository =
     customRepository || "https://github.com/ocaml/opam-repository.git";
 
+  await exec("brew", ["update"]);
   await exec("brew", ["install", "opam"]);
   await exec("opam", ["init", "--bare", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
