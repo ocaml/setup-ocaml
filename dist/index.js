@@ -5080,17 +5080,20 @@ function acquireOpamDarwin(version, customRepository) {
             switch (_a.label) {
                 case 0:
                     repository = customRepository || "https://github.com/ocaml/opam-repository.git";
-                    return [4 /*yield*/, exec_1.exec("brew", ["install", "opam"])];
+                    return [4 /*yield*/, exec_1.exec("brew", ["update"])];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-yav", repository])];
+                    return [4 /*yield*/, exec_1.exec("brew", ["install", "opam"])];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
+                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-yav", repository])];
                 case 3:
                     _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["install", "-y", "depext"])];
+                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
                 case 4:
+                    _a.sent();
+                    return [4 /*yield*/, exec_1.exec("opam", ["install", "-y", "depext"])];
+                case 5:
                     _a.sent();
                     return [2 /*return*/];
             }

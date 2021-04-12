@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Run brew update before set up to avoid an issue with Bintray transition
+  period.
+
 ## [1.1.9]
 
 ## Fixed
