@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+- Stop setting switch jobs variable on Windows (`OPAMJOBS` is sufficient).
+
 ## [1.1.10]
 
 ### Changed
