@@ -1,4 +1,3 @@
-module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -198,6 +197,7 @@ exports.getInput = getInput;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
+    process.stdout.write(os.EOL);
     command_1.issueCommand('set-output', { name }, value);
 }
 exports.setOutput = setOutput;
@@ -2183,7 +2183,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const semver = __importStar(__nccwpck_require__(562));
-const core_1 = __nccwpck_require__(186);
+const core_1 = __nccwpck_require__(705);
 // needs to be require for core node modules to be mocked
 /* eslint @typescript-eslint/no-require-imports: 0 */
 const os = __nccwpck_require__(87);
@@ -2295,7 +2295,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(186));
+const core = __importStar(__nccwpck_require__(705));
 /**
  * Internal class for retries
  */
@@ -2375,7 +2375,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(186));
+const core = __importStar(__nccwpck_require__(705));
 const io = __importStar(__nccwpck_require__(436));
 const fs = __importStar(__nccwpck_require__(747));
 const mm = __importStar(__nccwpck_require__(473));
@@ -2960,6 +2960,399 @@ function _unique(values) {
     return Array.from(new Set(values));
 }
 //# sourceMappingURL=tool-cache.js.map
+
+/***/ }),
+
+/***/ 532:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const os = __importStar(__nccwpck_require__(87));
+const utils_1 = __nccwpck_require__(576);
+/**
+ * Commands
+ *
+ * Command Format:
+ *   ::name key=value,key=value::message
+ *
+ * Examples:
+ *   ::warning::This is the message
+ *   ::set-env name=MY_VAR::some value
+ */
+function issueCommand(command, properties, message) {
+    const cmd = new Command(command, properties, message);
+    process.stdout.write(cmd.toString() + os.EOL);
+}
+exports.issueCommand = issueCommand;
+function issue(name, message = '') {
+    issueCommand(name, {}, message);
+}
+exports.issue = issue;
+const CMD_STRING = '::';
+class Command {
+    constructor(command, properties, message) {
+        if (!command) {
+            command = 'missing.command';
+        }
+        this.command = command;
+        this.properties = properties;
+        this.message = message;
+    }
+    toString() {
+        let cmdStr = CMD_STRING + this.command;
+        if (this.properties && Object.keys(this.properties).length > 0) {
+            cmdStr += ' ';
+            let first = true;
+            for (const key in this.properties) {
+                if (this.properties.hasOwnProperty(key)) {
+                    const val = this.properties[key];
+                    if (val) {
+                        if (first) {
+                            first = false;
+                        }
+                        else {
+                            cmdStr += ',';
+                        }
+                        cmdStr += `${key}=${escapeProperty(val)}`;
+                    }
+                }
+            }
+        }
+        cmdStr += `${CMD_STRING}${escapeData(this.message)}`;
+        return cmdStr;
+    }
+}
+function escapeData(s) {
+    return utils_1.toCommandValue(s)
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A');
+}
+function escapeProperty(s) {
+    return utils_1.toCommandValue(s)
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A')
+        .replace(/:/g, '%3A')
+        .replace(/,/g, '%2C');
+}
+//# sourceMappingURL=command.js.map
+
+/***/ }),
+
+/***/ 705:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const command_1 = __nccwpck_require__(532);
+const file_command_1 = __nccwpck_require__(637);
+const utils_1 = __nccwpck_require__(576);
+const os = __importStar(__nccwpck_require__(87));
+const path = __importStar(__nccwpck_require__(622));
+/**
+ * The code to exit an action
+ */
+var ExitCode;
+(function (ExitCode) {
+    /**
+     * A code indicating that the action was successful
+     */
+    ExitCode[ExitCode["Success"] = 0] = "Success";
+    /**
+     * A code indicating that the action was a failure
+     */
+    ExitCode[ExitCode["Failure"] = 1] = "Failure";
+})(ExitCode = exports.ExitCode || (exports.ExitCode = {}));
+//-----------------------------------------------------------------------
+// Variables
+//-----------------------------------------------------------------------
+/**
+ * Sets env variable for this action and future actions in the job
+ * @param name the name of the variable to set
+ * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function exportVariable(name, val) {
+    const convertedVal = utils_1.toCommandValue(val);
+    process.env[name] = convertedVal;
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        file_command_1.issueCommand('ENV', commandValue);
+    }
+    else {
+        command_1.issueCommand('set-env', { name }, convertedVal);
+    }
+}
+exports.exportVariable = exportVariable;
+/**
+ * Registers a secret which will get masked from logs
+ * @param secret value of the secret
+ */
+function setSecret(secret) {
+    command_1.issueCommand('add-mask', {}, secret);
+}
+exports.setSecret = setSecret;
+/**
+ * Prepends inputPath to the PATH (for this action and future actions)
+ * @param inputPath
+ */
+function addPath(inputPath) {
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        file_command_1.issueCommand('PATH', inputPath);
+    }
+    else {
+        command_1.issueCommand('add-path', {}, inputPath);
+    }
+    process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
+}
+exports.addPath = addPath;
+/**
+ * Gets the value of an input.  The value is also trimmed.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string
+ */
+function getInput(name, options) {
+    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+    if (options && options.required && !val) {
+        throw new Error(`Input required and not supplied: ${name}`);
+    }
+    return val.trim();
+}
+exports.getInput = getInput;
+/**
+ * Sets the value of an output.
+ *
+ * @param     name     name of the output to set
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function setOutput(name, value) {
+    command_1.issueCommand('set-output', { name }, value);
+}
+exports.setOutput = setOutput;
+/**
+ * Enables or disables the echoing of commands into stdout for the rest of the step.
+ * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
+ *
+ */
+function setCommandEcho(enabled) {
+    command_1.issue('echo', enabled ? 'on' : 'off');
+}
+exports.setCommandEcho = setCommandEcho;
+//-----------------------------------------------------------------------
+// Results
+//-----------------------------------------------------------------------
+/**
+ * Sets the action status to failed.
+ * When the action exits it will be with an exit code of 1
+ * @param message add error issue message
+ */
+function setFailed(message) {
+    process.exitCode = ExitCode.Failure;
+    error(message);
+}
+exports.setFailed = setFailed;
+//-----------------------------------------------------------------------
+// Logging Commands
+//-----------------------------------------------------------------------
+/**
+ * Gets whether Actions Step Debug is on or not
+ */
+function isDebug() {
+    return process.env['RUNNER_DEBUG'] === '1';
+}
+exports.isDebug = isDebug;
+/**
+ * Writes debug message to user log
+ * @param message debug message
+ */
+function debug(message) {
+    command_1.issueCommand('debug', {}, message);
+}
+exports.debug = debug;
+/**
+ * Adds an error issue
+ * @param message error issue message. Errors will be converted to string via toString()
+ */
+function error(message) {
+    command_1.issue('error', message instanceof Error ? message.toString() : message);
+}
+exports.error = error;
+/**
+ * Adds an warning issue
+ * @param message warning issue message. Errors will be converted to string via toString()
+ */
+function warning(message) {
+    command_1.issue('warning', message instanceof Error ? message.toString() : message);
+}
+exports.warning = warning;
+/**
+ * Writes info to log with console.log.
+ * @param message info message
+ */
+function info(message) {
+    process.stdout.write(message + os.EOL);
+}
+exports.info = info;
+/**
+ * Begin an output group.
+ *
+ * Output until the next `groupEnd` will be foldable in this group
+ *
+ * @param name The name of the output group
+ */
+function startGroup(name) {
+    command_1.issue('group', name);
+}
+exports.startGroup = startGroup;
+/**
+ * End an output group.
+ */
+function endGroup() {
+    command_1.issue('endgroup');
+}
+exports.endGroup = endGroup;
+/**
+ * Wrap an asynchronous function call in a group.
+ *
+ * Returns the same type as the function itself.
+ *
+ * @param name The name of the group
+ * @param fn The function to wrap in the group
+ */
+function group(name, fn) {
+    return __awaiter(this, void 0, void 0, function* () {
+        startGroup(name);
+        let result;
+        try {
+            result = yield fn();
+        }
+        finally {
+            endGroup();
+        }
+        return result;
+    });
+}
+exports.group = group;
+//-----------------------------------------------------------------------
+// Wrapper action state
+//-----------------------------------------------------------------------
+/**
+ * Saves state for current action, the state can only be retrieved by this action's post job execution.
+ *
+ * @param     name     name of the state to store
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function saveState(name, value) {
+    command_1.issueCommand('save-state', { name }, value);
+}
+exports.saveState = saveState;
+/**
+ * Gets the value of an state set by this action's main execution.
+ *
+ * @param     name     name of the state to get
+ * @returns   string
+ */
+function getState(name) {
+    return process.env[`STATE_${name}`] || '';
+}
+exports.getState = getState;
+//# sourceMappingURL=core.js.map
+
+/***/ }),
+
+/***/ 637:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+// For internal use, subject to change.
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(__nccwpck_require__(747));
+const os = __importStar(__nccwpck_require__(87));
+const utils_1 = __nccwpck_require__(576);
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
+    });
+}
+exports.issueCommand = issueCommand;
+//# sourceMappingURL=file-command.js.map
+
+/***/ }),
+
+/***/ 576:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
+//# sourceMappingURL=utils.js.map
 
 /***/ }),
 
@@ -4930,270 +5323,6 @@ module.exports = v4;
 
 /***/ }),
 
-/***/ 574:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.getOpam = void 0;
-var core = __nccwpck_require__(186);
-var exec_1 = __nccwpck_require__(514);
-var tc = __nccwpck_require__(784);
-var fs = __nccwpck_require__(747);
-var os = __nccwpck_require__(87);
-var path = __nccwpck_require__(622);
-var util = __nccwpck_require__(669);
-var osPlat = os.platform();
-var osArch = os.arch();
-function getOpamFileName(version) {
-    var platform = osPlat === "darwin" ? "macos" : osPlat;
-    var arch = osArch === "x64" ? "x86_64" : "i686";
-    var filename = util.format("opam-%s-%s-%s", version, arch, platform);
-    return filename;
-}
-function getOpamDownloadUrl(version, filename) {
-    return util.format("https://github.com/ocaml/opam/releases/download/%s/%s", version, filename);
-}
-function acquireOpamWindows(version, customRepository) {
-    return __awaiter(this, void 0, void 0, function () {
-        var cygwinRoot, repository, downloadPath, error_1, toolPath;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    cygwinRoot = "D:\\cygwin";
-                    repository = customRepository ||
-                        "https://github.com/fdopen/opam-repository-mingw.git#opam2";
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, tc.downloadTool("https://cygwin.com/setup-x86_64.exe")];
-                case 2:
-                    downloadPath = _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_1 = _a.sent();
-                    core.debug(error_1);
-                    throw "Failed to download cygwin: " + error_1;
-                case 4: return [4 /*yield*/, tc.cacheFile(downloadPath, "setup-x86_64.exe", "cygwin", "1.0")];
-                case 5:
-                    toolPath = _a.sent();
-                    core.exportVariable("CYGWIN_ROOT", cygwinRoot);
-                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-windows.cmd", [
-                            __dirname,
-                            toolPath,
-                            version,
-                            repository,
-                        ])];
-                case 6:
-                    _a.sent();
-                    core.addPath(path.join(cygwinRoot, "wrapperbin"));
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function acquireOpamLinux(version, customRepository) {
-    return __awaiter(this, void 0, void 0, function () {
-        var opamVersion, fileName, downloadUrl, repository, downloadPath, error_2, toolPath;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    opamVersion = "2.0.8";
-                    fileName = getOpamFileName(opamVersion);
-                    downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
-                    repository = customRepository || "https://github.com/ocaml/opam-repository.git";
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, tc.downloadTool(downloadUrl)];
-                case 2:
-                    downloadPath = _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_2 = _a.sent();
-                    core.debug(error_2);
-                    throw "Failed to download version " + opamVersion + ": " + error_2;
-                case 4:
-                    fs.chmodSync(downloadPath, 493);
-                    return [4 /*yield*/, tc.cacheFile(downloadPath, "opam", "opam", opamVersion)];
-                case 5:
-                    toolPath = _a.sent();
-                    core.addPath(toolPath);
-                    return [4 /*yield*/, exec_1.exec("sudo apt-get -y install bubblewrap musl-tools")];
-                case 6:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["init", "--bare", "-yav", repository])];
-                case 7:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
-                case 8:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("\"" + toolPath + "/opam\"", ["install", "-y", "depext"])];
-                case 9:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function acquireOpamDarwin(version, customRepository) {
-    return __awaiter(this, void 0, void 0, function () {
-        var repository;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    repository = customRepository || "https://github.com/ocaml/opam-repository.git";
-                    return [4 /*yield*/, exec_1.exec("brew", ["update"])];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("brew", ["install", "opam"])];
-                case 2:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["init", "--bare", "-yav", repository])];
-                case 3:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
-                case 4:
-                    _a.sent();
-                    return [4 /*yield*/, exec_1.exec("opam", ["install", "-y", "depext"])];
-                case 5:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function getOpam(version, repository) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            core.exportVariable("OPAMYES", "1");
-            if (osPlat === "win32")
-                return [2 /*return*/, acquireOpamWindows(version, repository)];
-            else if (osPlat === "darwin")
-                return [2 /*return*/, acquireOpamDarwin(version, repository)];
-            else if (osPlat === "linux")
-                return [2 /*return*/, acquireOpamLinux(version, repository)];
-            return [2 /*return*/];
-        });
-    });
-}
-exports.getOpam = getOpam;
-
-
-/***/ }),
-
-/***/ 923:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-var core = __nccwpck_require__(186);
-var os = __nccwpck_require__(87);
-var installer = __nccwpck_require__(574);
-function run() {
-    return __awaiter(this, void 0, void 0, function () {
-        var numberOfProcessors, jobs, ocamlVersion, opamRepository, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    numberOfProcessors = os.cpus().length;
-                    jobs = numberOfProcessors + 2;
-                    core.exportVariable("OPAMJOBS", jobs);
-                    ocamlVersion = core.getInput("ocaml-version");
-                    opamRepository = core.getInput("opam-repository");
-                    return [4 /*yield*/, installer.getOpam(ocamlVersion, opamRepository)];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_1 = _a.sent();
-                    core.setFailed(error_1.toString());
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-run();
-
-
-/***/ }),
-
 /***/ 357:
 /***/ ((module) => {
 
@@ -5306,8 +5435,9 @@ module.exports = require("util");;
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -5330,12 +5460,289 @@ module.exports = require("util");;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
-/******/ 	__nccwpck_require__.ab = __dirname + "/";/************************************************************************/
-/******/ 	// module exports must be returned from runtime so entry inlining is disabled
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	return __nccwpck_require__(923);
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(186);
+// EXTERNAL MODULE: external "os"
+var external_os_ = __nccwpck_require__(87);
+// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
+var exec = __nccwpck_require__(514);
+// EXTERNAL MODULE: ./node_modules/@actions/tool-cache/lib/tool-cache.js
+var tool_cache = __nccwpck_require__(784);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(747);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(622);
+// EXTERNAL MODULE: external "util"
+var external_util_ = __nccwpck_require__(669);
+;// CONCATENATED MODULE: ./src/installer.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+
+
+
+
+
+
+var osPlat = external_os_.platform();
+var osArch = external_os_.arch();
+function getOpamFileName(version) {
+    var platform = osPlat === "darwin" ? "macos" : osPlat;
+    var arch = osArch === "x64" ? "x86_64" : "i686";
+    var filename = external_util_.format("opam-%s-%s-%s", version, arch, platform);
+    return filename;
+}
+function getOpamDownloadUrl(version, filename) {
+    return external_util_.format("https://github.com/ocaml/opam/releases/download/%s/%s", version, filename);
+}
+function acquireOpamWindows(version, customRepository) {
+    return __awaiter(this, void 0, void 0, function () {
+        var cygwinRoot, repository, downloadPath, error_1, toolPath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    cygwinRoot = "D:\\cygwin";
+                    repository = customRepository ||
+                        "https://github.com/fdopen/opam-repository-mingw.git#opam2";
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, tool_cache.downloadTool("https://cygwin.com/setup-x86_64.exe")];
+                case 2:
+                    downloadPath = _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _a.sent();
+                    core.debug(error_1);
+                    throw "Failed to download cygwin: " + error_1;
+                case 4: return [4 /*yield*/, tool_cache.cacheFile(downloadPath, "setup-x86_64.exe", "cygwin", "1.0")];
+                case 5:
+                    toolPath = _a.sent();
+                    core.exportVariable("CYGWIN_ROOT", cygwinRoot);
+                    return [4 /*yield*/, (0,exec.exec)(__nccwpck_require__.ab + "install-ocaml-windows.cmd", [
+                            __dirname,
+                            toolPath,
+                            version,
+                            repository,
+                        ])];
+                case 6:
+                    _a.sent();
+                    core.addPath(external_path_.join(cygwinRoot, "wrapperbin"));
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function acquireOpamLinux(version, customRepository) {
+    return __awaiter(this, void 0, void 0, function () {
+        var opamVersion, fileName, downloadUrl, repository, downloadPath, error_2, toolPath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    opamVersion = "2.0.8";
+                    fileName = getOpamFileName(opamVersion);
+                    downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
+                    repository = customRepository || "https://github.com/ocaml/opam-repository.git";
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, tool_cache.downloadTool(downloadUrl)];
+                case 2:
+                    downloadPath = _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_2 = _a.sent();
+                    core.debug(error_2);
+                    throw "Failed to download version " + opamVersion + ": " + error_2;
+                case 4:
+                    external_fs_.chmodSync(downloadPath, 493);
+                    return [4 /*yield*/, tool_cache.cacheFile(downloadPath, "opam", "opam", opamVersion)];
+                case 5:
+                    toolPath = _a.sent();
+                    core.addPath(toolPath);
+                    return [4 /*yield*/, (0,exec.exec)("sudo apt-get -y install bubblewrap musl-tools")];
+                case 6:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)("\"" + toolPath + "/opam\"", ["init", "--bare", "-yav", repository])];
+                case 7:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
+                case 8:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)("\"" + toolPath + "/opam\"", ["install", "-y", "depext"])];
+                case 9:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function acquireOpamDarwin(version, customRepository) {
+    return __awaiter(this, void 0, void 0, function () {
+        var repository;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    repository = customRepository || "https://github.com/ocaml/opam-repository.git";
+                    return [4 /*yield*/, (0,exec.exec)("brew", ["update"])];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)("brew", ["install", "opam"])];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)("opam", ["init", "--bare", "-yav", repository])];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
+                case 4:
+                    _a.sent();
+                    return [4 /*yield*/, (0,exec.exec)("opam", ["install", "-y", "depext"])];
+                case 5:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function getOpam(version, repository) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            core.exportVariable("OPAMYES", "1");
+            if (osPlat === "win32")
+                return [2 /*return*/, acquireOpamWindows(version, repository)];
+            else if (osPlat === "darwin")
+                return [2 /*return*/, acquireOpamDarwin(version, repository)];
+            else if (osPlat === "linux")
+                return [2 /*return*/, acquireOpamLinux(version, repository)];
+            return [2 /*return*/];
+        });
+    });
+}
+
+;// CONCATENATED MODULE: ./src/setup-ocaml.ts
+var setup_ocaml_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var setup_ocaml_generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+
+
+function run() {
+    return setup_ocaml_awaiter(this, void 0, void 0, function () {
+        var numberOfProcessors, jobs, ocamlVersion, opamRepository, error_1;
+        return setup_ocaml_generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    numberOfProcessors = external_os_.cpus().length;
+                    jobs = numberOfProcessors + 2;
+                    core.exportVariable("OPAMJOBS", jobs);
+                    ocamlVersion = core.getInput("ocaml-version");
+                    opamRepository = core.getInput("opam-repository");
+                    return [4 /*yield*/, getOpam(ocamlVersion, opamRepository)];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 3];
+                case 2:
+                    error_1 = _a.sent();
+                    core.setFailed(error_1.toString());
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+run();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
