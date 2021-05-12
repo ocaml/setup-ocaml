@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.11]
+
+### Changed
+
 - Stop setting switch jobs variable on Windows (`OPAMJOBS` is sufficient).
 
 ## [1.1.10]
@@ -117,7 +121,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.10...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.11...HEAD
+[1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.11
 [1.1.10]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.10
 [1.1.9]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...v1.1.9
 [1.1.8]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...v1.1.8
