@@ -31,7 +31,6 @@ case "$SWITCH" in
     ;;
 esac
 opam init -c "ocaml-variants.${SWITCH}" --disable-sandboxing --enable-completion --enable-shell-hook --auto-setup default "$OPAM_REPOSITORY"
-opam config set jobs "$OPAMJOBS"
 opam update
 is_msvc=0
 case "$SWITCH" in
