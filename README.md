@@ -1,22 +1,37 @@
 # Set up OCaml
 
-[![Main workflow](https://github.com/avsm/setup-ocaml/workflows/Main%20workflow/badge.svg?branch=master)](https://github.com/avsm/setup-ocaml/actions)
-[![CodeQL](https://github.com/avsm/setup-ocaml/workflows/CodeQL/badge.svg?branch=master)](https://github.com/avsm/setup-ocaml/actions)
+[![Main workflow](https://github.com/ocaml/setup-ocaml/workflows/Main%20workflow/badge.svg?branch=master)](https://github.com/ocaml/setup-ocaml/actions)
+[![CodeQL](https://github.com/ocaml/setup-ocaml/workflows/CodeQL/badge.svg?branch=master)](https://github.com/ocaml/setup-ocaml/actions)
 
-Set up an OCaml and opam environment and add to PATH.
+Set up an OCaml and opam environment in [GitHub Actions](https://github.com/features/actions) and add to PATH. 
+
+## Action
+
+The action does the following:
+
+- **Ubuntu**: Installs the latest opam with sandboxing active
+- **macOS**: Installs the latest opam from Homebrew with sandboxing active
+- **Windows**: Installs Cygwin and the
+  [fdopen fork](https://fdopen.github.io/opam-repository-mingw) with mingw64c
+
+The repository is initialised to the default one, and then the following plugins
+are installed:
+
+- `opam-depext`
+
+The `opam` binary is added to the `PATH` for subsequent actions, so that
+executing `opam` commands will just work after that.
 
 ## Usage
 
-If you are new, this section is worth reading.
-
-### How to specify the version
+### How to specify the version of the Action
 
 There is a point that is particularly easy to misunderstand. It's where you
 specify the version of the action _itself_.
 
 ```yml
 - name: Use OCaml ${{ matrix.ocaml-version }}
-  uses: avsm/setup-ocaml@v1
+  uses: ocaml/setup-ocaml@v1
   #                     ^^^
   with:
     ocaml-version: ${{ matrix.ocaml-version }}
@@ -30,19 +45,19 @@ workflow when we publish a breaking update and increase the major version.
 ```yml
 steps:
   # Reference the major version of a release (most recommended)
-  - uses: avsm/setup-ocaml@v1
+  - uses: ocaml/setup-ocaml@v1
   # Reference a specific commit (most strict)
-  - uses: avsm/setup-ocaml@ab6ba4d
+  - uses: ocaml/setup-ocaml@ab6ba4d
   # Reference a semver version of a release (not recommended)
-  - uses: avsm/setup-ocaml@v1.0.1
+  - uses: ocaml/setup-ocaml@v1.0.1
   # Reference a branch (most dangerous)
-  - uses: avsm/setup-ocaml@master
+  - uses: ocaml/setup-ocaml@master
 ```
 
 ### Example workflow
 
 See the
-[Hello World OCaml Action](https://github.com/avsm/hello-world-action-ocaml)
+[Hello World OCaml Action](https://github.com/ocaml/hello-world-action-ocaml)
 that uses Dune and opam to build a simple library.
 
 ```yml
@@ -74,7 +89,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v1
+        uses: ocaml/setup-ocaml@v1
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
@@ -108,23 +123,6 @@ packages' external dependencies for such opam packages.
   `https://github.com/ocaml/opam-repository.git` for Ubuntu and macOS and
   `https://github.com/fdopen/opam-repository-mingw.git#opam2` for Windows.
 
-## Action
-
-The action does the following:
-
-- **Ubuntu**: Installs the latest opam with sandboxing active
-- **macOS**: Installs the latest opam from Homebrew with sandboxing active
-- **Windows**: Installs Cygwin and the
-  [fdopen fork](https://fdopen.github.io/opam-repository-mingw) with mingw64c
-
-The repository is initialised to the default one, and then the following plugins
-are installed:
-
-- `opam-depext`
-
-The `opam` binary is added to the `PATH` for subsequent actions, so that
-executing `opam` commands will just work after that.
-
 ## Advanced Configurations
 
 It is possible to feed different values to `opam-repository` depending on the
@@ -153,7 +151,7 @@ runs-on: ${{ matrix.os }}
 
 steps:
   - name: Use OCaml with repo ${{ matrix.opam-repo }}
-    uses: avsm/setup-ocaml@v1
+    uses: ocaml/setup-ocaml@v1
     with:
       opam-repository: ${{ matrix.opam-repo }}
 ```
@@ -174,7 +172,7 @@ steps:
       fi
 
   - name: Use OCaml with repo ${{ steps.repo.url }}
-    uses: avsm/setup-ocaml@v1
+    uses: ocaml/setup-ocaml@v1
     with:
       opam-repository: ${{ steps.repo.url }}
 ```
@@ -184,13 +182,13 @@ Using several conditional setup steps:
 ```yml
 steps:
   - name: Use OCaml on Windows
-    uses: avsm/setup-ocaml@v1
+    uses: ocaml/setup-ocaml@v1
     if: runner.os == 'Windows'
     with:
       ocaml-repository: https://github.com/fdopen/opam-repository-mingw.git#opam2
 
   - name: Use OCaml on Unix
-    uses: avsm/setup-ocaml@v1
+    uses: ocaml/setup-ocaml@v1
     if: runner.os != 'Windows'
     with:
       opam-repository: https://github.com/ocaml/opam-repository.git
@@ -202,5 +200,10 @@ This action aims to provide an OS-neutral interface to `opam`, and so will not
 add features that only work on one operating system. It will also track the
 latest stable release of opam.
 
-Discussions:
-https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745
+## Support
+
+Please feel free to post to the discuss.ocaml.org forum with any questions
+you have about this action.
+
+Previous discussions include:
+- https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745
