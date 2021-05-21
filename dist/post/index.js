@@ -2804,14 +2804,27 @@ function coerce (version, options) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(2087));
 const utils_1 = __nccwpck_require__(5278);
 /**
@@ -2890,6 +2903,25 @@ function escapeProperty(s) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2899,14 +2931,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
 const command_1 = __nccwpck_require__(7351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(5278);
@@ -2973,7 +2999,9 @@ function addPath(inputPath) {
 }
 exports.addPath = addPath;
 /**
- * Gets the value of an input.  The value is also trimmed.
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
  *
  * @param     name     name of the input to get
  * @param     options  optional. See InputOptions.
@@ -2984,9 +3012,34 @@ function getInput(name, options) {
     if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
     }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
     return val.trim();
 }
 exports.getInput = getInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */
+function getBooleanInput(name, options) {
+    const trueValue = ['true', 'True', 'TRUE'];
+    const falseValue = ['false', 'False', 'FALSE'];
+    const val = getInput(name, options);
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+        `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+exports.getBooleanInput = getBooleanInput;
 /**
  * Sets the value of an output.
  *
@@ -3137,14 +3190,27 @@ exports.getState = getState;
 "use strict";
 
 // For internal use, subject to change.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(5747));
@@ -3175,6 +3241,7 @@ exports.issueCommand = issueCommand;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -46834,7 +46901,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 var request = __nccwpck_require__(6234);
 var universalUserAgent = __nccwpck_require__(5030);
 
-const VERSION = "4.6.1";
+const VERSION = "4.6.2";
 
 class GraphqlError extends Error {
   constructor(request, response) {
@@ -57782,8 +57849,7 @@ var singleTag = new Set([
  */
 function render(node, options) {
     if (options === void 0) { options = {}; }
-    // TODO: This is a bit hacky.
-    var nodes = Array.isArray(node) || node.cheerio ? node : [node];
+    var nodes = "length" in node ? node : [node];
     var output = "";
     for (var i = 0; i < nodes.length; i++) {
         output += renderNode(nodes[i], options);
@@ -60150,8 +60216,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseFeed = exports.FeedHandler = void 0;
-var domhandler_1 = __importDefault(__nccwpck_require__(527));
-var DomUtils = __importStar(__nccwpck_require__(8436));
+var domhandler_1 = __importDefault(__nccwpck_require__(4038));
+var DomUtils = __importStar(__nccwpck_require__(5217));
 var Parser_1 = __nccwpck_require__(8460);
 var FeedItemMediaMedium;
 (function (FeedItemMediaMedium) {
@@ -61689,7 +61755,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RssHandler = exports.DefaultHandler = exports.DomUtils = exports.ElementType = exports.Tokenizer = exports.createDomStream = exports.parseDOM = exports.parseDocument = exports.DomHandler = exports.Parser = void 0;
 var Parser_1 = __nccwpck_require__(8460);
 Object.defineProperty(exports, "Parser", ({ enumerable: true, get: function () { return Parser_1.Parser; } }));
-var domhandler_1 = __nccwpck_require__(527);
+var domhandler_1 = __nccwpck_require__(4038);
 Object.defineProperty(exports, "DomHandler", ({ enumerable: true, get: function () { return domhandler_1.DomHandler; } }));
 Object.defineProperty(exports, "DefaultHandler", ({ enumerable: true, get: function () { return domhandler_1.DomHandler; } }));
 // Helper methods
@@ -61740,1336 +61806,9 @@ exports.ElementType = ElementType;
  * They should probably be removed eventually.
  */
 __exportStar(__nccwpck_require__(7725), exports);
-exports.DomUtils = __importStar(__nccwpck_require__(8436));
+exports.DomUtils = __importStar(__nccwpck_require__(5217));
 var FeedHandler_1 = __nccwpck_require__(7725);
 Object.defineProperty(exports, "RssHandler", ({ enumerable: true, get: function () { return FeedHandler_1.FeedHandler; } }));
-
-
-/***/ }),
-
-/***/ 527:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DomHandler = void 0;
-var domelementtype_1 = __nccwpck_require__(3944);
-var node_1 = __nccwpck_require__(6134);
-__exportStar(__nccwpck_require__(6134), exports);
-var reWhitespace = /\s+/g;
-// Default options
-var defaultOpts = {
-    normalizeWhitespace: false,
-    withStartIndices: false,
-    withEndIndices: false,
-};
-var DomHandler = /** @class */ (function () {
-    /**
-     * @param callback Called once parsing has completed.
-     * @param options Settings for the handler.
-     * @param elementCB Callback whenever a tag is closed.
-     */
-    function DomHandler(callback, options, elementCB) {
-        /** The elements of the DOM */
-        this.dom = [];
-        /** The root element for the DOM */
-        this.root = new node_1.Document(this.dom);
-        /** Indicated whether parsing has been completed. */
-        this.done = false;
-        /** Stack of open tags. */
-        this.tagStack = [this.root];
-        /** A data node that is still being written to. */
-        this.lastNode = null;
-        /** Reference to the parser instance. Used for location information. */
-        this.parser = null;
-        // Make it possible to skip arguments, for backwards-compatibility
-        if (typeof options === "function") {
-            elementCB = options;
-            options = defaultOpts;
-        }
-        if (typeof callback === "object") {
-            options = callback;
-            callback = undefined;
-        }
-        this.callback = callback !== null && callback !== void 0 ? callback : null;
-        this.options = options !== null && options !== void 0 ? options : defaultOpts;
-        this.elementCB = elementCB !== null && elementCB !== void 0 ? elementCB : null;
-    }
-    DomHandler.prototype.onparserinit = function (parser) {
-        this.parser = parser;
-    };
-    // Resets the handler back to starting state
-    DomHandler.prototype.onreset = function () {
-        var _a;
-        this.dom = [];
-        this.root = new node_1.Document(this.dom);
-        this.done = false;
-        this.tagStack = [this.root];
-        this.lastNode = null;
-        this.parser = (_a = this.parser) !== null && _a !== void 0 ? _a : null;
-    };
-    // Signals the handler that parsing is done
-    DomHandler.prototype.onend = function () {
-        if (this.done)
-            return;
-        this.done = true;
-        this.parser = null;
-        this.handleCallback(null);
-    };
-    DomHandler.prototype.onerror = function (error) {
-        this.handleCallback(error);
-    };
-    DomHandler.prototype.onclosetag = function () {
-        this.lastNode = null;
-        var elem = this.tagStack.pop();
-        if (this.options.withEndIndices) {
-            elem.endIndex = this.parser.endIndex;
-        }
-        if (this.elementCB)
-            this.elementCB(elem);
-    };
-    DomHandler.prototype.onopentag = function (name, attribs) {
-        var type = this.options.xmlMode ? domelementtype_1.ElementType.Tag : undefined;
-        var element = new node_1.Element(name, attribs, undefined, type);
-        this.addNode(element);
-        this.tagStack.push(element);
-    };
-    DomHandler.prototype.ontext = function (data) {
-        var normalizeWhitespace = this.options.normalizeWhitespace;
-        var lastNode = this.lastNode;
-        if (lastNode && lastNode.type === domelementtype_1.ElementType.Text) {
-            if (normalizeWhitespace) {
-                lastNode.data = (lastNode.data + data).replace(reWhitespace, " ");
-            }
-            else {
-                lastNode.data += data;
-            }
-        }
-        else {
-            if (normalizeWhitespace) {
-                data = data.replace(reWhitespace, " ");
-            }
-            var node = new node_1.Text(data);
-            this.addNode(node);
-            this.lastNode = node;
-        }
-    };
-    DomHandler.prototype.oncomment = function (data) {
-        if (this.lastNode && this.lastNode.type === domelementtype_1.ElementType.Comment) {
-            this.lastNode.data += data;
-            return;
-        }
-        var node = new node_1.Comment(data);
-        this.addNode(node);
-        this.lastNode = node;
-    };
-    DomHandler.prototype.oncommentend = function () {
-        this.lastNode = null;
-    };
-    DomHandler.prototype.oncdatastart = function () {
-        var text = new node_1.Text("");
-        var node = new node_1.NodeWithChildren(domelementtype_1.ElementType.CDATA, [text]);
-        this.addNode(node);
-        text.parent = node;
-        this.lastNode = text;
-    };
-    DomHandler.prototype.oncdataend = function () {
-        this.lastNode = null;
-    };
-    DomHandler.prototype.onprocessinginstruction = function (name, data) {
-        var node = new node_1.ProcessingInstruction(name, data);
-        this.addNode(node);
-    };
-    DomHandler.prototype.handleCallback = function (error) {
-        if (typeof this.callback === "function") {
-            this.callback(error, this.dom);
-        }
-        else if (error) {
-            throw error;
-        }
-    };
-    DomHandler.prototype.addNode = function (node) {
-        var parent = this.tagStack[this.tagStack.length - 1];
-        var previousSibling = parent.children[parent.children.length - 1];
-        if (this.options.withStartIndices) {
-            node.startIndex = this.parser.startIndex;
-        }
-        if (this.options.withEndIndices) {
-            node.endIndex = this.parser.endIndex;
-        }
-        parent.children.push(node);
-        if (previousSibling) {
-            node.prev = previousSibling;
-            previousSibling.next = node;
-        }
-        node.parent = parent;
-        this.lastNode = null;
-    };
-    return DomHandler;
-}());
-exports.DomHandler = DomHandler;
-exports.default = DomHandler;
-
-
-/***/ }),
-
-/***/ 6134:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cloneNode = exports.Element = exports.Document = exports.NodeWithChildren = exports.ProcessingInstruction = exports.Comment = exports.Text = exports.DataNode = exports.Node = void 0;
-var domelementtype_1 = __nccwpck_require__(3944);
-var nodeTypes = new Map([
-    [domelementtype_1.ElementType.Tag, 1],
-    [domelementtype_1.ElementType.Script, 1],
-    [domelementtype_1.ElementType.Style, 1],
-    [domelementtype_1.ElementType.Directive, 1],
-    [domelementtype_1.ElementType.Text, 3],
-    [domelementtype_1.ElementType.CDATA, 4],
-    [domelementtype_1.ElementType.Comment, 8],
-    [domelementtype_1.ElementType.Root, 9],
-]);
-/**
- * This object will be used as the prototype for Nodes when creating a
- * DOM-Level-1-compliant structure.
- */
-var Node = /** @class */ (function () {
-    /**
-     *
-     * @param type The type of the node.
-     */
-    function Node(type) {
-        this.type = type;
-        /** Parent of the node */
-        this.parent = null;
-        /** Previous sibling */
-        this.prev = null;
-        /** Next sibling */
-        this.next = null;
-        /** The start index of the node. Requires `withStartIndices` on the handler to be `true. */
-        this.startIndex = null;
-        /** The end index of the node. Requires `withEndIndices` on the handler to be `true. */
-        this.endIndex = null;
-    }
-    Object.defineProperty(Node.prototype, "nodeType", {
-        // Read-only aliases
-        get: function () {
-            var _a;
-            return (_a = nodeTypes.get(this.type)) !== null && _a !== void 0 ? _a : 1;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Node.prototype, "parentNode", {
-        // Read-write aliases for properties
-        get: function () {
-            return this.parent;
-        },
-        set: function (parent) {
-            this.parent = parent;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Node.prototype, "previousSibling", {
-        get: function () {
-            return this.prev;
-        },
-        set: function (prev) {
-            this.prev = prev;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Node.prototype, "nextSibling", {
-        get: function () {
-            return this.next;
-        },
-        set: function (next) {
-            this.next = next;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Clone this node, and optionally its children.
-     *
-     * @param recursive Clone child nodes as well.
-     * @returns A clone of the node.
-     */
-    Node.prototype.cloneNode = function (recursive) {
-        if (recursive === void 0) { recursive = false; }
-        return cloneNode(this, recursive);
-    };
-    return Node;
-}());
-exports.Node = Node;
-var DataNode = /** @class */ (function (_super) {
-    __extends(DataNode, _super);
-    /**
-     * @param type The type of the node
-     * @param data The content of the data node
-     */
-    function DataNode(type, data) {
-        var _this = _super.call(this, type) || this;
-        _this.data = data;
-        return _this;
-    }
-    Object.defineProperty(DataNode.prototype, "nodeValue", {
-        get: function () {
-            return this.data;
-        },
-        set: function (data) {
-            this.data = data;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return DataNode;
-}(Node));
-exports.DataNode = DataNode;
-var Text = /** @class */ (function (_super) {
-    __extends(Text, _super);
-    function Text(data) {
-        return _super.call(this, domelementtype_1.ElementType.Text, data) || this;
-    }
-    return Text;
-}(DataNode));
-exports.Text = Text;
-var Comment = /** @class */ (function (_super) {
-    __extends(Comment, _super);
-    function Comment(data) {
-        return _super.call(this, domelementtype_1.ElementType.Comment, data) || this;
-    }
-    return Comment;
-}(DataNode));
-exports.Comment = Comment;
-var ProcessingInstruction = /** @class */ (function (_super) {
-    __extends(ProcessingInstruction, _super);
-    function ProcessingInstruction(name, data) {
-        var _this = _super.call(this, domelementtype_1.ElementType.Directive, data) || this;
-        _this.name = name;
-        return _this;
-    }
-    return ProcessingInstruction;
-}(DataNode));
-exports.ProcessingInstruction = ProcessingInstruction;
-/**
- * A `Node` that can have children.
- */
-var NodeWithChildren = /** @class */ (function (_super) {
-    __extends(NodeWithChildren, _super);
-    /**
-     * @param type Type of the node.
-     * @param children Children of the node. Only certain node types can have children.
-     */
-    function NodeWithChildren(type, children) {
-        var _this = _super.call(this, type) || this;
-        _this.children = children;
-        return _this;
-    }
-    Object.defineProperty(NodeWithChildren.prototype, "firstChild", {
-        // Aliases
-        get: function () {
-            var _a;
-            return (_a = this.children[0]) !== null && _a !== void 0 ? _a : null;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(NodeWithChildren.prototype, "lastChild", {
-        get: function () {
-            return this.children.length > 0
-                ? this.children[this.children.length - 1]
-                : null;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(NodeWithChildren.prototype, "childNodes", {
-        get: function () {
-            return this.children;
-        },
-        set: function (children) {
-            this.children = children;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return NodeWithChildren;
-}(Node));
-exports.NodeWithChildren = NodeWithChildren;
-var Document = /** @class */ (function (_super) {
-    __extends(Document, _super);
-    function Document(children) {
-        return _super.call(this, domelementtype_1.ElementType.Root, children) || this;
-    }
-    return Document;
-}(NodeWithChildren));
-exports.Document = Document;
-var Element = /** @class */ (function (_super) {
-    __extends(Element, _super);
-    /**
-     * @param name Name of the tag, eg. `div`, `span`.
-     * @param attribs Object mapping attribute names to attribute values.
-     * @param children Children of the node.
-     */
-    function Element(name, attribs, children, type) {
-        if (children === void 0) { children = []; }
-        if (type === void 0) { type = name === "script"
-            ? domelementtype_1.ElementType.Script
-            : name === "style"
-                ? domelementtype_1.ElementType.Style
-                : domelementtype_1.ElementType.Tag; }
-        var _this = _super.call(this, type, children) || this;
-        _this.name = name;
-        _this.attribs = attribs;
-        return _this;
-    }
-    Object.defineProperty(Element.prototype, "tagName", {
-        // DOM Level 1 aliases
-        get: function () {
-            return this.name;
-        },
-        set: function (name) {
-            this.name = name;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Element.prototype, "attributes", {
-        get: function () {
-            var _this = this;
-            return Object.keys(this.attribs).map(function (name) {
-                var _a, _b;
-                return ({
-                    name: name,
-                    value: _this.attribs[name],
-                    namespace: (_a = _this["x-attribsNamespace"]) === null || _a === void 0 ? void 0 : _a[name],
-                    prefix: (_b = _this["x-attribsPrefix"]) === null || _b === void 0 ? void 0 : _b[name],
-                });
-            });
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return Element;
-}(NodeWithChildren));
-exports.Element = Element;
-/**
- * Clone a node, and optionally its children.
- *
- * @param recursive Clone child nodes as well.
- * @returns A clone of the node.
- */
-function cloneNode(node, recursive) {
-    if (recursive === void 0) { recursive = false; }
-    var result;
-    switch (node.type) {
-        case domelementtype_1.ElementType.Text:
-            result = new Text(node.data);
-            break;
-        case domelementtype_1.ElementType.Directive: {
-            var instr = node;
-            result = new ProcessingInstruction(instr.name, instr.data);
-            if (instr["x-name"] != null) {
-                result["x-name"] = instr["x-name"];
-                result["x-publicId"] = instr["x-publicId"];
-                result["x-systemId"] = instr["x-systemId"];
-            }
-            break;
-        }
-        case domelementtype_1.ElementType.Comment:
-            result = new Comment(node.data);
-            break;
-        case domelementtype_1.ElementType.Tag:
-        case domelementtype_1.ElementType.Script:
-        case domelementtype_1.ElementType.Style: {
-            var elem = node;
-            var children = recursive ? cloneChildren(elem.children) : [];
-            var clone_1 = new Element(elem.name, __assign({}, elem.attribs), children);
-            children.forEach(function (child) { return (child.parent = clone_1); });
-            if (elem["x-attribsNamespace"]) {
-                clone_1["x-attribsNamespace"] = __assign({}, elem["x-attribsNamespace"]);
-            }
-            if (elem["x-attribsPrefix"]) {
-                clone_1["x-attribsPrefix"] = __assign({}, elem["x-attribsPrefix"]);
-            }
-            result = clone_1;
-            break;
-        }
-        case domelementtype_1.ElementType.CDATA: {
-            var cdata = node;
-            var children = recursive ? cloneChildren(cdata.children) : [];
-            var clone_2 = new NodeWithChildren(node.type, children);
-            children.forEach(function (child) { return (child.parent = clone_2); });
-            result = clone_2;
-            break;
-        }
-        case domelementtype_1.ElementType.Root: {
-            var doc = node;
-            var children = recursive ? cloneChildren(doc.children) : [];
-            var clone_3 = new Document(children);
-            children.forEach(function (child) { return (child.parent = clone_3); });
-            if (doc["x-mode"]) {
-                clone_3["x-mode"] = doc["x-mode"];
-            }
-            result = clone_3;
-            break;
-        }
-        case domelementtype_1.ElementType.Doctype: {
-            // This type isn't used yet.
-            throw new Error("Not implemented yet: ElementType.Doctype case");
-        }
-    }
-    result.startIndex = node.startIndex;
-    result.endIndex = node.endIndex;
-    return result;
-}
-exports.cloneNode = cloneNode;
-function cloneChildren(childs) {
-    var children = childs.map(function (child) { return cloneNode(child, true); });
-    for (var i = 1; i < children.length; i++) {
-        children[i].prev = children[i - 1];
-        children[i - 1].next = children[i];
-    }
-    return children;
-}
-
-
-/***/ }),
-
-/***/ 9237:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.uniqueSort = exports.compareDocumentPosition = exports.removeSubsets = void 0;
-var tagtypes_1 = __nccwpck_require__(1986);
-/**
- * Given an array of nodes, remove any member that is contained by another.
- *
- * @param nodes Nodes to filter.
- * @returns Remaining nodes that aren't subtrees of each other.
- */
-function removeSubsets(nodes) {
-    var idx = nodes.length;
-    /*
-     * Check if each node (or one of its ancestors) is already contained in the
-     * array.
-     */
-    while (--idx >= 0) {
-        var node = nodes[idx];
-        /*
-         * Remove the node if it is not unique.
-         * We are going through the array from the end, so we only
-         * have to check nodes that preceed the node under consideration in the array.
-         */
-        if (idx > 0 && nodes.lastIndexOf(node, idx - 1) >= 0) {
-            nodes.splice(idx, 1);
-            continue;
-        }
-        for (var ancestor = node.parent; ancestor; ancestor = ancestor.parent) {
-            if (nodes.includes(ancestor)) {
-                nodes.splice(idx, 1);
-                break;
-            }
-        }
-    }
-    return nodes;
-}
-exports.removeSubsets = removeSubsets;
-/**
- * Compare the position of one node against another node in any other document.
- * The return value is a bitmask with the following values:
- *
- * Document order:
- * > There is an ordering, document order, defined on all the nodes in the
- * > document corresponding to the order in which the first character of the
- * > XML representation of each node occurs in the XML representation of the
- * > document after expansion of general entities. Thus, the document element
- * > node will be the first node. Element nodes occur before their children.
- * > Thus, document order orders element nodes in order of the occurrence of
- * > their start-tag in the XML (after expansion of entities). The attribute
- * > nodes of an element occur after the element and before its children. The
- * > relative order of attribute nodes is implementation-dependent./
- *
- * Source:
- * http://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-document-order
- *
- * @param nodeA The first node to use in the comparison
- * @param nodeB The second node to use in the comparison
- * @returns A bitmask describing the input nodes' relative position.
- *
- * See http://dom.spec.whatwg.org/#dom-node-comparedocumentposition for
- * a description of these values.
- */
-function compareDocumentPosition(nodeA, nodeB) {
-    var aParents = [];
-    var bParents = [];
-    if (nodeA === nodeB) {
-        return 0;
-    }
-    var current = tagtypes_1.hasChildren(nodeA) ? nodeA : nodeA.parent;
-    while (current) {
-        aParents.unshift(current);
-        current = current.parent;
-    }
-    current = tagtypes_1.hasChildren(nodeB) ? nodeB : nodeB.parent;
-    while (current) {
-        bParents.unshift(current);
-        current = current.parent;
-    }
-    var maxIdx = Math.min(aParents.length, bParents.length);
-    var idx = 0;
-    while (idx < maxIdx && aParents[idx] === bParents[idx]) {
-        idx++;
-    }
-    if (idx === 0) {
-        return 1 /* DISCONNECTED */;
-    }
-    var sharedParent = aParents[idx - 1];
-    var siblings = sharedParent.children;
-    var aSibling = aParents[idx];
-    var bSibling = bParents[idx];
-    if (siblings.indexOf(aSibling) > siblings.indexOf(bSibling)) {
-        if (sharedParent === nodeB) {
-            return 4 /* FOLLOWING */ | 16 /* CONTAINED_BY */;
-        }
-        return 4 /* FOLLOWING */;
-    }
-    if (sharedParent === nodeA) {
-        return 2 /* PRECEDING */ | 8 /* CONTAINS */;
-    }
-    return 2 /* PRECEDING */;
-}
-exports.compareDocumentPosition = compareDocumentPosition;
-/**
- * Sort an array of nodes based on their relative position in the document and
- * remove any duplicate nodes. If the array contains nodes that do not belong
- * to the same document, sort order is unspecified.
- *
- * @param nodes Array of DOM nodes.
- * @returns Collection of unique nodes, sorted in document order.
- */
-function uniqueSort(nodes) {
-    nodes = nodes.filter(function (node, i, arr) { return !arr.includes(node, i + 1); });
-    nodes.sort(function (a, b) {
-        var relative = compareDocumentPosition(a, b);
-        if (relative & 2 /* PRECEDING */) {
-            return -1;
-        }
-        else if (relative & 4 /* FOLLOWING */) {
-            return 1;
-        }
-        return 0;
-    });
-    return nodes;
-}
-exports.uniqueSort = uniqueSort;
-
-
-/***/ }),
-
-/***/ 8436:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(7158), exports);
-__exportStar(__nccwpck_require__(9678), exports);
-__exportStar(__nccwpck_require__(15), exports);
-__exportStar(__nccwpck_require__(2570), exports);
-__exportStar(__nccwpck_require__(2667), exports);
-__exportStar(__nccwpck_require__(9237), exports);
-__exportStar(__nccwpck_require__(1986), exports);
-
-
-/***/ }),
-
-/***/ 2667:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getElementsByTagType = exports.getElementsByTagName = exports.getElementById = exports.getElements = exports.testElement = void 0;
-var querying_1 = __nccwpck_require__(2570);
-var tagtypes_1 = __nccwpck_require__(1986);
-var Checks = {
-    tag_name: function (name) {
-        if (typeof name === "function") {
-            return function (elem) { return tagtypes_1.isTag(elem) && name(elem.name); };
-        }
-        else if (name === "*") {
-            return tagtypes_1.isTag;
-        }
-        return function (elem) { return tagtypes_1.isTag(elem) && elem.name === name; };
-    },
-    tag_type: function (type) {
-        if (typeof type === "function") {
-            return function (elem) { return type(elem.type); };
-        }
-        return function (elem) { return elem.type === type; };
-    },
-    tag_contains: function (data) {
-        if (typeof data === "function") {
-            return function (elem) { return tagtypes_1.isText(elem) && data(elem.data); };
-        }
-        return function (elem) { return tagtypes_1.isText(elem) && elem.data === data; };
-    },
-};
-/**
- * @param attrib Attribute to check.
- * @param value Attribute value to look for.
- * @returns A function to check whether the a node has an attribute with a particular value.
- */
-function getAttribCheck(attrib, value) {
-    if (typeof value === "function") {
-        return function (elem) { return tagtypes_1.isTag(elem) && value(elem.attribs[attrib]); };
-    }
-    return function (elem) { return tagtypes_1.isTag(elem) && elem.attribs[attrib] === value; };
-}
-/**
- * @param a First function to combine.
- * @param b Second function to combine.
- * @returns A function taking a node and returning `true` if either
- * of the input functions returns `true` for the node.
- */
-function combineFuncs(a, b) {
-    return function (elem) { return a(elem) || b(elem); };
-}
-/**
- * @param options An object describing nodes to look for.
- * @returns A function executing all checks in `options` and returning `true`
- * if any of them match a node.
- */
-function compileTest(options) {
-    var funcs = Object.keys(options).map(function (key) {
-        var value = options[key];
-        return key in Checks
-            ? Checks[key](value)
-            : getAttribCheck(key, value);
-    });
-    return funcs.length === 0 ? null : funcs.reduce(combineFuncs);
-}
-/**
- * @param options An object describing nodes to look for.
- * @param node The element to test.
- * @returns Whether the element matches the description in `options`.
- */
-function testElement(options, node) {
-    var test = compileTest(options);
-    return test ? test(node) : true;
-}
-exports.testElement = testElement;
-/**
- * @param options An object describing nodes to look for.
- * @param nodes Nodes to search through.
- * @param recurse Also consider child nodes.
- * @param limit Maximum number of nodes to return.
- * @returns All nodes that match `options`.
- */
-function getElements(options, nodes, recurse, limit) {
-    if (limit === void 0) { limit = Infinity; }
-    var test = compileTest(options);
-    return test ? querying_1.filter(test, nodes, recurse, limit) : [];
-}
-exports.getElements = getElements;
-/**
- * @param id The unique ID attribute value to look for.
- * @param nodes Nodes to search through.
- * @param recurse Also consider child nodes.
- * @returns The node with the supplied ID.
- */
-function getElementById(id, nodes, recurse) {
-    if (recurse === void 0) { recurse = true; }
-    if (!Array.isArray(nodes))
-        nodes = [nodes];
-    return querying_1.findOne(getAttribCheck("id", id), nodes, recurse);
-}
-exports.getElementById = getElementById;
-/**
- * @param tagName Tag name to search for.
- * @param nodes Nodes to search through.
- * @param recurse Also consider child nodes.
- * @param limit Maximum number of nodes to return.
- * @returns All nodes with the supplied `tagName`.
- */
-function getElementsByTagName(tagName, nodes, recurse, limit) {
-    if (recurse === void 0) { recurse = true; }
-    if (limit === void 0) { limit = Infinity; }
-    return querying_1.filter(Checks.tag_name(tagName), nodes, recurse, limit);
-}
-exports.getElementsByTagName = getElementsByTagName;
-/**
- * @param type Element type to look for.
- * @param nodes Nodes to search through.
- * @param recurse Also consider child nodes.
- * @param limit Maximum number of nodes to return.
- * @returns All nodes with the supplied `type`.
- */
-function getElementsByTagType(type, nodes, recurse, limit) {
-    if (recurse === void 0) { recurse = true; }
-    if (limit === void 0) { limit = Infinity; }
-    return querying_1.filter(Checks.tag_type(type), nodes, recurse, limit);
-}
-exports.getElementsByTagType = getElementsByTagType;
-
-
-/***/ }),
-
-/***/ 15:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.prepend = exports.prependChild = exports.append = exports.appendChild = exports.replaceElement = exports.removeElement = void 0;
-/**
- * Remove an element from the dom
- *
- * @param elem The element to be removed
- */
-function removeElement(elem) {
-    if (elem.prev)
-        elem.prev.next = elem.next;
-    if (elem.next)
-        elem.next.prev = elem.prev;
-    if (elem.parent) {
-        var childs = elem.parent.children;
-        childs.splice(childs.lastIndexOf(elem), 1);
-    }
-}
-exports.removeElement = removeElement;
-/**
- * Replace an element in the dom
- *
- * @param elem The element to be replaced
- * @param replacement The element to be added
- */
-function replaceElement(elem, replacement) {
-    var prev = (replacement.prev = elem.prev);
-    if (prev) {
-        prev.next = replacement;
-    }
-    var next = (replacement.next = elem.next);
-    if (next) {
-        next.prev = replacement;
-    }
-    var parent = (replacement.parent = elem.parent);
-    if (parent) {
-        var childs = parent.children;
-        childs[childs.lastIndexOf(elem)] = replacement;
-    }
-}
-exports.replaceElement = replaceElement;
-/**
- * Append a child to an element.
- *
- * @param elem The element to append to.
- * @param child The element to be added as a child.
- */
-function appendChild(elem, child) {
-    removeElement(child);
-    child.next = null;
-    child.parent = elem;
-    if (elem.children.push(child) > 1) {
-        var sibling = elem.children[elem.children.length - 2];
-        sibling.next = child;
-        child.prev = sibling;
-    }
-    else {
-        child.prev = null;
-    }
-}
-exports.appendChild = appendChild;
-/**
- * Append an element after another.
- *
- * @param elem The element to append after.
- * @param next The element be added.
- */
-function append(elem, next) {
-    removeElement(next);
-    var parent = elem.parent;
-    var currNext = elem.next;
-    next.next = currNext;
-    next.prev = elem;
-    elem.next = next;
-    next.parent = parent;
-    if (currNext) {
-        currNext.prev = next;
-        if (parent) {
-            var childs = parent.children;
-            childs.splice(childs.lastIndexOf(currNext), 0, next);
-        }
-    }
-    else if (parent) {
-        parent.children.push(next);
-    }
-}
-exports.append = append;
-/**
- * Prepend a child to an element.
- *
- * @param elem The element to prepend before.
- * @param child The element to be added as a child.
- */
-function prependChild(elem, child) {
-    removeElement(child);
-    child.parent = elem;
-    child.prev = null;
-    if (elem.children.unshift(child) !== 1) {
-        var sibling = elem.children[1];
-        sibling.prev = child;
-        child.next = sibling;
-    }
-    else {
-        child.next = null;
-    }
-}
-exports.prependChild = prependChild;
-/**
- * Prepend an element before another.
- *
- * @param elem The element to prepend before.
- * @param prev The element be added.
- */
-function prepend(elem, prev) {
-    removeElement(prev);
-    var parent = elem.parent;
-    if (parent) {
-        var childs = parent.children;
-        childs.splice(childs.indexOf(elem), 0, prev);
-    }
-    if (elem.prev) {
-        elem.prev.next = prev;
-    }
-    prev.parent = parent;
-    prev.prev = elem.prev;
-    prev.next = elem;
-    elem.prev = prev;
-}
-exports.prepend = prepend;
-
-
-/***/ }),
-
-/***/ 2570:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.findAll = exports.existsOne = exports.findOne = exports.findOneChild = exports.find = exports.filter = void 0;
-var tagtypes_1 = __nccwpck_require__(1986);
-/**
- * Search a node and its children for nodes passing a test function.
- *
- * @param test Function to test nodes on.
- * @param node Node to search. Will be included in the result set if it matches.
- * @param recurse Also consider child nodes.
- * @param limit Maximum number of nodes to return.
- * @returns All nodes passing `test`.
- */
-function filter(test, node, recurse, limit) {
-    if (recurse === void 0) { recurse = true; }
-    if (limit === void 0) { limit = Infinity; }
-    if (!Array.isArray(node))
-        node = [node];
-    return find(test, node, recurse, limit);
-}
-exports.filter = filter;
-/**
- * Search an array of node and its children for nodes passing a test function.
- *
- * @param test Function to test nodes on.
- * @param nodes Array of nodes to search.
- * @param recurse Also consider child nodes.
- * @param limit Maximum number of nodes to return.
- * @returns All nodes passing `test`.
- */
-function find(test, nodes, recurse, limit) {
-    var result = [];
-    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
-        var elem = nodes_1[_i];
-        if (test(elem)) {
-            result.push(elem);
-            if (--limit <= 0)
-                break;
-        }
-        if (recurse && tagtypes_1.hasChildren(elem) && elem.children.length > 0) {
-            var children = find(test, elem.children, recurse, limit);
-            result.push.apply(result, children);
-            limit -= children.length;
-            if (limit <= 0)
-                break;
-        }
-    }
-    return result;
-}
-exports.find = find;
-/**
- * Finds the first element inside of an array that matches a test function.
- *
- * @param test Function to test nodes on.
- * @param nodes Array of nodes to search.
- * @returns The first node in the array that passes `test`.
- */
-function findOneChild(test, nodes) {
-    return nodes.find(test);
-}
-exports.findOneChild = findOneChild;
-/**
- * Finds one element in a tree that passes a test.
- *
- * @param test Function to test nodes on.
- * @param nodes Array of nodes to search.
- * @param recurse Also consider child nodes.
- * @returns The first child node that passes `test`.
- */
-function findOne(test, nodes, recurse) {
-    if (recurse === void 0) { recurse = true; }
-    var elem = null;
-    for (var i = 0; i < nodes.length && !elem; i++) {
-        var checked = nodes[i];
-        if (!tagtypes_1.isTag(checked)) {
-            continue;
-        }
-        else if (test(checked)) {
-            elem = checked;
-        }
-        else if (recurse && checked.children.length > 0) {
-            elem = findOne(test, checked.children);
-        }
-    }
-    return elem;
-}
-exports.findOne = findOne;
-/**
- * @param test Function to test nodes on.
- * @param nodes Array of nodes to search.
- * @returns Whether a tree of nodes contains at least one node passing a test.
- */
-function existsOne(test, nodes) {
-    return nodes.some(function (checked) {
-        return tagtypes_1.isTag(checked) &&
-            (test(checked) ||
-                (checked.children.length > 0 &&
-                    existsOne(test, checked.children)));
-    });
-}
-exports.existsOne = existsOne;
-/**
- * Search and array of nodes and its children for nodes passing a test function.
- *
- * Same as `find`, only with less options, leading to reduced complexity.
- *
- * @param test Function to test nodes on.
- * @param nodes Array of nodes to search.
- * @returns All nodes passing `test`.
- */
-function findAll(test, nodes) {
-    var _a;
-    var result = [];
-    var stack = nodes.filter(tagtypes_1.isTag);
-    var elem;
-    while ((elem = stack.shift())) {
-        var children = (_a = elem.children) === null || _a === void 0 ? void 0 : _a.filter(tagtypes_1.isTag);
-        if (children && children.length > 0) {
-            stack.unshift.apply(stack, children);
-        }
-        if (test(elem))
-            result.push(elem);
-    }
-    return result;
-}
-exports.findAll = findAll;
-
-
-/***/ }),
-
-/***/ 7158:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getText = exports.getInnerHTML = exports.getOuterHTML = void 0;
-var tagtypes_1 = __nccwpck_require__(1986);
-var dom_serializer_1 = __importDefault(__nccwpck_require__(8621));
-/**
- * @param node Node to get the outer HTML of.
- * @param options Options for serialization.
- * @deprecated Use the `dom-serializer` module directly.
- * @returns `node`'s outer HTML.
- */
-function getOuterHTML(node, options) {
-    return dom_serializer_1.default(node, options);
-}
-exports.getOuterHTML = getOuterHTML;
-/**
- * @param node Node to get the inner HTML of.
- * @param options Options for serialization.
- * @deprecated Use the `dom-serializer` module directly.
- * @returns `node`'s inner HTML.
- */
-function getInnerHTML(node, options) {
-    return tagtypes_1.hasChildren(node)
-        ? node.children.map(function (node) { return getOuterHTML(node, options); }).join("")
-        : "";
-}
-exports.getInnerHTML = getInnerHTML;
-/**
- * Get a node's inner text.
- *
- * @param node Node to get the inner text of.
- * @returns `node`'s inner text.
- */
-function getText(node) {
-    if (Array.isArray(node))
-        return node.map(getText).join("");
-    if (tagtypes_1.isTag(node))
-        return node.name === "br" ? "\n" : getText(node.children);
-    if (tagtypes_1.isCDATA(node))
-        return getText(node.children);
-    if (tagtypes_1.isText(node))
-        return node.data;
-    return "";
-}
-exports.getText = getText;
-
-
-/***/ }),
-
-/***/ 1986:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.hasChildren = exports.isComment = exports.isText = exports.isCDATA = exports.isTag = void 0;
-var domelementtype_1 = __nccwpck_require__(3944);
-/**
- * @param node Node to check.
- * @returns `true` if the node is a `Element`, `false` otherwise.
- */
-function isTag(node) {
-    return domelementtype_1.isTag(node);
-}
-exports.isTag = isTag;
-/**
- * @param node Node to check.
- * @returns `true` if the node has the type `CDATA`, `false` otherwise.
- */
-function isCDATA(node) {
-    return node.type === domelementtype_1.ElementType.CDATA;
-}
-exports.isCDATA = isCDATA;
-/**
- * @param node Node to check.
- * @returns `true` if the node has the type `Text`, `false` otherwise.
- */
-function isText(node) {
-    return node.type === domelementtype_1.ElementType.Text;
-}
-exports.isText = isText;
-/**
- * @param node Node to check.
- * @returns `true` if the node has the type `Comment`, `false` otherwise.
- */
-function isComment(node) {
-    return node.type === domelementtype_1.ElementType.Comment;
-}
-exports.isComment = isComment;
-/**
- * @param node Node to check.
- * @returns `true` if the node is a `NodeWithChildren` (has children), `false` otherwise.
- */
-function hasChildren(node) {
-    return Object.prototype.hasOwnProperty.call(node, "children");
-}
-exports.hasChildren = hasChildren;
-
-
-/***/ }),
-
-/***/ 9678:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.prevElementSibling = exports.nextElementSibling = exports.getName = exports.hasAttrib = exports.getAttributeValue = exports.getSiblings = exports.getParent = exports.getChildren = void 0;
-var tagtypes_1 = __nccwpck_require__(1986);
-var emptyArray = [];
-/**
- * Get a node's children.
- *
- * @param elem Node to get the children of.
- * @returns `elem`'s children, or an empty array.
- */
-function getChildren(elem) {
-    var _a;
-    return (_a = elem.children) !== null && _a !== void 0 ? _a : emptyArray;
-}
-exports.getChildren = getChildren;
-/**
- * Get a node's parent.
- *
- * @param elem Node to get the parent of.
- * @returns `elem`'s parent node.
- */
-function getParent(elem) {
-    return elem.parent || null;
-}
-exports.getParent = getParent;
-/**
- * Gets an elements siblings, including the element itself.
- *
- * Attempts to get the children through the element's parent first.
- * If we don't have a parent (the element is a root node),
- * we walk the element's `prev` & `next` to get all remaining nodes.
- *
- * @param elem Element to get the siblings of.
- * @returns `elem`'s siblings.
- */
-function getSiblings(elem) {
-    var _a, _b;
-    var parent = getParent(elem);
-    if (parent != null)
-        return getChildren(parent);
-    var siblings = [elem];
-    var prev = elem.prev, next = elem.next;
-    while (prev != null) {
-        siblings.unshift(prev);
-        (_a = prev, prev = _a.prev);
-    }
-    while (next != null) {
-        siblings.push(next);
-        (_b = next, next = _b.next);
-    }
-    return siblings;
-}
-exports.getSiblings = getSiblings;
-/**
- * Gets an attribute from an element.
- *
- * @param elem Element to check.
- * @param name Attribute name to retrieve.
- * @returns The element's attribute value, or `undefined`.
- */
-function getAttributeValue(elem, name) {
-    var _a;
-    return (_a = elem.attribs) === null || _a === void 0 ? void 0 : _a[name];
-}
-exports.getAttributeValue = getAttributeValue;
-/**
- * Checks whether an element has an attribute.
- *
- * @param elem Element to check.
- * @param name Attribute name to look for.
- * @returns Returns whether `elem` has the attribute `name`.
- */
-function hasAttrib(elem, name) {
-    return (elem.attribs != null &&
-        Object.prototype.hasOwnProperty.call(elem.attribs, name) &&
-        elem.attribs[name] != null);
-}
-exports.hasAttrib = hasAttrib;
-/**
- * Get the tag name of an element.
- *
- * @param elem The element to get the name for.
- * @returns The tag name of `elem`.
- */
-function getName(elem) {
-    return elem.name;
-}
-exports.getName = getName;
-/**
- * Returns the next element sibling of a node.
- *
- * @param elem The element to get the next sibling of.
- * @returns `elem`'s next sibling that is a tag.
- */
-function nextElementSibling(elem) {
-    var _a;
-    var next = elem.next;
-    while (next !== null && !tagtypes_1.isTag(next))
-        (_a = next, next = _a.next);
-    return next;
-}
-exports.nextElementSibling = nextElementSibling;
-/**
- * Returns the previous element sibling of a node.
- *
- * @param elem The element to get the previous sibling of.
- * @returns `elem`'s previous sibling that is a tag.
- */
-function prevElementSibling(elem) {
-    var _a;
-    var prev = elem.prev;
-    while (prev !== null && !tagtypes_1.isTag(prev))
-        (_a = prev, prev = _a.prev);
-    return prev;
-}
-exports.prevElementSibling = prevElementSibling;
 
 
 /***/ }),
@@ -85708,15 +84447,15 @@ var constants_Platform;
 })(constants_Platform || (constants_Platform = {}));
 const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix");
 const constants_GITHUB_TOKEN = lib_core.getInput("github-token");
-const DUNE_CACHE = lib_core.getInput("dune-cache").toUpperCase() === "TRUE";
+const DUNE_CACHE = lib_core.getBooleanInput("dune-cache");
 const constants_OCAML_COMPILER = lib_core.getInput("ocaml-compiler");
-const OPAM_DEPEXT = lib_core.getInput("opam-depext").toUpperCase() === "TRUE";
+const OPAM_DEPEXT = lib_core.getBooleanInput("opam-depext");
 const OPAM_DEPEXT_FLAGS = lib_core.getInput("opam-depext-flags")
     .split(",")
     .map((f) => f.trim());
-const constants_OPAM_DISABLE_SANDBOXING = lib_core.getInput("opam-disable-sandboxing").toUpperCase() === "TRUE";
+const constants_OPAM_DISABLE_SANDBOXING = lib_core.getBooleanInput("opam-disable-sandboxing");
 const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages");
-const OPAM_PIN = lib_core.getInput("opam-pin").toUpperCase() === "TRUE";
+const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
 const constants_OPAM_REPOSITORY = lib_core.getInput("opam-repository");
 
 // EXTERNAL MODULE: ./node_modules/@actions/http-client/index.js
