@@ -3,7 +3,8 @@
 [![Main workflow](https://github.com/ocaml/setup-ocaml/workflows/Main%20workflow/badge.svg?branch=master)](https://github.com/ocaml/setup-ocaml/actions)
 [![CodeQL](https://github.com/ocaml/setup-ocaml/workflows/CodeQL/badge.svg?branch=master)](https://github.com/ocaml/setup-ocaml/actions)
 
-Set up an OCaml and opam environment in [GitHub Actions](https://github.com/features/actions) and add to PATH. 
+Set up an OCaml and opam environment in
+[GitHub Actions](https://github.com/features/actions) and add to PATH.
 
 ## Action
 
@@ -202,9 +203,10 @@ latest stable release of opam.
 
 ## Support
 
-Please feel free to post to the discuss.ocaml.org forum with any questions
-you have about this action.
+Please feel free to post to the discuss.ocaml.org forum with any questions you
+have about this action.
 
 Previous discussions include:
+
 - https://discuss.ocaml.org/t/github-actions-for-ocaml-now-stable-and-on-the-ocaml-org/7889
 - https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745
