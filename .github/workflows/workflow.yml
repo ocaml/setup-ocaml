@@ -1,8 +1,11 @@
 name: Main workflow
 
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+  schedule:
+    # Prime the caches every Monday
+    - cron: 0 1 * * MON
 
 jobs:
   build:
@@ -12,10 +15,30 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
-          - windows-latest
-        ocaml-version:
-          - 4.08.1
-          - 4.05.0
+        ocaml-compiler:
+          - 4.12.x
+          - ocaml-base-compiler.4.12.0
+        dune-cache:
+          - false
+        include:
+          - os: ubuntu-latest
+            ocaml-compiler: ocaml-base-compiler.4.12.0
+            dune-cache: true
+          - os: ubuntu-latest
+            ocaml-compiler: ocaml-variants.4.12.0+options,ocaml-option-32bit
+            dune-cache: false
+          - os: ubuntu-latest
+            ocaml-compiler: ocaml-variants.4.12.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
+            dune-cache: false
+          - os: windows-latest
+            ocaml-compiler: 4.12.x
+            dune-cache: true
+          - os: windows-latest
+            ocaml-compiler: ocaml-variants.4.12.0+mingw32c
+            dune-cache: false
+          - os: windows-latest
+            ocaml-compiler: ocaml-variants.4.12.0+mingw64c
+            dune-cache: false
 
     runs-on: ${{ matrix.os }}
 
@@ -24,14 +47,24 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 12.x
 
       - name: Install npm packages
+        if: runner.os == 'Linux'
         run: yarn --frozen-lockfile
 
+      - name: Check formatting
+        if: runner.os == 'Linux'
+        run: yarn fmt:check
+
+      - name: Check lint
+        if: runner.os == 'Linux'
+        run: yarn lint
+
       - name: Check type
+        if: runner.os == 'Linux'
         run: yarn typecheck
 
       - name: Ensure dist directory is up-to-date
@@ -45,17 +78,10 @@ jobs:
             exit 1
           fi
 
-      - name: Use OCaml ${{ matrix.ocaml-version }}
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: ${{ matrix.dune-cache }}
 
-      - run: opam depext yaml --install --verbose --yes
-
-      - name: Check formatting
-        run: yarn fmt:check
-        if: always()
-
-      - name: Check lint
-        run: yarn lint
-        if: always()
+      - run: opam depext uri --install

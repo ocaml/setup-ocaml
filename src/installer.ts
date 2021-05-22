@@ -1,103 +1,146 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
-import * as tc from "@actions/tool-cache";
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as util from "util";
+import * as process from "process";
 
-const osPlat = os.platform();
-const osArch = os.arch();
+import {
+  restoreCygwinCache,
+  restoreDuneCache,
+  restoreOpamCache,
+  restoreOpamDownloadCache,
+  saveOpamCache,
+} from "./cache";
+import {
+  DUNE_CACHE,
+  OCAML_COMPILER,
+  OPAM_DEPEXT,
+  OPAM_PIN,
+  Platform,
+} from "./constants";
+import { installDepext, installSystemPackages } from "./depext";
+import { installDune } from "./dune";
+import { installOcaml, pin, setupOpam, update } from "./opam";
+import { getOpamLocalPackages } from "./packages";
+import { startProfiler, stopProfiler } from "./profiler";
+import { getPlatform } from "./system";
+import { isSemverStyle, resolveVersion } from "./version";
 
-function getOpamFileName(version: string) {
-  const platform = osPlat === "darwin" ? "macos" : osPlat;
-  const arch = osArch === "x64" ? "x86_64" : "i686";
-  const filename = util.format("opam-%s-%s-%s", version, arch, platform);
-  return filename;
-}
-
-function getOpamDownloadUrl(version: string, filename: string) {
-  return util.format(
-    "https://github.com/ocaml/opam/releases/download/%s/%s",
-    version,
-    filename
-  );
-}
-
-async function acquireOpamWindows(version: string, customRepository: string) {
-  const cygwinRoot = "D:\\cygwin";
-  const repository =
-    customRepository ||
-    "https://github.com/fdopen/opam-repository-mingw.git#opam2";
-
-  let downloadPath;
-  try {
-    downloadPath = await tc.downloadTool("https://cygwin.com/setup-x86_64.exe");
-  } catch (error) {
-    core.debug(error);
-    throw `Failed to download cygwin: ${error}`;
+export async function installer(): Promise<void> {
+  const platform = getPlatform();
+  const numberOfProcessors = os.cpus().length;
+  const isDebug = core.isDebug();
+  core.exportVariable("OPAMCOLOR", "always");
+  core.exportVariable("OPAMERRLOGLEN", 0);
+  core.exportVariable("OPAMJOBS", numberOfProcessors);
+  core.exportVariable("OPAMPRECISETRACKING", 1);
+  core.exportVariable("OPAMSOLVERTIMEOUT", 500);
+  core.exportVariable("OPAMVERBOSE", isDebug);
+  core.exportVariable("OPAMYES", 1);
+  if (platform === Platform.Win32) {
+    const opamRoot = path.join("D:", ".opam");
+    core.exportVariable("OPAMROOT", opamRoot);
   }
-  const toolPath = await tc.cacheFile(
-    downloadPath,
-    "setup-x86_64.exe",
-    "cygwin",
-    "1.0"
-  );
-  core.exportVariable("CYGWIN_ROOT", cygwinRoot);
-  await exec(path.join(__dirname, "install-ocaml-windows.cmd"), [
-    __dirname,
-    toolPath,
-    version,
-    repository,
-  ]);
-  core.addPath(path.join(cygwinRoot, "wrapperbin"));
-}
-
-async function acquireOpamLinux(version: string, customRepository: string) {
-  const opamVersion = "2.0.8";
-  const fileName = getOpamFileName(opamVersion);
-  const downloadUrl = getOpamDownloadUrl(opamVersion, fileName);
-  const repository =
-    customRepository || "https://github.com/ocaml/opam-repository.git";
-
-  let downloadPath;
-  try {
-    downloadPath = await tc.downloadTool(downloadUrl);
-  } catch (error) {
-    core.debug(error);
-    throw `Failed to download version ${opamVersion}: ${error}`;
+  if (platform === Platform.Win32) {
+    const groupName = "Change the file system behavior parameters";
+    startProfiler(groupName);
+    await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
+    // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
+    await exec("fsutil", [
+      "behavior",
+      "set",
+      "symlinkEvaluation",
+      "R2L:1",
+      "R2R:1",
+    ]);
+    await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
+    stopProfiler(groupName);
   }
-  fs.chmodSync(downloadPath, 0o755);
-  const toolPath: string = await tc.cacheFile(
-    downloadPath,
-    "opam",
-    "opam",
-    opamVersion
-  );
-  core.addPath(toolPath);
-  await exec("sudo apt-get -y install bubblewrap musl-tools");
-  await exec(`"${toolPath}/opam"`, ["init", "--bare", "-yav", repository]);
-  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
-  await exec(`"${toolPath}/opam"`, ["install", "-y", "depext"]);
-}
-
-async function acquireOpamDarwin(version: string, customRepository: string) {
-  const repository =
-    customRepository || "https://github.com/ocaml/opam-repository.git";
-
-  await exec("brew", ["update"]);
-  await exec("brew", ["install", "opam"]);
-  await exec("opam", ["init", "--bare", "-yav", repository]);
-  await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
-  await exec("opam", ["install", "-y", "depext"]);
-}
-
-export async function getOpam(
-  version: string,
-  repository: string
-): Promise<void> {
-  core.exportVariable("OPAMYES", "1");
-  if (osPlat === "win32") return acquireOpamWindows(version, repository);
-  else if (osPlat === "darwin") return acquireOpamDarwin(version, repository);
-  else if (osPlat === "linux") return acquireOpamLinux(version, repository);
+  if (platform === Platform.Win32) {
+    core.exportVariable("HOME", process.env.USERPROFILE);
+    core.exportVariable("MSYS", "winsymlinks:native");
+  }
+  if (platform === Platform.Win32) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const originalPath = process.env.PATH!.split(path.delimiter);
+    const msys64Path = path.join("C:", "msys64", "usr", "bin");
+    const patchedPath = [msys64Path, ...originalPath];
+    process.env.PATH = patchedPath.join(path.delimiter);
+    await restoreCygwinCache();
+    process.env.PATH = originalPath.join(path.delimiter);
+  }
+  let opamCacheHit;
+  if (platform === Platform.Win32) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const originalPath = process.env.PATH!.split(path.delimiter);
+    const msys64Path = path.join("C:", "msys64", "usr", "bin");
+    const patchedPath = [msys64Path, ...originalPath];
+    process.env.PATH = patchedPath.join(path.delimiter);
+    opamCacheHit = await restoreOpamCache();
+    process.env.PATH = originalPath.join(path.delimiter);
+  } else {
+    opamCacheHit = await restoreOpamCache();
+  }
+  await setupOpam();
+  if (opamCacheHit) {
+    await update();
+  } else {
+    const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
+      ? platform === Platform.Win32
+        ? `ocaml-variants.${await resolveVersion(OCAML_COMPILER)}+mingw64c`
+        : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
+      : OCAML_COMPILER;
+    await installOcaml(ocamlCompiler);
+    if (platform === Platform.Win32) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const originalPath = process.env.PATH!.split(path.delimiter);
+      const msys64Path = path.join("C:", "msys64", "usr", "bin");
+      const patchedPath = [msys64Path, ...originalPath];
+      process.env.PATH = patchedPath.join(path.delimiter);
+      await saveOpamCache();
+      process.env.PATH = originalPath.join(path.delimiter);
+    } else {
+      await saveOpamCache();
+    }
+  }
+  if (platform === Platform.Win32) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const originalPath = process.env.PATH!.split(path.delimiter);
+    const msys64Path = path.join("C:", "msys64", "usr", "bin");
+    const patchedPath = [msys64Path, ...originalPath];
+    process.env.PATH = patchedPath.join(path.delimiter);
+    await restoreOpamDownloadCache();
+    process.env.PATH = originalPath.join(path.delimiter);
+  } else {
+    await restoreOpamDownloadCache();
+  }
+  await installDepext(platform);
+  if (DUNE_CACHE) {
+    if (platform === Platform.Win32) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const originalPath = process.env.PATH!.split(path.delimiter);
+      const msys64Path = path.join("C:", "msys64", "usr", "bin");
+      const patchedPath = [msys64Path, ...originalPath];
+      process.env.PATH = patchedPath.join(path.delimiter);
+      await restoreDuneCache();
+      process.env.PATH = originalPath.join(path.delimiter);
+    } else {
+      await restoreDuneCache();
+    }
+    await installDune();
+    core.exportVariable("DUNE_CACHE", "enabled");
+    core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
+  }
+  const fnames = await getOpamLocalPackages();
+  if (fnames.length > 0) {
+    if (OPAM_PIN) {
+      await pin(fnames);
+    }
+    if (OPAM_DEPEXT) {
+      await installSystemPackages(fnames);
+    }
+  }
+  await exec("opam", ["--version"]);
+  await exec("opam", ["depext", "--version"]);
+  await exec("opam", ["exec", "--", "ocaml", "-version"]);
 }
