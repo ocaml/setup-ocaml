@@ -82,25 +82,20 @@ async function initializeOpamUnix() {
   if (isGitHubRunner) {
     if (platform === Platform.Linux) {
       const { version: systemVersion } = await getSystemIdentificationInfo();
-      if (systemVersion === "16.04" || systemVersion === "18.04") {
+      if (systemVersion === "18.04") {
         // [info]: musl-tools bug in ubuntu 18.04;
         // <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
         await exec("sudo", ["add-apt-repository", "ppa:avsm/musl"]);
       }
-      const packages = [];
-      if (systemVersion !== "16.04") {
-        // [info]: <https://github.com/ocaml/opam/issues/3424>
-        packages.push("bubblewrap");
-      }
       await exec("sudo", [
         "apt-get",
         "install",
+        "bubblewrap",
         "darcs",
         "g++-multilib",
         "gcc-multilib",
         "mercurial",
         "musl-tools",
-        ...packages,
       ]);
     } else if (platform === Platform.MacOS) {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
