@@ -10,8 +10,8 @@ and this project adheres to
 
 ### Added
 
-- Added semver style version matching support.
-- Added `ocaml-compiler` input instead of `ocaml-version`.
+- Added support for 32 bits compiler variants.
+- Added semver-style version matching support.
 - Cache opam root (`~/.opam` on Unix, `D:\.opam` on Windows), opam
   download-cache (`~/.opam/download-cache` on Unix, `D:\.opam\download-cache` on
   Windows), and opam local switch (`_opam`).
@@ -35,6 +35,9 @@ and this project adheres to
 
 ### Changed
 
+- Added `ocaml-compiler` input instead of `ocaml-version`.
+- The Ubuntu runners install `mingw64-i686-gcc-core` and `mingw64-i686-gcc-g++`
+  for 32 bit compiler variant support.
 - Clean the log output by grouping some operations.
 - The compiler will be initialised in all platforms with an opam local switch to
   eliminate differences between platforms and prepare for full dependency
@@ -64,7 +67,6 @@ and this project adheres to
 - Use the appropriate file system behavior parameters on the Windows runners.
   (`R2L:1`, `R2R:1`)
 - Add `ppa: avsm/musl` on 18.04 and older Ubuntu runners.
-- Do not install `bubblewrap` on the Ubuntu 16.04 runner to avoid the failure.
 - Pass `--enable-shell-hook` to `opam init` fixes a bug that must be run via
   opam exec in subsequent steps.
 - The Ubuntu runners install `gcc-multilib`, `g++-multilib` for
