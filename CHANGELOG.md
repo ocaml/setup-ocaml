@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-alpha]
+
 ### Added
 
 - Added support for 32 bits compiler variants.
@@ -185,7 +187,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.11...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...HEAD
+[2.0.0-alpha]:
+  https://github.com/avsm/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
 [1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.11
 [1.1.10]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.10
 [1.1.9]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...v1.1.9
