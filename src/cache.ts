@@ -15,7 +15,11 @@ import {
 } from "./constants";
 import { getCygwinVersion } from "./opam";
 import { startProfiler, stopProfiler } from "./profiler";
-import { getArchitecture, getPlatform } from "./system";
+import {
+  getArchitecture,
+  getPlatform,
+  getSystemIdentificationInfo,
+} from "./system";
 import { isSemverStyle, resolveVersion } from "./version";
 
 function composeDate() {
@@ -55,6 +59,10 @@ function composeDuneCacheKeys() {
 
 async function composeOpamCacheKeys() {
   const platform = getPlatform();
+  const fullPlatform =
+    platform === Platform.Win32
+      ? platform
+      : `${platform}-${(await getSystemIdentificationInfo()).version}`;
   const architecture = getArchitecture();
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const {
@@ -70,10 +78,10 @@ async function composeOpamCacheKeys() {
     : OCAML_COMPILER;
   const ocamlVersion = ocamlCompiler.toLowerCase().replace(/,/g, "_");
   const { year, month, date } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${platform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${platform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`,
-    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${platform}-${architecture}-${ocamlVersion}-${year}-${month}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-`,
   ];
   return { key, restoreKeys };
 }

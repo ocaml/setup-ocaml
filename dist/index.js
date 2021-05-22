@@ -85014,6 +85014,9 @@ function composeDuneCacheKeys() {
 function composeOpamCacheKeys() {
     return cache_awaiter(this, void 0, void 0, function* () {
         const platform = getPlatform();
+        const fullPlatform = platform === Platform.Win32
+            ? platform
+            : `${platform}-${(yield getSystemIdentificationInfo()).version}`;
         const architecture = getArchitecture();
         const octokit = lib_github.getOctokit(constants_GITHUB_TOKEN);
         const { data: { tag_name: opamVersion }, } = yield octokit.rest.repos.getLatestRelease({
@@ -85027,10 +85030,10 @@ function composeOpamCacheKeys() {
             : OCAML_COMPILER;
         const ocamlVersion = ocamlCompiler.toLowerCase().replace(/,/g, "_");
         const { year, month, date } = composeDate();
-        const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${platform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`;
+        const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`;
         const restoreKeys = [
-            `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${platform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`,
-            `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${platform}-${architecture}-${ocamlVersion}-${year}-${month}-`,
+            `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`,
+            `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-`,
         ];
         return { key, restoreKeys };
     });
