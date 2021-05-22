@@ -172,12 +172,13 @@ async function setupCygwin() {
   const site = "http://cygwin.mirror.constant.com";
   const packages = [
     "curl",
-    "diff",
     "diffutils",
     "git",
     "m4",
     "make",
     "mercurial",
+    "mingw64-i686-gcc-core",
+    "mingw64-i686-gcc-g++",
     "mingw64-x86_64-gcc-core",
     "mingw64-x86_64-gcc-g++",
     "patch",
