@@ -34,11 +34,11 @@ jobs:
             ocaml-compiler: 4.12.x
             dune-cache: true
           - os: windows-latest
-            ocaml-compiler: ocaml-variants.4.12.0+mingw64c
+            ocaml-compiler: ocaml-variants.4.12.0+mingw32c
             dune-cache: false
           - os: windows-latest
             ocaml-compiler: ocaml-variants.4.12.0+mingw64c
-            dune-cache: true
+            dune-cache: false
 
     runs-on: ${{ matrix.os }}
 
