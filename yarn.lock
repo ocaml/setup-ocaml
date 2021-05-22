@@ -39,10 +39,10 @@
     "@octokit/plugin-paginate-rest" "^2.13.3"
     "@octokit/plugin-rest-endpoint-methods" "^5.1.1"
 
-"@actions/glob@0.1.1", "@actions/glob@^0.1.0":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@actions/glob/-/glob-0.1.1.tgz#0af851312dfed21fdf9eac3473cfde93ffa56e40"
-  integrity sha512-ikM4GVZOgSGDNTjv0ECJ8AOqmDqQwtO4K1M4P465C9iikRq34+FwCjUVSwzgOYDP85qtddyWpzBw5lTub/9Xmg==
+"@actions/glob@0.1.2", "@actions/glob@^0.1.0":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@actions/glob/-/glob-0.1.2.tgz#9685ed2d6583093479c8f137d067c4329d7d0974"
+  integrity sha512-SclLR7Ia5sEqjkJTPs7Sd86maMDw43p769YxBOxvPvEWuPEhpAnBsQfENOpXjFYMmhCqd127bmf+YdvJqVqR4A==
   dependencies:
     "@actions/core" "^1.2.6"
     minimatch "^3.0.4"
