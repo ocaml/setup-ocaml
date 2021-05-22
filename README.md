@@ -57,6 +57,12 @@ immediately after initialisation to minimize the size of the cache.
    - If the dune cache feature is enabled
 1. Save the opam download cache
 
+#### What is the difference between opam dependencies and depext dependencies?
+
+- opam dependencies: opam packages installed by `opam install`.
+- depext dependencies: System packages installed by `apt-get install`,
+  `yum install`, `brew install`, etc.
+
 ## Usage
 
 We adhere to [semantic versioning](https://semver.org), it's safe to use the
@@ -130,12 +136,6 @@ jobs:
 
       - run: opam exec -- dune runtest
 ```
-
-#### What is the difference between opam dependencies and depext dependencies?
-
-- opam dependencies: opam packages installed by `opam install`.
-- depext dependencies: System packages installed by `apt-get install`,
-  `yum install`, `brew install`, etc.
 
 ## Advanced Configurations
 
