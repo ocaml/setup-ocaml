@@ -37,8 +37,7 @@ and this project adheres to
 
 ### Changed
 
-- Added `ocaml-compiler` input instead of `ocaml-version`.
-- The Ubuntu runners install `mingw64-i686-gcc-core` and `mingw64-i686-gcc-g++`
+- The Windows runners install `mingw64-i686-gcc-core` and `mingw64-i686-gcc-g++`
   for 32 bit compiler variant support.
 - Clean the log output by grouping some operations.
 - The compiler will be initialised in all platforms with an opam local switch to
