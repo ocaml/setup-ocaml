@@ -104,8 +104,11 @@ methods to do this.
 name: Main workflow
 
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+  schedule:
+    # Prime the caches every Monday
+    - cron: 0 1 * * MON
 
 jobs:
   build:
