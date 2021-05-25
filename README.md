@@ -73,7 +73,7 @@ version.
 ```yml
 - name: Use OCaml ${{ matrix.ocaml-compiler }}
   uses: ocaml/setup-ocaml@v2
-  #                     ^^^
+  #                      ^^^
   with:
     ocaml-compiler: ${{ matrix.ocaml-compiler }}
 ```
