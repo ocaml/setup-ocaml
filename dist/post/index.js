@@ -57179,18 +57179,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.isTraversal = void 0;
 var reName = /^[^\\#]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 var reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
-// Modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
-var reAttr = /^\s*(?:(\*|[-\w]*)\|)?((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])((?:[^\\]|\\[^])*?)\4|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*([iIsS])?\s*\]/;
-var actionTypes = {
-    undefined: "exists",
-    "": "equals",
-    "~": "element",
-    "^": "start",
-    $: "end",
-    "*": "any",
-    "!": "not",
-    "|": "hyphen",
-};
+var actionTypes = new Map([
+    ["~", "element"],
+    ["^", "start"],
+    ["$", "end"],
+    ["*", "any"],
+    ["!", "not"],
+    ["|", "hyphen"],
+]);
 var Traversals = {
     ">": "child",
     "<": "parent",
@@ -57368,8 +57364,7 @@ function parseSelector(subselects, selector, options, selectorIndex) {
             sawWS = false;
             stripWhitespace(1);
         }
-        else if (firstChar === "/" &&
-            selector.charAt(selectorIndex + 1) === "*") {
+        else if (selector.startsWith("/*", selectorIndex)) {
             var endIndex = selector.indexOf("*/", selectorIndex + 2);
             if (endIndex < 0) {
                 throw new Error("Comment was not terminated");
@@ -57395,32 +57390,98 @@ function parseSelector(subselects, selector, options, selectorIndex) {
                 });
             }
             else if (firstChar === "[") {
-                var attributeMatch = selector
-                    .slice(selectorIndex + 1)
-                    .match(reAttr);
-                if (!attributeMatch) {
-                    throw new Error("Malformed attribute selector: " + selector.slice(selectorIndex));
+                stripWhitespace(1);
+                // Determine attribute name and namespace
+                var name_2 = void 0;
+                var namespace = null;
+                if (selector.charAt(selectorIndex) === "|") {
+                    namespace = "";
+                    selectorIndex += 1;
                 }
-                var completeSelector = attributeMatch[0], _d = attributeMatch[1], namespace = _d === void 0 ? null : _d, baseName = attributeMatch[2], actionType = attributeMatch[3], _e = attributeMatch[5], quotedValue = _e === void 0 ? "" : _e, _f = attributeMatch[6], value = _f === void 0 ? quotedValue : _f, forceIgnore = attributeMatch[7];
-                selectorIndex += completeSelector.length + 1;
-                var name_2 = unescapeCSS(baseName);
+                if (selector.startsWith("*|", selectorIndex)) {
+                    namespace = "*";
+                    selectorIndex += 2;
+                }
+                name_2 = getName(0);
+                if (namespace === null &&
+                    selector.charAt(selectorIndex) === "|" &&
+                    selector.charAt(selectorIndex + 1) !== "=") {
+                    namespace = name_2;
+                    name_2 = getName(1);
+                }
                 if ((_a = options.lowerCaseAttributeNames) !== null && _a !== void 0 ? _a : !options.xmlMode) {
                     name_2 = name_2.toLowerCase();
                 }
-                var ignoreCase = 
-                // If the forceIgnore flag is set (either `i` or `s`), use that value
-                forceIgnore
-                    ? forceIgnore.toLowerCase() === "i"
-                    : // If `xmlMode` is set, there are no rules; return `null`.
-                        options.xmlMode
-                            ? null
-                            : // Otherwise, use the `caseInsensitiveAttributes` list.
-                                caseInsensitiveAttributes.has(name_2);
+                stripWhitespace(0);
+                // Determine comparison operation
+                var action = "exists";
+                var possibleAction = actionTypes.get(selector.charAt(selectorIndex));
+                if (possibleAction) {
+                    action = possibleAction;
+                    if (selector.charAt(selectorIndex + 1) !== "=") {
+                        throw new Error("Expected `=`");
+                    }
+                    stripWhitespace(2);
+                }
+                else if (selector.charAt(selectorIndex) === "=") {
+                    action = "equals";
+                    stripWhitespace(1);
+                }
+                // Determine value
+                var value = "";
+                var ignoreCase = null;
+                if (action !== "exists") {
+                    if (quotes.has(selector.charAt(selectorIndex))) {
+                        var quote = selector.charAt(selectorIndex);
+                        var sectionEnd = selectorIndex + 1;
+                        while (sectionEnd < selector.length &&
+                            (selector.charAt(sectionEnd) !== quote ||
+                                isEscaped(sectionEnd))) {
+                            sectionEnd += 1;
+                        }
+                        if (selector.charAt(sectionEnd) !== quote) {
+                            throw new Error("Attribute value didn't end");
+                        }
+                        value = unescapeCSS(selector.slice(selectorIndex + 1, sectionEnd));
+                        selectorIndex = sectionEnd + 1;
+                    }
+                    else {
+                        var valueStart = selectorIndex;
+                        while (selectorIndex < selector.length &&
+                            ((!isWhitespace(selector.charAt(selectorIndex)) &&
+                                selector.charAt(selectorIndex) !== "]") ||
+                                isEscaped(selectorIndex))) {
+                            selectorIndex += 1;
+                        }
+                        value = unescapeCSS(selector.slice(valueStart, selectorIndex));
+                    }
+                    stripWhitespace(0);
+                    // See if we have a force ignore flag
+                    var forceIgnore = selector.charAt(selectorIndex);
+                    // If the forceIgnore flag is set (either `i` or `s`), use that value
+                    if (forceIgnore === "s" || forceIgnore === "S") {
+                        ignoreCase = false;
+                        stripWhitespace(1);
+                    }
+                    else if (forceIgnore === "i" || forceIgnore === "I") {
+                        ignoreCase = true;
+                        stripWhitespace(1);
+                    }
+                }
+                // If `xmlMode` is set, there are no rules; otherwise, use the `caseInsensitiveAttributes` list.
+                if (!options.xmlMode) {
+                    // TODO: Skip this for `exists`, as there is no value to compare to.
+                    ignoreCase !== null && ignoreCase !== void 0 ? ignoreCase : (ignoreCase = caseInsensitiveAttributes.has(name_2));
+                }
+                if (selector.charAt(selectorIndex) !== "]") {
+                    throw new Error("Attribute selector didn't terminate");
+                }
+                selectorIndex += 1;
                 var attributeSelector = {
                     type: "attribute",
                     name: name_2,
-                    action: actionTypes[actionType],
-                    value: unescapeCSS(value),
+                    action: action,
+                    value: value,
                     namespace: namespace,
                     ignoreCase: ignoreCase,
                 };
@@ -57570,6 +57631,7 @@ var charsToEscape = new Set(__spreadArray(__spreadArray([], Object.keys(actionTy
     "\\",
     "(",
     ")",
+    "'",
 ]));
 /**
  * Turns `selector` back into a string.
