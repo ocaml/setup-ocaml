@@ -55888,7 +55888,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.select = exports.filter = exports.some = exports.is = exports.aliases = exports.pseudos = exports.filters = void 0;
 var css_what_1 = __nccwpck_require__(9218);
 var css_select_1 = __nccwpck_require__(4508);
-var DomUtils = __importStar(__nccwpck_require__(5217));
+var DomUtils = __importStar(__nccwpck_require__(1796));
 var helpers_1 = __nccwpck_require__(8513);
 var positionals_1 = __nccwpck_require__(9159);
 // Re-export pseudo extension points
@@ -55907,11 +55907,7 @@ var CUSTOM_SCOPE_PSEUDO = __assign({}, SCOPE_PSEUDO);
 var UNIVERSAL_SELECTOR = { type: "universal", namespace: null };
 function is(element, selector, options) {
     if (options === void 0) { options = {}; }
-    if (typeof selector === "function")
-        return selector(element);
-    var _a = helpers_1.groupSelectors(css_what_1.parse(selector, options)), plain = _a[0], filtered = _a[1];
-    return ((plain.length > 0 && css_select_1.is(element, plain, options)) ||
-        filtered.some(function (sel) { return filterBySelector(sel, [element], options).length > 0; }));
+    return some([element], selector, options);
 }
 exports.is = is;
 function some(elements, selector, options) {
@@ -55982,7 +55978,7 @@ function filterParsed(selector, elements, options) {
     for (var i = 0; i < filteredSelectors.length && (found === null || found === void 0 ? void 0 : found.size) !== elements.length; i++) {
         var filteredSelector = filteredSelectors[i];
         var missing = found
-            ? elements.filter(function (e) { return !found.has(e); })
+            ? elements.filter(function (e) { return DomUtils.isTag(e) && !found.has(e); })
             : elements;
         if (missing.length === 0)
             break;
@@ -56004,18 +56000,22 @@ function filterParsed(selector, elements, options) {
         }
     }
     return typeof found !== "undefined"
-        ? found.size === elements.length
+        ? (found.size === elements.length
             ? elements
-            : elements.filter(function (el) { return found.has(el); })
+            : // Filter elements to preserve order
+                elements.filter(function (el) {
+                    return found.has(el);
+                }))
         : [];
 }
 function filterBySelector(selector, elements, options) {
+    var _a;
     if (selector.some(css_what_1.isTraversal)) {
         /*
-         * Get one root node, run selector with the scope
+         * Get root node, run selector with the scope
          * set to all of our nodes.
          */
-        var root = helpers_1.getDocumentRoot(elements[0]);
+        var root = (_a = options.root) !== null && _a !== void 0 ? _a : helpers_1.getDocumentRoot(elements[0]);
         var sel = __spreadArray(__spreadArray([], selector), [CUSTOM_SCOPE_PSEUDO]);
         return findFilterElements(root, sel, options, true, elements);
     }
@@ -56198,6 +56198,798 @@ exports.getLimit = getLimit;
 
 /***/ }),
 
+/***/ 5484:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.uniqueSort = exports.compareDocumentPosition = exports.removeSubsets = void 0;
+var domhandler_1 = __nccwpck_require__(4038);
+/**
+ * Given an array of nodes, remove any member that is contained by another.
+ *
+ * @param nodes Nodes to filter.
+ * @returns Remaining nodes that aren't subtrees of each other.
+ */
+function removeSubsets(nodes) {
+    var idx = nodes.length;
+    /*
+     * Check if each node (or one of its ancestors) is already contained in the
+     * array.
+     */
+    while (--idx >= 0) {
+        var node = nodes[idx];
+        /*
+         * Remove the node if it is not unique.
+         * We are going through the array from the end, so we only
+         * have to check nodes that preceed the node under consideration in the array.
+         */
+        if (idx > 0 && nodes.lastIndexOf(node, idx - 1) >= 0) {
+            nodes.splice(idx, 1);
+            continue;
+        }
+        for (var ancestor = node.parent; ancestor; ancestor = ancestor.parent) {
+            if (nodes.includes(ancestor)) {
+                nodes.splice(idx, 1);
+                break;
+            }
+        }
+    }
+    return nodes;
+}
+exports.removeSubsets = removeSubsets;
+/**
+ * Compare the position of one node against another node in any other document.
+ * The return value is a bitmask with the following values:
+ *
+ * Document order:
+ * > There is an ordering, document order, defined on all the nodes in the
+ * > document corresponding to the order in which the first character of the
+ * > XML representation of each node occurs in the XML representation of the
+ * > document after expansion of general entities. Thus, the document element
+ * > node will be the first node. Element nodes occur before their children.
+ * > Thus, document order orders element nodes in order of the occurrence of
+ * > their start-tag in the XML (after expansion of entities). The attribute
+ * > nodes of an element occur after the element and before its children. The
+ * > relative order of attribute nodes is implementation-dependent./
+ *
+ * Source:
+ * http://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-document-order
+ *
+ * @param nodeA The first node to use in the comparison
+ * @param nodeB The second node to use in the comparison
+ * @returns A bitmask describing the input nodes' relative position.
+ *
+ * See http://dom.spec.whatwg.org/#dom-node-comparedocumentposition for
+ * a description of these values.
+ */
+function compareDocumentPosition(nodeA, nodeB) {
+    var aParents = [];
+    var bParents = [];
+    if (nodeA === nodeB) {
+        return 0;
+    }
+    var current = domhandler_1.hasChildren(nodeA) ? nodeA : nodeA.parent;
+    while (current) {
+        aParents.unshift(current);
+        current = current.parent;
+    }
+    current = domhandler_1.hasChildren(nodeB) ? nodeB : nodeB.parent;
+    while (current) {
+        bParents.unshift(current);
+        current = current.parent;
+    }
+    var maxIdx = Math.min(aParents.length, bParents.length);
+    var idx = 0;
+    while (idx < maxIdx && aParents[idx] === bParents[idx]) {
+        idx++;
+    }
+    if (idx === 0) {
+        return 1 /* DISCONNECTED */;
+    }
+    var sharedParent = aParents[idx - 1];
+    var siblings = sharedParent.children;
+    var aSibling = aParents[idx];
+    var bSibling = bParents[idx];
+    if (siblings.indexOf(aSibling) > siblings.indexOf(bSibling)) {
+        if (sharedParent === nodeB) {
+            return 4 /* FOLLOWING */ | 16 /* CONTAINED_BY */;
+        }
+        return 4 /* FOLLOWING */;
+    }
+    if (sharedParent === nodeA) {
+        return 2 /* PRECEDING */ | 8 /* CONTAINS */;
+    }
+    return 2 /* PRECEDING */;
+}
+exports.compareDocumentPosition = compareDocumentPosition;
+/**
+ * Sort an array of nodes based on their relative position in the document and
+ * remove any duplicate nodes. If the array contains nodes that do not belong
+ * to the same document, sort order is unspecified.
+ *
+ * @param nodes Array of DOM nodes.
+ * @returns Collection of unique nodes, sorted in document order.
+ */
+function uniqueSort(nodes) {
+    nodes = nodes.filter(function (node, i, arr) { return !arr.includes(node, i + 1); });
+    nodes.sort(function (a, b) {
+        var relative = compareDocumentPosition(a, b);
+        if (relative & 2 /* PRECEDING */) {
+            return -1;
+        }
+        else if (relative & 4 /* FOLLOWING */) {
+            return 1;
+        }
+        return 0;
+    });
+    return nodes;
+}
+exports.uniqueSort = uniqueSort;
+
+
+/***/ }),
+
+/***/ 1796:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.hasChildren = exports.isDocument = exports.isComment = exports.isText = exports.isCDATA = exports.isTag = void 0;
+__exportStar(__nccwpck_require__(5522), exports);
+__exportStar(__nccwpck_require__(350), exports);
+__exportStar(__nccwpck_require__(9617), exports);
+__exportStar(__nccwpck_require__(3781), exports);
+__exportStar(__nccwpck_require__(961), exports);
+__exportStar(__nccwpck_require__(5484), exports);
+var domhandler_1 = __nccwpck_require__(4038);
+Object.defineProperty(exports, "isTag", ({ enumerable: true, get: function () { return domhandler_1.isTag; } }));
+Object.defineProperty(exports, "isCDATA", ({ enumerable: true, get: function () { return domhandler_1.isCDATA; } }));
+Object.defineProperty(exports, "isText", ({ enumerable: true, get: function () { return domhandler_1.isText; } }));
+Object.defineProperty(exports, "isComment", ({ enumerable: true, get: function () { return domhandler_1.isComment; } }));
+Object.defineProperty(exports, "isDocument", ({ enumerable: true, get: function () { return domhandler_1.isDocument; } }));
+Object.defineProperty(exports, "hasChildren", ({ enumerable: true, get: function () { return domhandler_1.hasChildren; } }));
+
+
+/***/ }),
+
+/***/ 961:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getElementsByTagType = exports.getElementsByTagName = exports.getElementById = exports.getElements = exports.testElement = void 0;
+var domhandler_1 = __nccwpck_require__(4038);
+var querying_1 = __nccwpck_require__(3781);
+var Checks = {
+    tag_name: function (name) {
+        if (typeof name === "function") {
+            return function (elem) { return domhandler_1.isTag(elem) && name(elem.name); };
+        }
+        else if (name === "*") {
+            return domhandler_1.isTag;
+        }
+        return function (elem) { return domhandler_1.isTag(elem) && elem.name === name; };
+    },
+    tag_type: function (type) {
+        if (typeof type === "function") {
+            return function (elem) { return type(elem.type); };
+        }
+        return function (elem) { return elem.type === type; };
+    },
+    tag_contains: function (data) {
+        if (typeof data === "function") {
+            return function (elem) { return domhandler_1.isText(elem) && data(elem.data); };
+        }
+        return function (elem) { return domhandler_1.isText(elem) && elem.data === data; };
+    },
+};
+/**
+ * @param attrib Attribute to check.
+ * @param value Attribute value to look for.
+ * @returns A function to check whether the a node has an attribute with a particular value.
+ */
+function getAttribCheck(attrib, value) {
+    if (typeof value === "function") {
+        return function (elem) { return domhandler_1.isTag(elem) && value(elem.attribs[attrib]); };
+    }
+    return function (elem) { return domhandler_1.isTag(elem) && elem.attribs[attrib] === value; };
+}
+/**
+ * @param a First function to combine.
+ * @param b Second function to combine.
+ * @returns A function taking a node and returning `true` if either
+ * of the input functions returns `true` for the node.
+ */
+function combineFuncs(a, b) {
+    return function (elem) { return a(elem) || b(elem); };
+}
+/**
+ * @param options An object describing nodes to look for.
+ * @returns A function executing all checks in `options` and returning `true`
+ * if any of them match a node.
+ */
+function compileTest(options) {
+    var funcs = Object.keys(options).map(function (key) {
+        var value = options[key];
+        return key in Checks
+            ? Checks[key](value)
+            : getAttribCheck(key, value);
+    });
+    return funcs.length === 0 ? null : funcs.reduce(combineFuncs);
+}
+/**
+ * @param options An object describing nodes to look for.
+ * @param node The element to test.
+ * @returns Whether the element matches the description in `options`.
+ */
+function testElement(options, node) {
+    var test = compileTest(options);
+    return test ? test(node) : true;
+}
+exports.testElement = testElement;
+/**
+ * @param options An object describing nodes to look for.
+ * @param nodes Nodes to search through.
+ * @param recurse Also consider child nodes.
+ * @param limit Maximum number of nodes to return.
+ * @returns All nodes that match `options`.
+ */
+function getElements(options, nodes, recurse, limit) {
+    if (limit === void 0) { limit = Infinity; }
+    var test = compileTest(options);
+    return test ? querying_1.filter(test, nodes, recurse, limit) : [];
+}
+exports.getElements = getElements;
+/**
+ * @param id The unique ID attribute value to look for.
+ * @param nodes Nodes to search through.
+ * @param recurse Also consider child nodes.
+ * @returns The node with the supplied ID.
+ */
+function getElementById(id, nodes, recurse) {
+    if (recurse === void 0) { recurse = true; }
+    if (!Array.isArray(nodes))
+        nodes = [nodes];
+    return querying_1.findOne(getAttribCheck("id", id), nodes, recurse);
+}
+exports.getElementById = getElementById;
+/**
+ * @param tagName Tag name to search for.
+ * @param nodes Nodes to search through.
+ * @param recurse Also consider child nodes.
+ * @param limit Maximum number of nodes to return.
+ * @returns All nodes with the supplied `tagName`.
+ */
+function getElementsByTagName(tagName, nodes, recurse, limit) {
+    if (recurse === void 0) { recurse = true; }
+    if (limit === void 0) { limit = Infinity; }
+    return querying_1.filter(Checks.tag_name(tagName), nodes, recurse, limit);
+}
+exports.getElementsByTagName = getElementsByTagName;
+/**
+ * @param type Element type to look for.
+ * @param nodes Nodes to search through.
+ * @param recurse Also consider child nodes.
+ * @param limit Maximum number of nodes to return.
+ * @returns All nodes with the supplied `type`.
+ */
+function getElementsByTagType(type, nodes, recurse, limit) {
+    if (recurse === void 0) { recurse = true; }
+    if (limit === void 0) { limit = Infinity; }
+    return querying_1.filter(Checks.tag_type(type), nodes, recurse, limit);
+}
+exports.getElementsByTagType = getElementsByTagType;
+
+
+/***/ }),
+
+/***/ 9617:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.prepend = exports.prependChild = exports.append = exports.appendChild = exports.replaceElement = exports.removeElement = void 0;
+/**
+ * Remove an element from the dom
+ *
+ * @param elem The element to be removed
+ */
+function removeElement(elem) {
+    if (elem.prev)
+        elem.prev.next = elem.next;
+    if (elem.next)
+        elem.next.prev = elem.prev;
+    if (elem.parent) {
+        var childs = elem.parent.children;
+        childs.splice(childs.lastIndexOf(elem), 1);
+    }
+}
+exports.removeElement = removeElement;
+/**
+ * Replace an element in the dom
+ *
+ * @param elem The element to be replaced
+ * @param replacement The element to be added
+ */
+function replaceElement(elem, replacement) {
+    var prev = (replacement.prev = elem.prev);
+    if (prev) {
+        prev.next = replacement;
+    }
+    var next = (replacement.next = elem.next);
+    if (next) {
+        next.prev = replacement;
+    }
+    var parent = (replacement.parent = elem.parent);
+    if (parent) {
+        var childs = parent.children;
+        childs[childs.lastIndexOf(elem)] = replacement;
+    }
+}
+exports.replaceElement = replaceElement;
+/**
+ * Append a child to an element.
+ *
+ * @param elem The element to append to.
+ * @param child The element to be added as a child.
+ */
+function appendChild(elem, child) {
+    removeElement(child);
+    child.next = null;
+    child.parent = elem;
+    if (elem.children.push(child) > 1) {
+        var sibling = elem.children[elem.children.length - 2];
+        sibling.next = child;
+        child.prev = sibling;
+    }
+    else {
+        child.prev = null;
+    }
+}
+exports.appendChild = appendChild;
+/**
+ * Append an element after another.
+ *
+ * @param elem The element to append after.
+ * @param next The element be added.
+ */
+function append(elem, next) {
+    removeElement(next);
+    var parent = elem.parent;
+    var currNext = elem.next;
+    next.next = currNext;
+    next.prev = elem;
+    elem.next = next;
+    next.parent = parent;
+    if (currNext) {
+        currNext.prev = next;
+        if (parent) {
+            var childs = parent.children;
+            childs.splice(childs.lastIndexOf(currNext), 0, next);
+        }
+    }
+    else if (parent) {
+        parent.children.push(next);
+    }
+}
+exports.append = append;
+/**
+ * Prepend a child to an element.
+ *
+ * @param elem The element to prepend before.
+ * @param child The element to be added as a child.
+ */
+function prependChild(elem, child) {
+    removeElement(child);
+    child.parent = elem;
+    child.prev = null;
+    if (elem.children.unshift(child) !== 1) {
+        var sibling = elem.children[1];
+        sibling.prev = child;
+        child.next = sibling;
+    }
+    else {
+        child.next = null;
+    }
+}
+exports.prependChild = prependChild;
+/**
+ * Prepend an element before another.
+ *
+ * @param elem The element to prepend before.
+ * @param prev The element be added.
+ */
+function prepend(elem, prev) {
+    removeElement(prev);
+    var parent = elem.parent;
+    if (parent) {
+        var childs = parent.children;
+        childs.splice(childs.indexOf(elem), 0, prev);
+    }
+    if (elem.prev) {
+        elem.prev.next = prev;
+    }
+    prev.parent = parent;
+    prev.prev = elem.prev;
+    prev.next = elem;
+    elem.prev = prev;
+}
+exports.prepend = prepend;
+
+
+/***/ }),
+
+/***/ 3781:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.findAll = exports.existsOne = exports.findOne = exports.findOneChild = exports.find = exports.filter = void 0;
+var domhandler_1 = __nccwpck_require__(4038);
+/**
+ * Search a node and its children for nodes passing a test function.
+ *
+ * @param test Function to test nodes on.
+ * @param node Node to search. Will be included in the result set if it matches.
+ * @param recurse Also consider child nodes.
+ * @param limit Maximum number of nodes to return.
+ * @returns All nodes passing `test`.
+ */
+function filter(test, node, recurse, limit) {
+    if (recurse === void 0) { recurse = true; }
+    if (limit === void 0) { limit = Infinity; }
+    if (!Array.isArray(node))
+        node = [node];
+    return find(test, node, recurse, limit);
+}
+exports.filter = filter;
+/**
+ * Search an array of node and its children for nodes passing a test function.
+ *
+ * @param test Function to test nodes on.
+ * @param nodes Array of nodes to search.
+ * @param recurse Also consider child nodes.
+ * @param limit Maximum number of nodes to return.
+ * @returns All nodes passing `test`.
+ */
+function find(test, nodes, recurse, limit) {
+    var result = [];
+    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+        var elem = nodes_1[_i];
+        if (test(elem)) {
+            result.push(elem);
+            if (--limit <= 0)
+                break;
+        }
+        if (recurse && domhandler_1.hasChildren(elem) && elem.children.length > 0) {
+            var children = find(test, elem.children, recurse, limit);
+            result.push.apply(result, children);
+            limit -= children.length;
+            if (limit <= 0)
+                break;
+        }
+    }
+    return result;
+}
+exports.find = find;
+/**
+ * Finds the first element inside of an array that matches a test function.
+ *
+ * @param test Function to test nodes on.
+ * @param nodes Array of nodes to search.
+ * @returns The first node in the array that passes `test`.
+ */
+function findOneChild(test, nodes) {
+    return nodes.find(test);
+}
+exports.findOneChild = findOneChild;
+/**
+ * Finds one element in a tree that passes a test.
+ *
+ * @param test Function to test nodes on.
+ * @param nodes Array of nodes to search.
+ * @param recurse Also consider child nodes.
+ * @returns The first child node that passes `test`.
+ */
+function findOne(test, nodes, recurse) {
+    if (recurse === void 0) { recurse = true; }
+    var elem = null;
+    for (var i = 0; i < nodes.length && !elem; i++) {
+        var checked = nodes[i];
+        if (!domhandler_1.isTag(checked)) {
+            continue;
+        }
+        else if (test(checked)) {
+            elem = checked;
+        }
+        else if (recurse && checked.children.length > 0) {
+            elem = findOne(test, checked.children);
+        }
+    }
+    return elem;
+}
+exports.findOne = findOne;
+/**
+ * @param test Function to test nodes on.
+ * @param nodes Array of nodes to search.
+ * @returns Whether a tree of nodes contains at least one node passing a test.
+ */
+function existsOne(test, nodes) {
+    return nodes.some(function (checked) {
+        return domhandler_1.isTag(checked) &&
+            (test(checked) ||
+                (checked.children.length > 0 &&
+                    existsOne(test, checked.children)));
+    });
+}
+exports.existsOne = existsOne;
+/**
+ * Search and array of nodes and its children for nodes passing a test function.
+ *
+ * Same as `find`, only with less options, leading to reduced complexity.
+ *
+ * @param test Function to test nodes on.
+ * @param nodes Array of nodes to search.
+ * @returns All nodes passing `test`.
+ */
+function findAll(test, nodes) {
+    var _a;
+    var result = [];
+    var stack = nodes.filter(domhandler_1.isTag);
+    var elem;
+    while ((elem = stack.shift())) {
+        var children = (_a = elem.children) === null || _a === void 0 ? void 0 : _a.filter(domhandler_1.isTag);
+        if (children && children.length > 0) {
+            stack.unshift.apply(stack, children);
+        }
+        if (test(elem))
+            result.push(elem);
+    }
+    return result;
+}
+exports.findAll = findAll;
+
+
+/***/ }),
+
+/***/ 5522:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.innerText = exports.textContent = exports.getText = exports.getInnerHTML = exports.getOuterHTML = void 0;
+var domhandler_1 = __nccwpck_require__(4038);
+var dom_serializer_1 = __importDefault(__nccwpck_require__(8621));
+var domelementtype_1 = __nccwpck_require__(3944);
+/**
+ * @param node Node to get the outer HTML of.
+ * @param options Options for serialization.
+ * @deprecated Use the `dom-serializer` module directly.
+ * @returns `node`'s outer HTML.
+ */
+function getOuterHTML(node, options) {
+    return dom_serializer_1.default(node, options);
+}
+exports.getOuterHTML = getOuterHTML;
+/**
+ * @param node Node to get the inner HTML of.
+ * @param options Options for serialization.
+ * @deprecated Use the `dom-serializer` module directly.
+ * @returns `node`'s inner HTML.
+ */
+function getInnerHTML(node, options) {
+    return domhandler_1.hasChildren(node)
+        ? node.children.map(function (node) { return getOuterHTML(node, options); }).join("")
+        : "";
+}
+exports.getInnerHTML = getInnerHTML;
+/**
+ * Get a node's inner text. Same as `textContent`, but inserts newlines for `<br>` tags.
+ *
+ * @deprecated Use `textContent` instead.
+ * @param node Node to get the inner text of.
+ * @returns `node`'s inner text.
+ */
+function getText(node) {
+    if (Array.isArray(node))
+        return node.map(getText).join("");
+    if (domhandler_1.isTag(node))
+        return node.name === "br" ? "\n" : getText(node.children);
+    if (domhandler_1.isCDATA(node))
+        return getText(node.children);
+    if (domhandler_1.isText(node))
+        return node.data;
+    return "";
+}
+exports.getText = getText;
+/**
+ * Get a node's text content.
+ *
+ * @param node Node to get the text content of.
+ * @returns `node`'s text content.
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent}
+ */
+function textContent(node) {
+    if (Array.isArray(node))
+        return node.map(textContent).join("");
+    if (domhandler_1.isTag(node))
+        return textContent(node.children);
+    if (domhandler_1.isCDATA(node))
+        return textContent(node.children);
+    if (domhandler_1.isText(node))
+        return node.data;
+    return "";
+}
+exports.textContent = textContent;
+/**
+ * Get a node's inner text.
+ *
+ * @param node Node to get the inner text of.
+ * @returns `node`'s inner text.
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/innerText}
+ */
+function innerText(node) {
+    if (Array.isArray(node))
+        return node.map(innerText).join("");
+    if (domhandler_1.hasChildren(node) && node.type === domelementtype_1.ElementType.Tag) {
+        return innerText(node.children);
+    }
+    if (domhandler_1.isCDATA(node))
+        return innerText(node.children);
+    if (domhandler_1.isText(node))
+        return node.data;
+    return "";
+}
+exports.innerText = innerText;
+
+
+/***/ }),
+
+/***/ 350:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.prevElementSibling = exports.nextElementSibling = exports.getName = exports.hasAttrib = exports.getAttributeValue = exports.getSiblings = exports.getParent = exports.getChildren = void 0;
+var domhandler_1 = __nccwpck_require__(4038);
+var emptyArray = [];
+/**
+ * Get a node's children.
+ *
+ * @param elem Node to get the children of.
+ * @returns `elem`'s children, or an empty array.
+ */
+function getChildren(elem) {
+    var _a;
+    return (_a = elem.children) !== null && _a !== void 0 ? _a : emptyArray;
+}
+exports.getChildren = getChildren;
+/**
+ * Get a node's parent.
+ *
+ * @param elem Node to get the parent of.
+ * @returns `elem`'s parent node.
+ */
+function getParent(elem) {
+    return elem.parent || null;
+}
+exports.getParent = getParent;
+/**
+ * Gets an elements siblings, including the element itself.
+ *
+ * Attempts to get the children through the element's parent first.
+ * If we don't have a parent (the element is a root node),
+ * we walk the element's `prev` & `next` to get all remaining nodes.
+ *
+ * @param elem Element to get the siblings of.
+ * @returns `elem`'s siblings.
+ */
+function getSiblings(elem) {
+    var _a, _b;
+    var parent = getParent(elem);
+    if (parent != null)
+        return getChildren(parent);
+    var siblings = [elem];
+    var prev = elem.prev, next = elem.next;
+    while (prev != null) {
+        siblings.unshift(prev);
+        (_a = prev, prev = _a.prev);
+    }
+    while (next != null) {
+        siblings.push(next);
+        (_b = next, next = _b.next);
+    }
+    return siblings;
+}
+exports.getSiblings = getSiblings;
+/**
+ * Gets an attribute from an element.
+ *
+ * @param elem Element to check.
+ * @param name Attribute name to retrieve.
+ * @returns The element's attribute value, or `undefined`.
+ */
+function getAttributeValue(elem, name) {
+    var _a;
+    return (_a = elem.attribs) === null || _a === void 0 ? void 0 : _a[name];
+}
+exports.getAttributeValue = getAttributeValue;
+/**
+ * Checks whether an element has an attribute.
+ *
+ * @param elem Element to check.
+ * @param name Attribute name to look for.
+ * @returns Returns whether `elem` has the attribute `name`.
+ */
+function hasAttrib(elem, name) {
+    return (elem.attribs != null &&
+        Object.prototype.hasOwnProperty.call(elem.attribs, name) &&
+        elem.attribs[name] != null);
+}
+exports.hasAttrib = hasAttrib;
+/**
+ * Get the tag name of an element.
+ *
+ * @param elem The element to get the name for.
+ * @returns The tag name of `elem`.
+ */
+function getName(elem) {
+    return elem.name;
+}
+exports.getName = getName;
+/**
+ * Returns the next element sibling of a node.
+ *
+ * @param elem The element to get the next sibling of.
+ * @returns `elem`'s next sibling that is a tag.
+ */
+function nextElementSibling(elem) {
+    var _a;
+    var next = elem.next;
+    while (next !== null && !domhandler_1.isTag(next))
+        (_a = next, next = _a.next);
+    return next;
+}
+exports.nextElementSibling = nextElementSibling;
+/**
+ * Returns the previous element sibling of a node.
+ *
+ * @param elem The element to get the previous sibling of.
+ * @returns `elem`'s previous sibling that is a tag.
+ */
+function prevElementSibling(elem) {
+    var _a;
+    var prev = elem.prev;
+    while (prev !== null && !domhandler_1.isTag(prev))
+        (_a = prev, prev = _a.prev);
+    return prev;
+}
+exports.prevElementSibling = prevElementSibling;
+
+
+/***/ }),
+
 /***/ 8596:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -56209,7 +57001,7 @@ exports.getLimit = getLimit;
  * @module cheerio/attributes
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.is = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.removeAttr = exports.val = exports.data = exports.prop = exports.attr = void 0;
+exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.removeAttr = exports.val = exports.data = exports.prop = exports.attr = void 0;
 var static_1 = __nccwpck_require__(2);
 var utils_1 = __nccwpck_require__(1183);
 var hasOwn = Object.prototype.hasOwnProperty;
@@ -56227,8 +57019,8 @@ var primitives = {
 // Attributes that are booleans
 var rboolean = /^(?:autofocus|autoplay|async|checked|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped|selected)$/i;
 // Matches strings that look like JSON objects or arrays
-var rbrace = /^(?:{[\w\W]*}|\[[\w\W]*])$/;
-function getAttr(elem, name) {
+var rbrace = /^{[^]*}$|^\[[^]*]$/;
+function getAttr(elem, name, xmlMode) {
     var _a;
     if (!elem || !utils_1.isTag(elem))
         return undefined;
@@ -56239,7 +57031,7 @@ function getAttr(elem, name) {
     }
     if (hasOwn.call(elem.attribs, name)) {
         // Get the (decoded) attribute
-        return rboolean.test(name) ? name : elem.attribs[name];
+        return !xmlMode && rboolean.test(name) ? name : elem.attribs[name];
     }
     // Mimic the DOM and return text content as value for `option's`
     if (elem.name === 'option' && name === 'value') {
@@ -56278,12 +57070,12 @@ function attr(name, value) {
                     throw new Error('Bad combination of arguments.');
                 }
             }
-            return utils_1.domEach(this, function (i, el) {
+            return utils_1.domEach(this, function (el, i) {
                 if (utils_1.isTag(el))
                     setAttr(el, name, value.call(el, i, el.attribs[name]));
             });
         }
-        return utils_1.domEach(this, function (_, el) {
+        return utils_1.domEach(this, function (el) {
             if (!utils_1.isTag(el))
                 return;
             if (typeof name === 'object') {
@@ -56297,7 +57089,9 @@ function attr(name, value) {
             }
         });
     }
-    return arguments.length > 1 ? this : getAttr(this[0], name);
+    return arguments.length > 1
+        ? this
+        : getAttr(this[0], name, this.options.xmlMode);
 }
 exports.attr = attr;
 /**
@@ -56309,15 +57103,15 @@ exports.attr = attr;
  * @param name - Name of the prop.
  * @returns The prop's value.
  */
-function getProp(el, name) {
+function getProp(el, name, xmlMode) {
     if (!el || !utils_1.isTag(el))
         return;
     return name in el
         ? // @ts-expect-error TS doesn't like us accessing the value directly here.
             el[name]
-        : rboolean.test(name)
-            ? getAttr(el, name) !== undefined
-            : getAttr(el, name);
+        : !xmlMode && rboolean.test(name)
+            ? getAttr(el, name, false) !== undefined
+            : getAttr(el, name, xmlMode);
 }
 /**
  * Sets the value of a prop.
@@ -56327,16 +57121,17 @@ function getProp(el, name) {
  * @param name - The prop's name.
  * @param value - The prop's value.
  */
-function setProp(el, name, value) {
+function setProp(el, name, value, xmlMode) {
     if (name in el) {
         // @ts-expect-error Overriding value
         el[name] = value;
     }
     else {
-        setAttr(el, name, rboolean.test(name) ? (value ? '' : null) : "" + value);
+        setAttr(el, name, !xmlMode && rboolean.test(name) ? (value ? '' : null) : "" + value);
     }
 }
 function prop(name, value) {
+    var _this = this;
     if (typeof name === 'string' && value === undefined) {
         switch (name) {
             case 'style': {
@@ -56358,7 +57153,7 @@ function prop(name, value) {
             case 'innerHTML':
                 return this.html();
             default:
-                return getProp(this[0], name);
+                return getProp(this[0], name, this.options.xmlMode);
         }
     }
     if (typeof name === 'object' || value !== undefined) {
@@ -56366,22 +57161,22 @@ function prop(name, value) {
             if (typeof name === 'object') {
                 throw new Error('Bad combination of arguments.');
             }
-            return utils_1.domEach(this, function (j, el) {
+            return utils_1.domEach(this, function (el, i) {
                 if (utils_1.isTag(el))
-                    setProp(el, name, value.call(el, j, getProp(el, name)));
+                    setProp(el, name, value.call(el, i, getProp(el, name, _this.options.xmlMode)), _this.options.xmlMode);
             });
         }
-        return utils_1.domEach(this, function (__, el) {
+        return utils_1.domEach(this, function (el) {
             if (!utils_1.isTag(el))
                 return;
             if (typeof name === 'object') {
                 Object.keys(name).forEach(function (key) {
                     var val = name[key];
-                    setProp(el, key, val);
+                    setProp(el, key, val, _this.options.xmlMode);
                 });
             }
             else {
-                setProp(el, name, value);
+                setProp(el, name, value, _this.options.xmlMode);
             }
         });
     }
@@ -56471,7 +57266,7 @@ function data(name, value) {
     }
     // Set the value (with attr map support)
     if (typeof name === 'object' || value !== undefined) {
-        utils_1.domEach(this, function (_, el) {
+        utils_1.domEach(this, function (el) {
             if (utils_1.isTag(el))
                 if (typeof name === 'object')
                     setData(el, name);
@@ -56564,7 +57359,7 @@ function splitNames(names) {
 function removeAttr(name) {
     var attrNames = splitNames(name);
     var _loop_1 = function (i) {
-        utils_1.domEach(this_1, function (_, elem) {
+        utils_1.domEach(this_1, function (elem) {
             if (utils_1.isTag(elem))
                 removeAttribute(elem, attrNames[i]);
         });
@@ -56635,7 +57430,7 @@ exports.hasClass = hasClass;
 function addClass(value) {
     // Support functions
     if (typeof value === 'function') {
-        return utils_1.domEach(this, function (i, el) {
+        return utils_1.domEach(this, function (el, i) {
             if (utils_1.isTag(el)) {
                 var className = el.attribs.class || '';
                 addClass.call([el], value.call(el, i, className));
@@ -56652,8 +57447,8 @@ function addClass(value) {
         // If selected element isn't a tag, move on
         if (!utils_1.isTag(el))
             continue;
-        // If we don't already have classes
-        var className = getAttr(el, 'class');
+        // If we don't already have classes — always set xmlMode to false here, as it doesn't matter for classes
+        var className = getAttr(el, 'class', false);
         if (!className) {
             setAttr(el, 'class', classNames.join(' ').trim());
         }
@@ -56693,7 +57488,7 @@ exports.addClass = addClass;
 function removeClass(name) {
     // Handle if value is a function
     if (typeof name === 'function') {
-        return utils_1.domEach(this, function (i, el) {
+        return utils_1.domEach(this, function (el, i) {
             if (utils_1.isTag(el))
                 removeClass.call([el], name.call(el, i, el.attribs.class || ''));
         });
@@ -56701,7 +57496,7 @@ function removeClass(name) {
     var classes = splitNames(name);
     var numClasses = classes.length;
     var removeAll = arguments.length === 0;
-    return utils_1.domEach(this, function (_, el) {
+    return utils_1.domEach(this, function (el) {
         if (!utils_1.isTag(el))
             return;
         if (removeAll) {
@@ -56753,7 +57548,7 @@ exports.removeClass = removeClass;
 function toggleClass(value, stateVal) {
     // Support functions
     if (typeof value === 'function') {
-        return utils_1.domEach(this, function (i, el) {
+        return utils_1.domEach(this, function (el, i) {
             if (utils_1.isTag(el)) {
                 toggleClass.call([el], value.call(el, i, el.attribs.class || '', stateVal), stateVal);
             }
@@ -56790,25 +57585,6 @@ function toggleClass(value, stateVal) {
     return this;
 }
 exports.toggleClass = toggleClass;
-/**
- * Checks the current list of elements and returns `true` if *any* of the
- * elements match the selector. If using an element or Cheerio selection,
- * returns `true` if *any* of the elements match. If using a predicate function,
- * the function is executed in the context of the selected element, so `this`
- * refers to the current element.
- *
- * @category Attributes
- * @param selector - Selector for the selection.
- * @returns Whether or not the selector matches an element of the instance.
- * @see {@link https://api.jquery.com/is/}
- */
-function is(selector) {
-    if (selector) {
-        return this.filter(selector).length > 0;
-    }
-    return false;
-}
-exports.is = is;
 
 
 /***/ }),
@@ -56825,10 +57601,10 @@ function css(prop, val) {
     if ((prop != null && val != null) ||
         // When `prop` is a "plain" object
         (typeof prop === 'object' && !Array.isArray(prop))) {
-        return utils_1.domEach(this, function (idx, el) {
+        return utils_1.domEach(this, function (el, i) {
             if (utils_1.isTag(el)) {
                 // `prop` can't be an array here anymore.
-                setCss(el, prop, val, idx);
+                setCss(el, prop, val, i);
             }
         });
     }
@@ -56964,10 +57740,10 @@ exports.serialize = serialize;
  * @see {@link https://api.jquery.com/serializeArray/}
  */
 function serializeArray() {
+    var _this = this;
     // Resolve all form elements from either forms or collections of form elements
-    var Cheerio = this.constructor;
     return this.map(function (_, elem) {
-        var $elem = Cheerio(elem);
+        var $elem = _this._make(elem);
         if (utils_1.isTag(elem) && elem.name === 'form') {
             return $elem.find(submittableSelector).toArray();
         }
@@ -56984,7 +57760,7 @@ function serializeArray() {
     )
         .map(function (_, elem) {
         var _a;
-        var $elem = Cheerio(elem);
+        var $elem = _this._make(elem);
         var name = $elem.attr('name'); // We have filtered for elements with a name before.
         // If there is no value set (e.g. `undefined`, `null`), then default value to empty
         var value = (_a = $elem.val()) !== null && _a !== void 0 ? _a : '';
@@ -57061,7 +57837,7 @@ function _insert(concatenator) {
             elems[_i] = arguments[_i];
         }
         var lastIdx = this.length - 1;
-        return utils_1.domEach(this, function (i, el) {
+        return utils_1.domEach(this, function (el, i) {
             if (!domhandler_1.hasChildren(el))
                 return;
             var domSrc = typeof elems[0] === 'function'
@@ -57149,9 +57925,7 @@ function uniqueSplice(array, spliceIdx, spliceCount, newElems, parent) {
  * @see {@link https://api.jquery.com/appendTo/}
  */
 function appendTo(target) {
-    var appendTarget = utils_1.isCheerio(target)
-        ? target
-        : this._make(target, null, this._originalRoot);
+    var appendTarget = utils_1.isCheerio(target) ? target : this._make(target);
     appendTarget.append(this);
     return this;
 }
@@ -57178,9 +57952,7 @@ exports.appendTo = appendTo;
  * @see {@link https://api.jquery.com/prependTo/}
  */
 function prependTo(target) {
-    var prependTarget = utils_1.isCheerio(target)
-        ? target
-        : this._make(target, null, this._originalRoot);
+    var prependTarget = utils_1.isCheerio(target) ? target : this._make(target);
     prependTarget.prepend(this);
     return this;
 }
@@ -57529,7 +58301,7 @@ function after() {
         elems[_i] = arguments[_i];
     }
     var lastIdx = this.length - 1;
-    return utils_1.domEach(this, function (i, el) {
+    return utils_1.domEach(this, function (el, i) {
         var parent = el.parent;
         if (!htmlparser2_1.DomUtils.hasChildren(el) || !parent) {
             return;
@@ -57574,11 +58346,11 @@ exports.after = after;
 function insertAfter(target) {
     var _this = this;
     if (typeof target === 'string') {
-        target = this._make(target, null, this._originalRoot);
+        target = this._make(target);
     }
     this.remove();
     var clones = [];
-    utils_1.domEach(this._makeDomArray(target), function (_, el) {
+    this._makeDomArray(target).forEach(function (el) {
         var clonedSelf = _this.clone().toArray();
         var parent = el.parent;
         if (!parent) {
@@ -57627,7 +58399,7 @@ function before() {
         elems[_i] = arguments[_i];
     }
     var lastIdx = this.length - 1;
-    return utils_1.domEach(this, function (i, el) {
+    return utils_1.domEach(this, function (el, i) {
         var parent = el.parent;
         if (!htmlparser2_1.DomUtils.hasChildren(el) || !parent) {
             return;
@@ -57671,10 +58443,10 @@ exports.before = before;
  */
 function insertBefore(target) {
     var _this = this;
-    var targetArr = this._make(target, null, this._originalRoot);
+    var targetArr = this._make(target);
     this.remove();
     var clones = [];
-    utils_1.domEach(targetArr, function (_, el) {
+    utils_1.domEach(targetArr, function (el) {
         var clonedSelf = _this.clone().toArray();
         var parent = el.parent;
         if (!parent) {
@@ -57716,7 +58488,7 @@ exports.insertBefore = insertBefore;
 function remove(selector) {
     // Filter if we have selector
     var elems = selector ? this.filter(selector) : this;
-    utils_1.domEach(elems, function (_, el) {
+    utils_1.domEach(elems, function (el) {
         htmlparser2_1.DomUtils.removeElement(el);
         el.prev = el.next = el.parent = null;
     });
@@ -57746,7 +58518,7 @@ exports.remove = remove;
  */
 function replaceWith(content) {
     var _this = this;
-    return utils_1.domEach(this, function (i, el) {
+    return utils_1.domEach(this, function (el, i) {
         var parent = el.parent;
         if (!parent) {
             return;
@@ -57784,7 +58556,7 @@ exports.replaceWith = replaceWith;
  * @see {@link https://api.jquery.com/empty/}
  */
 function empty() {
-    return utils_1.domEach(this, function (_, el) {
+    return utils_1.domEach(this, function (el) {
         if (!htmlparser2_1.DomUtils.hasChildren(el))
             return;
         el.children.forEach(function (child) {
@@ -57803,7 +58575,7 @@ function html(str) {
     }
     // Keep main options unchanged
     var opts = tslib_1.__assign(tslib_1.__assign({}, this.options), { context: null });
-    return utils_1.domEach(this, function (_, el) {
+    return utils_1.domEach(this, function (el) {
         if (!htmlparser2_1.DomUtils.hasChildren(el))
             return;
         el.children.forEach(function (child) {
@@ -57811,7 +58583,7 @@ function html(str) {
         });
         opts.context = el;
         var content = utils_1.isCheerio(str)
-            ? str.clone().get()
+            ? str.toArray()
             : parse_1.default("" + str, opts, false).children;
         parse_1.update(content, el);
     });
@@ -57835,12 +58607,12 @@ function text(str) {
     }
     if (typeof str === 'function') {
         // Function support
-        return utils_1.domEach(this, function (i, el) {
+        return utils_1.domEach(this, function (el, i) {
             text.call(_this._make(el), str.call(el, i, static_1.text([el])));
         });
     }
     // Append text node to each selected elements
-    return utils_1.domEach(this, function (_, el) {
+    return utils_1.domEach(this, function (el) {
         if (!htmlparser2_1.DomUtils.hasChildren(el))
             return;
         el.children.forEach(function (child) {
@@ -57883,11 +58655,12 @@ exports.clone = clone;
  * @module cheerio/traversing
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.addBack = exports.add = exports.end = exports.slice = exports.index = exports.get = exports.eq = exports.last = exports.first = exports.has = exports.not = exports.filter = exports.map = exports.each = exports.contents = exports.children = exports.siblings = exports.prevUntil = exports.prevAll = exports.prev = exports.nextUntil = exports.nextAll = exports.next = exports.closest = exports.parentsUntil = exports.parents = exports.parent = exports.find = void 0;
+exports.addBack = exports.add = exports.end = exports.slice = exports.index = exports.toArray = exports.get = exports.eq = exports.last = exports.first = exports.has = exports.not = exports.is = exports.filterArray = exports.filter = exports.map = exports.each = exports.contents = exports.children = exports.siblings = exports.prevUntil = exports.prevAll = exports.prev = exports.nextUntil = exports.nextAll = exports.next = exports.closest = exports.parentsUntil = exports.parents = exports.parent = exports.find = void 0;
 var tslib_1 = __nccwpck_require__(4351);
 var domhandler_1 = __nccwpck_require__(4038);
 var select = tslib_1.__importStar(__nccwpck_require__(5409));
 var utils_1 = __nccwpck_require__(1183);
+var static_1 = __nccwpck_require__(2);
 var htmlparser2_1 = __nccwpck_require__(2928);
 var uniqueSort = htmlparser2_1.DomUtils.uniqueSort;
 var reSiblingSelector = /^\s*[~+]/;
@@ -57910,28 +58683,119 @@ var reSiblingSelector = /^\s*[~+]/;
  * @see {@link https://api.jquery.com/find/}
  */
 function find(selectorOrHaystack) {
+    var _a;
     if (!selectorOrHaystack) {
         return this._make([]);
     }
     var context = this.toArray();
     if (typeof selectorOrHaystack !== 'string') {
-        var contains_1 = this.constructor.contains;
         var haystack = utils_1.isCheerio(selectorOrHaystack)
-            ? selectorOrHaystack.get()
+            ? selectorOrHaystack.toArray()
             : [selectorOrHaystack];
-        return this._make(haystack.filter(function (elem) { return context.some(function (node) { return contains_1(node, elem); }); }));
+        return this._make(haystack.filter(function (elem) { return context.some(function (node) { return static_1.contains(node, elem); }); }));
     }
     var elems = reSiblingSelector.test(selectorOrHaystack)
         ? context
-        : context.reduce(function (newElems, elem) {
-            return domhandler_1.hasChildren(elem)
-                ? newElems.concat(elem.children.filter(utils_1.isTag))
-                : newElems;
-        }, []);
-    var options = { context: context, xmlMode: this.options.xmlMode };
+        : this.children().toArray();
+    var options = {
+        context: context,
+        root: (_a = this._root) === null || _a === void 0 ? void 0 : _a[0],
+        xmlMode: this.options.xmlMode,
+    };
     return this._make(select.select(selectorOrHaystack, elems, options));
 }
 exports.find = find;
+/**
+ * Creates a matcher, using a particular mapping function. Matchers provide a
+ * function that finds elements using a generating function, supporting filtering.
+ *
+ * @private
+ * @param matchMap - Mapping function.
+ * @returns - Function for wrapping generating functions.
+ */
+function _getMatcher(matchMap) {
+    return function (fn) {
+        var postFns = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            postFns[_i - 1] = arguments[_i];
+        }
+        return function (selector) {
+            var _a;
+            var matched = matchMap(fn, this);
+            if (selector) {
+                matched = filterArray(matched, selector, this.options.xmlMode, (_a = this._root) === null || _a === void 0 ? void 0 : _a[0]);
+            }
+            return this._make(
+            // Post processing is only necessary if there is more than one element.
+            this.length > 1 && matched.length > 1
+                ? postFns.reduce(function (elems, fn) { return fn(elems); }, matched)
+                : matched);
+        };
+    };
+}
+/** Matcher that adds multiple elements for each entry in the input. */
+var _matcher = _getMatcher(function (fn, elems) {
+    var _a;
+    var ret = [];
+    for (var i = 0; i < elems.length; i++) {
+        var value = fn(elems[i]);
+        ret.push(value);
+    }
+    return (_a = new Array()).concat.apply(_a, ret);
+});
+/** Matcher that adds at most one element for each entry in the input. */
+var _singleMatcher = _getMatcher(function (fn, elems) {
+    var ret = [];
+    for (var i = 0; i < elems.length; i++) {
+        var value = fn(elems[i]);
+        if (value !== null) {
+            ret.push(value);
+        }
+    }
+    return ret;
+});
+/**
+ * Matcher that supports traversing until a condition is met.
+ *
+ * @returns A function usable for `*Until` methods.
+ */
+function _matchUntil(nextElem) {
+    var postFns = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        postFns[_i - 1] = arguments[_i];
+    }
+    // We use a variable here that is used from within the matcher.
+    var matches = null;
+    var innerMatcher = _getMatcher(function (nextElem, elems) {
+        var matched = [];
+        utils_1.domEach(elems, function (elem) {
+            for (var next_1; (next_1 = nextElem(elem)); elem = next_1) {
+                // FIXME: `matched` might contain duplicates here and the index is too large.
+                if (matches === null || matches === void 0 ? void 0 : matches(next_1, matched.length))
+                    break;
+                matched.push(next_1);
+            }
+        });
+        return matched;
+    }).apply(void 0, tslib_1.__spreadArray([nextElem], postFns));
+    return function (selector, filterSelector) {
+        var _this = this;
+        // Override `matches` variable with the new target.
+        matches =
+            typeof selector === 'string'
+                ? function (elem) { return select.is(elem, selector, _this.options); }
+                : selector
+                    ? getFilterFn(selector)
+                    : null;
+        var ret = innerMatcher.call(this, filterSelector);
+        // Set `matches` to `null`, so we don't waste memory.
+        matches = null;
+        return ret;
+    };
+}
+function _removeDuplicates(elems) {
+    return Array.from(new Set(elems));
+}
 /**
  * Get the parent of each element in the current set of matched elements,
  * optionally filtered by a selector.
@@ -57948,19 +58812,10 @@ exports.find = find;
  * @returns The parents.
  * @see {@link https://api.jquery.com/parent/}
  */
-function parent(selector) {
-    var set = [];
-    utils_1.domEach(this, function (_, elem) {
-        var parentElem = elem.parent;
-        if (parentElem &&
-            parentElem.type !== 'root' &&
-            !set.includes(parentElem)) {
-            set.push(parentElem);
-        }
-    });
-    return selector ? filter.call(set, selector, this) : this._make(set);
-}
-exports.parent = parent;
+exports.parent = _singleMatcher(function (_a) {
+    var parent = _a.parent;
+    return (parent && !domhandler_1.isDocument(parent) ? parent : null);
+}, _removeDuplicates);
 /**
  * Get a set of parents filtered by `selector` of each element in the current
  * set of match elements.
@@ -57979,27 +58834,14 @@ exports.parent = parent;
  * @returns The parents.
  * @see {@link https://api.jquery.com/parents/}
  */
-function parents(selector) {
-    var _this = this;
-    var parentNodes = [];
-    /*
-     * When multiple DOM elements are in the original set, the resulting set will
-     * be in *reverse* order of the original elements as well, with duplicates
-     * removed.
-     */
-    this.get()
-        .reverse()
-        .forEach(function (elem) {
-        return traverseParents(_this, elem.parent, selector, Infinity).forEach(function (node) {
-            // We know these must be `Element`s, as we filter out root nodes.
-            if (!parentNodes.includes(node)) {
-                parentNodes.push(node);
-            }
-        });
-    });
-    return this._make(parentNodes);
-}
-exports.parents = parents;
+exports.parents = _matcher(function (elem) {
+    var matched = [];
+    while (elem.parent && !domhandler_1.isDocument(elem.parent)) {
+        matched.push(elem.parent);
+        elem = elem.parent;
+    }
+    return matched;
+}, uniqueSort, function (elems) { return elems.reverse(); });
 /**
  * Get the ancestors of each element in the current set of matched elements, up
  * to but not including the element matched by the selector, DOM node, or cheerio object.
@@ -58013,50 +58855,14 @@ exports.parents = parents;
  * ```
  *
  * @param selector - Selector for element to stop at.
- * @param filterBy - Optional filter for parents.
+ * @param filterSelector - Optional filter for parents.
  * @returns The parents.
  * @see {@link https://api.jquery.com/parentsUntil/}
  */
-function parentsUntil(selector, filterBy) {
-    var parentNodes = [];
-    var untilNode;
-    var untilNodes;
-    if (typeof selector === 'string') {
-        untilNodes = this.parents(selector).toArray();
-    }
-    else if (selector && utils_1.isCheerio(selector)) {
-        untilNodes = selector.toArray();
-    }
-    else if (selector) {
-        untilNode = selector;
-    }
-    /*
-     * When multiple DOM elements are in the original set, the resulting set will
-     * be in *reverse* order of the original elements as well, with duplicates
-     * removed.
-     */
-    this.toArray()
-        .reverse()
-        .forEach(function (elem) {
-        while (elem.parent) {
-            elem = elem.parent;
-            if ((untilNode && elem !== untilNode) ||
-                (untilNodes && !untilNodes.includes(elem)) ||
-                (!untilNode && !untilNodes)) {
-                if (utils_1.isTag(elem) && !parentNodes.includes(elem)) {
-                    parentNodes.push(elem);
-                }
-            }
-            else {
-                break;
-            }
-        }
-    }, this);
-    return filterBy
-        ? filter.call(parentNodes, filterBy, this)
-        : this._make(parentNodes);
-}
-exports.parentsUntil = parentsUntil;
+exports.parentsUntil = _matchUntil(function (_a) {
+    var parent = _a.parent;
+    return (parent && !domhandler_1.isDocument(parent) ? parent : null);
+}, uniqueSort, function (elems) { return elems.reverse(); });
 /**
  * For each element in the set, get the first element that matches the selector
  * by testing the element itself and traversing up through its ancestors in the DOM tree.
@@ -58088,11 +58894,19 @@ function closest(selector) {
     if (!selector) {
         return this._make(set);
     }
-    utils_1.domEach(this, function (_, elem) {
-        var closestElem = traverseParents(_this, elem, selector, 1)[0];
-        // Do not add duplicate elements to the set
-        if (closestElem && !set.includes(closestElem)) {
-            set.push(closestElem);
+    utils_1.domEach(this, function (elem) {
+        var _a;
+        while (elem && elem.type !== 'root') {
+            if (!selector ||
+                filterArray([elem], selector, _this.options.xmlMode, (_a = _this._root) === null || _a === void 0 ? void 0 : _a[0])
+                    .length) {
+                // Do not add duplicate elements to the set
+                if (elem && !set.includes(elem)) {
+                    set.push(elem);
+                }
+                break;
+            }
+            elem = elem.parent;
         }
     });
     return this._make(set);
@@ -58113,20 +58927,7 @@ exports.closest = closest;
  * @returns The next nodes.
  * @see {@link https://api.jquery.com/next/}
  */
-function next(selector) {
-    var elems = [];
-    utils_1.domEach(this, function (_, elem) {
-        while (elem.next) {
-            elem = elem.next;
-            if (utils_1.isTag(elem)) {
-                elems.push(elem);
-                return;
-            }
-        }
-    });
-    return selector ? filter.call(elems, selector, this) : this._make(elems);
-}
-exports.next = next;
+exports.next = _singleMatcher(function (elem) { return htmlparser2_1.DomUtils.nextElementSibling(elem); });
 /**
  * Gets all the following siblings of the first selected element, optionally
  * filtered by a selector.
@@ -58145,19 +58946,15 @@ exports.next = next;
  * @returns The next nodes.
  * @see {@link https://api.jquery.com/nextAll/}
  */
-function nextAll(selector) {
-    var elems = [];
-    utils_1.domEach(this, function (_, elem) {
-        while (elem.next) {
-            elem = elem.next;
-            if (utils_1.isTag(elem) && !elems.includes(elem)) {
-                elems.push(elem);
-            }
-        }
-    });
-    return selector ? filter.call(elems, selector, this) : this._make(elems);
-}
-exports.nextAll = nextAll;
+exports.nextAll = _matcher(function (elem) {
+    var matched = [];
+    while (elem.next) {
+        elem = elem.next;
+        if (utils_1.isTag(elem))
+            matched.push(elem);
+    }
+    return matched;
+}, _removeDuplicates);
 /**
  * Gets all the following siblings up to but not including the element matched
  * by the selector, optionally filtered by another selector.
@@ -58175,39 +58972,7 @@ exports.nextAll = nextAll;
  * @returns The next nodes.
  * @see {@link https://api.jquery.com/nextUntil/}
  */
-function nextUntil(selector, filterSelector) {
-    var elems = [];
-    var untilNode;
-    var untilNodes;
-    if (typeof selector === 'string') {
-        untilNodes = this.nextAll(selector).toArray();
-    }
-    else if (selector && utils_1.isCheerio(selector)) {
-        untilNodes = selector.get();
-    }
-    else if (selector) {
-        untilNode = selector;
-    }
-    utils_1.domEach(this, function (_, elem) {
-        while (elem.next) {
-            elem = elem.next;
-            if ((untilNode && elem !== untilNode) ||
-                (untilNodes && !untilNodes.includes(elem)) ||
-                (!untilNode && !untilNodes)) {
-                if (utils_1.isTag(elem) && !elems.includes(elem)) {
-                    elems.push(elem);
-                }
-            }
-            else {
-                break;
-            }
-        }
-    });
-    return filterSelector
-        ? filter.call(elems, filterSelector, this)
-        : this._make(elems);
-}
-exports.nextUntil = nextUntil;
+exports.nextUntil = _matchUntil(function (el) { return htmlparser2_1.DomUtils.nextElementSibling(el); }, _removeDuplicates);
 /**
  * Gets the previous sibling of the first selected element optionally filtered
  * by a selector.
@@ -58224,20 +58989,7 @@ exports.nextUntil = nextUntil;
  * @returns The previous nodes.
  * @see {@link https://api.jquery.com/prev/}
  */
-function prev(selector) {
-    var elems = [];
-    utils_1.domEach(this, function (_, elem) {
-        while (elem.prev) {
-            elem = elem.prev;
-            if (utils_1.isTag(elem)) {
-                elems.push(elem);
-                return;
-            }
-        }
-    });
-    return selector ? filter.call(elems, selector, this) : this._make(elems);
-}
-exports.prev = prev;
+exports.prev = _singleMatcher(function (elem) { return htmlparser2_1.DomUtils.prevElementSibling(elem); });
 /**
  * Gets all the preceding siblings of the first selected element, optionally
  * filtered by a selector.
@@ -58257,19 +59009,15 @@ exports.prev = prev;
  * @returns The previous nodes.
  * @see {@link https://api.jquery.com/prevAll/}
  */
-function prevAll(selector) {
-    var elems = [];
-    utils_1.domEach(this, function (_, elem) {
-        while (elem.prev) {
-            elem = elem.prev;
-            if (utils_1.isTag(elem) && !elems.includes(elem)) {
-                elems.push(elem);
-            }
-        }
-    });
-    return selector ? filter.call(elems, selector, this) : this._make(elems);
-}
-exports.prevAll = prevAll;
+exports.prevAll = _matcher(function (elem) {
+    var matched = [];
+    while (elem.prev) {
+        elem = elem.prev;
+        if (utils_1.isTag(elem))
+            matched.push(elem);
+    }
+    return matched;
+}, _removeDuplicates);
 /**
  * Gets all the preceding siblings up to but not including the element matched
  * by the selector, optionally filtered by another selector.
@@ -58287,39 +59035,7 @@ exports.prevAll = prevAll;
  * @returns The previous nodes.
  * @see {@link https://api.jquery.com/prevUntil/}
  */
-function prevUntil(selector, filterSelector) {
-    var elems = [];
-    var untilNode;
-    var untilNodes;
-    if (typeof selector === 'string') {
-        untilNodes = this.prevAll(selector).toArray();
-    }
-    else if (selector && utils_1.isCheerio(selector)) {
-        untilNodes = selector.get();
-    }
-    else if (selector) {
-        untilNode = selector;
-    }
-    utils_1.domEach(this, function (_, elem) {
-        while (elem.prev) {
-            elem = elem.prev;
-            if ((untilNode && elem !== untilNode) ||
-                (untilNodes && !untilNodes.includes(elem)) ||
-                (!untilNode && !untilNodes)) {
-                if (utils_1.isTag(elem) && !elems.includes(elem)) {
-                    elems.push(elem);
-                }
-            }
-            else {
-                break;
-            }
-        }
-    });
-    return filterSelector
-        ? filter.call(elems, filterSelector, this)
-        : this._make(elems);
-}
-exports.prevUntil = prevUntil;
+exports.prevUntil = _matchUntil(function (el) { return htmlparser2_1.DomUtils.prevElementSibling(el); }, _removeDuplicates);
 /**
  * Get the siblings of each element (excluding the element) in the set of
  * matched elements, optionally filtered by a selector.
@@ -58339,18 +59055,9 @@ exports.prevUntil = prevUntil;
  * @returns The siblings.
  * @see {@link https://api.jquery.com/siblings/}
  */
-function siblings(selector) {
-    var _this = this;
-    // TODO Still get siblings if `parent` is null; see DomUtils' `getSiblings`.
-    var parent = this.parent();
-    var elems = parent
-        .children()
-        .toArray()
-        // TODO: This removes all elements in the selection. Note that they could be added here, if siblings are part of the selection.
-        .filter(function (elem) { return !_this.is(elem); });
-    return selector ? filter.call(elems, selector, this) : this._make(elems);
-}
-exports.siblings = siblings;
+exports.siblings = _matcher(function (elem) {
+    return htmlparser2_1.DomUtils.getSiblings(elem).filter(function (el) { return utils_1.isTag(el) && el !== elem; });
+}, uniqueSort);
 /**
  * Gets the children of the first selected element.
  *
@@ -58369,15 +59076,7 @@ exports.siblings = siblings;
  * @returns The children.
  * @see {@link https://api.jquery.com/children/}
  */
-function children(selector) {
-    var elems = this.toArray().reduce(function (newElems, elem) {
-        return domhandler_1.hasChildren(elem)
-            ? newElems.concat(elem.children.filter(utils_1.isTag))
-            : newElems;
-    }, []);
-    return selector ? filter.call(elems, selector, this) : this._make(elems);
-}
-exports.children = children;
+exports.children = _matcher(function (elem) { return htmlparser2_1.DomUtils.getChildren(elem).filter(utils_1.isTag); }, _removeDuplicates);
 /**
  * Gets the children of each element in the set of matched elements, including
  * text and comment nodes.
@@ -58471,66 +59170,55 @@ function map(fn) {
     return this._make(elems);
 }
 exports.map = map;
+/**
+ * Creates a function to test if a filter is matched.
+ *
+ * @param match - A filter.
+ * @returns A function that determines if a filter has been matched.
+ */
 function getFilterFn(match) {
     if (typeof match === 'function') {
-        return function (el, i) {
-            return match.call(el, i, el);
-        };
+        return function (el, i) { return match.call(el, i, el); };
     }
     if (utils_1.isCheerio(match)) {
-        return match.is.bind(match);
+        return function (el) { return Array.prototype.includes.call(match, el); };
     }
     return function (el) {
         return match === el;
     };
 }
-/**
- * Iterates over a cheerio object, reducing the set of selector elements to
- * those that match the selector or pass the function's test. When a Cheerio
- * selection is specified, return only the elements contained in that selection.
- * When an element is specified, return only that element (if it is contained in
- * the original selection). If using the function method, the function is
- * executed in the context of the selected element, so `this` refers to the
- * current element.
- *
- * @category Traversing
- * @example <caption>Selector</caption>
- *
- * ```js
- * $('li').filter('.orange').attr('class');
- * //=> orange
- * ```
- *
- * @example <caption>Function</caption>
- *
- * ```js
- * $('li')
- *   .filter(function (i, el) {
- *     // this === el
- *     return $(this).attr('class') === 'orange';
- *   })
- *   .attr('class'); //=> orange
- * ```
- *
- * @param match - Value to look for, following the rules above.
- * @param container - Optional node to filter instead.
- * @returns The filtered collection.
- * @see {@link https://api.jquery.com/filter/}
- */
-function filter(match, container) {
-    if (container === void 0) { container = this; }
-    if (!utils_1.isCheerio(container)) {
-        throw new Error('Not able to create a Cheerio instance.');
-    }
-    var nodes = utils_1.isCheerio(this) ? this.toArray() : this;
-    var elements = nodes.filter(utils_1.isTag);
-    elements =
-        typeof match === 'string'
-            ? select.filter(match, elements, container.options)
-            : elements.filter(getFilterFn(match));
-    return container._make(elements);
+function filter(match) {
+    var _a;
+    return this._make(filterArray(this.toArray(), match, this.options.xmlMode, (_a = this._root) === null || _a === void 0 ? void 0 : _a[0]));
 }
 exports.filter = filter;
+function filterArray(nodes, match, xmlMode, root) {
+    return typeof match === 'string'
+        ? select.filter(match, nodes, { xmlMode: xmlMode, root: root })
+        : nodes.filter(getFilterFn(match));
+}
+exports.filterArray = filterArray;
+/**
+ * Checks the current list of elements and returns `true` if *any* of the
+ * elements match the selector. If using an element or Cheerio selection,
+ * returns `true` if *any* of the elements match. If using a predicate function,
+ * the function is executed in the context of the selected element, so `this`
+ * refers to the current element.
+ *
+ * @category Attributes
+ * @param selector - Selector for the selection.
+ * @returns Whether or not the selector matches an element of the instance.
+ * @see {@link https://api.jquery.com/is/}
+ */
+function is(selector) {
+    var nodes = this.toArray();
+    return typeof selector === 'string'
+        ? select.some(nodes.filter(utils_1.isTag), selector, this.options)
+        : selector
+            ? nodes.some(getFilterFn(selector))
+            : false;
+}
+exports.is = is;
 /**
  * Remove elements from the set of matched elements. Given a Cheerio object that
  * represents a set of DOM elements, the `.not()` method constructs a new
@@ -58564,22 +59252,17 @@ exports.filter = filter;
  * @returns The filtered collection.
  * @see {@link https://api.jquery.com/not/}
  */
-function not(match, container) {
-    if (container === void 0) { container = this; }
-    if (!utils_1.isCheerio(container)) {
-        throw new Error('Not able to create a Cheerio instance.');
-    }
-    var nodes = utils_1.isCheerio(this) ? this.toArray() : this;
+function not(match) {
+    var nodes = this.toArray();
     if (typeof match === 'string') {
-        var elements = nodes.filter(utils_1.isTag);
-        var matches_1 = new Set(select.filter(match, elements, container.options));
+        var matches_1 = new Set(select.filter(match, nodes, this.options));
         nodes = nodes.filter(function (el) { return !matches_1.has(el); });
     }
     else {
         var filterFn_1 = getFilterFn(match);
         nodes = nodes.filter(function (el, i) { return !filterFn_1(el, i); });
     }
-    return container._make(nodes);
+    return this._make(nodes);
 }
 exports.not = not;
 /**
@@ -58608,7 +59291,7 @@ exports.not = not;
  */
 function has(selectorOrHaystack) {
     var _this = this;
-    return filter.call(this, typeof selectorOrHaystack === 'string'
+    return this.filter(typeof selectorOrHaystack === 'string'
         ? // Using the `:has` selector here short-circuits searches.
             ":has(" + selectorOrHaystack + ")"
         : function (_, el) { return _this._make(el).find(selectorOrHaystack).length > 0; });
@@ -58682,11 +59365,27 @@ function eq(i) {
 exports.eq = eq;
 function get(i) {
     if (i == null) {
-        return Array.prototype.slice.call(this);
+        return this.toArray();
     }
     return this[i < 0 ? this.length + i : i];
 }
 exports.get = get;
+/**
+ * Retrieve all the DOM elements contained in the jQuery set as an array.
+ *
+ * @example
+ *
+ * ```js
+ * $('li').toArray();
+ * //=> [ {...}, {...}, {...} ]
+ * ```
+ *
+ * @returns The contained items.
+ */
+function toArray() {
+    return Array.prototype.slice.call(this);
+}
+exports.toArray = toArray;
 /**
  * Search for a given element from among the matched elements.
  *
@@ -58722,7 +59421,7 @@ function index(selectorOrNeedle) {
             ? selectorOrNeedle[0]
             : selectorOrNeedle;
     }
-    return $haystack.get().indexOf(needle);
+    return Array.prototype.indexOf.call($haystack, needle);
 }
 exports.index = index;
 /**
@@ -58751,16 +59450,6 @@ function slice(start, end) {
     return this._make(Array.prototype.slice.call(this, start, end));
 }
 exports.slice = slice;
-function traverseParents(self, elem, selector, limit) {
-    var elems = [];
-    while (elem && elems.length < limit && elem.type !== 'root') {
-        if (!selector || filter.call([elem], selector, self).length) {
-            elems.push(elem);
-        }
-        elem = elem.parent;
-    }
-    return elems;
-}
 /**
  * End the most recent filtering operation in the current chain and return the
  * set of matched elements to its previous state.
@@ -58838,18 +59527,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Cheerio = void 0;
 var tslib_1 = __nccwpck_require__(4351);
 var parse_1 = tslib_1.__importDefault(__nccwpck_require__(9024));
-var options_1 = tslib_1.__importStar(__nccwpck_require__(8132));
+var options_1 = tslib_1.__importDefault(__nccwpck_require__(8132));
 var utils_1 = __nccwpck_require__(1183);
-var Static = tslib_1.__importStar(__nccwpck_require__(2));
 var Attributes = tslib_1.__importStar(__nccwpck_require__(8596));
 var Traversing = tslib_1.__importStar(__nccwpck_require__(6563));
 var Manipulation = tslib_1.__importStar(__nccwpck_require__(8196));
 var Css = tslib_1.__importStar(__nccwpck_require__(7084));
 var Forms = tslib_1.__importStar(__nccwpck_require__(5954));
-/*
- * The API
- */
-var api = [Attributes, Traversing, Manipulation, Css, Forms];
 var Cheerio = /** @class */ (function () {
     /**
      * Instance of cheerio. Methods are specified in the modules. Usage of this
@@ -58863,18 +59547,18 @@ var Cheerio = /** @class */ (function () {
      */
     function Cheerio(selector, context, root, options) {
         var _this = this;
-        if (!(this instanceof Cheerio)) {
-            return new Cheerio(selector, context, root, options);
-        }
+        if (options === void 0) { options = options_1.default; }
         this.length = 0;
-        this.options = tslib_1.__assign(tslib_1.__assign(tslib_1.__assign({}, options_1.default), this.options), options_1.flatten(options));
+        this.options = options;
         // $(), $(null), $(undefined), $(false)
         if (!selector)
             return this;
         if (root) {
             if (typeof root === 'string')
                 root = parse_1.default(root, this.options, false);
-            this._root = Cheerio.call(this, root);
+            this._root = new this.constructor(root, null, null, this.options);
+            // Add a cyclic reference, so that calling methods on `_root` never fails.
+            this._root._root = this._root;
         }
         // $($)
         if (utils_1.isCheerio(selector))
@@ -58904,14 +59588,14 @@ var Cheerio = /** @class */ (function () {
             : typeof context === 'string'
                 ? utils_1.isHtml(context)
                     ? // $('li', '<ul>...</ul>')
-                        new Cheerio(parse_1.default(context, this.options, false))
+                        this._make(parse_1.default(context, this.options, false))
                     : // $('li', 'ul')
                         ((search = context + " " + search), this._root)
                 : utils_1.isCheerio(context)
                     ? // $('li', $)
                         context
                     : // $('li', node), $('li', [nodes])
-                        new Cheerio(context);
+                        this._make(context);
         // If we still don't have a context, return
         if (!searchContext)
             return this;
@@ -58929,36 +59613,11 @@ var Cheerio = /** @class */ (function () {
      * @param context - The context of the new object.
      * @returns The new cheerio object.
      */
-    Cheerio.prototype._make = function (dom, context, root) {
-        if (root === void 0) { root = this._root; }
-        var cheerio = new this.constructor(dom, context, root, this.options);
+    Cheerio.prototype._make = function (dom, context) {
+        var cheerio = new this.constructor(dom, context, this._root, this.options);
         cheerio.prevObject = this;
         return cheerio;
     };
-    /**
-     * Retrieve all the DOM elements contained in the jQuery set as an array.
-     *
-     * @example
-     *
-     * ```js
-     * $('li').toArray();
-     * //=> [ {...}, {...}, {...} ]
-     * ```
-     *
-     * @returns The contained items.
-     */
-    Cheerio.prototype.toArray = function () {
-        return this.get();
-    };
-    Cheerio.html = Static.html;
-    Cheerio.xml = Static.xml;
-    Cheerio.text = Static.text;
-    Cheerio.parseHTML = Static.parseHTML;
-    Cheerio.root = Static.root;
-    Cheerio.contains = Static.contains;
-    Cheerio.merge = Static.merge;
-    /** Mimic jQuery's prototype alias for plugin authors. */
-    Cheerio.fn = Cheerio.prototype;
     return Cheerio;
 }());
 exports.Cheerio = Cheerio;
@@ -58971,15 +59630,13 @@ Cheerio.prototype.splice = Array.prototype.splice;
 // Support for (const element of $(...)) iteration:
 Cheerio.prototype[Symbol.iterator] = Array.prototype[Symbol.iterator];
 // Plug in the API
-api.forEach(function (mod) { return Object.assign(Cheerio.prototype, mod); });
+Object.assign(Cheerio.prototype, Attributes, Traversing, Manipulation, Css, Forms);
 function isNode(obj) {
     return (!!obj.name ||
         obj.type === 'root' ||
         obj.type === 'text' ||
         obj.type === 'comment');
 }
-// Make it possible to call Cheerio without using `new`.
-exports.default = Cheerio;
 
 
 /***/ }),
@@ -58992,13 +59649,6 @@ exports.default = Cheerio;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.root = exports.parseHTML = exports.merge = exports.contains = void 0;
 var tslib_1 = __nccwpck_require__(4351);
-var cheerio_1 = tslib_1.__importDefault(__nccwpck_require__(641));
-/**
- * The default cheerio instance.
- *
- * @deprecated Use the function returned by `load` instead.
- */
-exports.default = cheerio_1.default;
 /**
  * Types used in signatures of Cheerio methods.
  *
@@ -59007,8 +59657,12 @@ exports.default = cheerio_1.default;
 tslib_1.__exportStar(__nccwpck_require__(9317), exports);
 tslib_1.__exportStar(__nccwpck_require__(1313), exports);
 var load_1 = __nccwpck_require__(1313);
-// We add this here, to avoid a cyclic depenency
-cheerio_1.default.load = load_1.load;
+/**
+ * The default cheerio instance.
+ *
+ * @deprecated Use the function returned by `load` instead.
+ */
+exports.default = load_1.load([]);
 var staticMethods = tslib_1.__importStar(__nccwpck_require__(2));
 /**
  * In order to promote consistency with the jQuery library, users are encouraged
@@ -59094,48 +59748,42 @@ var parse_1 = tslib_1.__importDefault(__nccwpck_require__(9024));
  * introduce `<html>`, `<head>`, and `<body>` elements; set `isDocument` to
  * `false` to switch to fragment mode and disable this.
  *
- * See the README section titled "Loading" for additional usage information.
- *
  * @param content - Markup to be loaded.
  * @param options - Options for the created instance.
  * @param isDocument - Allows parser to be switched to fragment mode.
  * @returns The loaded document.
+ * @see {@link https://cheerio.js.org#loading} for additional usage information.
  */
 function load(content, options, isDocument) {
+    if (isDocument === void 0) { isDocument = true; }
     if (content == null) {
         throw new Error('cheerio.load() expects a string');
     }
-    options = tslib_1.__assign(tslib_1.__assign({}, options_1.default), options_1.flatten(options));
-    if (typeof isDocument === 'undefined')
-        isDocument = true;
-    var root = parse_1.default(content, options, isDocument);
-    var initialize = /** @class */ (function (_super) {
-        tslib_1.__extends(initialize, _super);
-        function initialize(selector, context, r, opts) {
-            if (r === void 0) { r = root; }
-            var _this = this;
-            // @ts-expect-error Using `this` before calling the constructor.
-            if (!(_this instanceof initialize)) {
-                return new initialize(selector, context, r, opts);
-            }
-            _this = _super.call(this, selector, context, r, tslib_1.__assign(tslib_1.__assign({}, options), opts)) || this;
-            return _this;
+    var internalOpts = tslib_1.__assign(tslib_1.__assign({}, options_1.default), options_1.flatten(options));
+    var root = parse_1.default(content, internalOpts, isDocument);
+    /** Create an extended class here, so that extensions only live on one instance. */
+    var LoadedCheerio = /** @class */ (function (_super) {
+        tslib_1.__extends(LoadedCheerio, _super);
+        function LoadedCheerio() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        // Mimic jQuery's prototype alias for plugin authors.
-        initialize.fn = initialize.prototype;
-        return initialize;
+        return LoadedCheerio;
     }(cheerio_1.Cheerio));
-    /*
-     * Keep a reference to the top-level scope so we can chain methods that implicitly
-     * resolve selectors; e.g. $("<span>").(".bar"), which otherwise loses ._root
-     */
-    initialize.prototype._originalRoot = root;
-    // Add in the static methods
-    Object.assign(initialize, staticMethods, { load: load });
-    // Add in the root
-    initialize._root = root;
-    // Store options
-    initialize._options = options;
+    function initialize(selector, context, r, opts) {
+        if (r === void 0) { r = root; }
+        return new LoadedCheerio(selector, context, r, tslib_1.__assign(tslib_1.__assign({}, internalOpts), options_1.flatten(opts)));
+    }
+    // Add in static methods & properties
+    Object.assign(initialize, staticMethods, {
+        load: load,
+        // `_root` and `_options` are used in static methods.
+        _root: root,
+        _options: internalOpts,
+        // Add `fn` for plugins
+        fn: LoadedCheerio.prototype,
+        // Add the prototype here to maintain `instanceof` behavior.
+        prototype: LoadedCheerio.prototype,
+    });
     return initialize;
 }
 exports.load = load;
@@ -59181,8 +59829,8 @@ exports.flatten = flatten;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.update = void 0;
 var htmlparser2_1 = __nccwpck_require__(2928);
-var htmlparser2_2 = __nccwpck_require__(6621);
-var parse5_1 = __nccwpck_require__(246);
+var htmlparser2_adapter_1 = __nccwpck_require__(2632);
+var parse5_adapter_1 = __nccwpck_require__(8186);
 var domhandler_1 = __nccwpck_require__(4038);
 /*
  * Parser
@@ -59193,8 +59841,8 @@ function parse(content, options, isDocument) {
     }
     if (typeof content === 'string') {
         return options.xmlMode || options._useHtmlParser2
-            ? htmlparser2_2.parse(content, options)
-            : parse5_1.parse(content, options, isDocument);
+            ? htmlparser2_adapter_1.parse(content, options)
+            : parse5_adapter_1.parse(content, options, isDocument);
     }
     var doc = content;
     if (!Array.isArray(doc) && domhandler_1.isDocument(doc)) {
@@ -59248,7 +59896,7 @@ exports.update = update;
 
 /***/ }),
 
-/***/ 6621:
+/***/ 2632:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -59266,7 +59914,7 @@ Object.defineProperty(exports, "render", ({ enumerable: true, get: function () {
 
 /***/ }),
 
-/***/ 246:
+/***/ 8186:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -59326,8 +59974,8 @@ var tslib_1 = __nccwpck_require__(4351);
 var options_1 = tslib_1.__importStar(__nccwpck_require__(8132));
 var cheerio_select_1 = __nccwpck_require__(5409);
 var htmlparser2_1 = __nccwpck_require__(2928);
-var parse5_1 = __nccwpck_require__(246);
-var htmlparser2_2 = __nccwpck_require__(6621);
+var parse5_adapter_1 = __nccwpck_require__(8186);
+var htmlparser2_adapter_1 = __nccwpck_require__(2632);
 /**
  * Helper function to render a DOM.
  *
@@ -59337,22 +59985,17 @@ var htmlparser2_2 = __nccwpck_require__(6621);
  * @returns The rendered document.
  */
 function render(that, dom, options) {
-    var _a, _b;
-    if (!dom) {
-        if ((_a = that === null || that === void 0 ? void 0 : that._root) === null || _a === void 0 ? void 0 : _a.children) {
-            dom = that._root.children;
-        }
-        else {
-            return '';
-        }
-    }
-    else if (typeof dom === 'string') {
-        dom = cheerio_select_1.select(dom, (_b = that === null || that === void 0 ? void 0 : that._root) !== null && _b !== void 0 ? _b : [], options);
-    }
+    var _a;
+    var toRender = dom
+        ? typeof dom === 'string'
+            ? cheerio_select_1.select(dom, (_a = that === null || that === void 0 ? void 0 : that._root) !== null && _a !== void 0 ? _a : [], options)
+            : dom
+        : that === null || that === void 0 ? void 0 : that._root.children;
+    if (!toRender)
+        return '';
     return options.xmlMode || options._useHtmlParser2
-        ? // FIXME: Pull in new version of dom-serializer to fix this.
-            htmlparser2_2.render(dom, options)
-        : parse5_1.render(dom);
+        ? htmlparser2_adapter_1.render(toRender, options)
+        : parse5_adapter_1.render(toRender);
 }
 /**
  * Checks if a passed object is an options object.
@@ -59381,8 +60024,8 @@ function html(dom, options) {
      * Sometimes `$.html()` is used without preloading html,
      * so fallback non-existing options to the default ones.
      */
-    options = tslib_1.__assign(tslib_1.__assign(tslib_1.__assign({}, options_1.default), (this ? this._options : {})), options_1.flatten(options !== null && options !== void 0 ? options : {}));
-    return render(this || undefined, dom, options);
+    var opts = tslib_1.__assign(tslib_1.__assign(tslib_1.__assign({}, options_1.default), (this ? this._options : {})), options_1.flatten(options !== null && options !== void 0 ? options : {}));
+    return render(this || undefined, dom, opts);
 }
 exports.html = html;
 /**
@@ -59456,8 +60099,7 @@ exports.parseHTML = parseHTML;
  * @alias Cheerio.root
  */
 function root() {
-    var fn = this;
-    return fn(this._root);
+    return this(this._root);
 }
 exports.root = root;
 /**
@@ -59615,8 +60257,8 @@ exports.cssCase = cssCase;
  */
 function domEach(array, fn) {
     var len = array.length;
-    for (var i = 0; i < len && fn(i, array[i]) !== false; i++)
-        ;
+    for (var i = 0; i < len; i++)
+        fn(array[i], i);
     return array;
 }
 exports.domEach = domEach;
@@ -60876,7 +61518,7 @@ var procedure_1 = __nccwpck_require__(7396);
 exports.PLACEHOLDER_ELEMENT = {};
 function ensureIsTag(next, adapter) {
     if (next === boolbase_1.falseFunc)
-        return next;
+        return boolbase_1.falseFunc;
     return function (elem) { return adapter.isTag(elem) && next(elem); };
 }
 exports.ensureIsTag = ensureIsTag;
@@ -80661,7 +81303,7 @@ module.exports = clean
 const eq = __nccwpck_require__(1898)
 const neq = __nccwpck_require__(6017)
 const gt = __nccwpck_require__(4123)
-const gte = __nccwpck_require__(5522)
+const gte = __nccwpck_require__(5930)
 const lt = __nccwpck_require__(194)
 const lte = __nccwpck_require__(7520)
 
@@ -80854,7 +81496,7 @@ module.exports = gt
 
 /***/ }),
 
-/***/ 5522:
+/***/ 5930:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const compare = __nccwpck_require__(4309)
@@ -81091,7 +81733,7 @@ module.exports = {
   lt: __nccwpck_require__(194),
   eq: __nccwpck_require__(1898),
   neq: __nccwpck_require__(6017),
-  gte: __nccwpck_require__(5522),
+  gte: __nccwpck_require__(5930),
   lte: __nccwpck_require__(7520),
   cmp: __nccwpck_require__(5098),
   coerce: __nccwpck_require__(3466),
@@ -81568,7 +82210,7 @@ const satisfies = __nccwpck_require__(6055)
 const gt = __nccwpck_require__(4123)
 const lt = __nccwpck_require__(194)
 const lte = __nccwpck_require__(7520)
-const gte = __nccwpck_require__(5522)
+const gte = __nccwpck_require__(5930)
 
 const outside = (version, range, hilo, options) => {
   version = new SemVer(version, options)

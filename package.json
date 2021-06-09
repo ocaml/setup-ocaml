@@ -18,7 +18,7 @@
     "@actions/http-client": "1.0.11",
     "@actions/io": "1.1.1",
     "@actions/tool-cache": "1.7.1",
-    "cheerio": "1.0.0-rc.9",
+    "cheerio": "1.0.0-rc.10",
     "semver": "7.3.5"
   },
   "devDependencies": {
