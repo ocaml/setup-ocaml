@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- ​Added `opam-repositories` input to support multiple opam repositories.
+
+### Removed
+
+- The `opam-repository` input has been removed in order to add the
+  `opam-repository` input.
+
 ## [2.0.0-alpha]
 
 ### Added
