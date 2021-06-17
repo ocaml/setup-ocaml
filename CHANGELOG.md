@@ -15,7 +15,7 @@ and this project adheres to
 ### Removed
 
 - The `opam-repository` input has been removed in order to add the
-  `opam-repository` input.
+  `opam-repositories` input.
 
 ## [2.0.0-alpha]
 
