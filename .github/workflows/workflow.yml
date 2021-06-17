@@ -39,6 +39,18 @@ jobs:
           - os: windows-latest
             ocaml-compiler: ocaml-variants.4.12.0+mingw64c
             dune-cache: false
+          - os: ubuntu-latest
+            ocaml-compiler: ocaml-variants.4.12.0+domains
+            dune-cache: false
+            opam-repositories: |
+              multicore: https://github.com/ocaml-multicore/multicore-opam.git
+              default: https://github.com/ocaml/opam-repository.git
+          - os: ubuntu-latest
+            ocaml-compiler: ocaml-variants.4.12.0+domains+effects
+            dune-cache: false
+            opam-repositories: |
+              multicore: https://github.com/ocaml-multicore/multicore-opam.git
+              default: https://github.com/ocaml/opam-repository.git
 
     runs-on: ${{ matrix.os }}
 
@@ -83,5 +95,6 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           dune-cache: ${{ matrix.dune-cache }}
+          opam-repositories: ${{ matrix.opam-repositories }}
 
       - run: opam depext uri --install

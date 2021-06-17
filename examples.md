@@ -41,13 +41,15 @@ steps:
     uses: avsm/setup-ocaml@v2
     if: runner.os == 'Windows'
     with:
-      ocaml-repository: https://github.com/fdopen/opam-repository-mingw.git#opam2
+      ocaml-repositories: |
+        default: https://github.com/fdopen/opam-repository-mingw.git#opam2
 
   - name: Use OCaml on Unix
     uses: avsm/setup-ocaml@v2
     if: runner.os != 'Windows'
     with:
-      opam-repository: https://github.com/ocaml/opam-repository.git
+      opam-repositories: |
+        default: https://github.com/ocaml/opam-repository.git
 ```
 <!-- prettier-ignore-end -->
 
@@ -74,7 +76,8 @@ steps:
   - name: Use OCaml with repository ${{ steps.repository.url }}
     uses: avsm/setup-ocaml@v2
     with:
-      opam-repository: ${{ steps.repository.url }}
+      opam-repositories: |
+        default: ${{ steps.repository.url }}
 ```
 <!-- prettier-ignore-end -->
 

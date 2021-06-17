@@ -1,4 +1,7 @@
 import * as core from "@actions/core";
+import * as yaml from "yaml";
+
+import { getPlatform } from "./system";
 
 export enum Architecture {
   X86_64 = "x86_64",
@@ -33,4 +36,17 @@ export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
 
 export const OPAM_PIN = core.getBooleanInput("opam-pin");
 
-export const OPAM_REPOSITORY = core.getInput("opam-repository");
+const repositories_yaml: { [key: string]: string } = yaml.parse(
+  core.getInput("opam-repositories")
+);
+
+const platform = getPlatform();
+
+const defaultRepository =
+  platform != Platform.Win32
+    ? "https://github.com/ocaml/opam-repository.git"
+    : "https://github.com/fdopen/opam-repository-mingw.git#opam2";
+
+export const OPAM_REPOSITORIES: [string, string][] = repositories_yaml
+  ? Object.entries(repositories_yaml)
+  : [["default", defaultRepository]];
