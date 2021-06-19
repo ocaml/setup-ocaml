@@ -16,11 +16,18 @@ import {
   OCAML_COMPILER,
   OPAM_DEPEXT,
   OPAM_PIN,
+  OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
 import { installDepext, installSystemPackages } from "./depext";
 import { installDune } from "./dune";
-import { installOcaml, pin, setupOpam, update } from "./opam";
+import {
+  installOcaml,
+  pin,
+  repositoryAddAll,
+  repositoryRemoveAll,
+  setupOpam,
+} from "./opam";
 import { getOpamLocalPackages } from "./packages";
 import { startProfiler, stopProfiler } from "./profiler";
 import { getPlatform } from "./system";
@@ -82,9 +89,9 @@ export async function installer(): Promise<void> {
     opamCacheHit = await restoreOpamCache();
   }
   await setupOpam();
-  if (opamCacheHit) {
-    await update();
-  } else {
+  await repositoryRemoveAll();
+  await repositoryAddAll(OPAM_REPOSITORIES);
+  if (!opamCacheHit) {
     const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
       ? platform === Platform.Win32
         ? `ocaml-variants.${await resolveVersion(OCAML_COMPILER)}+mingw64c`

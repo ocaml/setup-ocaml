@@ -1,4 +1,5 @@
 {
+  "version": "2.0.0-alpha",
   "private": true,
   "scripts": {
     "fmt": "prettier --write .",
@@ -19,7 +20,8 @@
     "@actions/io": "1.1.1",
     "@actions/tool-cache": "1.7.1",
     "cheerio": "1.0.0-rc.10",
-    "semver": "7.3.5"
+    "semver": "7.3.5",
+    "yaml": "2.0.0-5"
   },
   "devDependencies": {
     "@types/node": "15.12.2",

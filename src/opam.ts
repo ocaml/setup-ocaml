@@ -12,12 +12,7 @@ import * as process from "process";
 import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache";
-import {
-  GITHUB_TOKEN,
-  OPAM_DISABLE_SANDBOXING,
-  OPAM_REPOSITORY,
-  Platform,
-} from "./constants";
+import { GITHUB_TOKEN, OPAM_DISABLE_SANDBOXING, Platform } from "./constants";
 import { startProfiler, stopProfiler } from "./profiler";
 import {
   getArchitecture,
@@ -50,6 +45,22 @@ async function getLatestOpamRelease(): Promise<{
       browser_download_url.includes(`${architecture}-${platform}`)
   );
   return { version, browserDownloadUrl };
+}
+
+async function findOpam() {
+  const platform = getPlatform();
+  if (platform === Platform.Win32) {
+    const opamPath = path.join(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      process.env.CYGWIN_ROOT!,
+      "bin",
+      "opam.exe"
+    );
+    return opamPath;
+  } else {
+    const opamPath = await io.which("opam");
+    return opamPath;
+  }
 }
 
 async function acquireOpamUnix() {
@@ -101,16 +112,12 @@ async function initializeOpamUnix() {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
     }
   }
-  const repository =
-    OPAM_REPOSITORY || "https://github.com/ocaml/opam-repository.git";
   const disableSandboxing = [];
   if (OPAM_DISABLE_SANDBOXING) {
     disableSandboxing.push("--disable-sandboxing");
   }
   await exec("opam", [
     "init",
-    "default",
-    repository,
     "--auto-setup",
     "--bare",
     ...disableSandboxing,
@@ -216,13 +223,8 @@ async function acquireOpamWindows() {
 }
 
 async function initializeOpamWindows() {
-  const repository =
-    OPAM_REPOSITORY ||
-    "https://github.com/fdopen/opam-repository-mingw.git#opam2";
   await exec("opam", [
     "init",
-    "default",
-    repository,
     "--auto-setup",
     "--bare",
     "--disable-sandboxing",
@@ -315,19 +317,65 @@ export async function installOcaml(ocamlCompiler: string): Promise<void> {
 export async function pin(fpaths: string[]): Promise<void> {
   const groupName = "Pin local packages";
   startProfiler(groupName);
+  const opam = await findOpam();
   for (const fpath of fpaths) {
     const fname = path.basename(fpath, ".opam");
     const dname = path.dirname(fpath);
-    await exec("opam", ["pin", "add", `${fname}.dev`, ".", "--no-action"], {
+    await exec(opam, ["pin", "add", `${fname}.dev`, ".", "--no-action"], {
       cwd: dname,
     });
   }
   stopProfiler(groupName);
 }
 
-export async function update(): Promise<void> {
-  const groupName = "Update the list of available packages";
+async function repositoryAdd(name: string, address: string) {
+  const opam = await findOpam();
+  await exec(opam, [
+    "repository",
+    "add",
+    name,
+    address,
+    "--all-switches",
+    "--set-default",
+  ]);
+}
+
+export async function repositoryAddAll(
+  repositories: [string, string][]
+): Promise<void> {
+  const groupName = "Initialise the opam repositories";
   startProfiler(groupName);
-  await exec("opam", ["update", "--all"]);
+  for (const [name, address] of repositories) {
+    await repositoryAdd(name, address);
+  }
+  stopProfiler(groupName);
+}
+
+async function repositoryRemove(name: string): Promise<void> {
+  const opam = await findOpam();
+  await exec(opam, ["repository", "remove", name, "--all-switches"]);
+}
+
+async function repositoryList(): Promise<string[]> {
+  let output = "";
+  const opam = await findOpam();
+  await exec(opam, ["repository", "list", "--all-switches", "--short"], {
+    silent: true,
+    listeners: { stdout: (data) => (output += data.toString()) },
+  });
+  const result = output
+    .split("\n")
+    .map((repository) => repository.trim())
+    .filter((repository) => repository.length > 0);
+  return result;
+}
+
+export async function repositoryRemoveAll(): Promise<void> {
+  const groupName = "Remove the opam repositories";
+  startProfiler(groupName);
+  const repositories = await repositoryList();
+  for (const repository of repositories) {
+    await repositoryRemove(repository);
+  }
   stopProfiler(groupName);
 }

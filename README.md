@@ -27,8 +27,10 @@ The action does the following:
 1. Initialise the opam state
 1. Install the OCaml compiler
    - If the opam cache was not hit
+1. Remove the opam repositories
 1. Save the opam cache
    - If the opam cache was not hit
+1. Initialise the opam repositories
 1. Retrieve the opam download cache
 1. Install depext
    - On Windows, not only `opam-depext` is installed, but `depext-cygwinports`
@@ -149,7 +151,7 @@ See [Examples](examples.md) for more complex patterns.
 | Name                      | Required | Description                                                                                                                                                                                                                       | Type   | Default  |
 | ------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
 | `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `4.12.x`, `ocaml-base-compiler.4.12.0`, `ocaml-variants.4.12.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
-| `opam-repository`         | No       | The URL of the repository to fetch the packages from.                                                                                                                                                                             | string |          |
+| `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                                               | string |          |
 | `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                                                       | bool   | `true`   |
 | `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                                                    | bool   | `true`   |
 | `opam-depext-flags`       | No       | The flags for the opam depext command. The flags must be separated by the comma.                                                                                                                                                  | string |          |
