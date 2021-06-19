@@ -91610,7 +91610,7 @@ var external_os_ = __nccwpck_require__(2087);
 ;// CONCATENATED MODULE: external "process"
 const external_process_namespaceObject = require("process");;
 ;// CONCATENATED MODULE: ./package.json
-const package_namespaceObject = {"i8":"2.0.0-alpha"};
+const package_namespaceObject = {"i8":"2.0.0-beta"};
 // EXTERNAL MODULE: ./node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(5065);
 // EXTERNAL MODULE: external "fs"

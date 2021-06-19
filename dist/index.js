@@ -92797,7 +92797,7 @@ var cache = __nccwpck_require__(7799);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var lib_github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./package.json
-const package_namespaceObject = {"i8":"2.0.0-alpha"};
+const package_namespaceObject = {"i8":"2.0.0-beta"};
 // EXTERNAL MODULE: ./node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(5065);
 // EXTERNAL MODULE: external "fs"

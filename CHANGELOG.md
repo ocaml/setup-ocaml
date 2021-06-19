@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta]
+
 ### Added
 
 - ​Added `opam-repositories` input to support multiple opam repositories.
@@ -195,7 +197,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta...HEAD
+[2.0.0-beta]:
+  https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
 [2.0.0-alpha]:
   https://github.com/avsm/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
 [1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.11
