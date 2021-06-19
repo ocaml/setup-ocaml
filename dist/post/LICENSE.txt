@@ -1116,6 +1116,16 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+date-fns
+MIT
+Copyright (C) 2020 Sasha Koss and Lesha Koss
+
+# License
+
+date-fns is licensed under the [MIT license](http://kossnocorp.mit-license.org).
+Read more about MIT at [TLDRLegal](https://tldrlegal.com/license/mit-license).
+
+
 delayed-stream
 MIT
 Copyright (c) 2011 Debuggable Limited <felix@debuggable.com>
