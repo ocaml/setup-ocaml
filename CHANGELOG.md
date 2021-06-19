@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Removed
+
+- Removed the profiling functionality added in `2.0.0-alpha`.
+
 ## [2.0.0-beta]
 
 ### Added
