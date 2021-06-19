@@ -13,7 +13,6 @@ import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache";
 import { GITHUB_TOKEN, OPAM_DISABLE_SANDBOXING, Platform } from "./constants";
-import { startProfiler, stopProfiler } from "./profiler";
 import {
   getArchitecture,
   getPlatform,
@@ -126,14 +125,12 @@ async function initializeOpamUnix() {
 }
 
 async function setupOpamUnix() {
-  const installOpam = "Install opam";
-  startProfiler(installOpam);
+  core.startGroup("Install opam");
   await acquireOpamUnix();
-  stopProfiler(installOpam);
-  const initialiseTheOpamState = "Initialise the opam state";
-  startProfiler(initialiseTheOpamState);
+  core.endGroup();
+  core.startGroup("Initialise the opam state");
   await initializeOpamUnix();
-  stopProfiler(initialiseTheOpamState);
+  core.endGroup();
 }
 
 export async function getCygwinVersion(): Promise<string> {
@@ -244,8 +241,7 @@ async function initializeOpamWindows() {
 }
 
 async function setupOpamWindows() {
-  const prepareTheCygwinEnvironment = "Prepare the Cygwin environment";
-  startProfiler(prepareTheCygwinEnvironment);
+  core.startGroup("Prepare the Cygwin environment");
   const CYGWIN_ROOT = path.join("D:", "cygwin");
   const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
   const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
@@ -255,20 +251,18 @@ async function setupOpamWindows() {
   core.exportVariable("CYGWIN_ROOT_WRAPPERBIN", CYGWIN_ROOT_WRAPPERBIN);
   core.addPath(CYGWIN_ROOT_WRAPPERBIN);
   await setupCygwin();
-  stopProfiler(prepareTheCygwinEnvironment);
+  core.endGroup();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const originalPath = process.env.PATH!.split(path.delimiter);
   const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
   process.env.PATH = patchedPath.join(path.delimiter);
   await saveCygwinCache();
-  const installOpam = "Install opam";
-  startProfiler(installOpam);
+  core.startGroup("Install opam");
   await acquireOpamWindows();
-  stopProfiler(installOpam);
-  const initialiseTheOpamState = "Initialise the opam state";
-  startProfiler(initialiseTheOpamState);
+  core.endGroup();
+  core.startGroup("Initialise the opam state");
   await initializeOpamWindows();
-  stopProfiler(initialiseTheOpamState);
+  core.endGroup();
   process.env.PATH = originalPath.join(path.delimiter);
 }
 
@@ -282,8 +276,7 @@ export async function setupOpam(): Promise<void> {
 }
 
 export async function installOcaml(ocamlCompiler: string): Promise<void> {
-  const groupName = "Install OCaml";
-  startProfiler(groupName);
+  core.startGroup("Install OCaml");
   const platform = getPlatform();
   if (platform === Platform.Win32) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -311,12 +304,11 @@ export async function installOcaml(ocamlCompiler: string): Promise<void> {
       ocamlCompiler,
     ]);
   }
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function pin(fpaths: string[]): Promise<void> {
-  const groupName = "Pin local packages";
-  startProfiler(groupName);
+  core.startGroup("Pin local packages");
   const opam = await findOpam();
   for (const fpath of fpaths) {
     const fname = path.basename(fpath, ".opam");
@@ -325,7 +317,7 @@ export async function pin(fpaths: string[]): Promise<void> {
       cwd: dname,
     });
   }
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 async function repositoryAdd(name: string, address: string) {
@@ -343,12 +335,11 @@ async function repositoryAdd(name: string, address: string) {
 export async function repositoryAddAll(
   repositories: [string, string][]
 ): Promise<void> {
-  const groupName = "Initialise the opam repositories";
-  startProfiler(groupName);
+  core.startGroup("Initialise the opam repositories");
   for (const [name, address] of repositories) {
     await repositoryAdd(name, address);
   }
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 async function repositoryRemove(name: string): Promise<void> {
@@ -371,11 +362,10 @@ async function repositoryList(): Promise<string[]> {
 }
 
 export async function repositoryRemoveAll(): Promise<void> {
-  const groupName = "Remove the opam repositories";
-  startProfiler(groupName);
+  core.startGroup("Remove the opam repositories");
   const repositories = await repositoryList();
   for (const repository of repositories) {
     await repositoryRemove(repository);
   }
-  stopProfiler(groupName);
+  core.endGroup();
 }

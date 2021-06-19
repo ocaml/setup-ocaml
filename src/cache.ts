@@ -15,7 +15,6 @@ import {
   Platform,
 } from "./constants";
 import { getCygwinVersion } from "./opam";
-import { startProfiler, stopProfiler } from "./profiler";
 import {
   getArchitecture,
   getPlatform,
@@ -207,54 +206,48 @@ async function saveCache(key: string, paths: string[]) {
 }
 
 export async function restoreCygwinCache(): Promise<void> {
-  const groupName = "Retrieve the Cygwin cache";
-  startProfiler(groupName);
+  core.startGroup("Retrieve the Cygwin cache");
   const { key, restoreKeys } = await composeCygwinCacheKeys();
   const paths = composeCygwinCachePaths();
   await restoreCache(key, restoreKeys, paths);
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function saveCygwinCache(): Promise<void> {
-  const groupName = "Save the Cygwin cache";
-  startProfiler(groupName);
+  core.startGroup("Save the Cygwin cache");
   const { key } = await composeCygwinCacheKeys();
   const paths = composeCygwinCachePaths();
   await saveCache(key, paths);
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function restoreDuneCache(): Promise<void> {
-  const groupName = "Retrieve the dune cache";
-  startProfiler(groupName);
+  core.startGroup("Retrieve the dune cache");
   const { key, restoreKeys } = composeDuneCacheKeys();
   const paths = composeDuneCachePaths();
   await restoreCache(key, restoreKeys, paths);
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function saveDuneCache(): Promise<void> {
-  const groupName = "Save the dune cache";
-  startProfiler(groupName);
+  core.startGroup("Save the dune cache");
   const { key } = composeDuneCacheKeys();
   const paths = composeDuneCachePaths();
   await saveCache(key, paths);
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function restoreOpamCache(): Promise<string | undefined> {
-  const groupName = "Retrieve the opam cache";
-  startProfiler(groupName);
+  core.startGroup("Retrieve the opam cache");
   const { key, restoreKeys } = await composeOpamCacheKeys();
   const paths = composeOpamCachePaths();
   const cacheKey = await restoreCache(key, restoreKeys, paths);
-  stopProfiler(groupName);
+  core.endGroup();
   return cacheKey;
 }
 
 export async function saveOpamCache(): Promise<void> {
-  const groupName = "Save the opam cache";
-  startProfiler(groupName);
+  core.startGroup("Save the opam cache");
   await exec("opam", [
     "clean",
     "--all-switches",
@@ -266,24 +259,22 @@ export async function saveOpamCache(): Promise<void> {
   const { key } = await composeOpamCacheKeys();
   const paths = composeOpamCachePaths();
   await saveCache(key, paths);
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function restoreOpamDownloadCache(): Promise<string | undefined> {
-  const groupName = "Retrieve the opam download cache";
-  startProfiler(groupName);
+  core.startGroup("Retrieve the opam download cache");
   const { key, restoreKeys } = composeOpamDownloadCacheKeys();
   const paths = composeOpamDownloadCachePaths();
   const cacheKey = await restoreCache(key, restoreKeys, paths);
-  stopProfiler(groupName);
+  core.endGroup();
   return cacheKey;
 }
 
 export async function saveOpamDownloadCache(): Promise<void> {
-  const groupName = "Save the opam download cache";
-  startProfiler(groupName);
+  core.startGroup("Save the opam download cache");
   const { key } = composeOpamDownloadCacheKeys();
   const paths = composeOpamDownloadCachePaths();
   await saveCache(key, paths);
-  stopProfiler(groupName);
+  core.endGroup();
 }
