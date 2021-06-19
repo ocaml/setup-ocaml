@@ -92775,7 +92775,7 @@ exports.visit = visit;
 
 /***/ }),
 
-/***/ 9394:
+/***/ 6803:
 /***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -92783,7 +92783,7 @@ exports.visit = visit;
 __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(2186);
+var lib_core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var lib_exec = __nccwpck_require__(1514);
 // EXTERNAL MODULE: external "os"
@@ -92891,18 +92891,18 @@ var Platform;
     Platform["MacOS"] = "macos";
     Platform["Win32"] = "win32";
 })(Platform || (Platform = {}));
-const CACHE_PREFIX = core.getInput("cache-prefix");
-const constants_GITHUB_TOKEN = core.getInput("github-token");
-const DUNE_CACHE = core.getBooleanInput("dune-cache");
-const OCAML_COMPILER = core.getInput("ocaml-compiler");
-const OPAM_DEPEXT = core.getBooleanInput("opam-depext");
-const OPAM_DEPEXT_FLAGS = core.getInput("opam-depext-flags")
+const CACHE_PREFIX = lib_core.getInput("cache-prefix");
+const constants_GITHUB_TOKEN = lib_core.getInput("github-token");
+const DUNE_CACHE = lib_core.getBooleanInput("dune-cache");
+const OCAML_COMPILER = lib_core.getInput("ocaml-compiler");
+const OPAM_DEPEXT = lib_core.getBooleanInput("opam-depext");
+const OPAM_DEPEXT_FLAGS = lib_core.getInput("opam-depext-flags")
     .split(",")
     .map((f) => f.trim());
-const OPAM_DISABLE_SANDBOXING = core.getBooleanInput("opam-disable-sandboxing");
-const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
-const OPAM_PIN = core.getBooleanInput("opam-pin");
-const repositories_yaml = dist/* parse */.Qc(core.getInput("opam-repositories"));
+const OPAM_DISABLE_SANDBOXING = lib_core.getBooleanInput("opam-disable-sandboxing");
+const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages");
+const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
+const repositories_yaml = dist/* parse */.Qc(lib_core.getInput("opam-repositories"));
 const platform = getPlatform();
 const defaultRepository = platform != Platform.Win32
     ? "https://github.com/ocaml/opam-repository.git"
@@ -92921,21 +92921,6 @@ var tool_cache = __nccwpck_require__(7784);
 var lib = __nccwpck_require__(4612);
 // EXTERNAL MODULE: ./node_modules/semver/index.js
 var semver = __nccwpck_require__(1383);
-;// CONCATENATED MODULE: ./src/profiler.ts
-
-function profiler_startProfiler(name) {
-    core.startGroup(name);
-    if (core.isDebug()) {
-        console.time(name);
-    }
-}
-function profiler_stopProfiler(name) {
-    if (core.isDebug()) {
-        console.timeEnd(name);
-    }
-    core.endGroup();
-}
-
 ;// CONCATENATED MODULE: ./src/opam.ts
 var opam_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -92946,7 +92931,6 @@ var opam_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arg
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-
 
 
 
@@ -93003,16 +92987,16 @@ function acquireOpamUnix() {
         const cachedPath = tool_cache.find("opam", version, architecture);
         if (cachedPath === "") {
             const downloadedPath = yield tool_cache.downloadTool(browserDownloadUrl);
-            core.info(`Acquired ${version} from ${browserDownloadUrl}`);
+            lib_core.info(`Acquired ${version} from ${browserDownloadUrl}`);
             const cachedPath = yield tool_cache.cacheFile(downloadedPath, "opam", "opam", version, architecture);
-            core.info(`Successfully cached opam to ${cachedPath}`);
+            lib_core.info(`Successfully cached opam to ${cachedPath}`);
             yield external_fs_.promises.chmod(`${cachedPath}/opam`, 0o755);
-            core.addPath(cachedPath);
-            core.info("Added opam to the path");
+            lib_core.addPath(cachedPath);
+            lib_core.info("Added opam to the path");
         }
         else {
-            core.addPath(cachedPath);
-            core.info("Added cached opam to the path");
+            lib_core.addPath(cachedPath);
+            lib_core.info("Added cached opam to the path");
         }
     });
 }
@@ -93058,14 +93042,12 @@ function initializeOpamUnix() {
 }
 function setupOpamUnix() {
     return opam_awaiter(this, void 0, void 0, function* () {
-        const installOpam = "Install opam";
-        profiler_startProfiler(installOpam);
+        lib_core.startGroup("Install opam");
         yield acquireOpamUnix();
-        profiler_stopProfiler(installOpam);
-        const initialiseTheOpamState = "Initialise the opam state";
-        profiler_startProfiler(initialiseTheOpamState);
+        lib_core.endGroup();
+        lib_core.startGroup("Initialise the opam state");
         yield initializeOpamUnix();
-        profiler_stopProfiler(initialiseTheOpamState);
+        lib_core.endGroup();
     });
 }
 function getCygwinVersion() {
@@ -93091,10 +93073,10 @@ function setupCygwin() {
         if (cachedPath === "") {
             const downloadedPath = yield tool_cache.downloadTool("https://cygwin.com/setup-x86_64.exe");
             const cachedPath = yield tool_cache.cacheFile(downloadedPath, "setup-x86_64.exe", "cygwin", version, "x86_64");
-            core.addPath(cachedPath);
+            lib_core.addPath(cachedPath);
         }
         else {
-            core.addPath(cachedPath);
+            lib_core.addPath(cachedPath);
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const CYGWIN_ROOT = external_process_namespaceObject.env.CYGWIN_ROOT;
@@ -93173,31 +93155,28 @@ function initializeOpamWindows() {
 }
 function setupOpamWindows() {
     return opam_awaiter(this, void 0, void 0, function* () {
-        const prepareTheCygwinEnvironment = "Prepare the Cygwin environment";
-        profiler_startProfiler(prepareTheCygwinEnvironment);
+        lib_core.startGroup("Prepare the Cygwin environment");
         const CYGWIN_ROOT = external_path_.join("D:", "cygwin");
         const CYGWIN_ROOT_BIN = external_path_.join(CYGWIN_ROOT, "bin");
         const CYGWIN_ROOT_WRAPPERBIN = external_path_.join(CYGWIN_ROOT, "wrapperbin");
-        core.exportVariable("CYGWIN", "winsymlinks:native");
-        core.exportVariable("CYGWIN_ROOT", CYGWIN_ROOT);
-        core.exportVariable("CYGWIN_ROOT_BIN", CYGWIN_ROOT_BIN);
-        core.exportVariable("CYGWIN_ROOT_WRAPPERBIN", CYGWIN_ROOT_WRAPPERBIN);
-        core.addPath(CYGWIN_ROOT_WRAPPERBIN);
+        lib_core.exportVariable("CYGWIN", "winsymlinks:native");
+        lib_core.exportVariable("CYGWIN_ROOT", CYGWIN_ROOT);
+        lib_core.exportVariable("CYGWIN_ROOT_BIN", CYGWIN_ROOT_BIN);
+        lib_core.exportVariable("CYGWIN_ROOT_WRAPPERBIN", CYGWIN_ROOT_WRAPPERBIN);
+        lib_core.addPath(CYGWIN_ROOT_WRAPPERBIN);
         yield setupCygwin();
-        profiler_stopProfiler(prepareTheCygwinEnvironment);
+        lib_core.endGroup();
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const originalPath = external_process_namespaceObject.env.PATH.split(external_path_.delimiter);
         const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
         external_process_namespaceObject.env.PATH = patchedPath.join(external_path_.delimiter);
         yield saveCygwinCache();
-        const installOpam = "Install opam";
-        profiler_startProfiler(installOpam);
+        lib_core.startGroup("Install opam");
         yield acquireOpamWindows();
-        profiler_stopProfiler(installOpam);
-        const initialiseTheOpamState = "Initialise the opam state";
-        profiler_startProfiler(initialiseTheOpamState);
+        lib_core.endGroup();
+        lib_core.startGroup("Initialise the opam state");
         yield initializeOpamWindows();
-        profiler_stopProfiler(initialiseTheOpamState);
+        lib_core.endGroup();
         external_process_namespaceObject.env.PATH = originalPath.join(external_path_.delimiter);
     });
 }
@@ -93214,8 +93193,7 @@ function setupOpam() {
 }
 function installOcaml(ocamlCompiler) {
     return opam_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Install OCaml";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Install OCaml");
         const platform = getPlatform();
         if (platform === Platform.Win32) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -93244,13 +93222,12 @@ function installOcaml(ocamlCompiler) {
                 ocamlCompiler,
             ]);
         }
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function pin(fpaths) {
     return opam_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Pin local packages";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Pin local packages");
         const opam = yield findOpam();
         for (const fpath of fpaths) {
             const fname = external_path_.basename(fpath, ".opam");
@@ -93259,7 +93236,7 @@ function pin(fpaths) {
                 cwd: dname,
             });
         }
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function repositoryAdd(name, address) {
@@ -93277,12 +93254,11 @@ function repositoryAdd(name, address) {
 }
 function repositoryAddAll(repositories) {
     return opam_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Initialise the opam repositories";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Initialise the opam repositories");
         for (const [name, address] of repositories) {
             yield repositoryAdd(name, address);
         }
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function repositoryRemove(name) {
@@ -93308,13 +93284,12 @@ function repositoryList() {
 }
 function repositoryRemoveAll() {
     return opam_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Remove the opam repositories";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Remove the opam repositories");
         const repositories = yield repositoryList();
         for (const repository of repositories) {
             yield repositoryRemove(repository);
         }
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 
@@ -93390,7 +93365,6 @@ var cache_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _ar
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-
 
 
 
@@ -93552,10 +93526,10 @@ function restoreCache(key, restoreKeys, paths) {
     return cache_awaiter(this, void 0, void 0, function* () {
         const cacheKey = yield cache.restoreCache(paths, key, restoreKeys);
         if (cacheKey) {
-            core.info(`Cache restored from key: ${cacheKey}`);
+            lib_core.info(`Cache restored from key: ${cacheKey}`);
         }
         else {
-            core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+            lib_core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
         }
         return cacheKey;
     });
@@ -93566,65 +93540,59 @@ function saveCache(key, paths) {
             yield cache.saveCache(paths, key);
         }
         catch (error) {
-            core.info(error.message);
+            lib_core.info(error.message);
         }
     });
 }
 function restoreCygwinCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Retrieve the Cygwin cache";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Retrieve the Cygwin cache");
         const { key, restoreKeys } = yield composeCygwinCacheKeys();
         const paths = composeCygwinCachePaths();
         yield restoreCache(key, restoreKeys, paths);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function saveCygwinCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Save the Cygwin cache";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Save the Cygwin cache");
         const { key } = yield composeCygwinCacheKeys();
         const paths = composeCygwinCachePaths();
         yield saveCache(key, paths);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function restoreDuneCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Retrieve the dune cache";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Retrieve the dune cache");
         const { key, restoreKeys } = composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         yield restoreCache(key, restoreKeys, paths);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function saveDuneCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Save the dune cache";
-        startProfiler(groupName);
+        core.startGroup("Save the dune cache");
         const { key } = composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         yield saveCache(key, paths);
-        stopProfiler(groupName);
+        core.endGroup();
     });
 }
 function restoreOpamCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Retrieve the opam cache";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Retrieve the opam cache");
         const { key, restoreKeys } = yield composeOpamCacheKeys();
         const paths = composeOpamCachePaths();
         const cacheKey = yield restoreCache(key, restoreKeys, paths);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
         return cacheKey;
     });
 }
 function saveOpamCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Save the opam cache";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Save the opam cache");
         yield (0,lib_exec.exec)("opam", [
             "clean",
             "--all-switches",
@@ -93636,28 +93604,26 @@ function saveOpamCache() {
         const { key } = yield composeOpamCacheKeys();
         const paths = composeOpamCachePaths();
         yield saveCache(key, paths);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function restoreOpamDownloadCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Retrieve the opam download cache";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Retrieve the opam download cache");
         const { key, restoreKeys } = composeOpamDownloadCacheKeys();
         const paths = composeOpamDownloadCachePaths();
         const cacheKey = yield restoreCache(key, restoreKeys, paths);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
         return cacheKey;
     });
 }
 function saveOpamDownloadCache() {
     return cache_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Save the opam download cache";
-        startProfiler(groupName);
+        core.startGroup("Save the opam download cache");
         const { key } = composeOpamDownloadCacheKeys();
         const paths = composeOpamDownloadCachePaths();
         yield saveCache(key, paths);
-        stopProfiler(groupName);
+        core.endGroup();
     });
 }
 
@@ -93676,11 +93642,9 @@ var depext_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
 
 
 
-
 function installDepext(ocamlVersion) {
     return depext_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Install depext";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Install depext");
         const platform = getPlatform();
         const depextCygwinports = platform === Platform.Win32 ? ["depext-cygwinports"] : [];
         yield (0,lib_exec.exec)("opam", ["install", "opam-depext", ...depextCygwinports]);
@@ -93692,18 +93656,17 @@ function installDepext(ocamlVersion) {
             else if (ocamlVersion.includes("mingw32")) {
                 base = "i686-w64-mingw32";
             }
-            core.addPath(external_path_.posix.join("/", "usr", base, "sys-root", "mingw", "bin"));
+            lib_core.addPath(external_path_.posix.join("/", "usr", base, "sys-root", "mingw", "bin"));
         }
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function installSystemPackages(fpaths) {
     return depext_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Install system packages required by opam packages";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Install system packages required by opam packages");
         const fnames = fpaths.map((fpath) => external_path_.basename(fpath, ".opam"));
         yield (0,lib_exec.exec)("opam", ["depext", ...fnames, ...OPAM_DEPEXT_FLAGS]);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 
@@ -93724,16 +93687,14 @@ var dune_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arg
 const { repo: { owner, repo }, runId: run_id, } = lib_github.context;
 function installDune() {
     return dune_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Install dune";
-        profiler_startProfiler(groupName);
+        lib_core.startGroup("Install dune");
         yield (0,lib_exec.exec)("opam", ["depext", "dune", "--install"]);
-        profiler_stopProfiler(groupName);
+        lib_core.endGroup();
     });
 }
 function trimDuneCache() {
     return dune_awaiter(this, void 0, void 0, function* () {
-        const groupName = "Remove oldest files from the dune cache to free space";
-        startProfiler(groupName);
+        core.startGroup("Remove oldest files from the dune cache to free space");
         const octokit = github.getOctokit(GITHUB_TOKEN);
         const { data: { total_count: totalCount }, } = yield octokit.rest.actions.listJobsForWorkflowRun({
             owner,
@@ -93750,7 +93711,7 @@ function trimDuneCache() {
             "--size",
             `${cacheSize}MB`,
         ]);
-        stopProfiler(groupName);
+        core.endGroup();
     });
 }
 
@@ -93799,26 +93760,24 @@ var installer_awaiter = (undefined && undefined.__awaiter) || function (thisArg,
 
 
 
-
 function installer() {
     return installer_awaiter(this, void 0, void 0, function* () {
         const platform = getPlatform();
         const numberOfProcessors = external_os_.cpus().length;
-        const isDebug = core.isDebug();
-        core.exportVariable("OPAMCOLOR", "always");
-        core.exportVariable("OPAMERRLOGLEN", 0);
-        core.exportVariable("OPAMJOBS", numberOfProcessors);
-        core.exportVariable("OPAMPRECISETRACKING", 1);
-        core.exportVariable("OPAMSOLVERTIMEOUT", 500);
-        core.exportVariable("OPAMVERBOSE", isDebug);
-        core.exportVariable("OPAMYES", 1);
+        const isDebug = lib_core.isDebug();
+        lib_core.exportVariable("OPAMCOLOR", "always");
+        lib_core.exportVariable("OPAMERRLOGLEN", 0);
+        lib_core.exportVariable("OPAMJOBS", numberOfProcessors);
+        lib_core.exportVariable("OPAMPRECISETRACKING", 1);
+        lib_core.exportVariable("OPAMSOLVERTIMEOUT", 500);
+        lib_core.exportVariable("OPAMVERBOSE", isDebug);
+        lib_core.exportVariable("OPAMYES", 1);
         if (platform === Platform.Win32) {
             const opamRoot = external_path_.join("D:", ".opam");
-            core.exportVariable("OPAMROOT", opamRoot);
+            lib_core.exportVariable("OPAMROOT", opamRoot);
         }
         if (platform === Platform.Win32) {
-            const groupName = "Change the file system behavior parameters";
-            profiler_startProfiler(groupName);
+            lib_core.startGroup("Change the file system behavior parameters");
             yield (0,lib_exec.exec)("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
             // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
             yield (0,lib_exec.exec)("fsutil", [
@@ -93829,11 +93788,11 @@ function installer() {
                 "R2R:1",
             ]);
             yield (0,lib_exec.exec)("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-            profiler_stopProfiler(groupName);
+            lib_core.endGroup();
         }
         if (platform === Platform.Win32) {
-            core.exportVariable("HOME", external_process_namespaceObject.env.USERPROFILE);
-            core.exportVariable("MSYS", "winsymlinks:native");
+            lib_core.exportVariable("HOME", external_process_namespaceObject.env.USERPROFILE);
+            lib_core.exportVariable("MSYS", "winsymlinks:native");
         }
         if (platform === Platform.Win32) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -93907,8 +93866,8 @@ function installer() {
                 yield restoreDuneCache();
             }
             yield installDune();
-            core.exportVariable("DUNE_CACHE", "enabled");
-            core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
+            lib_core.exportVariable("DUNE_CACHE", "enabled");
+            lib_core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
         }
         const fnames = yield getOpamLocalPackages();
         if (fnames.length > 0) {
@@ -93943,7 +93902,7 @@ function run() {
             yield installer();
         }
         catch (error) {
-            core.setFailed(error.message);
+            lib_core.setFailed(error.message);
         }
     });
 }
@@ -94211,7 +94170,7 @@ module.exports = require("zlib");;
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module doesn't tell about it's top-level declarations so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(9394);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6803);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

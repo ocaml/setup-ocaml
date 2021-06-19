@@ -1,8 +1,8 @@
+import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 
 import { GITHUB_TOKEN } from "./constants";
-import { startProfiler, stopProfiler } from "./profiler";
 
 const {
   repo: { owner, repo },
@@ -10,15 +10,13 @@ const {
 } = github.context;
 
 export async function installDune(): Promise<void> {
-  const groupName = "Install dune";
-  startProfiler(groupName);
+  core.startGroup("Install dune");
   await exec("opam", ["depext", "dune", "--install"]);
-  stopProfiler(groupName);
+  core.endGroup();
 }
 
 export async function trimDuneCache(): Promise<void> {
-  const groupName = "Remove oldest files from the dune cache to free space";
-  startProfiler(groupName);
+  core.startGroup("Remove oldest files from the dune cache to free space");
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const {
     data: { total_count: totalCount },
@@ -37,5 +35,5 @@ export async function trimDuneCache(): Promise<void> {
     "--size",
     `${cacheSize}MB`,
   ]);
-  stopProfiler(groupName);
+  core.endGroup();
 }

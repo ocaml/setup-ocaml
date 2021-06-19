@@ -29,7 +29,6 @@ import {
   setupOpam,
 } from "./opam";
 import { getOpamLocalPackages } from "./packages";
-import { startProfiler, stopProfiler } from "./profiler";
 import { getPlatform } from "./system";
 import { isSemverStyle, resolveVersion } from "./version";
 
@@ -49,8 +48,7 @@ export async function installer(): Promise<void> {
     core.exportVariable("OPAMROOT", opamRoot);
   }
   if (platform === Platform.Win32) {
-    const groupName = "Change the file system behavior parameters";
-    startProfiler(groupName);
+    core.startGroup("Change the file system behavior parameters");
     await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
     await exec("fsutil", [
@@ -61,7 +59,7 @@ export async function installer(): Promise<void> {
       "R2R:1",
     ]);
     await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-    stopProfiler(groupName);
+    core.endGroup();
   }
   if (platform === Platform.Win32) {
     core.exportVariable("HOME", process.env.USERPROFILE);
