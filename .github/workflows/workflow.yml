@@ -15,39 +15,27 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
+          - windows-latest
         ocaml-compiler:
           - 4.12.x
-          - ocaml-base-compiler.4.12.0
         dune-cache:
           - false
         include:
           - os: ubuntu-latest
-            ocaml-compiler: ocaml-base-compiler.4.12.0
-            dune-cache: true
-          - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+options,ocaml-option-32bit
-            dune-cache: false
+            dune-cache: true
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
-            dune-cache: false
-          - os: windows-latest
-            ocaml-compiler: 4.12.x
             dune-cache: true
-          - os: windows-latest
-            ocaml-compiler: ocaml-variants.4.12.0+mingw32c
-            dune-cache: false
-          - os: windows-latest
-            ocaml-compiler: ocaml-variants.4.12.0+mingw64c
-            dune-cache: false
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+domains
-            dune-cache: false
+            dune-cache: true
             opam-repositories: |
               multicore: https://github.com/ocaml-multicore/multicore-opam.git
               default: https://github.com/ocaml/opam-repository.git
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+domains+effects
-            dune-cache: false
+            dune-cache: true
             opam-repositories: |
               multicore: https://github.com/ocaml-multicore/multicore-opam.git
               default: https://github.com/ocaml/opam-repository.git
