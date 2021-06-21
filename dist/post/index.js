@@ -83967,8 +83967,8 @@ function composeDoc(options, directives, { offset, start, value, end }, onError)
         schema: doc.schema
     };
     const props = resolveProps.resolveProps(start, {
-        ctx,
         indicator: 'doc-start',
+        next: value || (end === null || end === void 0 ? void 0 : end[0]),
         offset,
         onError,
         startOnNewline: true
@@ -84195,7 +84195,7 @@ function parsePrelude(prelude) {
             case '#':
                 comment +=
                     (comment === '' ? '' : afterEmptyLine ? '\n\n' : '\n') +
-                        source.substring(1);
+                        (source.substring(1) || ' ');
                 atComment = true;
                 afterEmptyLine = false;
                 break;
@@ -84403,6 +84403,7 @@ var Pair = __nccwpck_require__(3497);
 var YAMLMap = __nccwpck_require__(6761);
 var resolveProps = __nccwpck_require__(9663);
 var utilContainsNewline = __nccwpck_require__(7801);
+var utilMapIncludes = __nccwpck_require__(379);
 
 const startColMsg = 'All mapping items must start at the same column';
 function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
@@ -84412,8 +84413,8 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
     for (const { start, key, sep, value } of bm.items) {
         // key properties
         const keyProps = resolveProps.resolveProps(start, {
-            ctx,
             indicator: 'explicit-key-ind',
+            next: key || (sep === null || sep === void 0 ? void 0 : sep[0]),
             offset,
             onError,
             startOnNewline: true
@@ -84447,10 +84448,12 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
         const keyNode = key
             ? composeNode(ctx, key, keyProps, onError)
             : composeEmptyNode(ctx, keyStart, start, null, keyProps, onError);
+        if (utilMapIncludes.mapIncludes(ctx, map.items, keyNode))
+            onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique');
         // value properties
         const valueProps = resolveProps.resolveProps(sep || [], {
-            ctx,
             indicator: 'map-value-ind',
+            next: value,
             offset: keyNode.range[2],
             onError,
             startOnNewline: !key || key.type === 'block-scalar'
@@ -84650,7 +84653,7 @@ function parseBlockScalarHeader({ offset, props }, strict, onError) {
             case 'comment':
                 if (strict && !hasSpace) {
                     const message = 'Comments must be separated from other tokens by white space characters';
-                    onError(token, 'COMMENT_SPACE', message);
+                    onError(token, 'MISSING_CHAR', message);
                 }
                 length += token.source.length;
                 comment = token.source.substring(1);
@@ -84702,8 +84705,8 @@ function resolveBlockSeq({ composeNode, composeEmptyNode }, ctx, bs, onError) {
     let offset = bs.offset;
     for (const { start, value } of bs.items) {
         const props = resolveProps.resolveProps(start, {
-            ctx,
             indicator: 'seq-item-ind',
+            next: value,
             offset,
             onError,
             startOnNewline: true
@@ -84757,8 +84760,8 @@ function resolveEnd(end, offset, reqSpace, onError) {
                     break;
                 case 'comment': {
                     if (reqSpace && !hasSpace)
-                        onError(token, 'COMMENT_SPACE', 'Comments must be separated from other tokens by white space characters');
-                    const cb = source.substring(1);
+                        onError(token, 'MISSING_CHAR', 'Comments must be separated from other tokens by white space characters');
+                    const cb = source.substring(1) || ' ';
                     if (!comment)
                         comment = cb;
                     else
@@ -84798,6 +84801,7 @@ var YAMLSeq = __nccwpck_require__(3810);
 var resolveEnd = __nccwpck_require__(1789);
 var resolveProps = __nccwpck_require__(9663);
 var utilContainsNewline = __nccwpck_require__(7801);
+var utilMapIncludes = __nccwpck_require__(379);
 
 const blockMsg = 'Block collections are not allowed within flow collections';
 const isBlock = (token) => token && (token.type === 'block-map' || token.type === 'block-seq');
@@ -84812,9 +84816,9 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
     for (let i = 0; i < fc.items.length; ++i) {
         const { start, key, sep, value } = fc.items[i];
         const props = resolveProps.resolveProps(start, {
-            ctx,
             flow: fcName,
             indicator: 'explicit-key-ind',
+            next: key || (sep === null || sep === void 0 ? void 0 : sep[0]),
             offset,
             onError,
             startOnNewline: false
@@ -84892,9 +84896,9 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
                 onError(keyNode.range, 'BLOCK_IN_FLOW', blockMsg);
             // value properties
             const valueProps = resolveProps.resolveProps(sep || [], {
-                ctx,
                 flow: fcName,
                 indicator: 'map-value-ind',
+                next: value,
                 offset: keyNode.range[2],
                 onError,
                 startOnNewline: false
@@ -84937,8 +84941,12 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
                     keyNode.comment = valueProps.comment;
             }
             const pair = new Pair.Pair(keyNode, valueNode);
-            if (isMap)
-                coll.items.push(pair);
+            if (isMap) {
+                const map = coll;
+                if (utilMapIncludes.mapIncludes(ctx, map.items, keyNode))
+                    onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique');
+                map.items.push(pair);
+            }
             else {
                 const map = new YAMLMap.YAMLMap(ctx.schema);
                 map.flow = true;
@@ -84952,7 +84960,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
     const [ce, ...ee] = fc.end;
     let cePos = offset;
     if (ce && ce.source === expectedEnd)
-        cePos += ce.source.length;
+        cePos = ce.offset + ce.source.length;
     else {
         onError(offset + 1, 'MISSING_CHAR', `Expected ${fcName} to end with ${expectedEnd}`);
         if (ce && ce.source.length !== 1)
@@ -85206,19 +85214,27 @@ exports.resolveFlowScalar = resolveFlowScalar;
 "use strict";
 
 
-function resolveProps(tokens, { ctx, flow, indicator, offset, onError, startOnNewline }) {
+function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnNewline }) {
     let spaceBefore = false;
     let atNewline = startOnNewline;
     let hasSpace = startOnNewline;
     let comment = '';
     let commentSep = '';
     let hasNewline = false;
+    let reqSpace = false;
     let anchor = null;
     let tag = null;
     let comma = null;
     let found = null;
     let start = null;
     for (const token of tokens) {
+        if (reqSpace) {
+            if (token.type !== 'space' &&
+                token.type !== 'newline' &&
+                token.type !== 'comma')
+                onError(token.offset, 'MISSING_CHAR', 'Tags and anchors must be separated from the next token by white space');
+            reqSpace = false;
+        }
         switch (token.type) {
             case 'space':
                 // At the doc level, tabs at line start may be parsed
@@ -85232,23 +85248,29 @@ function resolveProps(tokens, { ctx, flow, indicator, offset, onError, startOnNe
                 hasSpace = true;
                 break;
             case 'comment': {
-                if (ctx.options.strict && !hasSpace)
-                    onError(token, 'COMMENT_SPACE', 'Comments must be separated from other tokens by white space characters');
-                const cb = token.source.substring(1);
+                if (!hasSpace)
+                    onError(token, 'MISSING_CHAR', 'Comments must be separated from other tokens by white space characters');
+                const cb = token.source.substring(1) || ' ';
                 if (!comment)
                     comment = cb;
                 else
                     comment += commentSep + cb;
                 commentSep = '';
+                atNewline = false;
                 break;
             }
             case 'newline':
-                if (atNewline && !comment)
-                    spaceBefore = true;
+                if (atNewline) {
+                    if (comment)
+                        comment += token.source;
+                    else
+                        spaceBefore = true;
+                }
+                else
+                    commentSep += token.source;
                 atNewline = true;
                 hasNewline = true;
                 hasSpace = true;
-                commentSep += token.source;
                 break;
             case 'anchor':
                 if (anchor)
@@ -85258,6 +85280,7 @@ function resolveProps(tokens, { ctx, flow, indicator, offset, onError, startOnNe
                     start = token.offset;
                 atNewline = false;
                 hasSpace = false;
+                reqSpace = true;
                 break;
             case 'tag': {
                 if (tag)
@@ -85267,6 +85290,7 @@ function resolveProps(tokens, { ctx, flow, indicator, offset, onError, startOnNe
                     start = token.offset;
                 atNewline = false;
                 hasSpace = false;
+                reqSpace = true;
                 break;
             }
             case indicator:
@@ -85295,6 +85319,13 @@ function resolveProps(tokens, { ctx, flow, indicator, offset, onError, startOnNe
     }
     const last = tokens[tokens.length - 1];
     const end = last ? last.offset + last.source.length : offset;
+    if (reqSpace &&
+        next &&
+        next.type !== 'space' &&
+        next.type !== 'newline' &&
+        next.type !== 'comma' &&
+        (next.type !== 'scalar' || next.source !== ''))
+        onError(next.offset, 'MISSING_CHAR', 'Tags and anchors must be separated from the next token by white space');
     return {
         comma,
         found,
@@ -85390,6 +85421,33 @@ function emptyScalarPosition(offset, before, pos) {
 }
 
 exports.emptyScalarPosition = emptyScalarPosition;
+
+
+/***/ }),
+
+/***/ 379:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var Node = __nccwpck_require__(9752);
+
+function mapIncludes(ctx, items, search) {
+    const { uniqueKeys } = ctx.options;
+    if (uniqueKeys === false)
+        return false;
+    const isEqual = typeof uniqueKeys === 'function'
+        ? uniqueKeys
+        : (a, b) => a === b ||
+            (Node.isScalar(a) &&
+                Node.isScalar(b) &&
+                a.value === b.value &&
+                !(a.value === '<<' && ctx.schema.merge));
+    return items.some(pair => isEqual(pair.key, search));
+}
+
+exports.mapIncludes = mapIncludes;
 
 
 /***/ }),
@@ -87049,6 +87107,7 @@ const defaultOptions = {
     logLevel: 'warn',
     prettyErrors: true,
     strict: true,
+    uniqueKeys: true,
     version: '1.2'
 };
 
@@ -88329,38 +88388,6 @@ function includesNonEmpty(list) {
     }
     return false;
 }
-function atFirstEmptyLineAfterComments(start) {
-    let hasComment = false;
-    for (let i = 0; i < start.length; ++i) {
-        switch (start[i].type) {
-            case 'space':
-                break;
-            case 'comment':
-                hasComment = true;
-                break;
-            case 'newline':
-                if (!hasComment)
-                    return false;
-                break;
-            default:
-                return false;
-        }
-    }
-    if (hasComment) {
-        for (let i = start.length - 1; i >= 0; --i) {
-            switch (start[i].type) {
-                /* istanbul ignore next */
-                case 'space':
-                    break;
-                case 'newline':
-                    return true;
-                default:
-                    return false;
-            }
-        }
-    }
-    return false;
-}
 function isFlowToken(token) {
     switch (token === null || token === void 0 ? void 0 : token.type) {
         case 'alias':
@@ -88813,24 +88840,38 @@ class Parser {
         switch (this.type) {
             case 'newline':
                 this.onKeyLine = false;
-                if (!it.sep && atFirstEmptyLineAfterComments(it.start)) {
-                    const prev = map.items[map.items.length - 2];
-                    const end = (_a = prev === null || prev === void 0 ? void 0 : prev.value) === null || _a === void 0 ? void 0 : _a.end;
-                    if (Array.isArray(end)) {
-                        Array.prototype.push.apply(end, it.start);
-                        it.start = [this.sourceToken];
-                        return;
-                    }
+                if (it.value) {
+                    const end = 'end' in it.value ? it.value.end : undefined;
+                    const last = Array.isArray(end) ? end[end.length - 1] : undefined;
+                    if ((last === null || last === void 0 ? void 0 : last.type) === 'comment')
+                        end === null || end === void 0 ? void 0 : end.push(this.sourceToken);
+                    else
+                        map.items.push({ start: [this.sourceToken] });
                 }
-            // fallthrough
+                else if (it.sep)
+                    it.sep.push(this.sourceToken);
+                else
+                    it.start.push(this.sourceToken);
+                return;
             case 'space':
             case 'comment':
                 if (it.value)
                     map.items.push({ start: [this.sourceToken] });
                 else if (it.sep)
                     it.sep.push(this.sourceToken);
-                else
+                else {
+                    if (this.atIndentedComment(it.start, map.indent)) {
+                        const prev = map.items[map.items.length - 2];
+                        const end = (_a = prev === null || prev === void 0 ? void 0 : prev.value) === null || _a === void 0 ? void 0 : _a.end;
+                        if (Array.isArray(end)) {
+                            Array.prototype.push.apply(end, it.start);
+                            end.push(this.sourceToken);
+                            map.items.pop();
+                            return;
+                        }
+                    }
                     it.start.push(this.sourceToken);
+                }
                 return;
         }
         if (this.indent >= map.indent) {
@@ -88935,22 +88976,34 @@ class Parser {
         const it = seq.items[seq.items.length - 1];
         switch (this.type) {
             case 'newline':
-                if (!it.value && atFirstEmptyLineAfterComments(it.start)) {
-                    const prev = seq.items[seq.items.length - 2];
-                    const end = (_a = prev === null || prev === void 0 ? void 0 : prev.value) === null || _a === void 0 ? void 0 : _a.end;
-                    if (Array.isArray(end)) {
-                        Array.prototype.push.apply(end, it.start);
-                        it.start = [this.sourceToken];
-                        return;
-                    }
+                if (it.value) {
+                    const end = 'end' in it.value ? it.value.end : undefined;
+                    const last = Array.isArray(end) ? end[end.length - 1] : undefined;
+                    if ((last === null || last === void 0 ? void 0 : last.type) === 'comment')
+                        end === null || end === void 0 ? void 0 : end.push(this.sourceToken);
+                    else
+                        seq.items.push({ start: [this.sourceToken] });
                 }
-            // fallthrough
+                else
+                    it.start.push(this.sourceToken);
+                return;
             case 'space':
             case 'comment':
                 if (it.value)
                     seq.items.push({ start: [this.sourceToken] });
-                else
+                else {
+                    if (this.atIndentedComment(it.start, seq.indent)) {
+                        const prev = seq.items[seq.items.length - 2];
+                        const end = (_a = prev === null || prev === void 0 ? void 0 : prev.value) === null || _a === void 0 ? void 0 : _a.end;
+                        if (Array.isArray(end)) {
+                            Array.prototype.push.apply(end, it.start);
+                            end.push(this.sourceToken);
+                            seq.items.pop();
+                            return;
+                        }
+                    }
                     it.start.push(this.sourceToken);
+                }
                 return;
             case 'anchor':
             case 'tag':
@@ -89144,6 +89197,13 @@ class Parser {
             }
         }
         return null;
+    }
+    atIndentedComment(start, indent) {
+        if (this.type !== 'comment')
+            return false;
+        if (this.indent <= indent)
+            return false;
+        return start.every(st => st.type === 'newline' || st.type === 'space');
     }
     *documentEnd(docEnd) {
         if (this.type !== 'doc-mode') {
@@ -90486,27 +90546,6 @@ exports.timestamp = timestamp;
 
 /***/ }),
 
-/***/ 2146:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-function addComment(str, indent, comment) {
-    return !comment
-        ? str
-        : comment.includes('\n')
-            ? `${str}\n` + comment.replace(/^/gm, `${indent || ''}#`)
-            : str.endsWith(' ')
-                ? `${str}#${comment}`
-                : `${str} #${comment}`;
-}
-
-exports.addComment = addComment;
-
-
-/***/ }),
-
 /***/ 1883:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -90767,9 +90806,9 @@ exports.stringify = stringify;
 
 
 var Collection = __nccwpck_require__(9797);
-var addComment = __nccwpck_require__(2146);
-var stringify = __nccwpck_require__(1922);
 var Node = __nccwpck_require__(9752);
+var stringify = __nccwpck_require__(1922);
+var stringifyComment = __nccwpck_require__(5577);
 
 function stringifyCollection({ comment, flow, items }, ctx, { blockItem, flowChars, itemIndent, onChompKeep, onComment }) {
     const { indent, indentStep } = ctx;
@@ -90784,10 +90823,17 @@ function stringifyCollection({ comment, flow, items }, ctx, { blockItem, flowCha
         if (Node.isNode(item)) {
             if (!chompKeep && item.spaceBefore)
                 nodes.push({ comment: true, str: '' });
-            if (item.commentBefore) {
+            let cb = item.commentBefore;
+            if (cb && chompKeep)
+                cb = cb.replace(/^\n+/, '');
+            if (cb) {
+                if (/^\n+$/.test(cb))
+                    cb = cb.substring(1);
                 // This match will always succeed on a non-empty string
-                for (const line of item.commentBefore.match(/^.*$/gm))
-                    nodes.push({ comment: true, str: `#${line}` });
+                for (const line of cb.match(/^.*$/gm)) {
+                    const str = line === ' ' ? '#' : line ? `#${line}` : '';
+                    nodes.push({ comment: true, str });
+                }
             }
             if (item.comment) {
                 comment = item.comment;
@@ -90799,10 +90845,17 @@ function stringifyCollection({ comment, flow, items }, ctx, { blockItem, flowCha
             if (ik) {
                 if (!chompKeep && ik.spaceBefore)
                     nodes.push({ comment: true, str: '' });
-                if (ik.commentBefore) {
+                let cb = ik.commentBefore;
+                if (cb && chompKeep)
+                    cb = cb.replace(/^\n+/, '');
+                if (cb) {
+                    if (/^\n+$/.test(cb))
+                        cb = cb.substring(1);
                     // This match will always succeed on a non-empty string
-                    for (const line of ik.commentBefore.match(/^.*$/gm))
-                        nodes.push({ comment: true, str: `#${line}` });
+                    for (const line of cb.match(/^.*$/gm)) {
+                        const str = line === ' ' ? '#' : line ? `#${line}` : '';
+                        nodes.push({ comment: true, str });
+                    }
                 }
                 if (ik.comment)
                     singleLineOutput = false;
@@ -90824,7 +90877,7 @@ function stringifyCollection({ comment, flow, items }, ctx, { blockItem, flowCha
         let str = stringify.stringify(item, ctx, () => (comment = null), () => (chompKeep = true));
         if (inFlow && i < items.length - 1)
             str += ',';
-        str = addComment.addComment(str, itemIndent, comment);
+        str = stringifyComment.addComment(str, itemIndent, comment);
         if (chompKeep && (comment || inFlow))
             chompKeep = false;
         nodes.push({ comment: false, str });
@@ -90864,7 +90917,7 @@ function stringifyCollection({ comment, flow, items }, ctx, { blockItem, flowCha
             str += s ? `\n${indent}${s}` : '\n';
     }
     if (comment) {
-        str += '\n' + comment.replace(/^/gm, `${indent}#`);
+        str += '\n' + stringifyComment.stringifyComment(comment, indent);
         if (onComment)
             onComment();
     }
@@ -90878,6 +90931,31 @@ exports.stringifyCollection = stringifyCollection;
 
 /***/ }),
 
+/***/ 5577:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+const stringifyComment = (comment, indent) => /^\n+$/.test(comment)
+    ? comment.substring(1)
+    : comment.replace(/^(?!$)(?: $)?/gm, `${indent}#`);
+function addComment(str, indent, comment) {
+    return !comment
+        ? str
+        : comment.includes('\n')
+            ? `${str}\n` + stringifyComment(comment, indent)
+            : str.endsWith(' ')
+                ? `${str}#${comment}`
+                : `${str} #${comment}`;
+}
+
+exports.addComment = addComment;
+exports.stringifyComment = stringifyComment;
+
+
+/***/ }),
+
 /***/ 9615:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -90885,8 +90963,8 @@ exports.stringifyCollection = stringifyCollection;
 
 
 var Node = __nccwpck_require__(9752);
-var addComment = __nccwpck_require__(2146);
 var stringify = __nccwpck_require__(1922);
+var stringifyComment = __nccwpck_require__(5577);
 
 function stringifyDocument(doc, options) {
     const lines = [];
@@ -90905,7 +90983,7 @@ function stringifyDocument(doc, options) {
     if (doc.commentBefore) {
         if (lines.length !== 1)
             lines.unshift('');
-        lines.unshift(doc.commentBefore.replace(/^/gm, '#'));
+        lines.unshift(stringifyComment.stringifyComment(doc.commentBefore, ''));
     }
     const ctx = stringify.createStringifyContext(doc, options);
     let chompKeep = false;
@@ -90915,7 +90993,7 @@ function stringifyDocument(doc, options) {
             if (doc.contents.spaceBefore && hasDirectives)
                 lines.push('');
             if (doc.contents.commentBefore)
-                lines.push(doc.contents.commentBefore.replace(/^/gm, '#'));
+                lines.push(stringifyComment.stringifyComment(doc.contents.commentBefore, ''));
             // top-level block scalars need to be indented if followed by a comment
             ctx.forceBlockIndent = !!doc.comment;
             contentComment = doc.contents.comment;
@@ -90923,7 +91001,7 @@ function stringifyDocument(doc, options) {
         const onChompKeep = contentComment ? undefined : () => (chompKeep = true);
         let body = stringify.stringify(doc.contents, ctx, () => (contentComment = null), onChompKeep);
         if (contentComment)
-            body = addComment.addComment(body, '', contentComment);
+            body = stringifyComment.addComment(body, '', contentComment);
         if ((body[0] === '|' || body[0] === '>') &&
             lines[lines.length - 1] === '---') {
             // Top-level block scalars with a preceding doc marker ought to use the
@@ -90936,10 +91014,13 @@ function stringifyDocument(doc, options) {
     else {
         lines.push(stringify.stringify(doc.contents, ctx));
     }
-    if (doc.comment) {
+    let dc = doc.comment;
+    if (dc && chompKeep)
+        dc = dc.replace(/^\n+/, '');
+    if (dc) {
         if ((!chompKeep || contentComment) && lines[lines.length - 1] !== '')
             lines.push('');
-        lines.push(doc.comment.replace(/^/gm, '#'));
+        lines.push(stringifyComment.stringifyComment(dc, ''));
     }
     return lines.join('\n') + '\n';
 }
@@ -90991,8 +91072,8 @@ exports.stringifyNumber = stringifyNumber;
 
 var Node = __nccwpck_require__(9752);
 var Scalar = __nccwpck_require__(8160);
-var addComment = __nccwpck_require__(2146);
 var stringify = __nccwpck_require__(1922);
+var stringifyComment = __nccwpck_require__(5577);
 
 function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
     const { allNullValues, doc, indent, indentStep, options: { indentSeq, simpleKeys } } = ctx;
@@ -91038,22 +91119,20 @@ function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
             keyComment = null;
         if (chompKeep && !keyComment && onChompKeep)
             onChompKeep();
-        return addComment.addComment(`? ${str}`, ctx.indent, keyComment);
+        return stringifyComment.addComment(`? ${str}`, ctx.indent, keyComment);
     }
     if (keyCommentDone)
         keyComment = null;
     str = explicitKey
-        ? `? ${addComment.addComment(str, ctx.indent, keyComment)}\n${indent}:`
-        : addComment.addComment(`${str}:`, ctx.indent, keyComment);
+        ? `? ${stringifyComment.addComment(str, ctx.indent, keyComment)}\n${indent}:`
+        : stringifyComment.addComment(`${str}:`, ctx.indent, keyComment);
     let vcb = '';
     let valueComment = null;
     if (Node.isNode(value)) {
         if (value.spaceBefore)
             vcb = '\n';
-        if (value.commentBefore) {
-            const cs = value.commentBefore.replace(/^/gm, `${ctx.indent}#`);
-            vcb += `\n${cs}`;
-        }
+        if (value.commentBefore)
+            vcb += `\n${stringifyComment.stringifyComment(value.commentBefore, ctx.indent)}`;
         valueComment = value.comment;
     }
     else if (value && typeof value === 'object') {
@@ -91097,7 +91176,7 @@ function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
             valueComment = null;
         if (chompKeep && !valueComment && onChompKeep)
             onChompKeep();
-        return addComment.addComment(str + ws + valueStr, ctx.indent, valueComment);
+        return stringifyComment.addComment(str + ws + valueStr, ctx.indent, valueComment);
     }
 }
 
