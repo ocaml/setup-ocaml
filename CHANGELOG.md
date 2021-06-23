@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Changed to force an update of the opam cache if the week number is changed.
+
 ### Removed
 
 - Removed the profiling functionality added in `2.0.0-alpha`.

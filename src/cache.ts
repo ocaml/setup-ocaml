@@ -2,6 +2,7 @@ import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
+import * as datefns from "date-fns";
 import * as os from "os";
 import * as path from "path";
 import * as process from "process";
@@ -23,11 +24,12 @@ import {
 import { isSemverStyle, resolveVersion } from "./version";
 
 function composeDate() {
-  const _date = new Date();
-  const year = _date.getFullYear();
-  const month = _date.getMonth();
-  const date = _date.getDate();
-  return { year, month, date };
+  const d = new Date();
+  const year = datefns.getYear(d);
+  const month = datefns.getMonth(d);
+  const date = datefns.getDate(d);
+  const week = datefns.getWeek(d);
+  return { year, month, date, week };
 }
 
 async function composeCygwinCacheKeys() {
@@ -78,11 +80,10 @@ async function composeOpamCacheKeys() {
       : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
     : OCAML_COMPILER;
   const ocamlVersion = ocamlCompiler.toLowerCase().replace(/\W/g, "_");
-  const { year, month, date } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`;
+  const { year, week } = composeDate();
+  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-${date}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${month}-`,
+    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
   ];
   return { key, restoreKeys };
 }
