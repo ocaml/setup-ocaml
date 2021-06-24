@@ -370,7 +370,7 @@ export async function repositoryRemoveAll(): Promise<void> {
   core.endGroup();
 }
 
-export function addOpamBinPath(): void {
+export function exposeOpamBinPath(): void {
   core.startGroup(
     "Add the bin directory under the local switch to the system path"
   );
