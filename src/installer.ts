@@ -22,6 +22,7 @@ import {
 import { installDepext, installSystemPackages } from "./depext";
 import { installDune } from "./dune";
 import {
+  addOpamBinPath,
   installOcaml,
   pin,
   repositoryAddAll,
@@ -145,6 +146,7 @@ export async function installer(): Promise<void> {
       await installSystemPackages(fnames);
     }
   }
+  addOpamBinPath();
   await exec("opam", ["--version"]);
   await exec("opam", ["depext", "--version"]);
   await exec("opam", ["exec", "--", "ocaml", "-version"]);

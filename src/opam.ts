@@ -369,3 +369,14 @@ export async function repositoryRemoveAll(): Promise<void> {
   }
   core.endGroup();
 }
+
+export function addOpamBinPath(): void {
+  core.startGroup(
+    "Add the bin directory under the local switch to the system path"
+  );
+  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
+  const opamBinPath = path.join(githubWorkspace, "_opam", "bin");
+  core.addPath(opamBinPath);
+  core.info(`Added ${opamBinPath} to the system path`);
+  core.endGroup();
+}
