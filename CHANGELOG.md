@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [v2.0.0-beta2]
+
 ### Changed
 
 - Changed to force an update of the opam cache if the week number is changed.
@@ -205,7 +207,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta2...HEAD
+[v2.0.0-beta2]:
+  https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
 [2.0.0-beta]:
   https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
 [2.0.0-alpha]:
