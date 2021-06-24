@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Use the week number to manage Cygwin cache.
+
 ## [v2.0.0-beta2]
 
 ### Changed
