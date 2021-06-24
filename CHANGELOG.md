@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- The bin directory under the local switch is now added to the system path.
+
 ### Changed
 
 - Use the week number to manage Cygwin cache.
