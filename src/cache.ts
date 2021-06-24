@@ -34,11 +34,10 @@ function composeDate() {
 
 async function composeCygwinCacheKeys() {
   const cygwinVersion = await getCygwinVersion();
-  const { year, month, date } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${month}-${date}`;
+  const { year, week } = composeDate();
+  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${week}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${month}-${date}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${month}-`,
+    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${week}`,
     `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-`,
   ];
   return { key, restoreKeys };
