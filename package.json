@@ -28,7 +28,7 @@
     "@types/node": "15.12.5",
     "@types/semver": "7.3.6",
     "@typescript-eslint/eslint-plugin": "4.28.0",
-    "@typescript-eslint/parser": "4.28.0",
+    "@typescript-eslint/parser": "4.28.1",
     "@vercel/ncc": "0.28.6",
     "eslint": "7.29.0",
     "eslint-config-prettier": "8.3.0",
