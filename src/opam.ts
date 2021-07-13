@@ -12,7 +12,13 @@ import * as process from "process";
 import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache";
-import { GITHUB_TOKEN, OPAM_DISABLE_SANDBOXING, Platform } from "./constants";
+import {
+  DEFAULT_REPOSITORY,
+  GITHUB_TOKEN,
+  OPAM_DISABLE_SANDBOXING,
+  OPAM_REPOSITORIES,
+  Platform,
+} from "./constants";
 import {
   getArchitecture,
   getPlatform,
@@ -111,12 +117,17 @@ async function initializeOpamUnix() {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
     }
   }
-  const disableSandboxing = [];
-  if (OPAM_DISABLE_SANDBOXING) {
-    disableSandboxing.push("--disable-sandboxing");
-  }
+  const defaultRepository =
+    JSON.stringify(OPAM_REPOSITORIES) ===
+    JSON.stringify([["default", DEFAULT_REPOSITORY]])
+      ? ["default", DEFAULT_REPOSITORY]
+      : [];
+  const disableSandboxing = OPAM_DISABLE_SANDBOXING
+    ? ["--disable-sandboxing"]
+    : [];
   await exec("opam", [
     "init",
+    ...defaultRepository,
     "--auto-setup",
     "--bare",
     ...disableSandboxing,
@@ -220,8 +231,14 @@ async function acquireOpamWindows() {
 }
 
 async function initializeOpamWindows() {
+  const defaultRepository =
+    JSON.stringify(OPAM_REPOSITORIES) ===
+    JSON.stringify([["default", DEFAULT_REPOSITORY]])
+      ? ["default", DEFAULT_REPOSITORY]
+      : [];
   await exec("opam", [
     "init",
+    ...defaultRepository,
     "--auto-setup",
     "--bare",
     "--disable-sandboxing",

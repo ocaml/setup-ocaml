@@ -12,6 +12,7 @@ import {
   saveOpamCache,
 } from "./cache";
 import {
+  DEFAULT_REPOSITORY,
   DUNE_CACHE,
   OCAML_COMPILER,
   OPAM_DEPEXT,
@@ -87,8 +88,13 @@ export async function installer(): Promise<void> {
     opamCacheHit = await restoreOpamCache();
   }
   await setupOpam();
-  await repositoryRemoveAll();
-  await repositoryAddAll(OPAM_REPOSITORIES);
+  if (
+    JSON.stringify(OPAM_REPOSITORIES) !==
+    JSON.stringify([["default", DEFAULT_REPOSITORY]])
+  ) {
+    await repositoryRemoveAll();
+    await repositoryAddAll(OPAM_REPOSITORIES);
+  }
   if (!opamCacheHit) {
     const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
       ? platform === Platform.Win32
