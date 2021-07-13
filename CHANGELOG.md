@@ -11,6 +11,8 @@ and this project adheres to
 ### Changed
 
 - Use the week number to manage Cygwin cache.
+- If the default repository structure is used, do not attempt to perform
+  additional repository-related operations to save set up time.
 
 ## [v2.0.0-beta2]
 
