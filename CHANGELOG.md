@@ -12,6 +12,10 @@ and this project adheres to
 
 - Use the week number to manage Cygwin cache.
 
+### Fixes
+
+- ​Set repository priorities correctly for multiple repositories feature.
+
 ## [v2.0.0-beta2]
 
 ### Changed

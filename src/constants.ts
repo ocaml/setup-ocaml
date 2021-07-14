@@ -48,5 +48,5 @@ const defaultRepository =
     : "https://github.com/fdopen/opam-repository-mingw.git#opam2";
 
 export const OPAM_REPOSITORIES: [string, string][] = repositories_yaml
-  ? Object.entries(repositories_yaml)
+  ? Object.entries(repositories_yaml).reverse()
   : [["default", defaultRepository]];
