@@ -11,7 +11,7 @@ const {
 
 export async function installDune(): Promise<void> {
   core.startGroup("Install dune");
-  await exec("opam", ["depext", "dune", "--install"]);
+  await exec("opam", ["depext", "dune", "--install", "--update"]);
   core.endGroup();
 }
 

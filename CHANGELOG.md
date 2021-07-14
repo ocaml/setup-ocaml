@@ -11,6 +11,8 @@ and this project adheres to
 ### Changed
 
 - Use the week number to manage Cygwin cache.
+- Pass the `--update` flag to depext to ensure that the repository is updated
+  each time.
 
 ## [v2.0.0-beta2]
 
