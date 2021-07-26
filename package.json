@@ -22,7 +22,7 @@
     "cheerio": "1.0.0-rc.10",
     "date-fns": "2.22.1",
     "semver": "7.3.5",
-    "yaml": "2.0.0-6"
+    "yaml": "2.0.0-7"
   },
   "devDependencies": {
     "@types/node": "16.4.3",
