@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Stop installing `depext` package on macOS runners (opam is now at 2.1.0).
+
 ## [1.1.11]
 
 ### Changed
