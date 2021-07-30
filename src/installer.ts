@@ -35,13 +35,13 @@ export async function installer(): Promise<void> {
   const numberOfProcessors = os.cpus().length;
   const isDebug = core.isDebug();
   core.exportVariable("OPAMCOLOR", "always");
+  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", numberOfProcessors);
   core.exportVariable("OPAMPRECISETRACKING", 1);
   core.exportVariable("OPAMSOLVERTIMEOUT", 500);
   core.exportVariable("OPAMVERBOSE", isDebug);
   core.exportVariable("OPAMYES", 1);
-  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   if (platform === Platform.Win32) {
     const opamRoot = path.join("D:", ".opam");
     core.exportVariable("OPAMROOT", opamRoot);
