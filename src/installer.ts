@@ -119,7 +119,9 @@ export async function installer(): Promise<void> {
   } else {
     await restoreOpamDownloadCache();
   }
-  await installDepext(platform);
+  if (OPAM_DEPEXT) {
+    await installDepext(platform);
+  }
   if (DUNE_CACHE) {
     if (platform === Platform.Win32) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
