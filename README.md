@@ -32,9 +32,6 @@ The action does the following:
    - If the opam cache was not hit
 1. Initialise the opam repositories
 1. Retrieve the opam download cache
-1. Install depext
-   - On Windows, not only `opam-depext` is installed, but `depext-cygwinports`
-     is installed as well
 1. Retrieve the dune cache
    - If the dune cache feature is enabled
    - If the cache already exists
@@ -42,9 +39,6 @@ The action does the following:
    - If the dune cache feature is enabled
 1. Pin the opam files, if they exist
    - If the opam pin feature is not disabled
-   - If there is an opam file in the workspace that matches the glob pattern
-1. Install the system dependencies required by the opam files via depext
-   - If the opam depext feature is enabled
    - If there is an opam file in the workspace that matches the glob pattern
 
 #### Post
