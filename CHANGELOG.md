@@ -8,16 +8,18 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta3]
+
 ### Changed
 
 - Use the week number to manage Cygwin cache.
-- Support opam 2.1.0 by removing the installation of `opam-depext` (#184)
+- Support opam 2.1.0 by removing the installation of `opam-depext`.
 
 ### Fixes
 
 - ​Set repository priorities correctly for multiple repositories feature.
 
-## [v2.0.0-beta2]
+## [2.0.0-beta2]
 
 ### Changed
 
@@ -217,7 +219,9 @@ that require it.
 - Initial release.
 
 [unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta2...HEAD
-[v2.0.0-beta2]:
+[2.0.0-beta3]:
+  https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
+[2.0.0-beta2]:
   https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
 [2.0.0-beta]:
   https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
