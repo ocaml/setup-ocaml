@@ -57,8 +57,8 @@ immediately after initialisation to minimize the size of the cache.
 
 - opam dependencies: opam packages installed by `opam install`.
 - depext dependencies: System packages installed by `apt-get install`,
-  `yum install`, `brew install`, etc.
-   Since opam 2.1.0, depext are installed automatically with `opam install`.
+  `yum install`, `brew install`, etc. Since opam 2.1.0, depext are installed
+  automatically with `opam install`.
 
 ## Usage
 
