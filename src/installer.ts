@@ -41,6 +41,7 @@ export async function installer(): Promise<void> {
   core.exportVariable("OPAMSOLVERTIMEOUT", 500);
   core.exportVariable("OPAMVERBOSE", isDebug);
   core.exportVariable("OPAMYES", 1);
+  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   if (platform === Platform.Win32) {
     const opamRoot = path.join("D:", ".opam");
     core.exportVariable("OPAMROOT", opamRoot);
