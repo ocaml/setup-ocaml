@@ -86,3 +86,7 @@ jobs:
           opam-repositories: ${{ matrix.opam-repositories }}
 
       - run: opam install uri
+        if: runner.os != 'Windows'
+
+      - run: opam depext uri --install
+        if: runner.os == 'Windows'

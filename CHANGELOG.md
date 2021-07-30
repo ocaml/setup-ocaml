@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Restore partial depext support for Windows.
+
 ## [2.0.0-beta3]
 
 ### Changed
@@ -15,7 +19,7 @@ and this project adheres to
 - Use the week number to manage Cygwin cache.
 - Support opam 2.1.0 by removing the installation of `opam-depext`.
 
-### Fixes
+### Fixed
 
 - ​Set repository priorities correctly for multiple repositories feature.
 

@@ -18,6 +18,7 @@ import {
   OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
+import { installDepextWindows } from "./depext";
 import { installDune } from "./dune";
 import {
   installOcaml,
@@ -88,12 +89,12 @@ export async function installer(): Promise<void> {
   await setupOpam();
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
+  const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
+    ? platform === Platform.Win32
+      ? `ocaml-variants.${await resolveVersion(OCAML_COMPILER)}+mingw64c`
+      : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
+    : OCAML_COMPILER;
   if (!opamCacheHit) {
-    const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
-      ? platform === Platform.Win32
-        ? `ocaml-variants.${await resolveVersion(OCAML_COMPILER)}+mingw64c`
-        : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
-      : OCAML_COMPILER;
     await installOcaml(ocamlCompiler);
     if (platform === Platform.Win32) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -117,6 +118,9 @@ export async function installer(): Promise<void> {
     process.env.PATH = originalPath.join(path.delimiter);
   } else {
     await restoreOpamDownloadCache();
+  }
+  if (platform === Platform.Win32) {
+    await installDepextWindows(ocamlCompiler);
   }
   if (DUNE_CACHE) {
     if (platform === Platform.Win32) {
