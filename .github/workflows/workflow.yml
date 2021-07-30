@@ -19,6 +19,7 @@ jobs:
         ocaml-compiler:
           - 4.12.x
         dune-cache:
+          - true
           - false
         include:
           - os: ubuntu-latest
@@ -85,4 +86,4 @@ jobs:
           dune-cache: ${{ matrix.dune-cache }}
           opam-repositories: ${{ matrix.opam-repositories }}
 
-      - run: opam depext uri --install
+      - run: opam install uri
