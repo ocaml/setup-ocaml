@@ -14,12 +14,10 @@ import {
 import {
   DUNE_CACHE,
   OCAML_COMPILER,
-  OPAM_DEPEXT,
   OPAM_PIN,
   OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
-import { installDepext, installSystemPackages } from "./depext";
 import { installDune } from "./dune";
 import {
   installOcaml,
@@ -37,6 +35,7 @@ export async function installer(): Promise<void> {
   const numberOfProcessors = os.cpus().length;
   const isDebug = core.isDebug();
   core.exportVariable("OPAMCOLOR", "always");
+  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", numberOfProcessors);
   core.exportVariable("OPAMPRECISETRACKING", 1);
@@ -119,7 +118,6 @@ export async function installer(): Promise<void> {
   } else {
     await restoreOpamDownloadCache();
   }
-  await installDepext(platform);
   if (DUNE_CACHE) {
     if (platform === Platform.Win32) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -141,11 +139,7 @@ export async function installer(): Promise<void> {
     if (OPAM_PIN) {
       await pin(fnames);
     }
-    if (OPAM_DEPEXT) {
-      await installSystemPackages(fnames);
-    }
   }
   await exec("opam", ["--version"]);
-  await exec("opam", ["depext", "--version"]);
   await exec("opam", ["exec", "--", "ocaml", "-version"]);
 }

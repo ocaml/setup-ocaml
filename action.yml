@@ -17,16 +17,8 @@ inputs:
     description: Enable the automation feature for opam pin.
     required: false
     default: true
-  opam-depext:
-    description: Enable the automation feature for opam depext.
-    required: false
-    default: true
-  opam-depext-flags:
-    description: The flags for the opam depext command.
-    required: false
-    default:
   opam-local-packages:
-    description: The local packages to be used by `opam-pin` or `opam-depext`.
+    description: The local packages to be used by `opam-pin`.
     required: false
     default: "*.opam"
   opam-disable-sandboxing:

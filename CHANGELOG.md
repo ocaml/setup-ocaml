@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - Use the week number to manage Cygwin cache.
+- Support opam 2.1.0 by removing the installation of `opam-depext` (#184)
 
 ### Fixes
 
