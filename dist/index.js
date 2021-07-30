@@ -5651,9 +5651,6 @@ function acquireOpamDarwin(version, customRepository) {
                     return [4 /*yield*/, (0,exec.exec)(__nccwpck_require__.ab + "install-ocaml-unix.sh", [version])];
                 case 4:
                     _a.sent();
-                    return [4 /*yield*/, (0,exec.exec)("opam", ["install", "-y", "depext"])];
-                case 5:
-                    _a.sent();
                     return [2 /*return*/];
             }
         });

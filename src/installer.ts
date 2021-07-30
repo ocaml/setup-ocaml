@@ -89,7 +89,6 @@ async function acquireOpamDarwin(version: string, customRepository: string) {
   await exec("brew", ["install", "opam"]);
   await exec("opam", ["init", "--bare", "-yav", repository]);
   await exec(path.join(__dirname, "install-ocaml-unix.sh"), [version]);
-  await exec("opam", ["install", "-y", "depext"]);
 }
 
 export async function getOpam(
