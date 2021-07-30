@@ -58,6 +58,7 @@ immediately after initialisation to minimize the size of the cache.
 - opam dependencies: opam packages installed by `opam install`.
 - depext dependencies: System packages installed by `apt-get install`,
   `yum install`, `brew install`, etc.
+   Since opam 2.1.0, depext are installed automatically with `opam install`.
 
 ## Usage
 
@@ -147,8 +148,6 @@ See [Examples](examples.md) for more complex patterns.
 | `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `4.12.x`, `ocaml-base-compiler.4.12.0`, `ocaml-variants.4.12.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
 | `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                                               | string |          |
 | `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                                                       | bool   | `true`   |
-| `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                                                    | bool   | `true`   |
-| `opam-depext-flags`       | No       | The flags for the opam depext command. The flags must be separated by the comma.                                                                                                                                                  | string |          |
 | `opam-local-packages`     | No       | The local packages to be used by `opam-pin` or `opam-depext`. See [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob) for supported patterns.                                                           | string | `*.opam` |
 | `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                                                                              | bool   | `false`  |
 | `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                                                                            | bool   | `false`  |
