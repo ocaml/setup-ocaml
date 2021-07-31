@@ -15,6 +15,8 @@ and this project adheres to
 ### Fixes
 
 - ​Set repository priorities correctly for multiple repositories feature.
+- Lock the version of opam to be installed only to < 2.1 releases until opam 2.2
+  is released.
 
 ## [v2.0.0-beta2]
 
