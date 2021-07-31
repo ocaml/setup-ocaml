@@ -152,7 +152,7 @@ steps:
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-  - run: opam install opam-dune-lint
+  - run: opam depext opam-dune-lint --install
 
   - run: opam exec -- opam-dune-lint
 ```
@@ -172,7 +172,7 @@ steps:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
       dune-cache: true
 
-  - run: opam install ocamlformat=$(grep 'version' .ocamlformat | awk -F '=' '{ print $2 }')
+  - run: opam depext ocamlformat=$(grep 'version' .ocamlformat | awk -F '=' '{ print $2 }') --install
 
   - run: opam exec -- dune build @fmt
 ```

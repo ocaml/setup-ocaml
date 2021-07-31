@@ -21,6 +21,13 @@ export const DUNE_CACHE = core.getBooleanInput("dune-cache");
 
 export const OCAML_COMPILER = core.getInput("ocaml-compiler");
 
+export const OPAM_DEPEXT = core.getBooleanInput("opam-depext");
+
+export const OPAM_DEPEXT_FLAGS = core
+  .getInput("opam-depext-flags")
+  .split(",")
+  .map((f) => f.trim());
+
 export const OPAM_DISABLE_SANDBOXING = core.getBooleanInput(
   "opam-disable-sandboxing"
 );
