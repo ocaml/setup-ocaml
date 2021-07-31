@@ -18,27 +18,28 @@ jobs:
           - windows-latest
         ocaml-compiler:
           - 4.12.x
-        dune-cache:
+        cache:
+          - true
           - false
         include:
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+options,ocaml-option-32bit
-            dune-cache: true
+            cache: true
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
-            dune-cache: true
+            cache: true
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+domains
-            dune-cache: true
             opam-repositories: |
               multicore: https://github.com/ocaml-multicore/multicore-opam.git
               default: https://github.com/ocaml/opam-repository.git
+            cache: true
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+domains+effects
-            dune-cache: true
             opam-repositories: |
               multicore: https://github.com/ocaml-multicore/multicore-opam.git
               default: https://github.com/ocaml/opam-repository.git
+            cache: true
 
     runs-on: ${{ matrix.os }}
 
@@ -78,11 +79,23 @@ jobs:
             exit 1
           fi
 
+      - name: Generate random number
+        id: random
+        shell: pwsh
+        run: |
+          if ("${{ matrix.cache }}" -eq "true") {
+            Write-Output "::set-output name=number::v2"
+          }
+          else {
+            Write-Output "::set-output name=number::$(Get-Random)"
+          }
+
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          dune-cache: ${{ matrix.dune-cache }}
+          dune-cache: ${{ matrix.cache }}
           opam-repositories: ${{ matrix.opam-repositories }}
+          cache-prefix: ${{ steps.random.outputs.number }}
 
       - run: opam depext uri --install
