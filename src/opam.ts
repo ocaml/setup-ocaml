@@ -30,13 +30,21 @@ async function getLatestOpamRelease(): Promise<{
   version: string;
   browserDownloadUrl: string;
 }> {
+  const semverRange = "<2.1.0";
   const octokit = github.getOctokit(GITHUB_TOKEN);
-  const {
-    data: { assets, tag_name: version },
-  } = await octokit.rest.repos.getLatestRelease({
+  const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam",
+    per_page: 100,
   });
+  const matchedReleases = releases
+    .filter((release) =>
+      semver.satisfies(release.tag_name, semverRange, { loose: true })
+    )
+    .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
+      semver.rcompare(v1, v2, { loose: true })
+    );
+  const { assets, tag_name: version } = matchedReleases[0];
   const architecture = getArchitecture();
   const platform = getPlatform();
   const [{ browser_download_url: browserDownloadUrl }] = assets.filter(
