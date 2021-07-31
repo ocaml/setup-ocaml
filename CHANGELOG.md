@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.12]
+
 ### Fixed
 
 - Stop installing `depext` package on macOS runners (opam is now at 2.1.0).
@@ -125,8 +127,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.11...HEAD
-[1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.11
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.12...HEAD
+[1.1.12]: https://github.com/avsm/setup-ocaml/compare/v1.1.11...v1.1.12
+[1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.10...v1.1.11
 [1.1.10]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.10
 [1.1.9]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...v1.1.9
 [1.1.8]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...v1.1.8
