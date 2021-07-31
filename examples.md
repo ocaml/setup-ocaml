@@ -73,11 +73,11 @@ steps:
         echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
       fi
 
-  - name: Use OCaml with repository ${{ steps.repository.url }}
+  - name: Use OCaml with repository ${{ steps.repository.outputs.url }}
     uses: avsm/setup-ocaml@v2
     with:
       opam-repositories: |
-        default: ${{ steps.repository.url }}
+        default: ${{ steps.repository.outputs.url }}
 ```
 <!-- prettier-ignore-end -->
 

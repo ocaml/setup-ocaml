@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta3]
+
 ### Changed
 
 - Use the week number to manage Cygwin cache.
@@ -18,7 +20,7 @@ and this project adheres to
 - Lock the version of opam to be installed only to < 2.1 releases until opam 2.2
   is released.
 
-## [v2.0.0-beta2]
+## [2.0.0-beta2]
 
 ### Changed
 
@@ -217,8 +219,10 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta2...HEAD
-[v2.0.0-beta2]:
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta3...HEAD
+[2.0.0-beta3]:
+  https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
+[2.0.0-beta2]:
   https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
 [2.0.0-beta]:
   https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
