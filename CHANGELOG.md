@@ -219,26 +219,26 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta3...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta3...HEAD
 [2.0.0-beta3]:
-  https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
 [2.0.0-beta2]:
-  https://github.com/avsm/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
 [2.0.0-beta]:
-  https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
 [2.0.0-alpha]:
-  https://github.com/avsm/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
-[1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.10...v1.1.11
-[1.1.10]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.10
-[1.1.9]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...v1.1.9
-[1.1.8]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...v1.1.8
-[1.1.7]: https://github.com/avsm/setup-ocaml/compare/v1.1.6...v1.1.7
-[1.1.6]: https://github.com/avsm/setup-ocaml/compare/v1.1.5...v1.1.6
-[1.1.5]: https://github.com/avsm/setup-ocaml/compare/v1.1.4...v1.1.5
-[1.1.4]: https://github.com/avsm/setup-ocaml/compare/v1.1.3...v1.1.4
-[1.1.3]: https://github.com/avsm/setup-ocaml/compare/v1.1.2...v1.1.3
-[1.1.2]: https://github.com/avsm/setup-ocaml/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/avsm/setup-ocaml/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/avsm/setup-ocaml/compare/v1.0.1...v1.1.0
-[1.0.1]: https://github.com/avsm/setup-ocaml/compare/v1.0...v1.0.1
-[1.0]: https://github.com/avsm/setup-ocaml/releases/tag/v0.0.1
+  https://github.com/ocaml/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
+[1.1.11]: https://github.com/ocaml/setup-ocaml/compare/v1.1.10...v1.1.11
+[1.1.10]: https://github.com/ocaml/setup-ocaml/compare/v1.1.9...v1.1.10
+[1.1.9]: https://github.com/ocaml/setup-ocaml/compare/v1.1.8...v1.1.9
+[1.1.8]: https://github.com/ocaml/setup-ocaml/compare/v1.1.7...v1.1.8
+[1.1.7]: https://github.com/ocaml/setup-ocaml/compare/v1.1.6...v1.1.7
+[1.1.6]: https://github.com/ocaml/setup-ocaml/compare/v1.1.5...v1.1.6
+[1.1.5]: https://github.com/ocaml/setup-ocaml/compare/v1.1.4...v1.1.5
+[1.1.4]: https://github.com/ocaml/setup-ocaml/compare/v1.1.3...v1.1.4
+[1.1.3]: https://github.com/ocaml/setup-ocaml/compare/v1.1.2...v1.1.3
+[1.1.2]: https://github.com/ocaml/setup-ocaml/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/ocaml/setup-ocaml/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/ocaml/setup-ocaml/compare/v1.0.1...v1.1.0
+[1.0.1]: https://github.com/ocaml/setup-ocaml/compare/v1.0...v1.0.1
+[1.0]: https://github.com/ocaml/setup-ocaml/releases/tag/v0.0.1

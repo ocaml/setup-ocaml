@@ -20,7 +20,7 @@ import {
 } from "./system";
 
 function createHttpClient(): HttpClient {
-  return new HttpClient(`avsm/setup-ocaml`, [], {
+  return new HttpClient(`ocaml/setup-ocaml`, [], {
     allowRetries: true,
     maxRetries: 5,
   });

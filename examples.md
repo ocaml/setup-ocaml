@@ -23,7 +23,7 @@ steps:
     uses: actions/checkout@v2
 
   - name: Use OCaml ${{ matrix.ocaml-compiler }}
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
 ```
@@ -38,14 +38,14 @@ steps:
     uses: actions/checkout@v2
 
   - name: Use OCaml on Windows
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     if: runner.os == 'Windows'
     with:
       ocaml-repositories: |
         default: https://github.com/fdopen/opam-repository-mingw.git#opam2
 
   - name: Use OCaml on Unix
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     if: runner.os != 'Windows'
     with:
       opam-repositories: |
@@ -74,7 +74,7 @@ steps:
       fi
 
   - name: Use OCaml with repository ${{ steps.repository.outputs.url }}
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     with:
       opam-repositories: |
         default: ${{ steps.repository.outputs.url }}
@@ -94,7 +94,7 @@ steps:
     uses: actions/checkout@v2
 
   - name: Use OCaml ${{ matrix.ocaml-compiler }}
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
       opam-local-packages: |
@@ -131,7 +131,7 @@ steps:
     run: apt-get install bubblewrap curl darcs gcc git m4 make mercurial patch rsync sudo unzip --yes
 
   - name: Use OCaml ${{ matrix.ocaml-compiler }}
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
       cache-prefix: v1-${{ matrix.container }}
@@ -148,7 +148,7 @@ steps:
     uses: actions/checkout@v2
 
   - name: Use OCaml ${{ matrix.ocaml-compiler }}
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
@@ -167,7 +167,7 @@ steps:
     uses: actions/checkout@v2
 
   - name: Use OCaml ${{ matrix.ocaml-compiler }}
-    uses: avsm/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
       dune-cache: true
