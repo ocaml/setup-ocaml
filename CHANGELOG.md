@@ -14,7 +14,7 @@ and this project adheres to
 
 - Use the week number to manage Cygwin cache.
 
-### Fixes
+### Fixed
 
 - ​Set repository priorities correctly for multiple repositories feature.
 - Lock the version of opam to be installed only to < 2.1 releases until opam 2.2
@@ -228,7 +228,7 @@ that require it.
   https://github.com/avsm/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
 [2.0.0-alpha]:
   https://github.com/avsm/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
-[1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.11
+[1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.10...v1.1.11
 [1.1.10]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.10
 [1.1.9]: https://github.com/avsm/setup-ocaml/compare/v1.1.8...v1.1.9
 [1.1.8]: https://github.com/avsm/setup-ocaml/compare/v1.1.7...v1.1.8
