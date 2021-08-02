@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Set `OPAMSOLVERTIMEOUT` to `1000` to avoid a timeout even if the opam solver
+  is slow.
+
 ## [2.0.0-beta3]
 
 ### Changed

@@ -40,7 +40,9 @@ export async function installer(): Promise<void> {
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", numberOfProcessors);
   core.exportVariable("OPAMPRECISETRACKING", 1);
-  core.exportVariable("OPAMSOLVERTIMEOUT", 500);
+  // [todo] remove this line once we unlock opam 2.2
+  // https://github.com/ocaml/opam/issues/3447
+  core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMVERBOSE", isDebug);
   core.exportVariable("OPAMYES", 1);
   if (platform === Platform.Win32) {
