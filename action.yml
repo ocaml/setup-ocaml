@@ -11,6 +11,9 @@ inputs:
   opam-repository:
     description: URL of the repository to fetch packages from
     default: ""
+  github-token:
+    required: false
+    default: ${{ github.token }}
 runs:
   using: node12
   main: dist/index.js

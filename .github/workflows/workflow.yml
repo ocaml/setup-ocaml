@@ -50,11 +50,7 @@ jobs:
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
-      - run: opam install yaml --verbose --confirm-level=unsafe-yes --cli=2.1
-        if: runner.os == 'macOS'
-
       - run: opam depext yaml --install --verbose --yes
-        if: runner.os != 'macOS'
 
       - name: Check formatting
         run: yarn fmt:check
