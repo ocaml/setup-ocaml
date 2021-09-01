@@ -25,7 +25,9 @@ async function run() {
       process.env.PATH = originalPath.join(path.delimiter);
     }
   } catch (error) {
-    core.error(error.message);
+    if (error instanceof Error) {
+      core.error(error.message);
+    }
   }
 }
 

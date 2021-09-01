@@ -201,7 +201,9 @@ async function saveCache(key: string, paths: string[]) {
   try {
     await cache.saveCache(paths, key);
   } catch (error) {
-    core.info(error.message);
+    if (error instanceof Error) {
+      core.info(error.message);
+    }
   }
 }
 
