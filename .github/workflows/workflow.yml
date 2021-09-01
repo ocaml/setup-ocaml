@@ -79,23 +79,11 @@ jobs:
             exit 1
           fi
 
-      - name: Generate random number
-        id: random
-        shell: pwsh
-        run: |
-          if ("${{ matrix.cache }}" -eq "true") {
-            Write-Output "::set-output name=number::v2"
-          }
-          else {
-            Write-Output "::set-output name=number::$(Get-Random)"
-          }
-
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           dune-cache: ${{ matrix.cache }}
           opam-repositories: ${{ matrix.opam-repositories }}
-          cache-prefix: ${{ steps.random.outputs.number }}
 
       - run: opam depext uri --install

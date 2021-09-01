@@ -12,6 +12,7 @@ and this project adheres to
 
 - Set `OPAMSOLVERTIMEOUT` to `1000` to avoid a timeout even if the opam solver
   is slow.
+- Increase cache hit ratio by loosening restore keys of opam cache.
 
 ## [2.0.0-beta3]
 
