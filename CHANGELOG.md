@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta4]
+
 ### Changed
 
 - Set `OPAMSOLVERTIMEOUT` to `1000` to avoid a timeout even if the opam solver
@@ -225,7 +227,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta3...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta4...HEAD
+[2.0.0-beta4]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta3...v2.0.0-beta4
 [2.0.0-beta3]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
 [2.0.0-beta2]:
