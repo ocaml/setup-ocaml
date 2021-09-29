@@ -11,10 +11,10 @@ strategy:
       - macos-latest
       - ubuntu-latest
     ocaml-compiler:
-      - ocaml-base-compiler.4.12.0
+      - ocaml-base-compiler.4.13.0
     include:
       - os: windows-latest
-        ocaml-compiler: ocaml-variants.4.12.0+mingw64c
+        ocaml-compiler: ocaml-variants.4.13.0+mingw64c
 
 runs-on: ${{ matrix.os }}
 
@@ -114,7 +114,7 @@ strategy:
       - debian:latest
       - ubuntu:latest
     ocaml-compiler:
-      - ocaml-base-compiler.4.12.0
+      - ocaml-base-compiler.4.13.0
 
 container: ${{ matrix.container }}
 

@@ -122,7 +122,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - 4.12.x
+          - 4.13.x
 
     runs-on: ${{ matrix.os }}
 
@@ -150,7 +150,7 @@ See [Examples](examples.md) for more complex patterns.
 
 | Name                      | Required | Description                                                                                                                                                                                                                       | Type   | Default  |
 | ------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `4.12.x`, `ocaml-base-compiler.4.12.0`, `ocaml-variants.4.12.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
+| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `4.13.x`, `ocaml-base-compiler.4.13.0`, `ocaml-variants.4.13.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
 | `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                                               | string |          |
 | `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                                                       | bool   | `true`   |
 | `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                                                    | bool   | `true`   |
