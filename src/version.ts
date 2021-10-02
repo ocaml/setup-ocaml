@@ -44,20 +44,31 @@ async function getAllCompilerVersions(): Promise<string[]> {
   return versions;
 }
 
-export async function resolveVersion(semverVersion: string): Promise<string> {
+export async function resolveVersion(
+  semverVersionRange: string
+): Promise<string> {
   const compilerVersions = await getAllCompilerVersions();
-  const matchedFullCompilerVersions = compilerVersions
-    .filter((version) =>
-      semver.satisfies(version, semverVersion, { loose: true })
-    )
-    .sort((v1, v2) => semver.rcompare(v1, v2, { loose: true }));
-  if (matchedFullCompilerVersions && matchedFullCompilerVersions.length) {
-    const latestFullCompilerVersion = matchedFullCompilerVersions[0];
+  const latestFullCompilerVersion = semver.maxSatisfying(
+    compilerVersions,
+    semverVersionRange,
+    { loose: true }
+  );
+  if (latestFullCompilerVersion !== null) {
     return latestFullCompilerVersion;
   } else {
     core.warning(
-      `No OCaml releases on GitHub matched the version ${semverVersion}; proceed with the version ${semverVersion} anyways.`
+      `Could not find an OCaml release on GitHub that matches the range ${semverVersionRange}.`
     );
-    return semverVersion;
+    const cleanedFullCompilerVersion = semver.clean(semverVersionRange, {
+      loose: true,
+    });
+    if (cleanedFullCompilerVersion === null) {
+      throw new Error(`Failed to resolve version range ${semverVersionRange}.`);
+    } else {
+      core.warning(
+        `Proceed with the OCaml version ${cleanedFullCompilerVersion}.`
+      );
+      return cleanedFullCompilerVersion;
+    }
   }
 }
