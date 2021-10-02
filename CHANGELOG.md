@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- If no user-input version is found in the opam-repository, explicitly raise an
+  error instead of implicitly breaking the workflow.
+
 ## [2.0.0-beta4]
 
 ### Changed

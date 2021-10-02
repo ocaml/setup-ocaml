@@ -44,11 +44,16 @@ async function getAllCompilerVersions(): Promise<string[]> {
 
 export async function resolveVersion(semverVersion: string): Promise<string> {
   const compilerVersions = await getAllCompilerVersions();
-  const matchedFullCompilerVersions = compilerVersions
-    .filter((version) =>
-      semver.satisfies(version, semverVersion, { loose: true })
-    )
-    .sort((v1, v2) => semver.rcompare(v1, v2, { loose: true }));
-  const latestFullCompilerVersion = matchedFullCompilerVersions[0];
-  return latestFullCompilerVersion;
+  const matchedFullCompilerVersion = semver.maxSatisfying(
+    compilerVersions,
+    semverVersion,
+    { loose: true }
+  );
+  if (matchedFullCompilerVersion !== null) {
+    return matchedFullCompilerVersion;
+  } else {
+    throw new Error(
+      `No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`
+    );
+  }
 }
