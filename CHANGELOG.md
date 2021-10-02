@@ -8,10 +8,16 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Reduce GitHub API calls to avoid issues that can easily hit rate-limiting.
+
 ### Fixed
 
 - If no user-input version is found in the opam-repository, explicitly raise an
   error instead of implicitly breaking the workflow.
+- Retrieve the base compiler version from opam-repository to use the live
+  released compiler version.
 
 ## [2.0.0-beta4]
 

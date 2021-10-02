@@ -1,7 +1,9 @@
 import * as github from "@actions/github";
+import * as path from "path";
 import * as semver from "semver";
 
-import { GITHUB_TOKEN } from "./constants";
+import { GITHUB_TOKEN, Platform } from "./constants";
+import { getPlatform } from "./system";
 
 export function isSemverStyle(semverVersion: string): boolean {
   const result = semver.validRange(semverVersion, { loose: true });
@@ -22,24 +24,34 @@ function unique(array: string[]) {
 
 async function getAllCompilerVersions(): Promise<string[]> {
   const octokit = github.getOctokit(GITHUB_TOKEN);
-  const releases = [];
-  const state = { continue: true, count: 0 };
-  while (state.continue) {
-    const response = await octokit.rest.repos.listReleases({
-      owner: "ocaml",
-      repo: "ocaml",
-      per_page: 100,
-      page: state.count,
-    });
-    if (response.data.length > 0) {
-      releases.push(...response.data);
-      state.count++;
-    } else {
-      state.continue = false;
+  const platform = getPlatform();
+  const owner = platform === Platform.Win32 ? "fdopen" : "ocaml";
+  const repo =
+    platform === Platform.Win32 ? "opam-repository-mingw" : "opam-repository";
+  const prefix =
+    platform === Platform.Win32 ? "ocaml-variants" : "ocaml-base-compiler";
+  const { data: packages } = await octokit.rest.repos.getContent({
+    owner,
+    repo,
+    path: `packages/${prefix}`,
+  });
+  if (Array.isArray(packages)) {
+    const versions = [];
+    for (const { path: p } of packages) {
+      const basename = path.basename(p);
+      const version = basename.replace(`${prefix}.`, "");
+      const parsed = semver.parse(version, { loose: true });
+      if (parsed !== null) {
+        const { major, minor: _minor, patch } = parsed;
+        const minor = _minor.toString().length > 1 ? _minor : `0${_minor}`;
+        const version = `${major}.${minor}.${patch}`;
+        versions.push(version);
+      }
     }
+    return unique(versions);
+  } else {
+    throw new Error("Failed to get compiler list from opam-repository.");
   }
-  const versions = unique(releases.map(({ tag_name }) => tag_name));
-  return versions;
 }
 
 export async function resolveVersion(semverVersion: string): Promise<string> {
