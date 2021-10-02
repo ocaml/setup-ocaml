@@ -1,3 +1,4 @@
+import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as semver from "semver";
 
@@ -20,6 +21,7 @@ function unique(array: string[]) {
   return Array.from(new Set(array));
 }
 
+// Get all the OCaml releases on GitHub
 async function getAllCompilerVersions(): Promise<string[]> {
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const releases = [];
@@ -49,6 +51,13 @@ export async function resolveVersion(semverVersion: string): Promise<string> {
       semver.satisfies(version, semverVersion, { loose: true })
     )
     .sort((v1, v2) => semver.rcompare(v1, v2, { loose: true }));
-  const latestFullCompilerVersion = matchedFullCompilerVersions[0];
-  return latestFullCompilerVersion;
+  if (matchedFullCompilerVersions && matchedFullCompilerVersions.length) {
+    const latestFullCompilerVersion = matchedFullCompilerVersions[0];
+    return latestFullCompilerVersion;
+  } else {
+    core.warning(
+      `No OCaml releases on GitHub matched the version ${semverVersion}; proceed with the version ${semverVersion} anyways.`
+    );
+    return semverVersion;
+  }
 }
