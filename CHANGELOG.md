@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta5]
+
 ### Changed
 
 - Reduce GitHub API calls to avoid issues that can easily hit rate-limiting.
@@ -238,7 +240,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta4...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta5...HEAD
+[2.0.0-beta5]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta4...v2.0.0-beta5
 [2.0.0-beta4]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta3...v2.0.0-beta4
 [2.0.0-beta3]:
