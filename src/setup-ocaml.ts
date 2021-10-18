@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as os from "os";
 
+import { OCAML_VERSION, OPAM_REPOSITORY } from "./constants";
 import * as installer from "./installer";
 
 async function run() {
@@ -8,9 +9,7 @@ async function run() {
     const numberOfProcessors = os.cpus().length;
     const jobs = numberOfProcessors + 2;
     core.exportVariable("OPAMJOBS", jobs);
-    const ocamlVersion = core.getInput("ocaml-version");
-    const opamRepository = core.getInput("opam-repository");
-    await installer.getOpam(ocamlVersion, opamRepository);
+    await installer.getOpam(OCAML_VERSION, OPAM_REPOSITORY);
   } catch (error) {
     core.setFailed(error.toString());
   }

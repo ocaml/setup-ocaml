@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Acquire opam from GitHub release on Unix.
+
 ## [1.1.12]
 
 ### Fixed
