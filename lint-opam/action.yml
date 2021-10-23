@@ -1,0 +1,17 @@
+name: Lint opam
+description: Check if your dune and opam dependencies are consistent
+author: Sora Morimoto
+branding:
+  icon: package
+  color: orange
+runs:
+  using: composite
+  steps:
+    - run: opam install . --deps-only --with-test --with-doc
+      shell: bash
+    - run: opam depext --install opam-dune-lint
+      shell: bash
+    - run: opam lint
+      shell: bash
+    - run: opam exec -- opam-dune-lint
+      shell: bash
