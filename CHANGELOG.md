@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Added "extends" experimentally.
+
 ### Changed
 
 - Remove some hacks as `--no-depexts` is now used in CLI 2.0 mode from opam
