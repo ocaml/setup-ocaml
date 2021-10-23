@@ -9,8 +9,7 @@ runs:
   steps:
     - run: opam depext --install conf-m4 dune 'odoc>=1.5.0'
       shell: bash
-    - run:
-        opam exec -- dune build @doc || (echo "dune build @doc failed"; exit 2)
+    - run: opam exec -- dune build @doc || (echo "dune build @doc failed"; exit 2)
       shell: bash
       env:
         ODOC_WARN_ERROR: true

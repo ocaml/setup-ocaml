@@ -9,8 +9,7 @@ inputs:
     description: The OCaml compiler packages to initialise.
     required: true
   opam-repositories:
-    description:
-      The name and URL pair of the repository to fetch the packages from.
+    description: The name and URL pair of the repository to fetch the packages from.
     required: false
     default:
   opam-pin:
