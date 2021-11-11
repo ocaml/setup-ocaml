@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta6]
+
 ### Changed
 
 - Unlock opam 2.1 on the Ubuntu and macOS runners.
@@ -244,7 +246,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta5...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta6...HEAD
+[2.0.0-beta6]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta5...v2.0.0-beta6
 [2.0.0-beta5]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta4...v2.0.0-beta5
 [2.0.0-beta4]:
