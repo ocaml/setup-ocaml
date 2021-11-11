@@ -38,7 +38,6 @@ export async function installer(): Promise<void> {
   const isDebug = core.isDebug();
   core.exportVariable("OPAMCLI", "2.0");
   core.exportVariable("OPAMCOLOR", "always");
-  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", numberOfProcessors);
   core.exportVariable("OPAMPRECISETRACKING", 1);
@@ -152,4 +151,8 @@ export async function installer(): Promise<void> {
   await exec("opam", ["--version"]);
   await exec("opam", ["depext", "--version"]);
   await exec("opam", ["exec", "--", "ocaml", "-version"]);
+  if (platform !== Platform.Win32) {
+    core.exportVariable("OPAMCLI", "2.1");
+    core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
+  }
 }
