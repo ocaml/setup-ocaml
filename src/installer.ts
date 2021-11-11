@@ -38,6 +38,7 @@ export async function installer(): Promise<void> {
   const isDebug = core.isDebug();
   core.exportVariable("OPAMCLI", "2.0");
   core.exportVariable("OPAMCOLOR", "always");
+  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", numberOfProcessors);
   core.exportVariable("OPAMPRECISETRACKING", 1);

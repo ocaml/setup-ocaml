@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Set `OPAMCONFIRMLEVEL` to `unsafe-yes` to make the built-in depext work.
+
 ## [2.0.0-beta7]
 
 ### Fixed
