@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta7]
+
 ### Fixed
 
 - Return an empty array to avoid depext failure when depext flags are not
@@ -251,7 +253,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta6...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta7...HEAD
+[2.0.0-beta7]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta6...v2.0.0-beta7
 [2.0.0-beta6]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta5...v2.0.0-beta6
 [2.0.0-beta5]:
