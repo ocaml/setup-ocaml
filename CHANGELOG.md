@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Return an empty array to avoid depext failure when depext flags are not
+  passed.
+
 ## [2.0.0-beta6]
 
 ### Changed

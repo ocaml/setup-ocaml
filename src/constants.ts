@@ -26,7 +26,8 @@ export const OPAM_DEPEXT = core.getBooleanInput("opam-depext");
 export const OPAM_DEPEXT_FLAGS = core
   .getInput("opam-depext-flags")
   .split(",")
-  .map((f) => f.trim());
+  .map((f) => f.trim())
+  .filter((f) => f.length > 0);
 
 export const OPAM_DISABLE_SANDBOXING = core.getBooleanInput(
   "opam-disable-sandboxing"
