@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Unlock opam 2.1 on the Ubuntu and macOS runners.
+
 ## [2.0.0-beta5]
 
 ### Changed
