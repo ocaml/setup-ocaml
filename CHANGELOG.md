@@ -8,9 +8,9 @@ and this project adheres to
 
 ## [unreleased]
 
-### Fixed
+### Changed
 
-- Enable `--assume-depext` mode to relax depext.
+- Use 2.1 mode instead of 2.0 mode on the Ubuntu and macOS runners.
 
 ## [2.0.0-beta7]
 
