@@ -8,14 +8,9 @@ and this project adheres to
 
 ## [unreleased]
 
-### Changed
-
-- Run opam in 2.0 mode during set up and the subsequent steps in 2.1 mode on the
-  Ubuntu and macOS runners to avoid built-in depext failure.
-
 ### Fixed
 
-- Set `OPAMCONFIRMLEVEL` to `unsafe-yes` to make the built-in depext work.
+- Enable `--assume-depext` mode to relax depext.
 
 ## [2.0.0-beta7]
 
