@@ -11,7 +11,9 @@ const {
 
 export async function installDune(): Promise<void> {
   core.startGroup("Install dune");
-  await exec("opam", ["depext", "dune", "--install"]);
+  await exec("opam", ["depext", "dune", "--install"], {
+    env: { ...process.env, PATH: process.env.PATH || "", OPAMCLI: "2.0" },
+  });
   core.endGroup();
 }
 
