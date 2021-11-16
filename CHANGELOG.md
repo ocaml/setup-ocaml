@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta8]
+
 ### Changed
 
 - Use 2.1 mode instead of 2.0 mode on the Ubuntu and macOS runners.
@@ -257,7 +259,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta7...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta8...HEAD
+[2.0.0-beta8]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta7...v2.0.0-beta8
 [2.0.0-beta7]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta6...v2.0.0-beta7
 [2.0.0-beta6]:
