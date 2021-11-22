@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Increase the allowed artifact cache size from 5GB to 10GB.
+
 ## [2.0.0-beta8]
 
 ### Changed
