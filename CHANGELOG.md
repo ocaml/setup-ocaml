@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta9]
+
 ### Changed
 
 - Increase the allowed artifact cache size from 5GB to 10GB.
@@ -263,7 +265,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta8...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta9...HEAD
+[2.0.0-beta9]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta8...v2.0.0-beta9
 [2.0.0-beta8]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta7...v2.0.0-beta8
 [2.0.0-beta7]:
