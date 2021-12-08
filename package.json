@@ -6,8 +6,8 @@
     "fmt:check": "prettier --check .",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.ts\" --cache",
-    "build:index": "ncc build src/index.ts --license=LICENSE.txt",
-    "build:post": "ncc build src/post.ts --out=dist/post --license=LICENSE.txt",
+    "build:index": "ncc build src/setup-ocaml/index.ts --license=LICENSE.txt",
+    "build:post": "ncc build src/setup-ocaml/post.ts --out=dist/post --license=LICENSE.txt",
     "build": "npm-run-all -p build:*"
   },
   "dependencies": {

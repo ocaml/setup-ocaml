@@ -7,7 +7,7 @@ import * as os from "os";
 import * as path from "path";
 import * as process from "process";
 
-import { version as actionVersion } from "../package.json";
+import { version as actionVersion } from "../../package.json";
 import {
   CACHE_PREFIX,
   GITHUB_TOKEN,
