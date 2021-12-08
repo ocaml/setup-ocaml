@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Add support for more styles for the ocamlformat configuration in lint-fmt
+  action.
+
 ## [2.0.0-beta10]
 
 ### Added

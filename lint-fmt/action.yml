@@ -7,7 +7,7 @@ branding:
 runs:
   using: composite
   steps:
-    - run: opam depext --install ocamlformat=$(awk -F = '/version/{print $2}' .ocamlformat)
+    - run: opam depext --install ocamlformat=$(awk '!/^#/' .ocamlformat | awk -F = '/version/{print $2}' | tr -d '[:space:]')
       shell: bash
     - run: opam exec -- dune build @fmt
       shell: bash
