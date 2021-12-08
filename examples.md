@@ -41,7 +41,7 @@ steps:
     uses: ocaml/setup-ocaml@v2
     if: runner.os == 'Windows'
     with:
-      ocaml-repositories: |
+      opam-repositories: |
         default: https://github.com/fdopen/opam-repository-mingw.git#opam2
 
   - name: Use OCaml on Unix
