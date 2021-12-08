@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta10]
+
 ### Added
 
 - Added "extends" experimentally.
@@ -274,7 +276,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta9...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta10...HEAD
+[2.0.0-beta10]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta9...v2.0.0-beta10
 [2.0.0-beta9]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta8...v2.0.0-beta9
 [2.0.0-beta8]:
