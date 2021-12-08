@@ -1,0 +1,13 @@
+name: Lint fmt
+description: Check if your files are well-formatted
+author: Sora Morimoto
+branding:
+  icon: package
+  color: orange
+runs:
+  using: composite
+  steps:
+    - run: opam depext --install ocamlformat=$(awk -F = '/version/{print $2}' .ocamlformat)
+      shell: bash
+    - run: opam exec -- dune build @fmt
+      shell: bash

@@ -1,0 +1,30 @@
+name: Deploy odoc
+description: Deploy odoc to GitHub Pages
+author: Sora Morimoto
+branding:
+  icon: package
+  color: orange
+inputs:
+  publish-dir:
+    description: The directory where the document is stored
+    required: false
+    default: _build/default/_doc/_html
+  destination-dir:
+    description: The subdirectory to deploy
+    required: false
+    default:
+runs:
+  using: composite
+  steps:
+    - run: opam install . --deps-only --with-doc
+      shell: bash
+    - run: opam depext --install doc
+      shell: bash
+    - run: opam exec -- dune build @doc
+      shell: bash
+    - name: Deploy odoc to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ github.token }}
+        publish_dir: ${{ inputs.publish-dir }}
+        destination_dir: ${{ inputs.destination-dir }}

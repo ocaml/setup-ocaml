@@ -142,6 +142,116 @@ jobs:
       - run: opam exec -- dune runtest
 ```
 
+## Extends
+
+**STATUS: EXPERIMENTAL**
+
+Note: All extends are recommended to use in separate jobs run on
+`ubuntu-latest`.
+
+- [deploy-doc](#deploy-doc)
+- [lint-doc](#lint-doc)
+- [lint-fmt](#lint-fmt)
+- [lint-opam](#lint-opam)
+
+### deploy-doc
+
+```yml
+name: Deploy odoc
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml 4.13.x
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.13.x
+          dune-cache: true
+
+      - name: Deploy odoc to GitHub Pages
+        uses: ocaml/setup-ocaml/deploy-doc@v2
+```
+
+See [action.yml](deploy-doc/action.yml) for inputs.
+
+### lint-doc
+
+```yml
+jobs:
+  lint-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml 4.13.x
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.13.x
+          dune-cache: true
+
+      - name: Lint doc
+        uses: ocaml/setup-ocaml/lint-doc@v2
+```
+
+See [action.yml](lint-doc/action.yml) for inputs.
+
+### lint-fmt
+
+Note: The ocamlformat configuration file must have the version of the
+ocamlformat used in the project.
+
+```yml
+jobs:
+  lint-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml 4.13.x
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.13.x
+          dune-cache: true
+
+      - name: Lint fmt
+        uses: ocaml/setup-ocaml/lint-fmt@v2
+```
+
+See [action.yml](lint-fmt/action.yml) for inputs.
+
+### lint-opam
+
+```yml
+jobs:
+  lint-opam:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml 4.13.x
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.13.x
+          dune-cache: true
+
+      - name: Lint opam
+        uses: ocaml/setup-ocaml/lint-opam@v2
+```
+
+See [action.yml](lint-opam/action.yml) for inputs.
+
 ## Advanced Configurations
 
 See [Examples](examples.md) for more complex patterns.

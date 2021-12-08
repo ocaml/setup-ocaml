@@ -1,0 +1,15 @@
+name: Lint doc
+description: Check if your doc comments are error-and-warning-free
+author: Sora Morimoto
+branding:
+  icon: package
+  color: orange
+runs:
+  using: composite
+  steps:
+    - run: opam depext --install conf-m4 dune 'odoc>=1.5.0'
+      shell: bash
+    - run: opam exec -- dune build @doc || (echo "dune build @doc failed"; exit 2)
+      shell: bash
+      env:
+        ODOC_WARN_ERROR: true
