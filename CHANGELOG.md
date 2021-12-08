@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Remove some hacks as `--no-depexts` is now used in CLI 2.0 mode from opam
+  2.1.2.
+
 ## [2.0.0-beta9]
 
 ### Changed
