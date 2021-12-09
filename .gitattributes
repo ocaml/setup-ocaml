@@ -1,2 +1,11 @@
 * text=auto
-dist/** -diff linguist-generated
+/dist/*.js -diff linguist-generated
+/dist/*.txt -diff linguist-generated
+/dist/post/*.js -diff linguist-generated
+/dist/post/*.txt -diff linguist-generated
+/lint-doc/*.js -diff linguist-generated
+/lint-doc/*.txt -diff linguist-generated
+/lint-fmt/*.js -diff linguist-generated
+/lint-fmt/*.txt -diff linguist-generated
+/lint-opam/*.js -diff linguist-generated
+/lint-opam/*.txt -diff linguist-generated
