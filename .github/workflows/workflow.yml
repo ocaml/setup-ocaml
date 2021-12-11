@@ -18,7 +18,6 @@ jobs:
           - windows-latest
         ocaml-compiler:
           - 4.13.x
-          - ">=4.13.0 <4.14.0"
         cache:
           - true
           - false
@@ -31,12 +30,6 @@ jobs:
             cache: true
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+domains
-            opam-repositories: |
-              multicore: https://github.com/ocaml-multicore/multicore-opam.git
-              default: https://github.com/ocaml/opam-repository.git
-            cache: true
-          - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.4.12.0+domains+effects
             opam-repositories: |
               multicore: https://github.com/ocaml-multicore/multicore-opam.git
               default: https://github.com/ocaml/opam-repository.git
