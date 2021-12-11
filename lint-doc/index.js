@@ -3035,14 +3035,12 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
     }
 };
 
-
 function lintOdoc() {
     return __awaiter(this, void 0, void 0, function () {
         var options, exitCode;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    core.startGroup("Lint odoc");
                     options = {
                         env: __assign(__assign({}, process.env), { PATH: process.env.PATH || "", ODOC_WARN_ERROR: "true" })
                     };
@@ -3052,7 +3050,6 @@ function lintOdoc() {
                     if (exitCode !== 0) {
                         throw new Error("dune build @doc failed");
                     }
-                    core.endGroup();
                     return [2 /*return*/];
             }
         });

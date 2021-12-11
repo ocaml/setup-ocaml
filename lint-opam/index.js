@@ -3024,17 +3024,13 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
     }
 };
 
-
 function opamLint() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    core.startGroup("Check package description of opam files");
-                    return [4 /*yield*/, (0,exec.exec)("opam", ["lint"])];
+                case 0: return [4 /*yield*/, (0,exec.exec)("opam", ["lint"])];
                 case 1:
                     _a.sent();
-                    core.endGroup();
                     return [2 /*return*/];
             }
         });
@@ -3044,12 +3040,9 @@ function opamDuneLint() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    core.startGroup("Check dune and opam dependencies are consistent");
-                    return [4 /*yield*/, (0,exec.exec)("opam", ["exec", "--", "opam-dune-lint"])];
+                case 0: return [4 /*yield*/, (0,exec.exec)("opam", ["exec", "--", "opam-dune-lint"])];
                 case 1:
                     _a.sent();
-                    core.endGroup();
                     return [2 /*return*/];
             }
         });
