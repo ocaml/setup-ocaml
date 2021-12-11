@@ -1,1 +1,5 @@
-dist/
+/deploy-doc/*
+/dist/*
+/lint-doc/*
+/lint-fmt/*
+/lint-opam/*

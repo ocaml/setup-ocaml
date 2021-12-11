@@ -5,9 +5,5 @@ branding:
   icon: package
   color: orange
 runs:
-  using: composite
-  steps:
-    - run: opam depext --install ocamlformat=$(awk '!/^#/' .ocamlformat | awk -F = '/version/{print $2}' | tr -d '[:space:]')
-      shell: bash
-    - run: opam exec -- dune build @fmt
-      shell: bash
+  using: node12
+  main: index.js

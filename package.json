@@ -6,8 +6,11 @@
     "fmt:check": "prettier --check .",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.ts\" --cache",
-    "build:index": "ncc build src/index.ts --license=LICENSE.txt",
-    "build:post": "ncc build src/post.ts --out=dist/post --license=LICENSE.txt",
+    "build:lint-doc": "ncc build src/lint-doc/index.ts --out=lint-doc --license=LICENSE.txt",
+    "build:lint-fmt": "ncc build src/lint-fmt/index.ts --out=lint-fmt --license=LICENSE.txt",
+    "build:lint-opam": "ncc build src/lint-opam/index.ts --out=lint-opam --license=LICENSE.txt",
+    "build:setup-ocaml.index": "ncc build src/setup-ocaml/index.ts --license=LICENSE.txt",
+    "build:setup-ocaml.post": "ncc build src/setup-ocaml/post.ts --out=dist/post --license=LICENSE.txt",
     "build": "npm-run-all -p build:*"
   },
   "dependencies": {
@@ -20,6 +23,7 @@
     "@actions/io": "1.1.1",
     "@actions/tool-cache": "1.7.1",
     "cheerio": "1.0.0-rc.10",
+    "core-js": "3.19.3",
     "date-fns": "2.27.0",
     "semver": "7.3.5",
     "yaml": "2.0.0-9"

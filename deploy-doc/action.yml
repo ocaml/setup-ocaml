@@ -18,7 +18,7 @@ runs:
   steps:
     - run: opam install . --deps-only --with-doc
       shell: bash
-    - run: opam depext --install doc
+    - run: opam depext --install odoc
       shell: bash
     - run: opam exec -- dune build @doc
       shell: bash
