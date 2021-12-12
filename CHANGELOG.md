@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta11]
+
 ### Fixed
 
 - Add support for more styles for the ocamlformat configuration in lint-fmt
@@ -281,7 +283,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta10...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta11...HEAD
+[2.0.0-beta11]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta10...v2.0.0-beta11
 [2.0.0-beta10]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta9...v2.0.0-beta10
 [2.0.0-beta9]:
