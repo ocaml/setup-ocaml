@@ -23,7 +23,7 @@
     "@actions/io": "1.1.1",
     "@actions/tool-cache": "1.7.1",
     "cheerio": "1.0.0-rc.10",
-    "core-js": "3.20.0",
+    "core-js": "3.20.1",
     "date-fns": "2.27.0",
     "semver": "7.3.5",
     "yaml": "2.0.0-9"
