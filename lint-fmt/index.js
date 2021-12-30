@@ -2542,6 +2542,16 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
+/***/ 2962:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var parent = __nccwpck_require__(5041);
+
+module.exports = parent;
+
+
+/***/ }),
+
 /***/ 1684:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -2591,10 +2601,10 @@ module.exports = path.String;
 /***/ 120:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var parent = __nccwpck_require__(5041);
+var parent = __nccwpck_require__(2962);
+// TODO: remove from `core-js@4`
 __nccwpck_require__(812);
-// TODO: disabled by default because of the conflict with another proposal
-// require('../../modules/esnext.string.at-alternative');
+__nccwpck_require__(8384);
 __nccwpck_require__(8131);
 // TODO: remove from `core-js@4`
 __nccwpck_require__(2167);
@@ -2815,13 +2825,15 @@ var ownKeys = __nccwpck_require__(609);
 var getOwnPropertyDescriptorModule = __nccwpck_require__(1590);
 var definePropertyModule = __nccwpck_require__(6085);
 
-module.exports = function (target, source) {
+module.exports = function (target, source, exceptions) {
   var keys = ownKeys(source);
   var defineProperty = definePropertyModule.f;
   var getOwnPropertyDescriptor = getOwnPropertyDescriptorModule.f;
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
-    if (!hasOwn(target, key)) defineProperty(target, key, getOwnPropertyDescriptor(source, key));
+    if (!hasOwn(target, key) && !(exceptions && hasOwn(exceptions, key))) {
+      defineProperty(target, key, getOwnPropertyDescriptor(source, key));
+    }
   }
 };
 
@@ -3537,7 +3549,7 @@ var createElement = __nccwpck_require__(9760);
 
 // Thank's IE8 for his funny defineProperty
 module.exports = !DESCRIPTORS && !fails(function () {
-  // eslint-disable-next-line es/no-object-defineproperty -- requied for testing
+  // eslint-disable-next-line es/no-object-defineproperty -- required for testing
   return Object.defineProperty(createElement('div'), 'a', {
     get: function () { return 7; }
   }).a != 7;
@@ -3695,7 +3707,7 @@ var constructorRegExp = /^\s*(?:class|function)\b/;
 var exec = uncurryThis(constructorRegExp.exec);
 var INCORRECT_TO_STRING = !constructorRegExp.exec(noop);
 
-var isConstructorModern = function (argument) {
+var isConstructorModern = function isConstructor(argument) {
   if (!isCallable(argument)) return false;
   try {
     construct(noop, empty, argument);
@@ -3705,15 +3717,24 @@ var isConstructorModern = function (argument) {
   }
 };
 
-var isConstructorLegacy = function (argument) {
+var isConstructorLegacy = function isConstructor(argument) {
   if (!isCallable(argument)) return false;
   switch (classof(argument)) {
     case 'AsyncFunction':
     case 'GeneratorFunction':
     case 'AsyncGeneratorFunction': return false;
+  }
+  try {
     // we can't check .prototype since constructors produced by .bind haven't it
-  } return INCORRECT_TO_STRING || !!exec(constructorRegExp, inspectSource(argument));
+    // `Function#toString` throws on some built-it function in some legacy engines
+    // (for example, `DOMQuad` and similar in FF41-)
+    return INCORRECT_TO_STRING || !!exec(constructorRegExp, inspectSource(argument));
+  } catch (error) {
+    return true;
+  }
 };
+
+isConstructorLegacy.sham = true;
 
 // `IsConstructor` abstract operation
 // https://tc39.es/ecma262/#sec-isconstructor
@@ -4716,9 +4737,10 @@ var wellKnownSymbol = __nccwpck_require__(4162);
 
 var TO_STRING_TAG = wellKnownSymbol('toStringTag');
 
-module.exports = function (it, TAG, STATIC) {
-  if (it && !hasOwn(it = STATIC ? it : it.prototype, TO_STRING_TAG)) {
-    defineProperty(it, TO_STRING_TAG, { configurable: true, value: TAG });
+module.exports = function (target, TAG, STATIC) {
+  if (target && !STATIC) target = target.prototype;
+  if (target && !hasOwn(target, TO_STRING_TAG)) {
+    defineProperty(target, TO_STRING_TAG, { configurable: true, value: TAG });
   }
 };
 
@@ -4763,7 +4785,7 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.19.3',
+  version: '3.20.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
 });
@@ -5309,7 +5331,7 @@ var fails = __nccwpck_require__(6287);
 var charAt = uncurryThis(''.charAt);
 
 var FORCED = fails(function () {
-  return '𠮷'.at(0) !== '\uD842';
+  return '𠮷'.at(-2) !== '\uD842';
 });
 
 // `String.prototype.at` method
@@ -6597,16 +6619,23 @@ $({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
 var $ = __nccwpck_require__(8283);
 var charAt = (__nccwpck_require__(57).charAt);
 var fails = __nccwpck_require__(6287);
+var requireObjectCoercible = __nccwpck_require__(4385);
+var toIntegerOrInfinity = __nccwpck_require__(5500);
+var toString = __nccwpck_require__(3442);
 
 var FORCED = fails(function () {
-  return '𠮷'.at(0) !== '𠮷';
+  return '𠮷'.at(-2) !== '𠮷';
 });
 
 // `String.prototype.at` method
 // https://github.com/mathiasbynens/String.prototype.at
 $({ target: 'String', proto: true, forced: FORCED }, {
-  at: function at(pos) {
-    return charAt(this, pos);
+  at: function at(index) {
+    var S = toString(requireObjectCoercible(this));
+    var len = S.length;
+    var relativeIndex = toIntegerOrInfinity(index);
+    var k = relativeIndex >= 0 ? relativeIndex : len + relativeIndex;
+    return (k < 0 || k >= len) ? undefined : charAt(S, k);
   }
 });
 
@@ -6654,6 +6683,43 @@ var $StringIterator = createIteratorConstructor(function StringIterator(string) 
 $({ target: 'String', proto: true }, {
   codePoints: function codePoints() {
     return new $StringIterator(toString(requireObjectCoercible(this)));
+  }
+});
+
+
+/***/ }),
+
+/***/ 8384:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var $ = __nccwpck_require__(8283);
+var global = __nccwpck_require__(2858);
+var uncurryThis = __nccwpck_require__(2642);
+var toIndexedObject = __nccwpck_require__(4747);
+var toString = __nccwpck_require__(3442);
+var lengthOfArrayLike = __nccwpck_require__(7991);
+
+var TypeError = global.TypeError;
+var ArrayPrototype = Array.prototype;
+var push = uncurryThis(ArrayPrototype.push);
+var join = uncurryThis(ArrayPrototype.join);
+
+// `String.cooked` method
+// https://github.com/tc39/proposal-string-cooked
+$({ target: 'String', stat: true }, {
+  cooked: function cooked(template /* , ...substitutions */) {
+    var cookedTemplate = toIndexedObject(template);
+    var literalSegments = lengthOfArrayLike(cookedTemplate);
+    var argumentsLength = arguments.length;
+    var elements = [];
+    var i = 0;
+    while (literalSegments > i) {
+      var nextVal = cookedTemplate[i++];
+      if (nextVal === undefined) throw TypeError('Incorrect template');
+      push(elements, toString(nextVal));
+      if (i === literalSegments) return join(elements, '');
+      if (i < argumentsLength) push(elements, toString(arguments[i]));
+    }
   }
 });
 
