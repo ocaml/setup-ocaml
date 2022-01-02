@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Fallback to the version in which the assets exist if no assets exist in the
+  latest opam release.
+
 ## [2.0.0-beta11]
 
 ### Fixed
