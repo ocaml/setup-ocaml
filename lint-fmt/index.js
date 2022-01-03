@@ -3388,10 +3388,10 @@ module.exports = {
 var FunctionPrototype = Function.prototype;
 var bind = FunctionPrototype.bind;
 var call = FunctionPrototype.call;
-var callBind = bind && bind.bind(call);
+var uncurryThis = bind && bind.bind(call, call);
 
 module.exports = bind ? function (fn) {
-  return fn && callBind(call, fn);
+  return fn && uncurryThis(fn);
 } : function (fn) {
   return fn && function () {
     return call.apply(fn, arguments);
@@ -3972,7 +3972,7 @@ module.exports = function (it) {
 
 /* global ActiveXObject -- old IE, WSH */
 var anObject = __nccwpck_require__(8005);
-var defineProperties = __nccwpck_require__(5428);
+var definePropertiesModule = __nccwpck_require__(5428);
 var enumBugKeys = __nccwpck_require__(8178);
 var hiddenKeys = __nccwpck_require__(7446);
 var html = __nccwpck_require__(49);
@@ -4050,16 +4050,17 @@ module.exports = Object.create || function create(O, Properties) {
     // add "__proto__" for Object.getPrototypeOf polyfill
     result[IE_PROTO] = O;
   } else result = NullProtoObject();
-  return Properties === undefined ? result : defineProperties(result, Properties);
+  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
 };
 
 
 /***/ }),
 
 /***/ 5428:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 var DESCRIPTORS = __nccwpck_require__(5121);
+var V8_PROTOTYPE_DEFINE_BUG = __nccwpck_require__(2016);
 var definePropertyModule = __nccwpck_require__(6085);
 var anObject = __nccwpck_require__(8005);
 var toIndexedObject = __nccwpck_require__(4747);
@@ -4068,7 +4069,7 @@ var objectKeys = __nccwpck_require__(385);
 // `Object.defineProperties` method
 // https://tc39.es/ecma262/#sec-object.defineproperties
 // eslint-disable-next-line es/no-object-defineproperties -- safe
-module.exports = DESCRIPTORS ? Object.defineProperties : function defineProperties(O, Properties) {
+exports.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
   anObject(O);
   var props = toIndexedObject(Properties);
   var keys = objectKeys(Properties);
@@ -4088,16 +4089,37 @@ module.exports = DESCRIPTORS ? Object.defineProperties : function defineProperti
 var global = __nccwpck_require__(2858);
 var DESCRIPTORS = __nccwpck_require__(5121);
 var IE8_DOM_DEFINE = __nccwpck_require__(3151);
+var V8_PROTOTYPE_DEFINE_BUG = __nccwpck_require__(2016);
 var anObject = __nccwpck_require__(8005);
 var toPropertyKey = __nccwpck_require__(9597);
 
 var TypeError = global.TypeError;
 // eslint-disable-next-line es/no-object-defineproperty -- safe
 var $defineProperty = Object.defineProperty;
+// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+var $getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+var ENUMERABLE = 'enumerable';
+var CONFIGURABLE = 'configurable';
+var WRITABLE = 'writable';
 
 // `Object.defineProperty` method
 // https://tc39.es/ecma262/#sec-object.defineproperty
-exports.f = DESCRIPTORS ? $defineProperty : function defineProperty(O, P, Attributes) {
+exports.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O, P, Attributes) {
+  anObject(O);
+  P = toPropertyKey(P);
+  anObject(Attributes);
+  if (typeof O === 'function' && P === 'prototype' && 'value' in Attributes && WRITABLE in Attributes && !Attributes[WRITABLE]) {
+    var current = $getOwnPropertyDescriptor(O, P);
+    if (current && current[WRITABLE]) {
+      O[P] = Attributes.value;
+      Attributes = {
+        configurable: CONFIGURABLE in Attributes ? Attributes[CONFIGURABLE] : current[CONFIGURABLE],
+        enumerable: ENUMERABLE in Attributes ? Attributes[ENUMERABLE] : current[ENUMERABLE],
+        writable: false
+      };
+    }
+  } return $defineProperty(O, P, Attributes);
+} : $defineProperty : function defineProperty(O, P, Attributes) {
   anObject(O);
   P = toPropertyKey(P);
   anObject(Attributes);
@@ -4785,9 +4807,9 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.20.1',
+  version: '3.20.2',
   mode: IS_PURE ? 'pure' : 'global',
-  copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
+  copyright: '© 2022 Denis Pushkarev (zloirock.ru)'
 });
 
 
@@ -5218,6 +5240,25 @@ var NATIVE_SYMBOL = __nccwpck_require__(4913);
 module.exports = NATIVE_SYMBOL
   && !Symbol.sham
   && typeof Symbol.iterator == 'symbol';
+
+
+/***/ }),
+
+/***/ 2016:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var DESCRIPTORS = __nccwpck_require__(5121);
+var fails = __nccwpck_require__(6287);
+
+// V8 ~ Chrome 36-
+// https://bugs.chromium.org/p/v8/issues/detail?id=3334
+module.exports = DESCRIPTORS && fails(function () {
+  // eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  return Object.defineProperty(function () { /* empty */ }, 'prototype', {
+    value: 42,
+    writable: false
+  }).prototype != 42;
+});
 
 
 /***/ }),
