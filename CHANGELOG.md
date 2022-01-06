@@ -12,6 +12,9 @@ and this project adheres to
 
 - Fallback to the version in which the assets exist if no assets exist in the
   latest opam release.
+- Instruct Cygwin setup to use "sys" symlinks during setup (partial workaround
+  for bug with native symlinks in Cygwin setup - some depexts may still be
+  affected)
 
 ## [2.0.0-beta11]
 
