@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta12]
+
 ### Fixed
 
 - Fallback to the version in which the assets exist if no assets exist in the
@@ -291,7 +293,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta11...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...HEAD
+[2.0.0-beta12]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta11...v2.0.0-beta12
 [2.0.0-beta11]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta10...v2.0.0-beta11
 [2.0.0-beta10]:
