@@ -67,7 +67,7 @@ jobs:
         shell: bash
         run: |
           yarn build
-          if [ "$(git status dist --porcelain | wc -l)" -gt "0" ]; then
+          if [ "$(git status dist lint-doc lint-fmt lint-opam --porcelain | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
             exit 1
