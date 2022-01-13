@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Print a proper error if the version not found in the `.ocamlformat` file.
+
 ## [2.0.0-beta12]
 
 ### Fixed
