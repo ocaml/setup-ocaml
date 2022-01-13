@@ -7422,11 +7422,13 @@ var opam_generator = (undefined && undefined.__generator) || function (thisArg, 
 
 function installOcamlformat(version) {
     return opam_awaiter(this, void 0, void 0, function () {
+        var dep;
         return opam_generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     core.startGroup("Install ocamlformat");
-                    return [4 /*yield*/, (0,exec.exec)("opam", ["depext", "--install", "ocamlformat=".concat(version)])];
+                    dep = "ocamlformat".concat(version ? "=".concat(version) : "");
+                    return [4 /*yield*/, (0,exec.exec)("opam", ["depext", "--install", dep])];
                 case 1:
                     _a.sent();
                     core.endGroup();

@@ -1,8 +1,9 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
-export async function installOcamlformat(version: string) {
+export async function installOcamlformat(version: string | undefined) {
   core.startGroup("Install ocamlformat");
-  await exec("opam", ["depext", "--install", `ocamlformat=${version}`]);
+  const dep = `ocamlformat${version ? `=${version}` : ""}`;
+  await exec("opam", ["depext", "--install", dep]);
   core.endGroup();
 }
