@@ -19,7 +19,9 @@ export async function getOcamlformatVersion() {
   const config = await parse();
   const version = config.filter((line) => line[0] === "version").flat()[1];
   if (version === undefined) {
-    throw new Error("Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice");
+    throw new Error(
+      "Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice"
+    );
   }
   return version;
 }
