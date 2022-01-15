@@ -122,7 +122,9 @@ export async function installer(): Promise<void> {
   } else {
     await restoreOpamDownloadCache();
   }
-  await installDepext(platform);
+  if (OPAM_DEPEXT) {
+    await installDepext(platform);
+  }
   if (DUNE_CACHE) {
     if (platform === Platform.Win32) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -149,6 +151,8 @@ export async function installer(): Promise<void> {
     }
   }
   await exec("opam", ["--version"]);
-  await exec("opam", ["depext", "--version"]);
+  if (OPAM_DEPEXT) {
+    await exec("opam", ["depext", "--version"]);
+  }
   await exec("opam", ["exec", "--", "ocaml", "-version"]);
 }

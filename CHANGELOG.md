@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Do not install opam-depext if it's not enabled.
+
 ### Fixed
 
 - Print a proper error if the version not found in the `.ocamlformat` file.
