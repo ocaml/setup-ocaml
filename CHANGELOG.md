@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0-beta13]
+
 ### Changed
 
 - Do not install opam-depext if it's not enabled.
@@ -301,7 +303,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta13...HEAD
+[2.0.0-beta13]:
+  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...v2.0.0-beta13
 [2.0.0-beta12]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta11...v2.0.0-beta12
 [2.0.0-beta11]:
