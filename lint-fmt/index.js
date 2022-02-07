@@ -4826,10 +4826,10 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.20.3',
+  version: '3.21.0',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.20.3/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.21.0/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -6680,18 +6680,13 @@ $({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
 
 var $ = __nccwpck_require__(8283);
 var charAt = (__nccwpck_require__(57).charAt);
-var fails = __nccwpck_require__(6287);
 var requireObjectCoercible = __nccwpck_require__(4385);
 var toIntegerOrInfinity = __nccwpck_require__(5500);
 var toString = __nccwpck_require__(3442);
 
-var FORCED = fails(function () {
-  return '𠮷'.at(-2) !== '𠮷';
-});
-
 // `String.prototype.at` method
 // https://github.com/mathiasbynens/String.prototype.at
-$({ target: 'String', proto: true, forced: FORCED }, {
+$({ target: 'String', proto: true, forced: true }, {
   at: function at(index) {
     var S = toString(requireObjectCoercible(this));
     var len = S.length;
@@ -6742,7 +6737,7 @@ var $StringIterator = createIteratorConstructor(function StringIterator(string) 
 
 // `String.prototype.codePoints` method
 // https://github.com/tc39/proposal-string-prototype-codepoints
-$({ target: 'String', proto: true }, {
+$({ target: 'String', proto: true, forced: true }, {
   codePoints: function codePoints() {
     return new $StringIterator(toString(requireObjectCoercible(this)));
   }
@@ -6768,7 +6763,7 @@ var join = uncurryThis(ArrayPrototype.join);
 
 // `String.cooked` method
 // https://github.com/tc39/proposal-string-cooked
-$({ target: 'String', stat: true }, {
+$({ target: 'String', stat: true, forced: true }, {
   cooked: function cooked(template /* , ...substitutions */) {
     var cookedTemplate = toIndexedObject(template);
     var literalSegments = lengthOfArrayLike(cookedTemplate);
