@@ -2,18 +2,18 @@
 # yarn lockfile v1
 
 
-"@actions/cache@1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@actions/cache/-/cache-1.0.8.tgz#426ad3a2127b35a4e21ad906e02202dc8b96663f"
-  integrity sha512-GWNNB67w93HGJRQXlsV56YqrdAuDoP3esK/mo5mzU8WoDCVjtQgJGsTdkYUX7brswtT7xnI30bWNo1WLKQ8FZQ==
+"@actions/cache@1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@actions/cache/-/cache-1.0.9.tgz#fd63b9300639d0b43803ab3c4d1158b86a8ca49e"
+  integrity sha512-VzqeDyW3kIDdARNQphd1FrzZCiJRuv98aXwM3R+BLe2UvdZXdRqjC/rrytSm4Nv4OJuI8NA1pbhkXIf+a4LFtw==
   dependencies:
     "@actions/core" "^1.2.6"
     "@actions/exec" "^1.0.1"
     "@actions/glob" "^0.1.0"
     "@actions/http-client" "^1.0.9"
     "@actions/io" "^1.0.1"
-    "@azure/ms-rest-js" "^2.0.7"
-    "@azure/storage-blob" "^12.1.2"
+    "@azure/ms-rest-js" "^2.6.0"
+    "@azure/storage-blob" "^12.8.0"
     semver "^6.1.0"
     uuid "^3.3.3"
 
@@ -155,7 +155,7 @@
   dependencies:
     tslib "^2.2.0"
 
-"@azure/ms-rest-js@^2.0.7":
+"@azure/ms-rest-js@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@azure/ms-rest-js/-/ms-rest-js-2.6.0.tgz#ec06e6a0b704567ea9b2c8044821cf47148c586b"
   integrity sha512-4C5FCtvEzWudblB+h92/TYYPiq7tuElX8icVYToxOdggnYqeec4Se14mjse5miInKtZahiFHdl8lZA/jziEc5g==
@@ -170,7 +170,7 @@
     uuid "^8.3.2"
     xml2js "^0.4.19"
 
-"@azure/storage-blob@^12.1.2":
+"@azure/storage-blob@^12.8.0":
   version "12.8.0"
   resolved "https://registry.yarnpkg.com/@azure/storage-blob/-/storage-blob-12.8.0.tgz#97b7ecc6c7b17bcbaf0281c79c16af6f512d6130"
   integrity sha512-c8+Wz19xauW0bGkTCoqZH4dYfbtBniPiGiRQOn1ca6G5jsjr4azwaTk9gwjVY8r3vY2Taf95eivLzipfIfiS4A==
