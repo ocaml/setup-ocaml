@@ -45,7 +45,7 @@ inputs:
     required: false
     default: ${{ github.token }}
 runs:
-  using: node12
+  using: node16
   main: dist/index.js
   post: dist/post/index.js
   post-if: success()

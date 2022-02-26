@@ -9,6 +9,6 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "strict": true,
-    "target": "ES3"
+    "target": "ES2015"
   }
 }
