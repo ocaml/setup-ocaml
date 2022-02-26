@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Update default runtime to node16.
+
 ## [2.0.0-beta13]
 
 ### Changed
