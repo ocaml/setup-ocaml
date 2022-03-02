@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.0]
+
 ### Changed
 
 - Update default runtime to node16.
@@ -307,7 +309,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta13...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta13...v2.0.0
 [2.0.0-beta13]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...v2.0.0-beta13
 [2.0.0-beta12]:
