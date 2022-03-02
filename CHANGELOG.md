@@ -106,7 +106,7 @@ and this project adheres to
 
 ### Fixed
 
-- ​Set repository priorities correctly for multiple repositories feature.
+- Set repository priorities correctly for multiple repositories feature.
 - Lock the version of opam to be installed only to < 2.1 releases until opam 2.2
   is released.
 
@@ -124,7 +124,7 @@ and this project adheres to
 
 ### Added
 
-- ​Added `opam-repositories` input to support multiple opam repositories.
+- Added `opam-repositories` input to support multiple opam repositories.
 
 ### Removed
 
