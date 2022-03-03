@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.1]
+
 ### Changed
 
 - Update the package index if the system package installation fails.
@@ -313,7 +315,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta13...v2.0.0
 [2.0.0-beta13]:
   https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...v2.0.0-beta13
