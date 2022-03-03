@@ -95,7 +95,7 @@ async function acquireOpamUnix() {
   }
 }
 
-async function initializeOpamUnix() {
+async function installUnixSystemPackages() {
   const isGitHubRunner = process.env.ImageOS !== undefined;
   const platform = getPlatform();
   if (isGitHubRunner) {
@@ -119,6 +119,30 @@ async function initializeOpamUnix() {
     } else if (platform === Platform.MacOS) {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
     }
+  }
+}
+
+async function updateUnixPackageIndexFiles() {
+  const isGitHubRunner = process.env.ImageOS !== undefined;
+  const platform = getPlatform();
+  if (isGitHubRunner) {
+    if (platform === Platform.Linux) {
+      await exec("sudo", ["apt-get", "update"]);
+    } else if (platform === Platform.MacOS) {
+      await exec("brew", ["update"]);
+    }
+  }
+}
+
+async function initializeOpamUnix() {
+  try {
+    await installUnixSystemPackages();
+  } catch (error) {
+    if (error instanceof Error) {
+      core.info(error.message);
+    }
+    await updateUnixPackageIndexFiles();
+    await installUnixSystemPackages();
   }
   const disableSandboxing = [];
   if (OPAM_DISABLE_SANDBOXING) {

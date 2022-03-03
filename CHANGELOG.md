@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Update the package index if the system package installation fails.
+
 ## [2.0.0]
 
 ### Changed
