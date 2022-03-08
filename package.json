@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/node": "17.0.21",
     "@types/semver": "7.3.9",
-    "@typescript-eslint/eslint-plugin": "5.13.0",
+    "@typescript-eslint/eslint-plugin": "5.14.0",
     "@typescript-eslint/parser": "5.13.0",
     "@vercel/ncc": "0.33.3",
     "eslint": "8.10.0",
