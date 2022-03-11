@@ -15,13 +15,13 @@ import {
   OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
-import { getCygwinVersion } from "./opam";
 import {
   getArchitecture,
   getPlatform,
   getSystemIdentificationInfo,
 } from "./system";
 import { isSemverStyle, resolveVersion } from "./version";
+import { getCygwinVersion } from "./win32";
 
 function composeDate() {
   const d = new Date();
