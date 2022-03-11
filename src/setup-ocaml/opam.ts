@@ -1,10 +1,8 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
-import { HttpClient } from "@actions/http-client";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
-import * as cheerio from "cheerio";
 import { promises as fs } from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -12,19 +10,20 @@ import * as process from "process";
 import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache";
-import { GITHUB_TOKEN, OPAM_DISABLE_SANDBOXING, Platform } from "./constants";
+import {
+  CYGWIN_ROOT,
+  CYGWIN_ROOT_BIN,
+  CYGWIN_ROOT_WRAPPERBIN,
+  GITHUB_TOKEN,
+  OPAM_DISABLE_SANDBOXING,
+  Platform,
+} from "./constants";
 import {
   getArchitecture,
   getPlatform,
   getSystemIdentificationInfo,
 } from "./system";
-
-function createHttpClient(): HttpClient {
-  return new HttpClient(`ocaml/setup-ocaml`, [], {
-    allowRetries: true,
-    maxRetries: 5,
-  });
-}
+import { getCygwinVersion } from "./win32";
 
 async function getLatestOpamRelease(): Promise<{
   version: string;
@@ -58,12 +57,7 @@ async function getLatestOpamRelease(): Promise<{
 async function findOpam() {
   const platform = getPlatform();
   if (platform === Platform.Win32) {
-    const opamPath = path.join(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      process.env.CYGWIN_ROOT!,
-      "bin",
-      "opam.exe"
-    );
+    const opamPath = path.join(CYGWIN_ROOT, "bin", "opam.exe");
     return opamPath;
   } else {
     const opamPath = await io.which("opam");
@@ -166,21 +160,6 @@ async function setupOpamUnix() {
   core.endGroup();
 }
 
-export async function getCygwinVersion(): Promise<string> {
-  const httpClient = createHttpClient();
-  const response = await httpClient.get("https://www.cygwin.com");
-  const body = await response.readBody();
-  const $ = cheerio.load(body);
-  let version = "";
-  $("a").each((_index, element) => {
-    const text = $(element).text();
-    if (semver.valid(text) === text) {
-      version = text;
-    }
-  });
-  return version;
-}
-
 async function setupCygwin() {
   const version = await getCygwinVersion();
   const cachedPath = tc.find("cygwin", version, "x86_64");
@@ -199,8 +178,6 @@ async function setupCygwin() {
   } else {
     core.addPath(cachedPath);
   }
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const CYGWIN_ROOT = process.env.CYGWIN_ROOT!;
   const site = "http://cygwin.mirror.constant.com";
   const packages = [
     "curl",
@@ -261,8 +238,6 @@ async function initializeOpamWindows() {
     "--disable-sandboxing",
     "--enable-shell-hook",
   ]);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const CYGWIN_ROOT_WRAPPERBIN = process.env.CYGWIN_ROOT_WRAPPERBIN!;
   await io.mkdirP(CYGWIN_ROOT_WRAPPERBIN);
   const opamCmd = path.join(CYGWIN_ROOT_WRAPPERBIN, "opam.cmd");
   const data = [
@@ -276,9 +251,6 @@ async function initializeOpamWindows() {
 
 async function setupOpamWindows() {
   core.startGroup("Prepare the Cygwin environment");
-  const CYGWIN_ROOT = path.join("D:", "cygwin");
-  const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
-  const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
   core.exportVariable("CYGWIN", "winsymlinks:native");
   core.exportVariable("CYGWIN_ROOT", CYGWIN_ROOT);
   core.exportVariable("CYGWIN_ROOT_BIN", CYGWIN_ROOT_BIN);
@@ -313,8 +285,6 @@ export async function installOcaml(ocamlCompiler: string): Promise<void> {
   core.startGroup("Install OCaml");
   const platform = getPlatform();
   if (platform === Platform.Win32) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const CYGWIN_ROOT_BIN = process.env.CYGWIN_ROOT_BIN!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const originalPath = process.env.PATH!.split(path.delimiter);
     const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];

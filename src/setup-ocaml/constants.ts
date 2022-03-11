@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as path from "path";
 import * as yaml from "yaml";
 
 import { getPlatform } from "./system";
@@ -12,6 +13,12 @@ export enum Platform {
   MacOS = "macos",
   Win32 = "win32",
 }
+
+export const CYGWIN_ROOT = path.join("D:", "cygwin");
+
+export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
+
+export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
 export const CACHE_PREFIX = core.getInput("cache-prefix");
 
