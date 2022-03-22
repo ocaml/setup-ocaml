@@ -84,6 +84,7 @@ async function composeOpamCacheKeys() {
   const restoreKeys = [
     `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
     `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-`,
+    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-`,
   ];
   return { key, restoreKeys };
 }
