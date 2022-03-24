@@ -20,32 +20,47 @@ export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
 export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
-export const CACHE_PREFIX = core.getInput("cache-prefix");
+export const CACHE_PREFIX = core.getInput("cache-prefix", {
+  trimWhitespace: true,
+});
 
-export const GITHUB_TOKEN = core.getInput("github-token");
+export const GITHUB_TOKEN = core.getInput("github-token", {
+  trimWhitespace: true,
+});
 
-export const DUNE_CACHE = core.getBooleanInput("dune-cache");
+export const DUNE_CACHE = core.getBooleanInput("dune-cache", {
+  trimWhitespace: true,
+});
 
-export const OCAML_COMPILER = core.getInput("ocaml-compiler");
+export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
+  trimWhitespace: true,
+});
 
-export const OPAM_DEPEXT = core.getBooleanInput("opam-depext");
+export const OPAM_DEPEXT = core.getBooleanInput("opam-depext", {
+  trimWhitespace: true,
+});
 
 export const OPAM_DEPEXT_FLAGS = core
-  .getInput("opam-depext-flags")
+  .getInput("opam-depext-flags", { trimWhitespace: true })
   .split(",")
   .map((f) => f.trim())
   .filter((f) => f.length > 0);
 
 export const OPAM_DISABLE_SANDBOXING = core.getBooleanInput(
-  "opam-disable-sandboxing"
+  "opam-disable-sandboxing",
+  { trimWhitespace: true }
 );
 
-export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
+export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages", {
+  trimWhitespace: true,
+});
 
-export const OPAM_PIN = core.getBooleanInput("opam-pin");
+export const OPAM_PIN = core.getBooleanInput("opam-pin", {
+  trimWhitespace: true,
+});
 
 const repositories_yaml: { [key: string]: string } = yaml.parse(
-  core.getInput("opam-repositories")
+  core.getInput("opam-repositories", { trimWhitespace: true })
 );
 
 const platform = getPlatform();
