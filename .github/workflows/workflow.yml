@@ -17,12 +17,12 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - 4.13.x
+          - 4.14.x
         include:
           - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.4.13.1+options,ocaml-option-32bit
+            ocaml-compiler: ocaml-variants.4.14.0+options,ocaml-option-32bit
           - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.4.13.1+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
+            ocaml-compiler: ocaml-variants.4.14.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.4.12.0+domains
             opam-repositories: |
