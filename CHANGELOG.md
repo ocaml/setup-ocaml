@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Expose the `enable-jekyll` alias to the `enable_jekyll` input for deploy-doc
+  action.
+
 ## [2.0.2]
 
 ### Changed
