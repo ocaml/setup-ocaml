@@ -2601,6 +2601,14 @@ module.exports = path.String;
 /***/ 120:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+/* unused reexport */ __nccwpck_require__(2036);
+
+
+/***/ }),
+
+/***/ 2036:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
 var parent = __nccwpck_require__(2962);
 // TODO: remove from `core-js@4`
 __nccwpck_require__(812);
@@ -2870,7 +2878,7 @@ var fails = __nccwpck_require__(6287);
 module.exports = !fails(function () {
   function F() { /* empty */ }
   F.prototype.constructor = null;
-  // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
+  // eslint-disable-next-line es-x/no-object-getprototypeof -- required for testing
   return Object.getPrototypeOf(new F()) !== F.prototype;
 });
 
@@ -3087,7 +3095,7 @@ var fails = __nccwpck_require__(6287);
 
 // Detect IE8's incomplete defineProperty implementation
 module.exports = !fails(function () {
-  // eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  // eslint-disable-next-line es-x/no-object-defineproperty -- required for testing
   return Object.defineProperty({}, 1, { get: function () { return 7; } })[1] != 7;
 });
 
@@ -3339,7 +3347,7 @@ var FunctionPrototype = Function.prototype;
 var apply = FunctionPrototype.apply;
 var call = FunctionPrototype.call;
 
-// eslint-disable-next-line es/no-reflect -- safe
+// eslint-disable-next-line es-x/no-reflect -- safe
 module.exports = typeof Reflect == 'object' && Reflect.apply || (NATIVE_BIND ? call.bind(apply) : function () {
   return call.apply(apply, arguments);
 });
@@ -3353,6 +3361,7 @@ module.exports = typeof Reflect == 'object' && Reflect.apply || (NATIVE_BIND ? c
 var fails = __nccwpck_require__(6287);
 
 module.exports = !fails(function () {
+  // eslint-disable-next-line es-x/no-function-prototype-bind -- safe
   var test = (function () { /* empty */ }).bind();
   // eslint-disable-next-line no-prototype-builtins -- safe
   return typeof test != 'function' || test.hasOwnProperty('prototype');
@@ -3382,7 +3391,7 @@ var DESCRIPTORS = __nccwpck_require__(5121);
 var hasOwn = __nccwpck_require__(9135);
 
 var FunctionPrototype = Function.prototype;
-// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+// eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
 var getDescriptor = DESCRIPTORS && Object.getOwnPropertyDescriptor;
 
 var EXISTS = hasOwn(FunctionPrototype, 'name');
@@ -3512,7 +3521,7 @@ var check = function (it) {
 
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 module.exports =
-  // eslint-disable-next-line es/no-global-this -- safe
+  // eslint-disable-next-line es-x/no-global-this -- safe
   check(typeof globalThis == 'object' && globalThis) ||
   check(typeof window == 'object' && window) ||
   // eslint-disable-next-line no-restricted-globals -- safe
@@ -3534,6 +3543,7 @@ var hasOwnProperty = uncurryThis({}.hasOwnProperty);
 
 // `HasOwnProperty` abstract operation
 // https://tc39.es/ecma262/#sec-hasownproperty
+// eslint-disable-next-line es-x/no-object-hasown -- safe
 module.exports = Object.hasOwn || function hasOwn(it, key) {
   return hasOwnProperty(toObject(it), key);
 };
@@ -3568,7 +3578,7 @@ var createElement = __nccwpck_require__(9760);
 
 // Thanks to IE8 for its funny defineProperty
 module.exports = !DESCRIPTORS && !fails(function () {
-  // eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  // eslint-disable-next-line es-x/no-object-defineproperty -- required for testing
   return Object.defineProperty(createElement('div'), 'a', {
     get: function () { return 7; }
   }).a != 7;
@@ -3877,7 +3887,7 @@ var BUGGY_SAFARI_ITERATORS = false;
 // https://tc39.es/ecma262/#sec-%iteratorprototype%-object
 var IteratorPrototype, PrototypeOfArrayIteratorPrototype, arrayIterator;
 
-/* eslint-disable es/no-array-prototype-keys -- safe */
+/* eslint-disable es-x/no-array-prototype-keys -- safe */
 if ([].keys) {
   arrayIterator = [].keys();
   // Safari 8 has buggy iterators w/o `next`
@@ -3938,11 +3948,11 @@ module.exports = function (obj) {
 /***/ 4913:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-/* eslint-disable es/no-symbol -- required for testing */
+/* eslint-disable es-x/no-symbol -- required for testing */
 var V8_VERSION = __nccwpck_require__(9524);
 var fails = __nccwpck_require__(6287);
 
-// eslint-disable-next-line es/no-object-getownpropertysymbols -- required for testing
+// eslint-disable-next-line es-x/no-object-getownpropertysymbols -- required for testing
 module.exports = !!Object.getOwnPropertySymbols && !fails(function () {
   var symbol = Symbol();
   // Chrome 38 Symbol has incorrect toString conversion
@@ -4060,6 +4070,7 @@ hiddenKeys[IE_PROTO] = true;
 
 // `Object.create` method
 // https://tc39.es/ecma262/#sec-object.create
+// eslint-disable-next-line es-x/no-object-create -- safe
 module.exports = Object.create || function create(O, Properties) {
   var result;
   if (O !== null) {
@@ -4087,7 +4098,7 @@ var objectKeys = __nccwpck_require__(385);
 
 // `Object.defineProperties` method
 // https://tc39.es/ecma262/#sec-object.defineproperties
-// eslint-disable-next-line es/no-object-defineproperties -- safe
+// eslint-disable-next-line es-x/no-object-defineproperties -- safe
 exports.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
   anObject(O);
   var props = toIndexedObject(Properties);
@@ -4113,9 +4124,9 @@ var anObject = __nccwpck_require__(8005);
 var toPropertyKey = __nccwpck_require__(9597);
 
 var TypeError = global.TypeError;
-// eslint-disable-next-line es/no-object-defineproperty -- safe
+// eslint-disable-next-line es-x/no-object-defineproperty -- safe
 var $defineProperty = Object.defineProperty;
-// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+// eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
 var $getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var ENUMERABLE = 'enumerable';
 var CONFIGURABLE = 'configurable';
@@ -4165,7 +4176,7 @@ var toPropertyKey = __nccwpck_require__(9597);
 var hasOwn = __nccwpck_require__(9135);
 var IE8_DOM_DEFINE = __nccwpck_require__(3151);
 
-// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+// eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
 var $getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 // `Object.getOwnPropertyDescriptor` method
@@ -4192,7 +4203,7 @@ var hiddenKeys = enumBugKeys.concat('length', 'prototype');
 
 // `Object.getOwnPropertyNames` method
 // https://tc39.es/ecma262/#sec-object.getownpropertynames
-// eslint-disable-next-line es/no-object-getownpropertynames -- safe
+// eslint-disable-next-line es-x/no-object-getownpropertynames -- safe
 exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
   return internalObjectKeys(O, hiddenKeys);
 };
@@ -4203,7 +4214,7 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 /***/ 2243:
 /***/ ((__unused_webpack_module, exports) => {
 
-// eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
+// eslint-disable-next-line es-x/no-object-getownpropertysymbols -- safe
 exports.f = Object.getOwnPropertySymbols;
 
 
@@ -4282,7 +4293,7 @@ var enumBugKeys = __nccwpck_require__(8178);
 
 // `Object.keys` method
 // https://tc39.es/ecma262/#sec-object.keys
-// eslint-disable-next-line es/no-object-keys -- safe
+// eslint-disable-next-line es-x/no-object-keys -- safe
 module.exports = Object.keys || function keys(O) {
   return internalObjectKeys(O, enumBugKeys);
 };
@@ -4296,7 +4307,7 @@ module.exports = Object.keys || function keys(O) {
 "use strict";
 
 var $propertyIsEnumerable = {}.propertyIsEnumerable;
-// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+// eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 // Nashorn ~ JDK8 bug
@@ -4323,13 +4334,13 @@ var aPossiblePrototype = __nccwpck_require__(6331);
 // `Object.setPrototypeOf` method
 // https://tc39.es/ecma262/#sec-object.setprototypeof
 // Works with __proto__ only. Old v8 can't work with null proto objects.
-// eslint-disable-next-line es/no-object-setprototypeof -- safe
+// eslint-disable-next-line es-x/no-object-setprototypeof -- safe
 module.exports = Object.setPrototypeOf || ('__proto__' in {} ? function () {
   var CORRECT_SETTER = false;
   var test = {};
   var setter;
   try {
-    // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+    // eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
     setter = uncurryThis(Object.getOwnPropertyDescriptor(Object.prototype, '__proto__').set);
     setter(test, []);
     CORRECT_SETTER = test instanceof Array;
@@ -4741,7 +4752,7 @@ module.exports = function (it) {
 
 // `SameValue` abstract operation
 // https://tc39.es/ecma262/#sec-samevalue
-// eslint-disable-next-line es/no-object-is -- safe
+// eslint-disable-next-line es-x/no-object-is -- safe
 module.exports = Object.is || function is(x, y) {
   // eslint-disable-next-line no-self-compare -- NaN check
   return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
@@ -4755,7 +4766,7 @@ module.exports = Object.is || function is(x, y) {
 
 var global = __nccwpck_require__(2858);
 
-// eslint-disable-next-line es/no-object-defineproperty -- safe
+// eslint-disable-next-line es-x/no-object-defineproperty -- safe
 var defineProperty = Object.defineProperty;
 
 module.exports = function (key, value) {
@@ -4826,10 +4837,10 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.21.1',
+  version: '3.22.0',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.21.1/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.22.0/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -4995,6 +5006,25 @@ module.exports = function repeat(count) {
 
 /***/ }),
 
+/***/ 9602:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+var $trimEnd = (__nccwpck_require__(1304).end);
+var forcedStringTrimMethod = __nccwpck_require__(7283);
+
+// `String.prototype.{ trimEnd, trimRight }` method
+// https://tc39.es/ecma262/#sec-string.prototype.trimend
+// https://tc39.es/ecma262/#String.prototype.trimright
+module.exports = forcedStringTrimMethod('trimEnd') ? function trimEnd() {
+  return $trimEnd(this);
+// eslint-disable-next-line es-x/no-string-prototype-trimstart-trimend -- safe
+} : ''.trimEnd;
+
+
+/***/ }),
+
 /***/ 7283:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -5013,6 +5043,25 @@ module.exports = function (METHOD_NAME) {
       || (PROPER_FUNCTION_NAME && whitespaces[METHOD_NAME].name !== METHOD_NAME);
   });
 };
+
+
+/***/ }),
+
+/***/ 9088:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+var $trimStart = (__nccwpck_require__(1304).start);
+var forcedStringTrimMethod = __nccwpck_require__(7283);
+
+// `String.prototype.{ trimStart, trimLeft }` method
+// https://tc39.es/ecma262/#sec-string.prototype.trimstart
+// https://tc39.es/ecma262/#String.prototype.trimleft
+module.exports = forcedStringTrimMethod('trimStart') ? function trimStart() {
+  return $trimStart(this);
+// eslint-disable-next-line es-x/no-string-prototype-trimstart-trimend -- safe
+} : ''.trimStart;
 
 
 /***/ }),
@@ -5255,7 +5304,7 @@ module.exports = function (key) {
 /***/ 5263:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-/* eslint-disable es/no-symbol -- required for testing */
+/* eslint-disable es-x/no-symbol -- required for testing */
 var NATIVE_SYMBOL = __nccwpck_require__(4913);
 
 module.exports = NATIVE_SYMBOL
@@ -5274,7 +5323,7 @@ var fails = __nccwpck_require__(6287);
 // V8 ~ Chrome 36-
 // https://bugs.chromium.org/p/v8/issues/detail?id=3334
 module.exports = DESCRIPTORS && fails(function () {
-  // eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  // eslint-disable-next-line es-x/no-object-defineproperty -- required for testing
   return Object.defineProperty(function () { /* empty */ }, 'prototype', {
     value: 42,
     writable: false
@@ -5393,6 +5442,7 @@ var fails = __nccwpck_require__(6287);
 var charAt = uncurryThis(''.charAt);
 
 var FORCED = fails(function () {
+  // eslint-disable-next-line es-x/no-array-string-prototype-at -- safe
   return '𠮷'.at(-2) !== '\uD842';
 });
 
@@ -5505,7 +5555,7 @@ var requireObjectCoercible = __nccwpck_require__(4385);
 var correctIsRegExpLogic = __nccwpck_require__(3323);
 var IS_PURE = __nccwpck_require__(4432);
 
-// eslint-disable-next-line es/no-string-prototype-endswith -- safe
+// eslint-disable-next-line es-x/no-string-prototype-endswith -- safe
 var un$EndsWith = uncurryThis(''.endsWith);
 var slice = uncurryThis(''.slice);
 var min = Math.min;
@@ -5606,7 +5656,7 @@ var toAbsoluteIndex = __nccwpck_require__(987);
 
 var RangeError = global.RangeError;
 var fromCharCode = String.fromCharCode;
-// eslint-disable-next-line es/no-string-fromcodepoint -- required for testing
+// eslint-disable-next-line es-x/no-string-fromcodepoint -- required for testing
 var $fromCodePoint = String.fromCodePoint;
 var join = uncurryThis([].join);
 
@@ -5747,7 +5797,7 @@ $({ target: 'String', proto: true, forced: forcedStringHTMLMethod('link') }, {
 
 "use strict";
 
-/* eslint-disable es/no-string-prototype-matchall -- safe */
+/* eslint-disable es-x/no-string-prototype-matchall -- safe */
 var $ = __nccwpck_require__(8283);
 var global = __nccwpck_require__(2858);
 var call = __nccwpck_require__(2636);
@@ -6472,7 +6522,7 @@ var requireObjectCoercible = __nccwpck_require__(4385);
 var correctIsRegExpLogic = __nccwpck_require__(3323);
 var IS_PURE = __nccwpck_require__(4432);
 
-// eslint-disable-next-line es/no-string-prototype-startswith -- safe
+// eslint-disable-next-line es-x/no-string-prototype-startswith -- safe
 var un$StartsWith = uncurryThis(''.startsWith);
 var stringSlice = uncurryThis(''.slice);
 var min = Math.min;
@@ -6556,7 +6606,7 @@ var stringSlice = uncurryThis(''.slice);
 var max = Math.max;
 var min = Math.min;
 
-// eslint-disable-next-line unicorn/prefer-string-slice -- required for testing
+// eslint-disable-next-line unicorn/prefer-string-slice, es-x/no-string-prototype-substr -- required for testing
 var FORCED = !''.substr || 'ab'.substr(-1) !== 'b';
 
 // `String.prototype.substr` method
@@ -6602,24 +6652,47 @@ $({ target: 'String', proto: true, forced: forcedStringHTMLMethod('sup') }, {
 /***/ 4484:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
-"use strict";
+// TODO: Remove this line from `core-js@4`
+__nccwpck_require__(3236);
+var $ = __nccwpck_require__(8283);
+var trimEnd = __nccwpck_require__(9602);
+
+// `String.prototype.trimEnd` method
+// https://tc39.es/ecma262/#sec-string.prototype.trimend
+// eslint-disable-next-line es-x/no-string-prototype-trimstart-trimend -- safe
+$({ target: 'String', proto: true, name: 'trimEnd', forced: ''.trimEnd !== trimEnd }, {
+  trimEnd: trimEnd
+});
+
+
+/***/ }),
+
+/***/ 9870:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var $ = __nccwpck_require__(8283);
-var $trimEnd = (__nccwpck_require__(1304).end);
-var forcedStringTrimMethod = __nccwpck_require__(7283);
+var trimStart = __nccwpck_require__(9088);
 
-var FORCED = forcedStringTrimMethod('trimEnd');
+// `String.prototype.trimLeft` method
+// https://tc39.es/ecma262/#sec-string.prototype.trimleft
+// eslint-disable-next-line es-x/no-string-prototype-trimleft-trimright -- safe
+$({ target: 'String', proto: true, name: 'trimStart', forced: ''.trimLeft !== trimStart }, {
+  trimLeft: trimStart
+});
 
-var trimEnd = FORCED ? function trimEnd() {
-  return $trimEnd(this);
-// eslint-disable-next-line es/no-string-prototype-trimstart-trimend -- safe
-} : ''.trimEnd;
 
-// `String.prototype.{ trimEnd, trimRight }` methods
+/***/ }),
+
+/***/ 3236:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var $ = __nccwpck_require__(8283);
+var trimEnd = __nccwpck_require__(9602);
+
+// `String.prototype.trimRight` method
 // https://tc39.es/ecma262/#sec-string.prototype.trimend
-// https://tc39.es/ecma262/#String.prototype.trimright
-$({ target: 'String', proto: true, name: 'trimEnd', forced: FORCED }, {
-  trimEnd: trimEnd,
+// eslint-disable-next-line es-x/no-string-prototype-trimleft-trimright -- safe
+$({ target: 'String', proto: true, name: 'trimEnd', forced: ''.trimRight !== trimEnd }, {
   trimRight: trimEnd
 });
 
@@ -6629,25 +6702,16 @@ $({ target: 'String', proto: true, name: 'trimEnd', forced: FORCED }, {
 /***/ 5200:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
-"use strict";
-
+// TODO: Remove this line from `core-js@4`
+__nccwpck_require__(9870);
 var $ = __nccwpck_require__(8283);
-var $trimStart = (__nccwpck_require__(1304).start);
-var forcedStringTrimMethod = __nccwpck_require__(7283);
+var trimStart = __nccwpck_require__(9088);
 
-var FORCED = forcedStringTrimMethod('trimStart');
-
-var trimStart = FORCED ? function trimStart() {
-  return $trimStart(this);
-// eslint-disable-next-line es/no-string-prototype-trimstart-trimend -- safe
-} : ''.trimStart;
-
-// `String.prototype.{ trimStart, trimLeft }` methods
+// `String.prototype.trimStart` method
 // https://tc39.es/ecma262/#sec-string.prototype.trimstart
-// https://tc39.es/ecma262/#String.prototype.trimleft
-$({ target: 'String', proto: true, name: 'trimStart', forced: FORCED }, {
-  trimStart: trimStart,
-  trimLeft: trimStart
+// eslint-disable-next-line es-x/no-string-prototype-trimstart-trimend -- safe
+$({ target: 'String', proto: true, name: 'trimStart', forced: ''.trimStart !== trimStart }, {
+  trimStart: trimStart
 });
 
 
@@ -6678,6 +6742,7 @@ $({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
 
 "use strict";
 
+// TODO: Remove from `core-js@4`
 var $ = __nccwpck_require__(8283);
 var charAt = (__nccwpck_require__(57).charAt);
 var requireObjectCoercible = __nccwpck_require__(4385);
