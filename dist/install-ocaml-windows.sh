@@ -17,6 +17,7 @@ export OPAM_LINT="false"
 export CYGWIN='winsymlinks:native'
 export OPAMYES=1
 set -eu
+git config --global --add safe.directory '*'
 curl -fsSL -o "${OPAM_ARCH}.tar.xz" "${OPAM_URL}"
 tar -xf "${OPAM_ARCH}.tar.xz"
 "${OPAM_ARCH}/install.sh" --quiet --prefix=/usr
