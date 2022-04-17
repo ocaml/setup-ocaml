@@ -231,6 +231,7 @@ async function acquireOpamWindows() {
 }
 
 async function initializeOpamWindows() {
+  await exec("git", ["config", "--global", "--add", "safe.directory", "'*'"]);
   await exec("opam", [
     "init",
     "--auto-setup",
