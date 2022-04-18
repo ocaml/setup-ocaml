@@ -8,9 +8,15 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.13]
+
 ### Changed
 
 - Acquire opam from GitHub release on Unix.
+
+### Fixed
+
+- Turn off git directory ownership check.
 
 ## [1.1.12]
 
@@ -131,7 +137,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.12...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.13...HEAD
+[1.1.13]: https://github.com/avsm/setup-ocaml/compare/v1.1.12...v1.1.13
 [1.1.12]: https://github.com/avsm/setup-ocaml/compare/v1.1.11...v1.1.12
 [1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.10...v1.1.11
 [1.1.10]: https://github.com/avsm/setup-ocaml/compare/v1.1.9...v1.1.10
