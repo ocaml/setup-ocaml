@@ -21,12 +21,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: 16.x
 
       - name: Install npm packages
         run: yarn --frozen-lockfile
@@ -34,11 +34,17 @@ jobs:
       - name: Check type
         run: yarn typecheck
 
+      - name: Run build
+        run: yarn build
+
+      - name: Correct vercel/ncc crlf output
+        if: runner.os == 'Linux'
+        run: sed -i 's/\x0D$//' ./dist/index.js
+
       - name: Ensure dist directory is up-to-date
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          yarn build
           if [ "$(git status dist --porcelain | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff

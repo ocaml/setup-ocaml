@@ -11,7 +11,9 @@ async function run() {
     core.exportVariable("OPAMJOBS", jobs);
     await installer.getOpam(OCAML_VERSION, OPAM_REPOSITORY);
   } catch (error) {
-    core.setFailed(error.toString());
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
   }
 }
 
