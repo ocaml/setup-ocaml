@@ -39,14 +39,9 @@ async function acquireOpamWindows(version: string, customRepository: string) {
   const repository =
     customRepository ||
     "https://github.com/fdopen/opam-repository-mingw.git#opam2";
-
-  let downloadPath;
-  try {
-    downloadPath = await tc.downloadTool("https://cygwin.com/setup-x86_64.exe");
-  } catch (error) {
-    core.debug(error);
-    throw `Failed to download cygwin: ${error}`;
-  }
+  const downloadPath = await tc.downloadTool(
+    "https://cygwin.com/setup-x86_64.exe"
+  );
   const toolPath = await tc.cacheFile(
     downloadPath,
     "setup-x86_64.exe",

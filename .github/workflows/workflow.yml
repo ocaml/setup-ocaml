@@ -34,11 +34,16 @@ jobs:
       - name: Check type
         run: yarn typecheck
 
+      - name: Run build
+        run: yarn build
+
+      - name: Correct vercel/ncc crlf output
+        run: sed -i 's/\x0D$//' ./dist/index.js
+
       - name: Ensure dist directory is up-to-date
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          yarn build
           if [ "$(git status dist --porcelain | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
