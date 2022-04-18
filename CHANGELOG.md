@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [unreleased]
 
+## [1.1.14]
+
+### Changed
+
+- Update dependencies.
+- Update default runtime to node16.
+
 ## [1.1.13]
 
 ### Changed
@@ -137,7 +144,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.13...HEAD
+[unreleased]: https://github.com/avsm/setup-ocaml/compare/v1.1.14...HEAD
+[1.1.14]: https://github.com/avsm/setup-ocaml/compare/v1.1.13...v1.1.14
 [1.1.13]: https://github.com/avsm/setup-ocaml/compare/v1.1.12...v1.1.13
 [1.1.12]: https://github.com/avsm/setup-ocaml/compare/v1.1.11...v1.1.12
 [1.1.11]: https://github.com/avsm/setup-ocaml/compare/v1.1.10...v1.1.11
