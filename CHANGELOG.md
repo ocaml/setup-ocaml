@@ -13,6 +13,10 @@ and this project adheres to
 - Expose the `enable-jekyll` alias to the `enable_jekyll` input for deploy-doc
   action.
 
+### Fixed
+
+- Turn off git directory ownership check.
+
 ## [2.0.2]
 
 ### Changed
