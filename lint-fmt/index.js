@@ -4646,6 +4646,7 @@ var anObject = __nccwpck_require__(8005);
 module.exports = function () {
   var that = anObject(this);
   var result = '';
+  if (that.hasIndices) result += 'd';
   if (that.global) result += 'g';
   if (that.ignoreCase) result += 'i';
   if (that.multiline) result += 'm';
@@ -4653,6 +4654,25 @@ module.exports = function () {
   if (that.unicode) result += 'u';
   if (that.sticky) result += 'y';
   return result;
+};
+
+
+/***/ }),
+
+/***/ 1557:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var call = __nccwpck_require__(2636);
+var hasOwn = __nccwpck_require__(9135);
+var isPrototypeOf = __nccwpck_require__(2413);
+var regExpFlags = __nccwpck_require__(6309);
+
+var RegExpPrototype = RegExp.prototype;
+
+module.exports = function (R) {
+  var flags = R.flags;
+  return flags === undefined && !('flags' in RegExpPrototype) && !hasOwn(R, 'flags') && isPrototypeOf(RegExpPrototype, R)
+    ? call(regExpFlags, R) : flags;
 };
 
 
@@ -4837,10 +4857,10 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.22.0',
+  version: '3.22.3',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.22.0/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.22.3/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -5808,9 +5828,8 @@ var toLength = __nccwpck_require__(5626);
 var toString = __nccwpck_require__(3442);
 var anObject = __nccwpck_require__(8005);
 var classof = __nccwpck_require__(619);
-var isPrototypeOf = __nccwpck_require__(2413);
 var isRegExp = __nccwpck_require__(2832);
-var regExpFlags = __nccwpck_require__(6309);
+var getRegExpFlags = __nccwpck_require__(1557);
 var getMethod = __nccwpck_require__(7953);
 var redefine = __nccwpck_require__(7384);
 var fails = __nccwpck_require__(6287);
@@ -5828,7 +5847,6 @@ var setInternalState = InternalStateModule.set;
 var getInternalState = InternalStateModule.getterFor(REGEXP_STRING_ITERATOR);
 var RegExpPrototype = RegExp.prototype;
 var TypeError = global.TypeError;
-var getFlags = uncurryThis(regExpFlags);
 var stringIndexOf = uncurryThis(''.indexOf);
 var un$MatchAll = uncurryThis(''.matchAll);
 
@@ -5863,13 +5881,9 @@ var $RegExpStringIterator = createIteratorConstructor(function RegExpStringItera
 var $matchAll = function (string) {
   var R = anObject(this);
   var S = toString(string);
-  var C, flagsValue, flags, matcher, $global, fullUnicode;
-  C = speciesConstructor(R, RegExp);
-  flagsValue = R.flags;
-  if (flagsValue === undefined && isPrototypeOf(RegExpPrototype, R) && !('flags' in RegExpPrototype)) {
-    flagsValue = getFlags(R);
-  }
-  flags = flagsValue === undefined ? '' : toString(flagsValue);
+  var C = speciesConstructor(R, RegExp);
+  var flags = toString(getRegExpFlags(R));
+  var matcher, $global, fullUnicode;
   matcher = new C(C === RegExp ? R.source : R, flags);
   $global = !!~stringIndexOf(flags, 'g');
   fullUnicode = !!~stringIndexOf(flags, 'u');
@@ -5885,10 +5899,7 @@ $({ target: 'String', proto: true, forced: WORKS_WITH_NON_GLOBAL_REGEX }, {
     var flags, S, matcher, rx;
     if (regexp != null) {
       if (isRegExp(regexp)) {
-        flags = toString(requireObjectCoercible('flags' in RegExpPrototype
-          ? regexp.flags
-          : getFlags(regexp)
-        ));
+        flags = toString(requireObjectCoercible(getRegExpFlags(regexp)));
         if (!~stringIndexOf(flags, 'g')) throw TypeError('`.matchAll` does not allow non-global regexes');
       }
       if (WORKS_WITH_NON_GLOBAL_REGEX) return un$MatchAll(O, regexp);
@@ -6064,15 +6075,13 @@ var isCallable = __nccwpck_require__(4767);
 var isRegExp = __nccwpck_require__(2832);
 var toString = __nccwpck_require__(3442);
 var getMethod = __nccwpck_require__(7953);
-var regExpFlags = __nccwpck_require__(6309);
+var getRegExpFlags = __nccwpck_require__(1557);
 var getSubstitution = __nccwpck_require__(9818);
 var wellKnownSymbol = __nccwpck_require__(4162);
 var IS_PURE = __nccwpck_require__(4432);
 
 var REPLACE = wellKnownSymbol('replace');
-var RegExpPrototype = RegExp.prototype;
 var TypeError = global.TypeError;
-var getFlags = uncurryThis(regExpFlags);
 var indexOf = uncurryThis(''.indexOf);
 var replace = uncurryThis(''.replace);
 var stringSlice = uncurryThis(''.slice);
@@ -6096,10 +6105,7 @@ $({ target: 'String', proto: true }, {
     if (searchValue != null) {
       IS_REG_EXP = isRegExp(searchValue);
       if (IS_REG_EXP) {
-        flags = toString(requireObjectCoercible('flags' in RegExpPrototype
-          ? searchValue.flags
-          : getFlags(searchValue)
-        ));
+        flags = toString(requireObjectCoercible(getRegExpFlags(searchValue)));
         if (!~indexOf(flags, 'g')) throw TypeError('`.replaceAll` does not allow non-global regexes');
       }
       replacer = getMethod(searchValue, REPLACE);
