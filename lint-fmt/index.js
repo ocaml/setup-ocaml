@@ -3281,6 +3281,38 @@ module.exports = function (object, key, value) {
 
 /***/ }),
 
+/***/ 5118:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var global = __nccwpck_require__(2858);
+var isCallable = __nccwpck_require__(4767);
+var createNonEnumerableProperty = __nccwpck_require__(7754);
+var makeBuiltIn = __nccwpck_require__(493);
+var setGlobal = __nccwpck_require__(2380);
+
+module.exports = function (O, key, value, options) {
+  var unsafe = options ? !!options.unsafe : false;
+  var simple = options ? !!options.enumerable : false;
+  var noTargetGet = options ? !!options.noTargetGet : false;
+  var name = options && options.name !== undefined ? options.name : key;
+  if (isCallable(value)) makeBuiltIn(value, name, options);
+  if (O === global) {
+    if (simple) O[key] = value;
+    else setGlobal(key, value);
+    return O;
+  } else if (!unsafe) {
+    delete O[key];
+  } else if (!noTargetGet && O[key]) {
+    simple = true;
+  }
+  if (simple) O[key] = value;
+  else createNonEnumerableProperty(O, key, value);
+  return O;
+};
+
+
+/***/ }),
+
 /***/ 376:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -3296,7 +3328,7 @@ var getPrototypeOf = __nccwpck_require__(4257);
 var setPrototypeOf = __nccwpck_require__(116);
 var setToStringTag = __nccwpck_require__(8504);
 var createNonEnumerableProperty = __nccwpck_require__(7754);
-var redefine = __nccwpck_require__(7384);
+var defineBuiltIn = __nccwpck_require__(5118);
 var wellKnownSymbol = __nccwpck_require__(4162);
 var Iterators = __nccwpck_require__(6879);
 var IteratorsCore = __nccwpck_require__(4945);
@@ -3343,7 +3375,7 @@ module.exports = function (Iterable, NAME, IteratorConstructor, next, DEFAULT, I
         if (setPrototypeOf) {
           setPrototypeOf(CurrentIteratorPrototype, IteratorPrototype);
         } else if (!isCallable(CurrentIteratorPrototype[ITERATOR])) {
-          redefine(CurrentIteratorPrototype, ITERATOR, returnThis);
+          defineBuiltIn(CurrentIteratorPrototype, ITERATOR, returnThis);
         }
       }
       // Set @@toStringTag to native iterators
@@ -3371,14 +3403,14 @@ module.exports = function (Iterable, NAME, IteratorConstructor, next, DEFAULT, I
     };
     if (FORCED) for (KEY in methods) {
       if (BUGGY_SAFARI_ITERATORS || INCORRECT_VALUES_NAME || !(KEY in IterablePrototype)) {
-        redefine(IterablePrototype, KEY, methods[KEY]);
+        defineBuiltIn(IterablePrototype, KEY, methods[KEY]);
       }
     } else $({ target: NAME, proto: true, forced: BUGGY_SAFARI_ITERATORS || INCORRECT_VALUES_NAME }, methods);
   }
 
   // define iterator
   if ((!IS_PURE || FORCED) && IterablePrototype[ITERATOR] !== defaultIterator) {
-    redefine(IterablePrototype, ITERATOR, defaultIterator, { name: DEFAULT });
+    defineBuiltIn(IterablePrototype, ITERATOR, defaultIterator, { name: DEFAULT });
   }
   Iterators[NAME] = defaultIterator;
 
@@ -3486,7 +3518,7 @@ module.exports = [
 var global = __nccwpck_require__(2858);
 var getOwnPropertyDescriptor = (__nccwpck_require__(1590).f);
 var createNonEnumerableProperty = __nccwpck_require__(7754);
-var redefine = __nccwpck_require__(7384);
+var defineBuiltIn = __nccwpck_require__(5118);
 var setGlobal = __nccwpck_require__(2380);
 var copyConstructorProperties = __nccwpck_require__(7976);
 var isForced = __nccwpck_require__(783);
@@ -3534,8 +3566,7 @@ module.exports = function (options, source) {
     if (options.sham || (targetProperty && targetProperty.sham)) {
       createNonEnumerableProperty(sourceProperty, 'sham', true);
     }
-    // extend global
-    redefine(target, key, sourceProperty, options);
+    defineBuiltIn(target, key, sourceProperty, options);
   }
 };
 
@@ -3564,7 +3595,7 @@ module.exports = function (exec) {
 // TODO: Remove from `core-js@4` since it's moved to entry points
 __nccwpck_require__(2483);
 var uncurryThis = __nccwpck_require__(2642);
-var redefine = __nccwpck_require__(7384);
+var defineBuiltIn = __nccwpck_require__(5118);
 var regexpExec = __nccwpck_require__(7344);
 var fails = __nccwpck_require__(6287);
 var wellKnownSymbol = __nccwpck_require__(4162);
@@ -3628,8 +3659,8 @@ module.exports = function (KEY, exec, FORCED, SHAM) {
       return { done: false };
     });
 
-    redefine(String.prototype, KEY, methods[0]);
-    redefine(RegExpPrototype, SYMBOL, methods[1]);
+    defineBuiltIn(String.prototype, KEY, methods[0]);
+    defineBuiltIn(RegExpPrototype, SYMBOL, methods[1]);
   }
 
   if (SHAM) createNonEnumerableProperty(RegExpPrototype[SYMBOL], 'sham', true);
@@ -4176,7 +4207,7 @@ var fails = __nccwpck_require__(6287);
 var isCallable = __nccwpck_require__(4767);
 var create = __nccwpck_require__(8456);
 var getPrototypeOf = __nccwpck_require__(4257);
-var redefine = __nccwpck_require__(7384);
+var defineBuiltIn = __nccwpck_require__(5118);
 var wellKnownSymbol = __nccwpck_require__(4162);
 var IS_PURE = __nccwpck_require__(4432);
 
@@ -4210,7 +4241,7 @@ else if (IS_PURE) IteratorPrototype = create(IteratorPrototype);
 // `%IteratorPrototype%[@@iterator]()` method
 // https://tc39.es/ecma262/#sec-%iteratorprototype%-@@iterator
 if (!isCallable(IteratorPrototype[ITERATOR])) {
-  redefine(IteratorPrototype, ITERATOR, function () {
+  defineBuiltIn(IteratorPrototype, ITERATOR, function () {
     return this;
   });
 }
@@ -4241,6 +4272,53 @@ var toLength = __nccwpck_require__(5626);
 module.exports = function (obj) {
   return toLength(obj.length);
 };
+
+
+/***/ }),
+
+/***/ 493:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var fails = __nccwpck_require__(6287);
+var isCallable = __nccwpck_require__(4767);
+var hasOwn = __nccwpck_require__(9135);
+var defineProperty = (__nccwpck_require__(6085).f);
+var CONFIGURABLE_FUNCTION_NAME = (__nccwpck_require__(3311).CONFIGURABLE);
+var inspectSource = __nccwpck_require__(3261);
+var InternalStateModule = __nccwpck_require__(1896);
+
+var enforceInternalState = InternalStateModule.enforce;
+var getInternalState = InternalStateModule.get;
+
+var CONFIGURABLE_LENGTH = !fails(function () {
+  return defineProperty(function () { /* empty */ }, 'length', { value: 8 }).length !== 8;
+});
+
+var TEMPLATE = String(String).split('String');
+
+var makeBuiltIn = module.exports = function (value, name, options) {
+  if (String(name).slice(0, 7) === 'Symbol(') {
+    name = '[' + String(name).replace(/^Symbol\(([^)]*)\)/, '$1') + ']';
+  }
+  if (options && options.getter) name = 'get ' + name;
+  if (options && options.setter) name = 'set ' + name;
+  if (!hasOwn(value, 'name') || (CONFIGURABLE_FUNCTION_NAME && value.name !== name)) {
+    defineProperty(value, 'name', { value: name, configurable: true });
+  }
+  if (CONFIGURABLE_LENGTH && options && hasOwn(options, 'arity') && value.length !== options.arity) {
+    defineProperty(value, 'length', { value: options.arity });
+  }
+  var state = enforceInternalState(value);
+  if (!hasOwn(state, 'source')) {
+    state.source = TEMPLATE.join(typeof name == 'string' ? name : '');
+  } return value;
+};
+
+// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
+// eslint-disable-next-line no-extend-native -- required
+Function.prototype.toString = makeBuiltIn(function toString() {
+  return isCallable(this) && getInternalState(this).source || inspectSource(this);
+}, 'toString');
 
 
 /***/ }),
@@ -4728,59 +4806,6 @@ module.exports = global;
 
 /***/ }),
 
-/***/ 7384:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var global = __nccwpck_require__(2858);
-var isCallable = __nccwpck_require__(4767);
-var hasOwn = __nccwpck_require__(9135);
-var createNonEnumerableProperty = __nccwpck_require__(7754);
-var setGlobal = __nccwpck_require__(2380);
-var inspectSource = __nccwpck_require__(3261);
-var InternalStateModule = __nccwpck_require__(1896);
-var CONFIGURABLE_FUNCTION_NAME = (__nccwpck_require__(3311).CONFIGURABLE);
-
-var getInternalState = InternalStateModule.get;
-var enforceInternalState = InternalStateModule.enforce;
-var TEMPLATE = String(String).split('String');
-
-(module.exports = function (O, key, value, options) {
-  var unsafe = options ? !!options.unsafe : false;
-  var simple = options ? !!options.enumerable : false;
-  var noTargetGet = options ? !!options.noTargetGet : false;
-  var name = options && options.name !== undefined ? options.name : key;
-  var state;
-  if (isCallable(value)) {
-    if (String(name).slice(0, 7) === 'Symbol(') {
-      name = '[' + String(name).replace(/^Symbol\(([^)]*)\)/, '$1') + ']';
-    }
-    if (!hasOwn(value, 'name') || (CONFIGURABLE_FUNCTION_NAME && value.name !== name)) {
-      createNonEnumerableProperty(value, 'name', name);
-    }
-    state = enforceInternalState(value);
-    if (!state.source) {
-      state.source = TEMPLATE.join(typeof name == 'string' ? name : '');
-    }
-  }
-  if (O === global) {
-    if (simple) O[key] = value;
-    else setGlobal(key, value);
-    return;
-  } else if (!unsafe) {
-    delete O[key];
-  } else if (!noTargetGet && O[key]) {
-    simple = true;
-  }
-  if (simple) O[key] = value;
-  else createNonEnumerableProperty(O, key, value);
-// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
-})(Function.prototype, 'toString', function toString() {
-  return isCallable(this) && getInternalState(this).source || inspectSource(this);
-});
-
-
-/***/ }),
-
 /***/ 4111:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -5157,10 +5182,10 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.22.3',
+  version: '3.22.4',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.22.3/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.22.4/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -5698,13 +5723,13 @@ module.exports = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var TO_STRING_TAG_SUPPORT = __nccwpck_require__(270);
-var redefine = __nccwpck_require__(7384);
+var defineBuiltIn = __nccwpck_require__(5118);
 var toString = __nccwpck_require__(4102);
 
 // `Object.prototype.toString` method
 // https://tc39.es/ecma262/#sec-object.prototype.tostring
 if (!TO_STRING_TAG_SUPPORT) {
-  redefine(Object.prototype, 'toString', toString, { unsafe: true });
+  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
 }
 
 
@@ -5985,7 +6010,7 @@ var INCORRECT_LENGTH = !!$fromCodePoint && $fromCodePoint.length != 1;
 
 // `String.fromCodePoint` method
 // https://tc39.es/ecma262/#sec-string.fromcodepoint
-$({ target: 'String', stat: true, forced: INCORRECT_LENGTH }, {
+$({ target: 'String', stat: true, arity: 1, forced: INCORRECT_LENGTH }, {
   // eslint-disable-next-line no-unused-vars -- required for `.length`
   fromCodePoint: function fromCodePoint(x) {
     var elements = [];
@@ -6131,7 +6156,7 @@ var classof = __nccwpck_require__(619);
 var isRegExp = __nccwpck_require__(2832);
 var getRegExpFlags = __nccwpck_require__(1557);
 var getMethod = __nccwpck_require__(7953);
-var redefine = __nccwpck_require__(7384);
+var defineBuiltIn = __nccwpck_require__(5118);
 var fails = __nccwpck_require__(6287);
 var wellKnownSymbol = __nccwpck_require__(4162);
 var speciesConstructor = __nccwpck_require__(8336);
@@ -6213,7 +6238,7 @@ $({ target: 'String', proto: true, forced: WORKS_WITH_NON_GLOBAL_REGEX }, {
   }
 });
 
-IS_PURE || MATCH_ALL in RegExpPrototype || redefine(RegExpPrototype, MATCH_ALL, $matchAll);
+IS_PURE || MATCH_ALL in RegExpPrototype || defineBuiltIn(RegExpPrototype, MATCH_ALL, $matchAll);
 
 
 /***/ }),
