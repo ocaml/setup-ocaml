@@ -65,11 +65,11 @@ const repositories_yaml: { [key: string]: string } = yaml.parse(
 
 const platform = getPlatform();
 
-const defaultRepository =
-  platform !== Platform.Win32
-    ? "https://github.com/ocaml/opam-repository.git"
-    : "https://github.com/fdopen/opam-repository-mingw.git#opam2";
-
 export const OPAM_REPOSITORIES: [string, string][] = repositories_yaml
   ? Object.entries(repositories_yaml).reverse()
-  : [["default", defaultRepository]];
+  : platform !== Platform.Win32
+  ? [["default", "https://github.com/ocaml/opam-repository.git"]]
+  : [
+      ["upstream", "https://github.com/ocaml/opam-repository.git"],
+      ["default", "https://github.com/fdopen/opam-repository-mingw.git#opam2"],
+    ];

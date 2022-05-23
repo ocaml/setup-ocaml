@@ -178,7 +178,7 @@ async function setupCygwin() {
   } else {
     core.addPath(cachedPath);
   }
-  const site = "http://cygwin.mirror.constant.com";
+  const site = "https://cygwin.mirror.constant.com";
   const packages = [
     "curl",
     "diffutils",

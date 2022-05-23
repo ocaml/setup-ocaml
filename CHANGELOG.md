@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Set the upstream git url as a secondary repository on Windows.
+
 ## [2.0.3]
 
 ### Added
