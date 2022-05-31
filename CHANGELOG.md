@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Unset the secondary repository on Windows.
+
 ## [2.0.4]
 
 ### Changed
