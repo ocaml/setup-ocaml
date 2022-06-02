@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.5]
+
 ### Changed
 
 - Unset the secondary repository on Windows.
@@ -342,8 +344,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.4...HEAD
-[2.0.3]: https://github.com/ocaml/setup-ocaml/compare/v2.0.3...v2.0.4
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.5...HEAD
+[2.0.5]: https://github.com/ocaml/setup-ocaml/compare/v2.0.4...v2.0.5
+[2.0.4]: https://github.com/ocaml/setup-ocaml/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/ocaml/setup-ocaml/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/ocaml/setup-ocaml/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0...v2.0.1
