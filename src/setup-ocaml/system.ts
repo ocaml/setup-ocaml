@@ -8,6 +8,8 @@ export function getArchitecture(): Architecture {
   switch (os.arch()) {
     case "x64":
       return Architecture.X86_64;
+    case "arm64":
+      return Architecture.ARM;
     default:
       throw new Error("The architecture is not supported.");
   }
