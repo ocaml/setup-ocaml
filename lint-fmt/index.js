@@ -3018,16 +3018,15 @@ module.exports = parent;
 /***/ 8486:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var isCallable = __nccwpck_require__(4767);
 var tryToString = __nccwpck_require__(111);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 
 // `Assert: IsCallable(argument) is true`
 module.exports = function (argument) {
   if (isCallable(argument)) return argument;
-  throw TypeError(tryToString(argument) + ' is not a function');
+  throw $TypeError(tryToString(argument) + ' is not a function');
 };
 
 
@@ -3036,16 +3035,15 @@ module.exports = function (argument) {
 /***/ 3176:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var isConstructor = __nccwpck_require__(140);
 var tryToString = __nccwpck_require__(111);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 
 // `Assert: IsConstructor(argument) is true`
 module.exports = function (argument) {
   if (isConstructor(argument)) return argument;
-  throw TypeError(tryToString(argument) + ' is not a constructor');
+  throw $TypeError(tryToString(argument) + ' is not a constructor');
 };
 
 
@@ -3054,15 +3052,14 @@ module.exports = function (argument) {
 /***/ 6331:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var isCallable = __nccwpck_require__(4767);
 
-var String = global.String;
-var TypeError = global.TypeError;
+var $String = String;
+var $TypeError = TypeError;
 
 module.exports = function (argument) {
   if (typeof argument == 'object' || isCallable(argument)) return argument;
-  throw TypeError("Can't set " + String(argument) + ' as a prototype');
+  throw $TypeError("Can't set " + $String(argument) + ' as a prototype');
 };
 
 
@@ -3087,16 +3084,15 @@ module.exports = function (S, index, unicode) {
 /***/ 8005:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var isObject = __nccwpck_require__(5429);
 
-var String = global.String;
-var TypeError = global.TypeError;
+var $String = String;
+var $TypeError = TypeError;
 
 // `Assert: Type(argument) is Object`
 module.exports = function (argument) {
   if (isObject(argument)) return argument;
-  throw TypeError(String(argument) + ' is not an object');
+  throw $TypeError($String(argument) + ' is not an object');
 };
 
 
@@ -3144,19 +3140,18 @@ module.exports = {
 /***/ 9893:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var toAbsoluteIndex = __nccwpck_require__(987);
 var lengthOfArrayLike = __nccwpck_require__(7991);
 var createProperty = __nccwpck_require__(6549);
 
-var Array = global.Array;
+var $Array = Array;
 var max = Math.max;
 
 module.exports = function (O, start, end) {
   var length = lengthOfArrayLike(O);
   var k = toAbsoluteIndex(start, length);
   var fin = toAbsoluteIndex(end === undefined ? length : end, length);
-  var result = Array(max(fin - k, 0));
+  var result = $Array(max(fin - k, 0));
   for (var n = 0; k < fin; k++, n++) createProperty(result, n, O[k]);
   result.length = n;
   return result;
@@ -3183,14 +3178,13 @@ module.exports = function (it) {
 /***/ 477:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var TO_STRING_TAG_SUPPORT = __nccwpck_require__(270);
 var isCallable = __nccwpck_require__(4767);
 var classofRaw = __nccwpck_require__(619);
 var wellKnownSymbol = __nccwpck_require__(4162);
 
 var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-var Object = global.Object;
+var $Object = Object;
 
 // ES3 wrong here
 var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) == 'Arguments';
@@ -3207,7 +3201,7 @@ module.exports = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
   var O, tag, result;
   return it === undefined ? 'Undefined' : it === null ? 'Null'
     // @@toStringTag case
-    : typeof (tag = tryGet(O = Object(it), TO_STRING_TAG)) == 'string' ? tag
+    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
     // builtinTag case
     : CORRECT_ARGUMENTS ? classofRaw(O)
     // ES3 arguments fallback
@@ -4027,22 +4021,21 @@ module.exports = !DESCRIPTORS && !fails(function () {
 /***/ 2804:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var uncurryThis = __nccwpck_require__(2642);
 var fails = __nccwpck_require__(6287);
 var classof = __nccwpck_require__(619);
 
-var Object = global.Object;
+var $Object = Object;
 var split = uncurryThis(''.split);
 
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 module.exports = fails(function () {
   // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
   // eslint-disable-next-line no-prototype-builtins -- safe
-  return !Object('z').propertyIsEnumerable(0);
+  return !$Object('z').propertyIsEnumerable(0);
 }) ? function (it) {
-  return classof(it) == 'String' ? split(it, '') : Object(it);
-} : Object;
+  return classof(it) == 'String' ? split(it, '') : $Object(it);
+} : $Object;
 
 
 /***/ }),
@@ -4286,19 +4279,18 @@ module.exports = function (it) {
 /***/ 1385:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var getBuiltIn = __nccwpck_require__(4527);
 var isCallable = __nccwpck_require__(4767);
 var isPrototypeOf = __nccwpck_require__(2413);
 var USE_SYMBOL_AS_UID = __nccwpck_require__(5263);
 
-var Object = global.Object;
+var $Object = Object;
 
 module.exports = USE_SYMBOL_AS_UID ? function (it) {
   return typeof it == 'symbol';
 } : function (it) {
   var $Symbol = getBuiltIn('Symbol');
-  return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, Object(it));
+  return isCallable($Symbol) && isPrototypeOf($Symbol.prototype, $Object(it));
 };
 
 
@@ -4491,14 +4483,13 @@ module.exports = isCallable(WeakMap) && /native code/.test(inspectSource(WeakMap
 /***/ 9961:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var isRegExp = __nccwpck_require__(2832);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 
 module.exports = function (it) {
   if (isRegExp(it)) {
-    throw TypeError("The method doesn't accept regular expressions");
+    throw $TypeError("The method doesn't accept regular expressions");
   } return it;
 };
 
@@ -4625,14 +4616,13 @@ exports.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : 
 /***/ 6085:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var DESCRIPTORS = __nccwpck_require__(5121);
 var IE8_DOM_DEFINE = __nccwpck_require__(3151);
 var V8_PROTOTYPE_DEFINE_BUG = __nccwpck_require__(2016);
 var anObject = __nccwpck_require__(8005);
 var toPropertyKey = __nccwpck_require__(9597);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 // eslint-disable-next-line es-x/no-object-defineproperty -- safe
 var $defineProperty = Object.defineProperty;
 // eslint-disable-next-line es-x/no-object-getownpropertydescriptor -- safe
@@ -4665,7 +4655,7 @@ exports.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O, P
   if (IE8_DOM_DEFINE) try {
     return $defineProperty(O, P, Attributes);
   } catch (error) { /* empty */ }
-  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported');
+  if ('get' in Attributes || 'set' in Attributes) throw $TypeError('Accessors not supported');
   if ('value' in Attributes) O[P] = Attributes.value;
   return O;
 };
@@ -4732,7 +4722,6 @@ exports.f = Object.getOwnPropertySymbols;
 /***/ 4257:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var hasOwn = __nccwpck_require__(9135);
 var isCallable = __nccwpck_require__(4767);
 var toObject = __nccwpck_require__(3228);
@@ -4740,18 +4729,19 @@ var sharedKey = __nccwpck_require__(3560);
 var CORRECT_PROTOTYPE_GETTER = __nccwpck_require__(565);
 
 var IE_PROTO = sharedKey('IE_PROTO');
-var Object = global.Object;
-var ObjectPrototype = Object.prototype;
+var $Object = Object;
+var ObjectPrototype = $Object.prototype;
 
 // `Object.getPrototypeOf` method
 // https://tc39.es/ecma262/#sec-object.getprototypeof
-module.exports = CORRECT_PROTOTYPE_GETTER ? Object.getPrototypeOf : function (O) {
+// eslint-disable-next-line es-x/no-object-getprototypeof -- safe
+module.exports = CORRECT_PROTOTYPE_GETTER ? $Object.getPrototypeOf : function (O) {
   var object = toObject(O);
   if (hasOwn(object, IE_PROTO)) return object[IE_PROTO];
   var constructor = object.constructor;
   if (isCallable(constructor) && object instanceof constructor) {
     return constructor.prototype;
-  } return object instanceof Object ? ObjectPrototype : null;
+  } return object instanceof $Object ? ObjectPrototype : null;
 };
 
 
@@ -4886,12 +4876,11 @@ module.exports = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
 /***/ 9739:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var call = __nccwpck_require__(2636);
 var isCallable = __nccwpck_require__(4767);
 var isObject = __nccwpck_require__(5429);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 
 // `OrdinaryToPrimitive` abstract operation
 // https://tc39.es/ecma262/#sec-ordinarytoprimitive
@@ -4900,7 +4889,7 @@ module.exports = function (input, pref) {
   if (pref === 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val;
   if (isCallable(fn = input.valueOf) && !isObject(val = call(fn, input))) return val;
   if (pref !== 'string' && isCallable(fn = input.toString) && !isObject(val = call(fn, input))) return val;
-  throw TypeError("Can't convert object to primitive value");
+  throw $TypeError("Can't convert object to primitive value");
 };
 
 
@@ -4940,14 +4929,13 @@ module.exports = global;
 /***/ 4111:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var call = __nccwpck_require__(2636);
 var anObject = __nccwpck_require__(8005);
 var isCallable = __nccwpck_require__(4767);
 var classof = __nccwpck_require__(619);
 var regexpExec = __nccwpck_require__(7344);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 
 // `RegExpExec` abstract operation
 // https://tc39.es/ecma262/#sec-regexpexec
@@ -4959,7 +4947,7 @@ module.exports = function (R, S) {
     return result;
   }
   if (classof(R) === 'RegExp') return call(regexpExec, R, S);
-  throw TypeError('RegExp#exec called on incompatible receiver');
+  throw $TypeError('RegExp#exec called on incompatible receiver');
 };
 
 
@@ -5207,16 +5195,14 @@ module.exports = fails(function () {
 /***/ }),
 
 /***/ 4385:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
-var global = __nccwpck_require__(2858);
-
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 
 // `RequireObjectCoercible` abstract operation
 // https://tc39.es/ecma262/#sec-requireobjectcoercible
 module.exports = function (it) {
-  if (it == undefined) throw TypeError("Can't call method on " + it);
+  if (it == undefined) throw $TypeError("Can't call method on " + it);
   return it;
 };
 
@@ -5294,10 +5280,10 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.22.7',
+  version: '3.22.8',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.22.7/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.22.8/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -5442,12 +5428,11 @@ module.exports = {
 
 "use strict";
 
-var global = __nccwpck_require__(2858);
 var toIntegerOrInfinity = __nccwpck_require__(5500);
 var toString = __nccwpck_require__(3442);
 var requireObjectCoercible = __nccwpck_require__(4385);
 
-var RangeError = global.RangeError;
+var $RangeError = RangeError;
 
 // `String.prototype.repeat` method implementation
 // https://tc39.es/ecma262/#sec-string.prototype.repeat
@@ -5455,7 +5440,7 @@ module.exports = function repeat(count) {
   var str = toString(requireObjectCoercible(this));
   var result = '';
   var n = toIntegerOrInfinity(count);
-  if (n < 0 || n == Infinity) throw RangeError('Wrong number of repetitions');
+  if (n < 0 || n == Infinity) throw $RangeError('Wrong number of repetitions');
   for (;n > 0; (n >>>= 1) && (str += str)) if (n & 1) result += str;
   return result;
 };
@@ -5629,15 +5614,14 @@ module.exports = function (argument) {
 /***/ 3228:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var requireObjectCoercible = __nccwpck_require__(4385);
 
-var Object = global.Object;
+var $Object = Object;
 
 // `ToObject` abstract operation
 // https://tc39.es/ecma262/#sec-toobject
 module.exports = function (argument) {
-  return Object(requireObjectCoercible(argument));
+  return $Object(requireObjectCoercible(argument));
 };
 
 
@@ -5646,7 +5630,6 @@ module.exports = function (argument) {
 /***/ 8400:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var call = __nccwpck_require__(2636);
 var isObject = __nccwpck_require__(5429);
 var isSymbol = __nccwpck_require__(1385);
@@ -5654,7 +5637,7 @@ var getMethod = __nccwpck_require__(7953);
 var ordinaryToPrimitive = __nccwpck_require__(9739);
 var wellKnownSymbol = __nccwpck_require__(4162);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 var TO_PRIMITIVE = wellKnownSymbol('toPrimitive');
 
 // `ToPrimitive` abstract operation
@@ -5667,7 +5650,7 @@ module.exports = function (input, pref) {
     if (pref === undefined) pref = 'default';
     result = call(exoticToPrim, input, pref);
     if (!isObject(result) || isSymbol(result)) return result;
-    throw TypeError("Can't convert object to primitive value");
+    throw $TypeError("Can't convert object to primitive value");
   }
   if (pref === undefined) pref = 'number';
   return ordinaryToPrimitive(input, pref);
@@ -5710,29 +5693,26 @@ module.exports = String(test) === '[object z]';
 /***/ 3442:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var global = __nccwpck_require__(2858);
 var classof = __nccwpck_require__(477);
 
-var String = global.String;
+var $String = String;
 
 module.exports = function (argument) {
   if (classof(argument) === 'Symbol') throw TypeError('Cannot convert a Symbol value to a string');
-  return String(argument);
+  return $String(argument);
 };
 
 
 /***/ }),
 
 /***/ 111:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
-var global = __nccwpck_require__(2858);
-
-var String = global.String;
+var $String = String;
 
 module.exports = function (argument) {
   try {
-    return String(argument);
+    return $String(argument);
   } catch (error) {
     return 'Object';
   }
@@ -6106,11 +6086,10 @@ $({ target: 'String', proto: true, forced: forcedStringHTMLMethod('fontsize') },
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var $ = __nccwpck_require__(8283);
-var global = __nccwpck_require__(2858);
 var uncurryThis = __nccwpck_require__(2642);
 var toAbsoluteIndex = __nccwpck_require__(987);
 
-var RangeError = global.RangeError;
+var $RangeError = RangeError;
 var fromCharCode = String.fromCharCode;
 // eslint-disable-next-line es-x/no-string-fromcodepoint -- required for testing
 var $fromCodePoint = String.fromCodePoint;
@@ -6130,7 +6109,7 @@ $({ target: 'String', stat: true, arity: 1, forced: INCORRECT_LENGTH }, {
     var code;
     while (length > i) {
       code = +arguments[i++];
-      if (toAbsoluteIndex(code, 0x10FFFF) !== code) throw RangeError(code + ' is not a valid code point');
+      if (toAbsoluteIndex(code, 0x10FFFF) !== code) throw $RangeError(code + ' is not a valid code point');
       elements[i] = code < 0x10000
         ? fromCharCode(code)
         : fromCharCode(((code -= 0x10000) >> 10) + 0xD800, code % 0x400 + 0xDC00);
@@ -6255,7 +6234,6 @@ $({ target: 'String', proto: true, forced: forcedStringHTMLMethod('link') }, {
 
 /* eslint-disable es-x/no-string-prototype-matchall -- safe */
 var $ = __nccwpck_require__(8283);
-var global = __nccwpck_require__(2858);
 var call = __nccwpck_require__(2636);
 var uncurryThis = __nccwpck_require__(2642);
 var createIteratorConstructor = __nccwpck_require__(9411);
@@ -6282,7 +6260,7 @@ var REGEXP_STRING_ITERATOR = REGEXP_STRING + ' Iterator';
 var setInternalState = InternalStateModule.set;
 var getInternalState = InternalStateModule.getterFor(REGEXP_STRING_ITERATOR);
 var RegExpPrototype = RegExp.prototype;
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 var stringIndexOf = uncurryThis(''.indexOf);
 var un$MatchAll = uncurryThis(''.matchAll);
 
@@ -6336,7 +6314,7 @@ $({ target: 'String', proto: true, forced: WORKS_WITH_NON_GLOBAL_REGEX }, {
     if (regexp != null) {
       if (isRegExp(regexp)) {
         flags = toString(requireObjectCoercible(getRegExpFlags(regexp)));
-        if (!~stringIndexOf(flags, 'g')) throw TypeError('`.matchAll` does not allow non-global regexes');
+        if (!~stringIndexOf(flags, 'g')) throw $TypeError('`.matchAll` does not allow non-global regexes');
       }
       if (WORKS_WITH_NON_GLOBAL_REGEX) return un$MatchAll(O, regexp);
       matcher = getMethod(regexp, MATCH_ALL);
@@ -6503,7 +6481,6 @@ $({ target: 'String', proto: true }, {
 "use strict";
 
 var $ = __nccwpck_require__(8283);
-var global = __nccwpck_require__(2858);
 var call = __nccwpck_require__(2636);
 var uncurryThis = __nccwpck_require__(2642);
 var requireObjectCoercible = __nccwpck_require__(4385);
@@ -6517,7 +6494,7 @@ var wellKnownSymbol = __nccwpck_require__(4162);
 var IS_PURE = __nccwpck_require__(4432);
 
 var REPLACE = wellKnownSymbol('replace');
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 var indexOf = uncurryThis(''.indexOf);
 var replace = uncurryThis(''.replace);
 var stringSlice = uncurryThis(''.slice);
@@ -6542,7 +6519,7 @@ $({ target: 'String', proto: true }, {
       IS_REG_EXP = isRegExp(searchValue);
       if (IS_REG_EXP) {
         flags = toString(requireObjectCoercible(getRegExpFlags(searchValue)));
-        if (!~indexOf(flags, 'g')) throw TypeError('`.replaceAll` does not allow non-global regexes');
+        if (!~indexOf(flags, 'g')) throw $TypeError('`.replaceAll` does not allow non-global regexes');
       }
       replacer = getMethod(searchValue, REPLACE);
       if (replacer) {
@@ -7257,13 +7234,12 @@ $({ target: 'String', proto: true, forced: true }, {
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var $ = __nccwpck_require__(8283);
-var global = __nccwpck_require__(2858);
 var uncurryThis = __nccwpck_require__(2642);
 var toIndexedObject = __nccwpck_require__(4747);
 var toString = __nccwpck_require__(3442);
 var lengthOfArrayLike = __nccwpck_require__(7991);
 
-var TypeError = global.TypeError;
+var $TypeError = TypeError;
 var ArrayPrototype = Array.prototype;
 var push = uncurryThis(ArrayPrototype.push);
 var join = uncurryThis(ArrayPrototype.join);
@@ -7279,7 +7255,7 @@ $({ target: 'String', stat: true, forced: true }, {
     var i = 0;
     while (literalSegments > i) {
       var nextVal = cookedTemplate[i++];
-      if (nextVal === undefined) throw TypeError('Incorrect template');
+      if (nextVal === undefined) throw $TypeError('Incorrect template');
       push(elements, toString(nextVal));
       if (i === literalSegments) return join(elements, '');
       if (i < argumentsLength) push(elements, toString(arguments[i]));
