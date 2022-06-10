@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Add support for arm64.
+
 ## [2.0.5]
 
 ### Changed
