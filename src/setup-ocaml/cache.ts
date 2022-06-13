@@ -188,6 +188,7 @@ async function restoreCache(
   restoreKeys: string[],
   paths: string[]
 ) {
+  return undefined;
   const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
   if (cacheKey) {
     core.info(`Cache restored from key: ${cacheKey}`);
