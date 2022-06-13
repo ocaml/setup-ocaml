@@ -188,8 +188,14 @@ async function restoreCache(
   restoreKeys: string[],
   paths: string[]
 ) {
-  return undefined;
-  const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
+  let cacheKey;
+  try {
+      cacheKey = await cache.restoreCache(paths, key, restoreKeys);
+  } catch (error) {
+    if (error instanceof Error) {
+        core.warning(error.message);
+    }
+  }
   if (cacheKey) {
     core.info(`Cache restored from key: ${cacheKey}`);
   } else {
