@@ -1,4 +1,4 @@
-import { exec } from "@actions/exec";
+import { getExecOutput } from "@actions/exec";
 import { promises as fs } from "fs";
 import * as os from "os";
 
@@ -48,12 +48,8 @@ export async function getSystemIdentificationInfo(): Promise<{
     }
     return { id, version };
   } else if (platform === Platform.MacOS) {
-    let output = "";
-    await exec("sw_vers", undefined, {
-      silent: true,
-      listeners: { stdout: (data) => (output += data.toString()) },
-    });
-    const lines = output.split(os.EOL);
+    const swVers = await getExecOutput("sw_vers");
+    const lines = swVers.stdout.split(os.EOL);
     let version = "";
     for (const line of lines) {
       const [key, value] = line.split(":").map((kv) => kv.trim());
