@@ -1,0 +1,12 @@
+{
+  "endOfLine": "auto",
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "proseWrap": "always"
+      }
+    }
+  ],
+  "plugins": ["prettier-plugin-packagejson"]
+}

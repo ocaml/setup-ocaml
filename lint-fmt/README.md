@@ -1,9 +1,7 @@
 # lint-fmt
 
-Performs several quality checks for OCaml code.
-
-> **Warning** First of all, make sure you have an `.ocamlformat` file at the
-> root of your project.
+> **Warning** Make sure you have an `.ocamlformat` file at the root of your
+> project.
 
 ## Usage
 

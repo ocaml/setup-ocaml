@@ -1,7 +1,5 @@
 # lint-opam
 
-Perform several quality checks on the opam file.
-
 ## Usage
 
 ### Example workflow
@@ -14,10 +12,10 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@v4
 
-      - name: Set-up OCaml 4.14
+      - name: Set-up OCaml 5.1
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: "4.14"
+          ocaml-compiler: "5.1"
           dune-cache: true
 
       - name: Lint opam

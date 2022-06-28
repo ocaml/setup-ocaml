@@ -1,0 +1,14 @@
+name: Analysis
+description: Calculates dependencies for a opam build-target and submits the list to the Dependency Submission API
+author: Sora Morimoto
+branding:
+  icon: package
+  color: orange
+inputs:
+  token:
+    description: DO NOT SET THIS.
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: node20
+  main: dist/index.js
