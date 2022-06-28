@@ -2,7 +2,7 @@ import * as path from "node:path";
 
 import * as core from "@actions/core";
 
-import { saveDuneCache, saveOpamDownloadCache } from "./cache";
+import { saveDuneCache, saveOpamCache, saveOpamDownloadCache } from "./cache";
 import { DUNE_CACHE, Platform } from "./constants";
 import { trimDuneCache } from "./dune";
 import { getPlatform } from "./system";
@@ -22,6 +22,7 @@ async function run() {
       await saveDuneCache();
     }
     await saveOpamDownloadCache();
+    await saveOpamCache();
     if (platform === Platform.Win32) {
       process.env["PATH"] = originalPath.join(path.delimiter);
     }

@@ -28,13 +28,13 @@ The action does the following:
 1. Install the OCaml compiler
    - If the opam cache was not hit
 1. Remove the opam repositories
-1. Save the opam cache
-   - If the opam cache was not hit
 1. Initialise the opam repositories
 1. Retrieve the opam download cache
 1. Install depext
    - On Windows, not only `opam-depext` is installed, but `depext-cygwinports`
      is installed as well
+   - Depexts of existing packages are installed, relevant when the cache has
+     been hit
 1. Retrieve the dune cache
    - If the dune cache feature is enabled
    - If the cache already exists
@@ -49,15 +49,12 @@ The action does the following:
 
 #### Post
 
-The reason for not caching opam stuff in the post stage (more precisely, why you
-can't) is due to the size of the cache and repeatability. They should be cached
-immediately after initialisation to minimize the size of the cache.
-
 1. Remove oldest dune cache files to free space
    - If the dune cache feature is enabled
 1. Save the dune cache
    - If the dune cache feature is enabled
 1. Save the opam download cache
+1. Save the opam build cache
 
 #### What is the difference between opam dependencies and depext dependencies?
 

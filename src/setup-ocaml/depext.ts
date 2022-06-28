@@ -1,7 +1,7 @@
 import * as path from "node:path";
 
 import * as core from "@actions/core";
-import { exec } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 
 import { OPAM_DEPEXT_FLAGS, Platform } from "./constants";
 import { getPlatform } from "./system";
@@ -12,6 +12,17 @@ export async function installDepext(ocamlVersion: string): Promise<void> {
   const depextCygwinports =
     platform === Platform.Win32 ? ["depext-cygwinports"] : [];
   await exec("opam", ["install", "opam-depext", ...depextCygwinports]);
+
+  // Install system dependencies installed by currently-installed packages.
+  // Useful when the opam cache has been recovered
+  const { stdout } = await getExecOutput("opam", [
+    "list",
+    "--installed",
+    "--short",
+  ]);
+  const installed = stdout.split("\n").filter((pkg) => pkg != "");
+  await exec("opam", ["depext"].concat(installed));
+
   if (platform === Platform.Win32) {
     let base = "";
     if (ocamlVersion.includes("mingw64")) {

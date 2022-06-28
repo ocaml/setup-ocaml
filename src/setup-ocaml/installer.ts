@@ -10,7 +10,6 @@ import {
   restoreDuneCache,
   restoreOpamCache,
   restoreOpamDownloadCache,
-  saveOpamCache,
 } from "./cache";
 import {
   DUNE_CACHE,
@@ -38,7 +37,7 @@ export async function installer(): Promise<void> {
   const numberOfProcessors = os.cpus().length;
   const isDebug = core.isDebug();
   core.exportVariable("OPAMCLI", "2.0");
-  core.exportVariable("OPAMCOLOR", "always");
+  core.exportVariable("OPAMCOLOR", "never");
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", numberOfProcessors);
   core.exportVariable("OPAMPRECISETRACKING", 1);
@@ -100,17 +99,6 @@ export async function installer(): Promise<void> {
         : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
       : OCAML_COMPILER;
     await installOcaml(ocamlCompiler);
-    if (platform === Platform.Win32) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const originalPath = process.env["PATH"]!.split(path.delimiter);
-      const msys64Path = path.join("C:", "msys64", "usr", "bin");
-      const patchedPath = [msys64Path, ...originalPath];
-      process.env["PATH"] = patchedPath.join(path.delimiter);
-      await saveOpamCache();
-      process.env["PATH"] = originalPath.join(path.delimiter);
-    } else {
-      await saveOpamCache();
-    }
   }
   if (platform === Platform.Win32) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -259,6 +259,14 @@ export async function restoreOpamCache(): Promise<string | undefined> {
 
 export async function saveOpamCache(): Promise<void> {
   core.startGroup("Save the opam cache");
+  const platform = getPlatform();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const originalPath = process.env["PATH"]!.split(path.delimiter);
+  if (platform === Platform.Win32) {
+    const msys64Path = path.join("C:", "msys64", "usr", "bin");
+    const patchedPath = [msys64Path, ...originalPath];
+    process.env["PATH"] = patchedPath.join(path.delimiter);
+  }
   await exec("opam", [
     "clean",
     "--all-switches",
@@ -270,6 +278,9 @@ export async function saveOpamCache(): Promise<void> {
   const { key } = await composeOpamCacheKeys();
   const paths = composeOpamCachePaths();
   await saveCache(key, paths);
+  if (platform === Platform.Win32) {
+    process.env["PATH"] = originalPath.join(path.delimiter);
+  }
   core.endGroup();
 }
 
