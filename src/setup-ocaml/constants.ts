@@ -4,12 +4,12 @@ import * as yaml from "yaml";
 
 import { getPlatform } from "./system";
 
-export enum Architecture {
+export const enum Architecture {
   X86_64 = "x86_64",
   ARM = "arm64",
 }
 
-export enum Platform {
+export const enum Platform {
   Linux = "linux",
   MacOS = "macos",
   Win32 = "win32",
