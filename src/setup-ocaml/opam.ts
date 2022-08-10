@@ -37,7 +37,6 @@ async function getLatestOpamRelease(): Promise<{
     per_page: 100,
   });
   const matchedReleases = releases
-    .filter((release) => release.assets !== null)
     .filter((release) =>
       semver.satisfies(release.tag_name, semverRange, { loose: true })
     )

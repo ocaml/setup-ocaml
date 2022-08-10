@@ -60,9 +60,9 @@ export const OPAM_PIN = core.getBooleanInput("opam-pin", {
   trimWhitespace: true,
 });
 
-const repositories_yaml: { [key: string]: string } = yaml.parse(
+const repositories_yaml = yaml.parse(
   core.getInput("opam-repositories", { trimWhitespace: true })
-);
+) as Record<string, string> | null;
 
 const platform = getPlatform();
 

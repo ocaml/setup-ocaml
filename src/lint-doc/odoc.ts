@@ -5,7 +5,7 @@ export async function lintOdoc() {
   const options: ExecOptions = {
     env: {
       ...process.env,
-      PATH: process.env.PATH || "",
+      PATH: process.env.PATH ?? "",
       ODOC_WARN_ERROR: "true",
     },
   };

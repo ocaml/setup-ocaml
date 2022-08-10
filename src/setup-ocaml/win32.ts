@@ -3,7 +3,7 @@ import * as cheerio from "cheerio";
 import * as semver from "semver";
 
 function createHttpClient(): HttpClient {
-  return new HttpClient(`ocaml/setup-ocaml`, [], {
+  return new HttpClient("ocaml/setup-ocaml", [], {
     allowRetries: true,
     maxRetries: 5,
   });
