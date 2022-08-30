@@ -4113,87 +4113,50 @@ var core = __nccwpck_require__(186);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(514);
 ;// CONCATENATED MODULE: ./src/lint-opam/lint.ts
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
-function opamLint() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield (0,exec.exec)("opam", ["lint"]);
-    });
+async function opamLint() {
+    await (0,exec.exec)("opam", ["lint"]);
 }
-function opamDuneLint() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield (0,exec.exec)("opam", ["exec", "--", "opam-dune-lint"]);
-    });
+async function opamDuneLint() {
+    await (0,exec.exec)("opam", ["exec", "--", "opam-dune-lint"]);
 }
 
 ;// CONCATENATED MODULE: ./src/lint-opam/opam.ts
-var opam_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
-function installOpamPackages() {
-    return opam_awaiter(this, void 0, void 0, function* () {
-        core.startGroup("Install opam packages");
-        yield (0,exec.exec)("opam", [
-            "install",
-            ".",
-            "--deps-only",
-            "--with-test",
-            "--with-doc",
-        ]);
-        core.endGroup();
-    });
+async function installOpamPackages() {
+    core.startGroup("Install opam packages");
+    await (0,exec.exec)("opam", [
+        "install",
+        ".",
+        "--deps-only",
+        "--with-test",
+        "--with-doc",
+    ]);
+    core.endGroup();
 }
-function installOpamDuneLint() {
-    return opam_awaiter(this, void 0, void 0, function* () {
-        core.startGroup("Install opam-dune-lint");
-        yield (0,exec.exec)("opam", ["depext", "--install", "opam-dune-lint"]);
-        core.endGroup();
-    });
+async function installOpamDuneLint() {
+    core.startGroup("Install opam-dune-lint");
+    await (0,exec.exec)("opam", ["depext", "--install", "opam-dune-lint"]);
+    core.endGroup();
 }
 
 ;// CONCATENATED MODULE: ./src/lint-opam/index.ts
-var lint_opam_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 
-function run() {
-    return lint_opam_awaiter(this, void 0, void 0, function* () {
-        try {
-            yield installOpamPackages();
-            yield installOpamDuneLint();
-            yield opamLint();
-            yield opamDuneLint();
+async function run() {
+    try {
+        await installOpamPackages();
+        await installOpamDuneLint();
+        await opamLint();
+        await opamDuneLint();
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.setFailed(error.message);
         }
-        catch (error) {
-            if (error instanceof Error) {
-                core.setFailed(error.message);
-            }
-        }
-    });
+    }
 }
 void run();
 
