@@ -3659,12 +3659,13 @@ module.exports = function (namespace, method) {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var aCallable = __nccwpck_require__(8486);
+var isNullOrUndefined = __nccwpck_require__(5631);
 
 // `GetMethod` abstract operation
 // https://tc39.es/ecma262/#sec-getmethod
 module.exports = function (V, P) {
   var func = V[P];
-  return func == null ? undefined : aCallable(func);
+  return isNullOrUndefined(func) ? undefined : aCallable(func);
 };
 
 
@@ -3842,7 +3843,7 @@ module.exports = store.inspectSource;
 /***/ 1896:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var NATIVE_WEAK_MAP = __nccwpck_require__(4590);
+var NATIVE_WEAK_MAP = __nccwpck_require__(7300);
 var global = __nccwpck_require__(2858);
 var uncurryThis = __nccwpck_require__(2642);
 var isObject = __nccwpck_require__(5429);
@@ -3876,7 +3877,7 @@ if (NATIVE_WEAK_MAP || shared.state) {
   var wmhas = uncurryThis(store.has);
   var wmset = uncurryThis(store.set);
   set = function (it, metadata) {
-    if (wmhas(store, it)) throw new TypeError(OBJECT_ALREADY_INITIALIZED);
+    if (wmhas(store, it)) throw TypeError(OBJECT_ALREADY_INITIALIZED);
     metadata.facade = it;
     wmset(store, it, metadata);
     return metadata;
@@ -3891,7 +3892,7 @@ if (NATIVE_WEAK_MAP || shared.state) {
   var STATE = sharedKey('state');
   hiddenKeys[STATE] = true;
   set = function (it, metadata) {
-    if (hasOwn(it, STATE)) throw new TypeError(OBJECT_ALREADY_INITIALIZED);
+    if (hasOwn(it, STATE)) throw TypeError(OBJECT_ALREADY_INITIALIZED);
     metadata.facade = it;
     createNonEnumerableProperty(it, STATE, metadata);
     return metadata;
@@ -3956,12 +3957,31 @@ module.exports = isForced;
 
 /***/ }),
 
+/***/ 5631:
+/***/ ((module) => {
+
+// we can't use just `it == null` since of `document.all` special case
+// https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
+module.exports = function (it) {
+  return it === null || it === undefined;
+};
+
+
+/***/ }),
+
 /***/ 5429:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var isCallable = __nccwpck_require__(4767);
 
-module.exports = function (it) {
+var documentAll = typeof document == 'object' && document.all;
+
+// https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
+var SPECIAL_DOCUMENT_ALL = typeof documentAll == 'undefined' && documentAll !== undefined;
+
+module.exports = SPECIAL_DOCUMENT_ALL ? function (it) {
+  return typeof it == 'object' ? it !== null : isCallable(it) || it === documentAll;
+} : function (it) {
   return typeof it == 'object' ? it !== null : isCallable(it);
 };
 
@@ -4098,40 +4118,6 @@ module.exports = Math.trunc || function trunc(x) {
   var n = +x;
   return (n > 0 ? floor : ceil)(n);
 };
-
-
-/***/ }),
-
-/***/ 4913:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-/* eslint-disable es-x/no-symbol -- required for testing */
-var V8_VERSION = __nccwpck_require__(9524);
-var fails = __nccwpck_require__(6287);
-
-// eslint-disable-next-line es-x/no-object-getownpropertysymbols -- required for testing
-module.exports = !!Object.getOwnPropertySymbols && !fails(function () {
-  var symbol = Symbol();
-  // Chrome 38 Symbol has incorrect toString conversion
-  // `get-own-property-symbols` polyfill symbols converted to object are not Symbol instances
-  return !String(symbol) || !(Object(symbol) instanceof Symbol) ||
-    // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
-    !Symbol.sham && V8_VERSION && V8_VERSION < 41;
-});
-
-
-/***/ }),
-
-/***/ 4590:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var global = __nccwpck_require__(2858);
-var isCallable = __nccwpck_require__(4767);
-var inspectSource = __nccwpck_require__(3261);
-
-var WeakMap = global.WeakMap;
-
-module.exports = isCallable(WeakMap) && /native code/.test(inspectSource(WeakMap));
 
 
 /***/ }),
@@ -4747,14 +4733,16 @@ module.exports = fails(function () {
 /***/ }),
 
 /***/ 4385:
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var isNullOrUndefined = __nccwpck_require__(5631);
 
 var $TypeError = TypeError;
 
 // `RequireObjectCoercible` abstract operation
 // https://tc39.es/ecma262/#sec-requireobjectcoercible
 module.exports = function (it) {
-  if (it == undefined) throw $TypeError("Can't call method on " + it);
+  if (isNullOrUndefined(it)) throw $TypeError("Can't call method on " + it);
   return it;
 };
 
@@ -4799,10 +4787,10 @@ var store = __nccwpck_require__(9557);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.24.1',
+  version: '3.25.0',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.24.1/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.25.0/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -4848,6 +4836,26 @@ module.exports = {
   // https://github.com/mathiasbynens/String.prototype.at
   charAt: createMethod(true)
 };
+
+
+/***/ }),
+
+/***/ 494:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/* eslint-disable es-x/no-symbol -- required for testing */
+var V8_VERSION = __nccwpck_require__(9524);
+var fails = __nccwpck_require__(6287);
+
+// eslint-disable-next-line es-x/no-object-getownpropertysymbols -- required for testing
+module.exports = !!Object.getOwnPropertySymbols && !fails(function () {
+  var symbol = Symbol();
+  // Chrome 38 Symbol has incorrect toString conversion
+  // `get-own-property-symbols` polyfill symbols converted to object are not Symbol instances
+  return !String(symbol) || !(Object(symbol) instanceof Symbol) ||
+    // Chrome 38-40 symbols are not inherited from DOM collections prototypes to instances
+    !Symbol.sham && V8_VERSION && V8_VERSION < 41;
+});
 
 
 /***/ }),
@@ -5047,7 +5055,7 @@ module.exports = function (key) {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 /* eslint-disable es-x/no-symbol -- required for testing */
-var NATIVE_SYMBOL = __nccwpck_require__(4913);
+var NATIVE_SYMBOL = __nccwpck_require__(494);
 
 module.exports = NATIVE_SYMBOL
   && !Symbol.sham
@@ -5075,6 +5083,19 @@ module.exports = DESCRIPTORS && fails(function () {
 
 /***/ }),
 
+/***/ 7300:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var global = __nccwpck_require__(2858);
+var isCallable = __nccwpck_require__(4767);
+
+var WeakMap = global.WeakMap;
+
+module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap));
+
+
+/***/ }),
+
 /***/ 4162:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -5082,7 +5103,7 @@ var global = __nccwpck_require__(2858);
 var shared = __nccwpck_require__(7932);
 var hasOwn = __nccwpck_require__(9135);
 var uid = __nccwpck_require__(5048);
-var NATIVE_SYMBOL = __nccwpck_require__(4913);
+var NATIVE_SYMBOL = __nccwpck_require__(494);
 var USE_SYMBOL_AS_UID = __nccwpck_require__(5263);
 
 var WellKnownSymbolsStore = shared('wks');
@@ -5133,6 +5154,7 @@ var call = __nccwpck_require__(2636);
 var uncurryThis = __nccwpck_require__(2642);
 var requireObjectCoercible = __nccwpck_require__(4385);
 var isCallable = __nccwpck_require__(4767);
+var isNullOrUndefined = __nccwpck_require__(5631);
 var isRegExp = __nccwpck_require__(2832);
 var toString = __nccwpck_require__(3442);
 var getMethod = __nccwpck_require__(7953);
@@ -5163,7 +5185,7 @@ $({ target: 'String', proto: true }, {
     var position = 0;
     var endOfLastMatch = 0;
     var result = '';
-    if (searchValue != null) {
+    if (!isNullOrUndefined(searchValue)) {
       IS_REG_EXP = isRegExp(searchValue);
       if (IS_REG_EXP) {
         flags = toString(requireObjectCoercible(getRegExpFlags(searchValue)));
@@ -5213,6 +5235,7 @@ var fixRegExpWellKnownSymbolLogic = __nccwpck_require__(1824);
 var fails = __nccwpck_require__(6287);
 var anObject = __nccwpck_require__(8005);
 var isCallable = __nccwpck_require__(4767);
+var isNullOrUndefined = __nccwpck_require__(5631);
 var toIntegerOrInfinity = __nccwpck_require__(5500);
 var toLength = __nccwpck_require__(5626);
 var toString = __nccwpck_require__(3442);
@@ -5270,7 +5293,7 @@ fixRegExpWellKnownSymbolLogic('replace', function (_, nativeReplace, maybeCallNa
     // https://tc39.es/ecma262/#sec-string.prototype.replace
     function replace(searchValue, replaceValue) {
       var O = requireObjectCoercible(this);
-      var replacer = searchValue == undefined ? undefined : getMethod(searchValue, REPLACE);
+      var replacer = isNullOrUndefined(searchValue) ? undefined : getMethod(searchValue, REPLACE);
       return replacer
         ? call(replacer, searchValue, O, replaceValue)
         : call(nativeReplace, toString(O), searchValue, replaceValue);
@@ -6454,20 +6477,9 @@ var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(1514);
 ;// CONCATENATED MODULE: ./src/lint-fmt/lint.ts
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
-function checkFmt() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield (0,exec.exec)("opam", ["exec", "--", "dune", "build", "@fmt"]);
-    });
+async function checkFmt() {
+    await (0,exec.exec)("opam", ["exec", "--", "dune", "build", "@fmt"]);
 }
 
 // EXTERNAL MODULE: external "fs"
@@ -6485,92 +6497,56 @@ function convertToUnix(str) {
 }
 
 ;// CONCATENATED MODULE: ./src/lint-fmt/ocamlformat.ts
-var ocamlformat_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 
-function parse() {
-    var _a;
-    return ocamlformat_awaiter(this, void 0, void 0, function* () {
-        const githubWorkspace = (_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : process.cwd();
-        const fpath = external_path_.join(githubWorkspace, ".ocamlformat");
-        const buf = yield external_fs_.promises.readFile(fpath);
-        const str = buf.toString();
-        const normalisedStr = convertToUnix(str);
-        const config = normalisedStr
-            .split("\n")
-            .map((line) => line.split("=").map((str) => str.trim()));
-        return config;
-    });
+async function parse() {
+    const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
+    const fpath = external_path_.join(githubWorkspace, ".ocamlformat");
+    const buf = await external_fs_.promises.readFile(fpath);
+    const str = buf.toString();
+    const normalisedStr = convertToUnix(str);
+    const config = normalisedStr
+        .split("\n")
+        .map((line) => line.split("=").map((str) => str.trim()));
+    return config;
 }
-function getOcamlformatVersion() {
-    return ocamlformat_awaiter(this, void 0, void 0, function* () {
-        const config = yield parse();
-        const version = config.filter((line) => line[0] === "version").flat()[1];
-        if (version) {
-            return version;
-        }
-        else {
-            throw new Error("Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice");
-        }
-    });
+async function getOcamlformatVersion() {
+    const config = await parse();
+    const version = config.filter((line) => line[0] === "version").flat()[1];
+    if (version) {
+        return version;
+    }
+    else {
+        throw new Error("Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice");
+    }
 }
 
 ;// CONCATENATED MODULE: ./src/lint-fmt/opam.ts
-var opam_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
-function installOcamlformat(version) {
-    return opam_awaiter(this, void 0, void 0, function* () {
-        core.startGroup("Install ocamlformat");
-        yield (0,exec.exec)("opam", ["depext", "--install", `ocamlformat=${version}`]);
-        core.endGroup();
-    });
+async function installOcamlformat(version) {
+    core.startGroup("Install ocamlformat");
+    await (0,exec.exec)("opam", ["depext", "--install", `ocamlformat=${version}`]);
+    core.endGroup();
 }
 
 ;// CONCATENATED MODULE: ./src/lint-fmt/index.ts
-var lint_fmt_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 
 
-function run() {
-    return lint_fmt_awaiter(this, void 0, void 0, function* () {
-        try {
-            const version = yield getOcamlformatVersion();
-            yield installOcamlformat(version);
-            yield checkFmt();
+async function run() {
+    try {
+        const version = await getOcamlformatVersion();
+        await installOcamlformat(version);
+        await checkFmt();
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.setFailed(error.message);
         }
-        catch (error) {
-            if (error instanceof Error) {
-                core.setFailed(error.message);
-            }
-        }
-    });
+    }
 }
 void run();
 
