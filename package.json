@@ -24,7 +24,7 @@
     "@actions/tool-cache": "2.0.1",
     "cheerio": "1.0.0-rc.12",
     "core-js": "3.24.1",
-    "date-fns": "2.29.1",
+    "date-fns": "2.29.2",
     "semver": "7.3.7",
     "yaml": "2.1.1"
   },
