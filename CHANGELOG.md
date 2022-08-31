@@ -12,6 +12,10 @@ and this project adheres to
 
 - Add support for arm64.
 
+### Changed
+
+- Fail on missing required input instead of warning.
+
 ## [2.0.5]
 
 ### Changed
