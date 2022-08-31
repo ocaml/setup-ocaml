@@ -22,46 +22,53 @@ export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
 export const CACHE_PREFIX = core.getInput("cache-prefix", {
+  required: false,
   trimWhitespace: true,
 });
 
 export const GITHUB_TOKEN = core.getInput("github-token", {
+  required: false,
   trimWhitespace: true,
 });
 
 export const DUNE_CACHE = core.getBooleanInput("dune-cache", {
+  required: false,
   trimWhitespace: true,
 });
 
 export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
+  required: true,
   trimWhitespace: true,
 });
 
 export const OPAM_DEPEXT = core.getBooleanInput("opam-depext", {
+  required: false,
   trimWhitespace: true,
 });
 
 export const OPAM_DEPEXT_FLAGS = core
-  .getInput("opam-depext-flags", { trimWhitespace: true })
+  .getInput("opam-depext-flags", { required: false, trimWhitespace: true })
   .split(",")
   .map((f) => f.trim())
   .filter((f) => f.length > 0);
 
 export const OPAM_DISABLE_SANDBOXING = core.getBooleanInput(
   "opam-disable-sandboxing",
-  { trimWhitespace: true }
+  { required: false, trimWhitespace: true }
 );
 
 export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages", {
+  required: false,
   trimWhitespace: true,
 });
 
 export const OPAM_PIN = core.getBooleanInput("opam-pin", {
+  required: false,
   trimWhitespace: true,
 });
 
 const repositories_yaml = yaml.parse(
-  core.getInput("opam-repositories", { trimWhitespace: true })
+  core.getInput("opam-repositories", { required: false, trimWhitespace: true })
 ) as Record<string, string> | null;
 
 const platform = getPlatform();
