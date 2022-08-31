@@ -122,7 +122,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - 4.13.x
+          - 4.14.x
 
     runs-on: ${{ matrix.os }}
 
@@ -171,10 +171,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use OCaml 4.13.x
+      - name: Use OCaml 4.14.x
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.13.x
+          ocaml-compiler: 4.14.x
           dune-cache: true
 
       - name: Deploy odoc to GitHub Pages
@@ -193,10 +193,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use OCaml 4.13.x
+      - name: Use OCaml 4.14.x
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.13.x
+          ocaml-compiler: 4.14.x
           dune-cache: true
 
       - name: Lint doc
@@ -218,10 +218,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use OCaml 4.13.x
+      - name: Use OCaml 4.14.x
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.13.x
+          ocaml-compiler: 4.14.x
           dune-cache: true
 
       - name: Lint fmt
@@ -240,10 +240,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use OCaml 4.13.x
+      - name: Use OCaml 4.14.x
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.13.x
+          ocaml-compiler: 4.14.x
           dune-cache: true
 
       - name: Lint opam
@@ -260,7 +260,7 @@ See [Examples](examples.md) for more complex patterns.
 
 | Name                      | Required | Description                                                                                                                                                                                                                       | Type   | Default  |
 | ------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `4.13.x`, `ocaml-base-compiler.4.13.0`, `ocaml-variants.4.13.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
+| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `4.14.x`, `ocaml-base-compiler.4.13.0`, `ocaml-variants.4.13.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
 | `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                                               | string |          |
 | `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                                                       | bool   | `true`   |
 | `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                                                    | bool   | `true`   |

@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.6]
+
 ### Added
 
 - Add support for arm64.
@@ -352,7 +354,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.5...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.6...HEAD
+[2.0.6]: https://github.com/ocaml/setup-ocaml/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/ocaml/setup-ocaml/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/ocaml/setup-ocaml/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/ocaml/setup-ocaml/compare/v2.0.2...v2.0.3
