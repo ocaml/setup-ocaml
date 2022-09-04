@@ -3,3 +3,4 @@
 /lint-doc/*
 /lint-fmt/*
 /lint-opam/*
+pnpm-lock.yaml
