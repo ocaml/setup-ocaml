@@ -1,5 +1,6 @@
+import * as path from "node:path";
+
 import * as core from "@actions/core";
-import * as path from "path";
 import * as yaml from "yaml";
 
 import { getPlatform } from "./system";

@@ -1,6 +1,7 @@
+import * as path from "node:path";
+
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
-import * as path from "path";
 
 import { OPAM_DEPEXT_FLAGS, Platform } from "./constants";
 import { getPlatform } from "./system";

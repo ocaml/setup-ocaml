@@ -6482,8 +6482,8 @@ async function checkFmt() {
     await (0,exec.exec)("opam", ["exec", "--", "dune", "build", "@fmt"]);
 }
 
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
+;// CONCATENATED MODULE: external "node:fs"
+const external_node_fs_namespaceObject = require("node:fs");
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(1017);
 // EXTERNAL MODULE: ./node_modules/.pnpm/core-js@3.25.0/node_modules/core-js/actual/string/replace-all.js
@@ -6503,7 +6503,7 @@ function convertToUnix(str) {
 async function parse() {
     const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
     const fpath = external_path_.join(githubWorkspace, ".ocamlformat");
-    const buf = await external_fs_.promises.readFile(fpath);
+    const buf = await external_node_fs_namespaceObject.promises.readFile(fpath);
     const str = buf.toString();
     const normalisedStr = convertToUnix(str);
     const config = normalisedStr

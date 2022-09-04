@@ -1,11 +1,12 @@
+import * as os from "node:os";
+import * as path from "node:path";
+import * as process from "node:process";
+
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 import * as datefns from "date-fns";
-import * as os from "os";
-import * as path from "path";
-import * as process from "process";
 
 import { version as actionVersion } from "../../package.json";
 import {

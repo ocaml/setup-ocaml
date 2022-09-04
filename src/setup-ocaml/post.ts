@@ -1,5 +1,6 @@
+import * as path from "node:path";
+
 import * as core from "@actions/core";
-import * as path from "path";
 
 import { saveDuneCache, saveOpamDownloadCache } from "./cache";
 import { DUNE_CACHE, Platform } from "./constants";

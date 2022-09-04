@@ -1,12 +1,13 @@
+import { promises as fs } from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import * as process from "node:process";
+
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
-import { promises as fs } from "fs";
-import * as os from "os";
-import * as path from "path";
-import * as process from "process";
 import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache";

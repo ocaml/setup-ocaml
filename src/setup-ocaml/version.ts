@@ -1,5 +1,6 @@
+import * as path from "node:path";
+
 import * as github from "@actions/github";
-import * as path from "path";
 import * as semver from "semver";
 
 import { GITHUB_TOKEN, Platform } from "./constants";
