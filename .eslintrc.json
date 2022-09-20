@@ -13,15 +13,11 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:@typescript-eslint/strict",
-    "plugin:import/errors",
+    "plugin:import/recommended",
     "plugin:import/typescript",
-    "plugin:import/warnings",
     "plugin:prettier/recommended"
   ],
   "plugins": ["@typescript-eslint", "simple-import-sort"],
-  "settings": {
-    "import/extensions": [".ts"]
-  },
   "rules": {
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
