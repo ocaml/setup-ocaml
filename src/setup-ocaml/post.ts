@@ -11,11 +11,11 @@ async function run() {
   try {
     const platform = getPlatform();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env.PATH!.split(path.delimiter);
+    const originalPath = process.env["PATH"]!.split(path.delimiter);
     if (platform === Platform.Win32) {
       const msys64Path = path.join("C:", "msys64", "usr", "bin");
       const patchedPath = [msys64Path, ...originalPath];
-      process.env.PATH = patchedPath.join(path.delimiter);
+      process.env["PATH"] = patchedPath.join(path.delimiter);
     }
     if (DUNE_CACHE) {
       await trimDuneCache();
@@ -23,7 +23,7 @@ async function run() {
     }
     await saveOpamDownloadCache();
     if (platform === Platform.Win32) {
-      process.env.PATH = originalPath.join(path.delimiter);
+      process.env["PATH"] = originalPath.join(path.delimiter);
     }
   } catch (error) {
     if (error instanceof Error) {

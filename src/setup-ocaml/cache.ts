@@ -111,7 +111,7 @@ function composeOpamDownloadCacheKeys() {
 
 function composeCygwinCachePaths() {
   const paths = [];
-  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
+  const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
   const cygwinRoot = path.join("D:", "cygwin");
   paths.push(cygwinRoot);
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
@@ -132,7 +132,7 @@ function composeDuneCachePaths() {
     const duneCacheDir = path.join(homeDir, "Local Settings", "Cache", "dune");
     paths.push(duneCacheDir);
   } else {
-    const xdgCacheHome = process.env.XDG_CACHE_HOME;
+    const xdgCacheHome = process.env["XDG_CACHE_HOME"];
     const duneCacheDir = xdgCacheHome
       ? path.join(xdgCacheHome, "dune")
       : path.join(homeDir, ".cache", "dune");
@@ -164,7 +164,7 @@ function composeOpamCachePaths() {
     const opamRootCachePath = path.join(homeDir, ".opam");
     paths.push(opamRootCachePath);
   }
-  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
+  const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
   const opamLocalCachePath = path.join(githubWorkspace, "_opam");
   paths.push(opamLocalCachePath);
   return paths;

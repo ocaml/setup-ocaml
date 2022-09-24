@@ -5,7 +5,7 @@ import * as path from "path";
 import { convertToUnix } from "./compat";
 
 async function parse() {
-  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
+  const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
   const fpath = path.join(githubWorkspace, ".ocamlformat");
   const buf = await fs.readFile(fpath);
   const str = buf.toString();

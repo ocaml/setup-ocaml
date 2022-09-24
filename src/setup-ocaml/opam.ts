@@ -44,14 +44,23 @@ async function getLatestOpamRelease(): Promise<{
     .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
       semver.rcompare(v1, v2, { loose: true })
     );
-  const { assets, tag_name: version } = matchedReleases[0];
-  const architecture = getArchitecture();
-  const platform = getPlatform();
-  const [{ browser_download_url: browserDownloadUrl }] = assets.filter(
-    ({ browser_download_url }) =>
+  const latestRelease = matchedReleases[0];
+  if (latestRelease !== undefined) {
+    const { assets, tag_name: version } = latestRelease;
+    const architecture = getArchitecture();
+    const platform = getPlatform();
+    const matchedAssets = assets.filter(({ browser_download_url }) =>
       browser_download_url.includes(`${architecture}-${platform}`)
-  );
-  return { version, browserDownloadUrl };
+    )[0];
+    if (matchedAssets !== undefined) {
+      const { browser_download_url: browserDownloadUrl } = matchedAssets;
+      return { version, browserDownloadUrl };
+    } else {
+      throw new Error("matchedAssets not found");
+    }
+  } else {
+    throw new Error("latestRelease not found");
+  }
 }
 
 async function findOpam() {
@@ -90,7 +99,7 @@ async function acquireOpamUnix() {
 }
 
 async function installUnixSystemPackages() {
-  const isGitHubRunner = process.env.ImageOS !== undefined;
+  const isGitHubRunner = process.env["ImageOS"] !== undefined;
   const platform = getPlatform();
   if (isGitHubRunner) {
     if (platform === Platform.Linux) {
@@ -117,7 +126,7 @@ async function installUnixSystemPackages() {
 }
 
 async function updateUnixPackageIndexFiles() {
-  const isGitHubRunner = process.env.ImageOS !== undefined;
+  const isGitHubRunner = process.env["ImageOS"] !== undefined;
   const platform = getPlatform();
   if (isGitHubRunner) {
     if (platform === Platform.Linux) {
@@ -260,9 +269,9 @@ async function setupOpamWindows() {
   await setupCygwin();
   core.endGroup();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const originalPath = process.env.PATH!.split(path.delimiter);
+  const originalPath = process.env["PATH"]!.split(path.delimiter);
   const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
-  process.env.PATH = patchedPath.join(path.delimiter);
+  process.env["PATH"] = patchedPath.join(path.delimiter);
   await saveCygwinCache();
   core.startGroup("Install opam");
   await acquireOpamWindows();
@@ -270,7 +279,7 @@ async function setupOpamWindows() {
   core.startGroup("Initialise the opam state");
   await initializeOpamWindows();
   core.endGroup();
-  process.env.PATH = originalPath.join(path.delimiter);
+  process.env["PATH"] = originalPath.join(path.delimiter);
 }
 
 export async function setupOpam(): Promise<void> {
@@ -287,9 +296,9 @@ export async function installOcaml(ocamlCompiler: string): Promise<void> {
   const platform = getPlatform();
   if (platform === Platform.Win32) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env.PATH!.split(path.delimiter);
+    const originalPath = process.env["PATH"]!.split(path.delimiter);
     const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
-    process.env.PATH = patchedPath.join(path.delimiter);
+    process.env["PATH"] = patchedPath.join(path.delimiter);
     await exec("opam", [
       "switch",
       "create",
@@ -298,7 +307,7 @@ export async function installOcaml(ocamlCompiler: string): Promise<void> {
       "--packages",
       ocamlCompiler,
     ]);
-    process.env.PATH = originalPath.join(path.delimiter);
+    process.env["PATH"] = originalPath.join(path.delimiter);
   } else {
     await exec("opam", [
       "switch",

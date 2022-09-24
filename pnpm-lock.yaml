@@ -9,6 +9,7 @@ specifiers:
   '@actions/http-client': 2.0.1
   '@actions/io': 1.1.2
   '@actions/tool-cache': 2.0.1
+  '@tsconfig/strictest': 1.0.1
   '@types/node': 18.7.18
   '@types/semver': 7.3.12
   '@typescript-eslint/eslint-plugin': 5.38.0
@@ -44,6 +45,7 @@ dependencies:
   yaml: 2.1.1
 
 devDependencies:
+  '@tsconfig/strictest': 1.0.1
   '@types/node': 18.7.18
   '@types/semver': 7.3.12
   '@typescript-eslint/eslint-plugin': 5.38.0_wsb62dxj2oqwgas4kadjymcmry
@@ -397,6 +399,10 @@ packages:
     resolution: {integrity: sha512-0nBr+VZNKm9tvNDZFstI3Pq1fCTEDK5OZTnVKNvBNAKgd0yIvmwsP4m61rEv7ZP+tOUjWJhROpxK5MsnlF911g==}
     engines: {node: '>=8.0.0'}
     dev: false
+
+  /@tsconfig/strictest/1.0.1:
+    resolution: {integrity: sha512-7O8Q537UQdTZSKEV0f5WRLRFtfL9B8agGqIZrCOwOiWvbjZWPP2rAoZ7LHcwjdG4vnjdleHMEE+ZetM+lhRkcA==}
+    dev: true
 
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}

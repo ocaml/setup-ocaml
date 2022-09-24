@@ -66,27 +66,27 @@ export async function installer(): Promise<void> {
     core.endGroup();
   }
   if (platform === Platform.Win32) {
-    core.exportVariable("HOME", process.env.USERPROFILE);
+    core.exportVariable("HOME", process.env["USERPROFILE"]);
     core.exportVariable("MSYS", "winsymlinks:native");
   }
   if (platform === Platform.Win32) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env.PATH!.split(path.delimiter);
+    const originalPath = process.env["PATH"]!.split(path.delimiter);
     const msys64Path = path.join("C:", "msys64", "usr", "bin");
     const patchedPath = [msys64Path, ...originalPath];
-    process.env.PATH = patchedPath.join(path.delimiter);
+    process.env["PATH"] = patchedPath.join(path.delimiter);
     await restoreCygwinCache();
-    process.env.PATH = originalPath.join(path.delimiter);
+    process.env["PATH"] = originalPath.join(path.delimiter);
   }
   let opamCacheHit;
   if (platform === Platform.Win32) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env.PATH!.split(path.delimiter);
+    const originalPath = process.env["PATH"]!.split(path.delimiter);
     const msys64Path = path.join("C:", "msys64", "usr", "bin");
     const patchedPath = [msys64Path, ...originalPath];
-    process.env.PATH = patchedPath.join(path.delimiter);
+    process.env["PATH"] = patchedPath.join(path.delimiter);
     opamCacheHit = await restoreOpamCache();
-    process.env.PATH = originalPath.join(path.delimiter);
+    process.env["PATH"] = originalPath.join(path.delimiter);
   } else {
     opamCacheHit = await restoreOpamCache();
   }
@@ -102,24 +102,24 @@ export async function installer(): Promise<void> {
     await installOcaml(ocamlCompiler);
     if (platform === Platform.Win32) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const originalPath = process.env.PATH!.split(path.delimiter);
+      const originalPath = process.env["PATH"]!.split(path.delimiter);
       const msys64Path = path.join("C:", "msys64", "usr", "bin");
       const patchedPath = [msys64Path, ...originalPath];
-      process.env.PATH = patchedPath.join(path.delimiter);
+      process.env["PATH"] = patchedPath.join(path.delimiter);
       await saveOpamCache();
-      process.env.PATH = originalPath.join(path.delimiter);
+      process.env["PATH"] = originalPath.join(path.delimiter);
     } else {
       await saveOpamCache();
     }
   }
   if (platform === Platform.Win32) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env.PATH!.split(path.delimiter);
+    const originalPath = process.env["PATH"]!.split(path.delimiter);
     const msys64Path = path.join("C:", "msys64", "usr", "bin");
     const patchedPath = [msys64Path, ...originalPath];
-    process.env.PATH = patchedPath.join(path.delimiter);
+    process.env["PATH"] = patchedPath.join(path.delimiter);
     await restoreOpamDownloadCache();
-    process.env.PATH = originalPath.join(path.delimiter);
+    process.env["PATH"] = originalPath.join(path.delimiter);
   } else {
     await restoreOpamDownloadCache();
   }
@@ -129,12 +129,12 @@ export async function installer(): Promise<void> {
   if (DUNE_CACHE) {
     if (platform === Platform.Win32) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const originalPath = process.env.PATH!.split(path.delimiter);
+      const originalPath = process.env["PATH"]!.split(path.delimiter);
       const msys64Path = path.join("C:", "msys64", "usr", "bin");
       const patchedPath = [msys64Path, ...originalPath];
-      process.env.PATH = patchedPath.join(path.delimiter);
+      process.env["PATH"] = patchedPath.join(path.delimiter);
       await restoreDuneCache();
-      process.env.PATH = originalPath.join(path.delimiter);
+      process.env["PATH"] = originalPath.join(path.delimiter);
     } else {
       await restoreDuneCache();
     }

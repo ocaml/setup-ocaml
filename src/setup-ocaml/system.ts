@@ -41,9 +41,9 @@ export async function getSystemIdentificationInfo(): Promise<{
     let version = "";
     for (const line of lines) {
       const [key, value] = line.split("=").map((kv) => kv.trim());
-      if (key === "ID") {
+      if (key === "ID" && value !== undefined) {
         id = value.toLowerCase();
-      } else if (key === "VERSION_ID") {
+      } else if (key === "VERSION_ID" && value !== undefined) {
         version = value.toLowerCase().replace(/["]/g, "");
       }
     }
@@ -54,7 +54,7 @@ export async function getSystemIdentificationInfo(): Promise<{
     let version = "";
     for (const line of lines) {
       const [key, value] = line.split(":").map((kv) => kv.trim());
-      if (key === "ProductVersion") {
+      if (key === "ProductVersion" && value !== undefined) {
         version = value;
       }
     }
