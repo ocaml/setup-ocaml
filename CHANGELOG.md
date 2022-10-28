@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+## Added
+
+- Define `CLICOLOR_FORCE=1` in CI runs.
+
 ## [2.0.6]
 
 ### Added

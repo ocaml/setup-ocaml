@@ -82,3 +82,5 @@ const defaultRepository =
 export const OPAM_REPOSITORIES: [string, string][] = repositories_yaml
   ? Object.entries(repositories_yaml).reverse()
   : [["default", defaultRepository]];
+
+export const CLICOLOR_FORCE = "1";
