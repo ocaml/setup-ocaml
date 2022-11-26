@@ -142,6 +142,7 @@ export async function installer(): Promise<void> {
     core.exportVariable("DUNE_CACHE", "enabled");
     core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
   }
+  core.exportVariable("CLICOLOR_FORCE", "1");
   const fnames = await getOpamLocalPackages();
   if (fnames.length > 0) {
     if (OPAM_PIN) {
