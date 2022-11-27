@@ -12,6 +12,11 @@ and this project adheres to
 
 - Define `CLICOLOR_FORCE=1` in CI runs.
 
+### Fixed
+
+- Make the retry handling around unix system package installation more
+  stringent.
+
 ## [2.0.6]
 
 ### Added

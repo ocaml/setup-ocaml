@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
 
-import { getExecOutput } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 
 import { Architecture, Platform } from "./constants";
 
@@ -61,5 +61,17 @@ export async function getSystemIdentificationInfo(): Promise<{
     return { id: "macos", version };
   } else {
     throw new Error("The system is not supported.");
+  }
+}
+
+export async function updateUnixPackageIndexFiles() {
+  const isGitHubRunner = process.env["ImageOS"] !== undefined;
+  const platform = getPlatform();
+  if (isGitHubRunner) {
+    if (platform === Platform.Linux) {
+      await exec("sudo", ["apt-get", "update"]);
+    } else if (platform === Platform.MacOS) {
+      await exec("brew", ["update"]);
+    }
   }
 }

@@ -23,6 +23,7 @@ import {
   getArchitecture,
   getPlatform,
   getSystemIdentificationInfo,
+  updateUnixPackageIndexFiles,
 } from "./system";
 import { getCygwinVersion } from "./win32";
 
@@ -109,7 +110,7 @@ async function installUnixSystemPackages() {
         // <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
         await exec("sudo", ["add-apt-repository", "ppa:avsm/musl"]);
       }
-      await exec("sudo", [
+      return await exec("sudo", [
         "apt-get",
         "install",
         "bubblewrap",
@@ -120,30 +121,15 @@ async function installUnixSystemPackages() {
         "musl-tools",
       ]);
     } else if (platform === Platform.MacOS) {
-      await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
+      return await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
     }
   }
-}
-
-async function updateUnixPackageIndexFiles() {
-  const isGitHubRunner = process.env["ImageOS"] !== undefined;
-  const platform = getPlatform();
-  if (isGitHubRunner) {
-    if (platform === Platform.Linux) {
-      await exec("sudo", ["apt-get", "update"]);
-    } else if (platform === Platform.MacOS) {
-      await exec("brew", ["update"]);
-    }
-  }
+  return 0;
 }
 
 async function initializeOpamUnix() {
-  try {
-    await installUnixSystemPackages();
-  } catch (error) {
-    if (error instanceof Error) {
-      core.info(error.message);
-    }
+  const exitCode = await installUnixSystemPackages();
+  if (exitCode !== 0) {
     await updateUnixPackageIndexFiles();
     await installUnixSystemPackages();
   }
