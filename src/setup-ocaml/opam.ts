@@ -110,7 +110,7 @@ async function installUnixSystemPackages() {
         // <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
         await exec("sudo", ["add-apt-repository", "ppa:avsm/musl"]);
       }
-      return await exec("sudo", [
+      await exec("sudo", [
         "apt-get",
         "install",
         "bubblewrap",
@@ -121,15 +121,18 @@ async function installUnixSystemPackages() {
         "musl-tools",
       ]);
     } else if (platform === Platform.MacOS) {
-      return await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
+      await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
     }
   }
-  return 0;
 }
 
 async function initializeOpamUnix() {
-  const exitCode = await installUnixSystemPackages();
-  if (exitCode !== 0) {
+  try {
+    await installUnixSystemPackages();
+  } catch (error) {
+    if (error instanceof Error) {
+      core.error(error.message);
+    }
     await updateUnixPackageIndexFiles();
     await installUnixSystemPackages();
   }
