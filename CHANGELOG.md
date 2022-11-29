@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Make the retry handling around unix package installation simple back.
+
+### Fixed
+
+- Make the retry handling around depext package installation more robust.
+
 ## [2.0.7]
 
 ## Added
