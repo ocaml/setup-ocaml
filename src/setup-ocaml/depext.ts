@@ -24,7 +24,7 @@ export async function installDepext(ocamlVersion: string): Promise<void> {
   core.endGroup();
 }
 
-export async function installSystemPackages(fpaths: string[]): Promise<void> {
+export async function installDepextPackages(fpaths: string[]): Promise<void> {
   core.startGroup("Install system packages required by opam packages");
   const fnames = fpaths.map((fpath) => path.basename(fpath, ".opam"));
   await exec("opam", ["depext", ...fnames, ...OPAM_DEPEXT_FLAGS]);

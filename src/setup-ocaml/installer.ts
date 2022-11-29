@@ -20,7 +20,7 @@ import {
   OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
-import { installDepext, installSystemPackages } from "./depext";
+import { installDepext, installDepextPackages } from "./depext";
 import { installDune } from "./dune";
 import {
   installOcaml,
@@ -30,7 +30,7 @@ import {
   setupOpam,
 } from "./opam";
 import { getOpamLocalPackages } from "./packages";
-import { getPlatform } from "./system";
+import { getPlatform, updateUnixPackageIndexFiles } from "./system";
 import { isSemverStyle, resolveVersion } from "./version";
 
 export async function installer(): Promise<void> {
@@ -149,7 +149,15 @@ export async function installer(): Promise<void> {
       await pin(fnames);
     }
     if (OPAM_DEPEXT) {
-      await installSystemPackages(fnames);
+      try {
+        await installDepextPackages(fnames);
+      } catch (error) {
+        if (error instanceof Error) {
+          core.error(error.message);
+        }
+        await updateUnixPackageIndexFiles();
+        await installDepextPackages(fnames);
+      }
     }
   }
   await exec("opam", ["--version"]);
