@@ -13,6 +13,7 @@ import {
   CACHE_PREFIX,
   GITHUB_TOKEN,
   OCAML_COMPILER,
+  OPAM_DISABLE_SANDBOXING,
   OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
@@ -80,12 +81,13 @@ async function composeOpamCacheKeys() {
       : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
     : OCAML_COMPILER;
   const ocamlVersion = ocamlCompiler.toLowerCase().replace(/\W/g, "_");
+  const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const { year, week } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${fullPlatform}-${architecture}-${ocamlVersion}-`,
+    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
+    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-`,
+    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-`,
   ];
   return { key, restoreKeys };
 }
