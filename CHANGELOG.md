@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Take the sandbox option value into account when computing the cache key
+
 ## [2.0.8]
 
 ### Changed
