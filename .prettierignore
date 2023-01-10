@@ -1,6 +1,7 @@
+/.pnp.*
+/.yarn/*
 /deploy-doc/*
 /dist/*
 /lint-doc/*
 /lint-fmt/*
 /lint-opam/*
-pnpm-lock.yaml

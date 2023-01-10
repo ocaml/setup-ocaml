@@ -35,11 +35,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use pnpm
-        uses: pnpm/action-setup@v2.2.4
-        with:
-          version: latest
-
       - name: Use Node.js 16.x
         uses: actions/setup-node@v3
         with:
@@ -47,25 +42,25 @@ jobs:
 
       - name: Install npm packages
         if: runner.os == 'Linux'
-        run: pnpm install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Check formatting
         if: runner.os == 'Linux'
-        run: pnpm fmt:check
+        run: yarn fmt:check
 
       - name: Check lint
         if: runner.os == 'Linux'
-        run: pnpm lint
+        run: yarn lint
 
       - name: Check type
         if: runner.os == 'Linux'
-        run: pnpm typecheck
+        run: yarn typecheck
 
       - name: Ensure dist directory is up-to-date
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          pnpm build
+          yarn build
           if [ "$(git status dist lint-doc lint-fmt lint-opam --porcelain | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
