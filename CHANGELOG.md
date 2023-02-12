@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.9]
+
 ### Fixed
 
 - Take the sandbox option value into account when computing the cache key
@@ -379,7 +381,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.8...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.9...HEAD
+[2.0.9]: https://github.com/ocaml/setup-ocaml/compare/v2.0.8...v2.0.9
 [2.0.8]: https://github.com/ocaml/setup-ocaml/compare/v2.0.7...v2.0.8
 [2.0.7]: https://github.com/ocaml/setup-ocaml/compare/v2.0.6...v2.0.7
 [2.0.6]: https://github.com/ocaml/setup-ocaml/compare/v2.0.5...v2.0.6
