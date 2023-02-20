@@ -5,9 +5,9 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@actions/cache@npm:3.0.6":
-  version: 3.0.6
-  resolution: "@actions/cache@npm:3.0.6"
+"@actions/cache@npm:3.1.4":
+  version: 3.1.4
+  resolution: "@actions/cache@npm:3.1.4"
   dependencies:
     "@actions/core": ^1.10.0
     "@actions/exec": ^1.0.1
@@ -19,7 +19,7 @@ __metadata:
     "@azure/storage-blob": ^12.8.0
     semver: ^6.1.0
     uuid: ^3.3.3
-  checksum: 1cc63d07ad514454d7fb4d2cde928157d31847c2b9eafb081fbd518c8619ed6a66c9bd570d60787610ad152bd69839358176f03f1ee5f9d1baa660236cdfcfdf
+  checksum: 6816cda7819a9dbd0cf69ac4f37ed287ce4c176ff5929b91046f626b1880e21557ed4fb45ae62b9812ae6e0a55205c9fbe598f28a2a69afdaa452151c244a44e
   languageName: node
   linkType: hard
 
@@ -479,7 +479,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:18.13.0":
+"@types/node@npm:*":
+  version: 18.14.0
+  resolution: "@types/node@npm:18.14.0"
+  checksum: d83fcf5e4ed544755dd9028f5cbb6b9d46235043159111bb2ad62223729aee581c0144a9f6df8ba73d74011db9ed4ebd7af2fd5e0996714e3beb508a5da8ac5c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:18.13.0":
   version: 18.13.0
   resolution: "@types/node@npm:18.13.0"
   checksum: 4ea10f8802848b01672bce938f678b6774ca2cee0c9774f12275ab064ae07818419c3e2e41d6257ce7ba846d1ea26c63214aa1dfa4166fa3746291752b8c6416
@@ -1547,11 +1554,11 @@ __metadata:
   linkType: hard
 
 "esquery@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "esquery@npm:1.4.0"
+  version: 1.4.2
+  resolution: "esquery@npm:1.4.2"
   dependencies:
     estraverse: ^5.1.0
-  checksum: a0807e17abd7fbe5fbd4fab673038d6d8a50675cdae6b04fbaa520c34581be0c5fa24582990e8acd8854f671dd291c78bb2efb9e0ed5b62f33bac4f9cf820210
+  checksum: 2f4ad89c5aafaca61cc2c15e256190f0d6deb4791cae6552d3cb4b1eb8867958cdf27a56aaa3272ff17435e3eaa19ee0d4129fac336ca6373d7354d7b5da7966
   languageName: node
   linkType: hard
 
@@ -2422,9 +2429,9 @@ __metadata:
   linkType: hard
 
 "lru-cache@npm:^7.7.1":
-  version: 7.14.1
-  resolution: "lru-cache@npm:7.14.1"
-  checksum: d72c6713c6a6d86836a7a6523b3f1ac6764768cca47ec99341c3e76db06aacd4764620e5e2cda719a36848785a52a70e531822dc2b33fb071fa709683746c104
+  version: 7.16.1
+  resolution: "lru-cache@npm:7.16.1"
+  checksum: 64618e3ed4fd1203afedd9bbf5247921b1419f8e3100f20e58e5f04e741f8287bd7d04fefaad332411bb53b3a73445714b235de750cf5d310cba1fa23bd82795
   languageName: node
   linkType: hard
 
@@ -3129,7 +3136,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@actions/cache": 3.0.6
+    "@actions/cache": 3.1.4
     "@actions/core": 1.10.0
     "@actions/exec": 1.1.1
     "@actions/github": 5.1.1

@@ -70,26 +70,9 @@ export async function installer(): Promise<void> {
     core.exportVariable("MSYS", "winsymlinks:native");
   }
   if (platform === Platform.Win32) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env["PATH"]!.split(path.delimiter);
-    const msys64Path = path.join("C:", "msys64", "usr", "bin");
-    const patchedPath = [msys64Path, ...originalPath];
-    process.env["PATH"] = patchedPath.join(path.delimiter);
     await restoreCygwinCache();
-    process.env["PATH"] = originalPath.join(path.delimiter);
   }
-  let opamCacheHit;
-  if (platform === Platform.Win32) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env["PATH"]!.split(path.delimiter);
-    const msys64Path = path.join("C:", "msys64", "usr", "bin");
-    const patchedPath = [msys64Path, ...originalPath];
-    process.env["PATH"] = patchedPath.join(path.delimiter);
-    opamCacheHit = await restoreOpamCache();
-    process.env["PATH"] = originalPath.join(path.delimiter);
-  } else {
-    opamCacheHit = await restoreOpamCache();
-  }
+  const opamCacheHit = await restoreOpamCache();
   await setupOpam();
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
@@ -100,44 +83,14 @@ export async function installer(): Promise<void> {
         : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
       : OCAML_COMPILER;
     await installOcaml(ocamlCompiler);
-    if (platform === Platform.Win32) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const originalPath = process.env["PATH"]!.split(path.delimiter);
-      const msys64Path = path.join("C:", "msys64", "usr", "bin");
-      const patchedPath = [msys64Path, ...originalPath];
-      process.env["PATH"] = patchedPath.join(path.delimiter);
-      await saveOpamCache();
-      process.env["PATH"] = originalPath.join(path.delimiter);
-    } else {
-      await saveOpamCache();
-    }
+    await saveOpamCache();
   }
-  if (platform === Platform.Win32) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env["PATH"]!.split(path.delimiter);
-    const msys64Path = path.join("C:", "msys64", "usr", "bin");
-    const patchedPath = [msys64Path, ...originalPath];
-    process.env["PATH"] = patchedPath.join(path.delimiter);
-    await restoreOpamDownloadCache();
-    process.env["PATH"] = originalPath.join(path.delimiter);
-  } else {
-    await restoreOpamDownloadCache();
-  }
+  await restoreOpamDownloadCache();
   if (OPAM_DEPEXT) {
     await installDepext(platform);
   }
   if (DUNE_CACHE) {
-    if (platform === Platform.Win32) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const originalPath = process.env["PATH"]!.split(path.delimiter);
-      const msys64Path = path.join("C:", "msys64", "usr", "bin");
-      const patchedPath = [msys64Path, ...originalPath];
-      process.env["PATH"] = patchedPath.join(path.delimiter);
-      await restoreDuneCache();
-      process.env["PATH"] = originalPath.join(path.delimiter);
-    } else {
-      await restoreDuneCache();
-    }
+    await restoreDuneCache();
     await installDune();
     core.exportVariable("DUNE_CACHE", "enabled");
     core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");

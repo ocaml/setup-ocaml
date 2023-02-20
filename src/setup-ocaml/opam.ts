@@ -212,11 +212,9 @@ async function acquireOpamWindows() {
   const cachedPath = tc.find("opam", opamVersion);
   if (cachedPath === "") {
     const downloadedPath = await tc.downloadTool(
-      `https://github.com/fdopen/opam-repository-mingw/releases/download/${opamVersion}/opam64.tar.xz`
+      `https://github.com/fdopen/opam-repository-mingw/releases/download/${opamVersion}/opam64.zip`
     );
-    const extractedPath = await tc.extractTar(downloadedPath, undefined, [
-      "xv",
-    ]);
+    const extractedPath = await tc.extractZip(downloadedPath);
     const cachedPath = await tc.cacheDir(extractedPath, "opam", opamVersion);
     const installSh = path.join(cachedPath, "opam64", "install.sh");
     await fs.chmod(installSh, 0o755);
@@ -257,11 +255,11 @@ async function setupOpamWindows() {
   core.addPath(CYGWIN_ROOT_WRAPPERBIN);
   await setupCygwin();
   core.endGroup();
+  await saveCygwinCache();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const originalPath = process.env["PATH"]!.split(path.delimiter);
   const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
   process.env["PATH"] = patchedPath.join(path.delimiter);
-  await saveCygwinCache();
   core.startGroup("Install opam");
   await acquireOpamWindows();
   core.endGroup();
