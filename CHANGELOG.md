@@ -8,11 +8,15 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Speed up caching and get rid of bugs and hacks on Windows.
+
 ## [2.0.9]
 
 ### Fixed
 
-- Take the sandbox option value into account when computing the cache key
+- Take the sandbox option value into account when computing the cache key.
 
 ## [2.0.8]
 
