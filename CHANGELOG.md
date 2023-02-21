@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.10]
+
 ### Fixed
 
 - Speed up caching and get rid of bugs and hacks on Windows.
@@ -385,7 +387,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.9...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.10...HEAD
+[2.0.10]: https://github.com/ocaml/setup-ocaml/compare/v2.0.9...v2.0.10
 [2.0.9]: https://github.com/ocaml/setup-ocaml/compare/v2.0.8...v2.0.9
 [2.0.8]: https://github.com/ocaml/setup-ocaml/compare/v2.0.7...v2.0.8
 [2.0.7]: https://github.com/ocaml/setup-ocaml/compare/v2.0.6...v2.0.7
