@@ -12,6 +12,10 @@ and this project adheres to
 
 - Don't install Cygwin's git or mercurial packages (reduces cache by ~90MB)
 
+### Fixed
+
+- Ensure ocaml/opam-repository can be added without getting hash errors.
+
 ## [2.0.10]
 
 ### Fixed
