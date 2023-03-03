@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Don't install Cygwin's git or mercurial packages (reduces cache by ~90MB)
+
 ## [2.0.10]
 
 ### Fixed
