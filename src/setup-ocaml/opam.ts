@@ -4,7 +4,7 @@ import * as path from "node:path";
 import * as process from "node:process";
 
 import * as core from "@actions/core";
-import { exec } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
@@ -334,9 +334,39 @@ async function repositoryAdd(name: string, address: string) {
 export async function repositoryAddAll(
   repositories: [string, string][]
 ): Promise<void> {
+  const platform = getPlatform();
+  let restore_autocrlf;
   core.startGroup("Initialise the opam repositories");
+  // Works around the lack of https://github.com/ocaml/opam/pull/3882 when
+  // adding ocaml/opam-repository on Windows. Can be removed when the action
+  // switches to opam 2.2
+  if (platform === Platform.Win32) {
+    const autocrlf = await getExecOutput(
+      "git",
+      ["config", "--global", "core.autocrlf"],
+      { ignoreReturnCode: true }
+    );
+    if (autocrlf.stdout !== "input") {
+      if (autocrlf.exitCode !== 0) {
+        restore_autocrlf = null; // Unset the value at the end
+      } else {
+        restore_autocrlf = autocrlf.stdout;
+      }
+    }
+    await exec("git", ["config", "--global", "core.autocrlf", "input"]);
+  }
   for (const [name, address] of repositories) {
     await repositoryAdd(name, address);
+  }
+  if (restore_autocrlf === null) {
+    await exec("git", ["config", "--global", "--unset", "core.autocrlf"]);
+  } else if (restore_autocrlf !== undefined) {
+    await exec("git", [
+      "config",
+      "--global",
+      "core.autocrlf",
+      restore_autocrlf,
+    ]);
   }
   core.endGroup();
 }
