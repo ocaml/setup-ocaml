@@ -26,7 +26,7 @@ function unique(array: string[]) {
 async function getAllCompilerVersions(): Promise<string[]> {
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const platform = getPlatform();
-  const owner = platform === Platform.Win32 ? "fdopen" : "ocaml";
+  const owner = platform === Platform.Win32 ? "ocaml-opam" : "ocaml";
   const repo =
     platform === Platform.Win32 ? "opam-repository-mingw" : "opam-repository";
   const prefix =

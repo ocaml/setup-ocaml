@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Use ocaml-opam/opam-repository-mingw instead of fdopen/opam-repository-mingw.
+
 ## [2.0.11]
 
 ### Changed

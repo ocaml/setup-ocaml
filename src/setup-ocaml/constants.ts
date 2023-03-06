@@ -77,7 +77,7 @@ const platform = getPlatform();
 const defaultRepository =
   platform !== Platform.Win32
     ? "https://github.com/ocaml/opam-repository.git"
-    : "https://github.com/fdopen/opam-repository-mingw.git#opam2";
+    : "https://github.com/ocaml-opam/opam-repository-mingw.git#sunset";
 
 export const OPAM_REPOSITORIES: [string, string][] = repositories_yaml
   ? Object.entries(repositories_yaml).reverse()
