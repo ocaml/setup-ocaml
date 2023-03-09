@@ -12,6 +12,10 @@ and this project adheres to
 
 - Use ocaml-opam/opam-repository-mingw instead of fdopen/opam-repository-mingw.
 
+### Fixed
+
+- Fix in 2.0.11 for hashing caused an invalid git configuration to be written.
+
 ## [2.0.11]
 
 ### Changed

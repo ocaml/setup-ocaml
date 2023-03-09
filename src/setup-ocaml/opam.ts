@@ -350,7 +350,7 @@ export async function repositoryAddAll(
       if (autocrlf.exitCode !== 0) {
         restore_autocrlf = null; // Unset the value at the end
       } else {
-        restore_autocrlf = autocrlf.stdout;
+        restore_autocrlf = autocrlf.stdout.trim();
       }
     }
     await exec("git", ["config", "--global", "core.autocrlf", "input"]);
