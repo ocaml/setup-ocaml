@@ -66,7 +66,8 @@ async function composeOpamCacheKeys() {
   const fullPlatform =
     platform === Platform.Win32
       ? platform
-      : `${platform}-${(await getSystemIdentificationInfo()).version}`;
+      : // eslint-disable-next-line unicorn/no-await-expression-member
+        `${platform}-${(await getSystemIdentificationInfo()).version}`;
   const architecture = getArchitecture();
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const {

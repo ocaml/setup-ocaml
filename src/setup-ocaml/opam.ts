@@ -46,21 +46,21 @@ async function getLatestOpamRelease(): Promise<{
       semver.rcompare(v1, v2, { loose: true })
     );
   const latestRelease = matchedReleases[0];
-  if (latestRelease !== undefined) {
+  if (latestRelease === undefined) {
+    throw new Error("latestRelease not found");
+  } else {
     const { assets, tag_name: version } = latestRelease;
     const architecture = getArchitecture();
     const platform = getPlatform();
-    const matchedAssets = assets.filter(({ browser_download_url }) =>
+    const matchedAssets = assets.find(({ browser_download_url }) =>
       browser_download_url.includes(`${architecture}-${platform}`)
-    )[0];
-    if (matchedAssets !== undefined) {
+    );
+    if (matchedAssets === undefined) {
+      throw new Error("matchedAssets not found");
+    } else {
       const { browser_download_url: browserDownloadUrl } = matchedAssets;
       return { version, browserDownloadUrl };
-    } else {
-      throw new Error("matchedAssets not found");
     }
-  } else {
-    throw new Error("latestRelease not found");
   }
 }
 
@@ -347,10 +347,11 @@ export async function repositoryAddAll(
       { ignoreReturnCode: true }
     );
     if (autocrlf.stdout.trim() !== "input") {
-      if (autocrlf.exitCode !== 0) {
-        restore_autocrlf = null; // Unset the value at the end
-      } else {
+      if (autocrlf.exitCode === 0) {
         restore_autocrlf = autocrlf.stdout.trim();
+      } else {
+        // eslint-disable-next-line unicorn/no-null
+        restore_autocrlf = null; // Unset the value at the end
       }
     }
     await exec("git", ["config", "--global", "core.autocrlf", "input"]);

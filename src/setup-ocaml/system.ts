@@ -7,25 +7,32 @@ import { Architecture, Platform } from "./constants";
 
 export function getArchitecture(): Architecture {
   switch (os.arch()) {
-    case "x64":
+    case "x64": {
       return Architecture.X86_64;
-    case "arm64":
+    }
+    case "arm64": {
       return Architecture.ARM;
-    default:
+    }
+    default: {
       throw new Error("The architecture is not supported.");
+    }
   }
 }
 
 export function getPlatform(): Platform {
   switch (os.platform()) {
-    case "linux":
+    case "linux": {
       return Platform.Linux;
-    case "darwin":
+    }
+    case "darwin": {
       return Platform.MacOS;
-    case "win32":
+    }
+    case "win32": {
       return Platform.Win32;
-    default:
+    }
+    default: {
       throw new Error("The platform is not supported.");
+    }
   }
 }
 
@@ -35,7 +42,7 @@ export async function getSystemIdentificationInfo(): Promise<{
 }> {
   const platform = getPlatform();
   if (platform === Platform.Linux) {
-    const osRelease = (await fs.readFile("/etc/os-release")).toString();
+    const osRelease = await fs.readFile("/etc/os-release", "utf8");
     const lines = osRelease.split(os.EOL);
     let id = "";
     let version = "";
@@ -44,7 +51,7 @@ export async function getSystemIdentificationInfo(): Promise<{
       if (key === "ID" && value !== undefined) {
         id = value.toLowerCase();
       } else if (key === "VERSION_ID" && value !== undefined) {
-        version = value.toLowerCase().replace(/["]/g, "");
+        version = value.toLowerCase().replace(/"/g, "");
       }
     }
     return { id, version };

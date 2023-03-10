@@ -75,9 +75,9 @@ const repositories_yaml = yaml.parse(
 const platform = getPlatform();
 
 const defaultRepository =
-  platform !== Platform.Win32
-    ? "https://github.com/ocaml/opam-repository.git"
-    : "https://github.com/ocaml-opam/opam-repository-mingw.git#sunset";
+  platform === Platform.Win32
+    ? "https://github.com/ocaml-opam/opam-repository-mingw.git#sunset"
+    : "https://github.com/ocaml/opam-repository.git";
 
 export const OPAM_REPOSITORIES: [string, string][] = repositories_yaml
   ? Object.entries(repositories_yaml).reverse()

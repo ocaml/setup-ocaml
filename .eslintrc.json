@@ -1,14 +1,7 @@
 {
-  "root": true,
-  "env": { "node": true },
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": "latest",
-    "project": "tsconfig.json",
-    "sourceType": "module"
-  },
   "extends": [
     "eslint:recommended",
+    "plugin:unicorn/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
@@ -17,13 +10,30 @@
     "plugin:import/typescript",
     "plugin:prettier/recommended"
   ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "project": "tsconfig.json",
+    "sourceType": "module"
+  },
   "plugins": ["@typescript-eslint", "simple-import-sort"],
   "rules": {
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
-    "sort-imports": "off",
     "import/first": "error",
     "import/newline-after-import": "error",
-    "import/no-duplicates": "error"
-  }
+    "import/no-duplicates": "error",
+    "import/order": "off",
+    "simple-import-sort/exports": "error",
+    "simple-import-sort/imports": "error",
+    "import/exports-last": "off",
+    "sort-imports": "off",
+    "unicorn/prefer-ternary": "off",
+    "unicorn/prefer-top-level-await": "off",
+    "unicorn/prevent-abbreviations": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": { "alwaysTryTypes": true, "project": "tsconfig.json" }
+    }
+  },
+  "reportUnusedDisableDirectives": true
 }

@@ -20,7 +20,7 @@ export function isSemverStyle(semverVersion: string): boolean {
 }
 
 function unique(array: string[]) {
-  return Array.from(new Set(array));
+  return [...new Set(array)];
 }
 
 async function getAllCompilerVersions(): Promise<string[]> {
@@ -51,6 +51,7 @@ async function getAllCompilerVersions(): Promise<string[]> {
     }
     return unique(versions);
   } else {
+    // eslint-disable-next-line unicorn/prefer-type-error
     throw new Error("Failed to get compiler list from opam-repository.");
   }
 }
@@ -62,11 +63,11 @@ export async function resolveVersion(semverVersion: string): Promise<string> {
     semverVersion,
     { loose: true }
   );
-  if (matchedFullCompilerVersion !== null) {
-    return matchedFullCompilerVersion;
-  } else {
+  if (matchedFullCompilerVersion === null) {
     throw new Error(
       `No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`
     );
+  } else {
+    return matchedFullCompilerVersion;
   }
 }

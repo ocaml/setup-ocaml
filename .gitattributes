@@ -1,6 +1,10 @@
+# Default behaviour, for if core.autocrlf isn't set
 * text=auto
-/.yarn/releases/** binary
-/.yarn/plugins/** binary
+
+# the linguist-vendored/linguist-generated attribute suppresses changes being
+# displayed by default in pull requests.
+/.yarn/** linguist-vendored
+
 /dist/*.js -diff linguist-generated
 /dist/*.txt -diff linguist-generated
 /dist/post/*.js -diff linguist-generated
@@ -11,3 +15,7 @@
 /lint-fmt/*.txt -diff linguist-generated
 /lint-opam/*.js -diff linguist-generated
 /lint-opam/*.txt -diff linguist-generated
+
+# Binary files
+/.yarn/releases/* binary
+/.yarn/plugins/**/* binary
