@@ -346,11 +346,11 @@ export async function repositoryAddAll(
       ["config", "--global", "core.autocrlf"],
       { ignoreReturnCode: true }
     );
-    if (autocrlf.stdout !== "input") {
+    if (autocrlf.stdout.trim() !== "input") {
       if (autocrlf.exitCode !== 0) {
         restore_autocrlf = null; // Unset the value at the end
       } else {
-        restore_autocrlf = autocrlf.stdout;
+        restore_autocrlf = autocrlf.stdout.trim();
       }
     }
     await exec("git", ["config", "--global", "core.autocrlf", "input"]);
@@ -380,7 +380,6 @@ async function repositoryList(): Promise<string[]> {
   let output = "";
   const opam = await findOpam();
   await exec(opam, ["repository", "list", "--all-switches", "--short"], {
-    silent: true,
     listeners: { stdout: (data) => (output += data.toString()) },
   });
   const result = output
