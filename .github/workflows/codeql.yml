@@ -3,8 +3,6 @@ name: CodeQL
 on:
   pull_request:
   push:
-    branches-ignore:
-      - "dependabot/**"
   schedule:
     - cron: 0 0 * * 0
 
@@ -17,12 +15,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
-          config-file: .github/codeql/codeql-config.yml
+          config-file: .github/codeql/codeql-configuration.yml
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
+        uses: github/codeql-action/autobuild@v2
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
