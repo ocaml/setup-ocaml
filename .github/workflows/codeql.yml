@@ -1,14 +1,25 @@
-name: CodeQL
+name: Code Scanning
 
 on:
   pull_request:
+    branches:
+      - master
   push:
+    branches:
+      - master
   schedule:
-    - cron: 0 0 * * 0
+    - cron: 0 1 * * MON
+
+permissions: read-all
 
 jobs:
-  codeql:
+  codeql-build:
+    name: CodeQL Build
+
     runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write
 
     steps:
       - name: Checkout code
