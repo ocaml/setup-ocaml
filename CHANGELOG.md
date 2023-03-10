@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.12]
+
 ### Changed
 
 - Use ocaml-opam/opam-repository-mingw instead of fdopen/opam-repository-mingw.
@@ -405,7 +407,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.11...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.12...HEAD
+[2.0.12]: https://github.com/ocaml/setup-ocaml/compare/v2.0.11...v2.0.12
 [2.0.11]: https://github.com/ocaml/setup-ocaml/compare/v2.0.10...v2.0.11
 [2.0.10]: https://github.com/ocaml/setup-ocaml/compare/v2.0.9...v2.0.10
 [2.0.9]: https://github.com/ocaml/setup-ocaml/compare/v2.0.8...v2.0.9
