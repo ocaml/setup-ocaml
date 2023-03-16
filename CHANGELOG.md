@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Ensure cache key creation works with local opam repositories.
+
 ## [2.0.12]
 
 ### Changed

@@ -95,9 +95,13 @@ async function composeOpamCacheKeys() {
 
 function composeOpamDownloadCacheKeys() {
   const repositories = OPAM_REPOSITORIES.map(([, u]) => {
-    const url = new URL(u);
-    const urn = path.join(url.hostname, url.pathname);
-    return urn;
+    try {
+      const url = new URL(u);
+      const urn = path.join(url.hostname, url.pathname);
+      return urn;
+    } catch {
+      return path.resolve(u);
+    }
   }).join("_");
   const ocamlVersion = OCAML_COMPILER.toLowerCase().replace(/\W/g, "_");
   const { year, month, date } = composeDate();
