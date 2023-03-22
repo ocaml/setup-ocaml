@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.13]
+
 ### Fixed
 
 - Ensure cache key creation works with local opam repositories.
@@ -411,7 +413,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.12...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.13...HEAD
+[2.0.13]: https://github.com/ocaml/setup-ocaml/compare/v2.0.12...v2.0.13
 [2.0.12]: https://github.com/ocaml/setup-ocaml/compare/v2.0.11...v2.0.12
 [2.0.11]: https://github.com/ocaml/setup-ocaml/compare/v2.0.10...v2.0.11
 [2.0.10]: https://github.com/ocaml/setup-ocaml/compare/v2.0.9...v2.0.10
