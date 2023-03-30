@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "node",
     "noEmit": true,
