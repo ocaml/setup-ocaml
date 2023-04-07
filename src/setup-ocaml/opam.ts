@@ -112,6 +112,7 @@ async function installUnixSystemPackages() {
       }
       await exec("sudo", [
         "apt-get",
+        "--yes",
         "install",
         "bubblewrap",
         "darcs",
@@ -119,6 +120,7 @@ async function installUnixSystemPackages() {
         "gcc-multilib",
         "mercurial",
         "musl-tools",
+        "rsync",
       ]);
     } else if (platform === Platform.MacOS) {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
