@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.14]
+
+### Added
+
+- Add support for nektos/act.
+
 ## [2.0.13]
 
 ### Fixed
@@ -58,7 +64,7 @@ and this project adheres to
 
 ## [2.0.7]
 
-## Added
+### Added
 
 - Define `CLICOLOR_FORCE=1` in CI runs.
 
@@ -413,7 +419,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.13...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.14...HEAD
+[2.0.14]: https://github.com/ocaml/setup-ocaml/compare/v2.0.13...v2.0.14
 [2.0.13]: https://github.com/ocaml/setup-ocaml/compare/v2.0.12...v2.0.13
 [2.0.12]: https://github.com/ocaml/setup-ocaml/compare/v2.0.11...v2.0.12
 [2.0.11]: https://github.com/ocaml/setup-ocaml/compare/v2.0.10...v2.0.11
