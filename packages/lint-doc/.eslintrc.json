@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "env": { "node": true },
+  "extends": ["@ocaml/eslint-config-ocaml"],
+  "root": true
+}

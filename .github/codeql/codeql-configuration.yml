@@ -1,5 +1,5 @@
 paths:
-  - src
+  - packages
 paths-ignore:
   - .yarn
   - deploy-doc
