@@ -1,0 +1,26 @@
+{
+  "name": "@ocaml/lint-fmt",
+  "version": "2.0.14",
+  "scripts": {
+    "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../lint-fmt/dist",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "lint": "TIMING=1 eslint .",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@actions/core": "1.10.0",
+    "@actions/exec": "1.1.1"
+  },
+  "devDependencies": {
+    "@ocaml/eslint-config-ocaml": "workspace:*",
+    "@tsconfig/strictest": "2.0.1",
+    "@types/node": "18.16.1",
+    "@types/prettier": "2.7.2",
+    "@vercel/ncc": "0.36.1",
+    "eslint": "8.39.0",
+    "prettier": "2.8.8",
+    "typescript": "5.0.4"
+  },
+  "private": true
+}

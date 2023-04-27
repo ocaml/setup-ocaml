@@ -1,0 +1,39 @@
+{
+  "name": "@ocaml/setup-ocaml",
+  "version": "2.0.14",
+  "scripts": {
+    "build:main": "ncc build src/index.ts --license=LICENSE.txt --out ../../dist",
+    "build:post": "ncc build src/post.ts --license=LICENSE.txt --out ../../dist/post",
+    "build": "yarn build:main & yarn build:post",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "lint": "TIMING=1 eslint .",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@actions/cache": "3.2.1",
+    "@actions/core": "1.10.0",
+    "@actions/exec": "1.1.1",
+    "@actions/github": "5.1.1",
+    "@actions/glob": "0.4.0",
+    "@actions/http-client": "2.1.0",
+    "@actions/io": "1.1.3",
+    "@actions/tool-cache": "2.0.1",
+    "cheerio": "1.0.0-rc.12",
+    "date-fns": "2.29.3",
+    "semver": "7.5.0",
+    "yaml": "2.2.2"
+  },
+  "devDependencies": {
+    "@ocaml/eslint-config-ocaml": "workspace:*",
+    "@tsconfig/strictest": "2.0.1",
+    "@types/node": "18.16.1",
+    "@types/prettier": "2.7.2",
+    "@types/semver": "7.3.13",
+    "@vercel/ncc": "0.36.1",
+    "eslint": "8.39.0",
+    "prettier": "2.8.8",
+    "typescript": "5.0.4"
+  },
+  "private": true
+}

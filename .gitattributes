@@ -6,15 +6,9 @@
 /.yarn/** linguist-vendored
 
 /dist/*.js -diff linguist-generated
-/dist/*.txt -diff linguist-generated
-/dist/post/*.js -diff linguist-generated
-/dist/post/*.txt -diff linguist-generated
-/lint-doc/*.js -diff linguist-generated
-/lint-doc/*.txt -diff linguist-generated
-/lint-fmt/*.js -diff linguist-generated
-/lint-fmt/*.txt -diff linguist-generated
-/lint-opam/*.js -diff linguist-generated
-/lint-opam/*.txt -diff linguist-generated
+/lint-doc/dist/*.js -diff linguist-generated
+/lint-fmt/dist/*.js -diff linguist-generated
+/lint-opam/dist/*.js -diff linguist-generated
 
 # Binary files
 /.yarn/releases/* binary

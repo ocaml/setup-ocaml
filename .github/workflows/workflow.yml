@@ -10,8 +10,51 @@ on:
 permissions: read-all
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  hygiene:
+    name: Hygiene
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v3
+
+      - name: Set-up Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install npm packages
+        if: runner.os == 'Linux'
+        run: yarn install --immutable
+
+      - name: Check formatting
+        if: runner.os == 'Linux'
+        run: yarn format:check
+
+      - name: Check lint
+        if: runner.os == 'Linux'
+        run: yarn lint
+
+      - name: Check type
+        if: runner.os == 'Linux'
+        run: yarn typecheck
+
+      - name: Ensure dist directory is up-to-date
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          yarn build
+          if [ "$(git status dist lint-doc lint-fmt lint-opam --porcelain | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff
+            exit 1
+          fi
+
+  test:
+    name: Test
+
+    needs: hygiene
 
     strategy:
       fail-fast: false
@@ -38,40 +81,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout tree
         uses: actions/checkout@v3
-
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-
-      - name: Install npm packages
-        if: runner.os == 'Linux'
-        run: yarn install --immutable
-
-      - name: Check formatting
-        if: runner.os == 'Linux'
-        run: yarn fmt:check
-
-      - name: Check lint
-        if: runner.os == 'Linux'
-        run: yarn lint
-
-      - name: Check type
-        if: runner.os == 'Linux'
-        run: yarn typecheck
-
-      - name: Ensure dist directory is up-to-date
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          yarn build
-          if [ "$(git status dist lint-doc lint-fmt lint-opam --porcelain | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build. See status below:"
-            git diff
-            exit 1
-          fi
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
