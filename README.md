@@ -90,10 +90,10 @@ jobs:
 Note: All extends are recommended to use in separate jobs run on
 `ubuntu-latest`.
 
-- [deploy-doc](deploy-doc/README.md)
-- [lint-doc](lint-doc/README.md)
-- [lint-fmt](lint-fmt/README.md)
-- [lint-opam](lint-opam/README.md)
+- [deploy-doc](deploy-doc)
+- [lint-doc](lint-doc)
+- [lint-fmt](lint-fmt)
+- [lint-opam](lint-opam)
 
 ## Advanced Configurations
 
