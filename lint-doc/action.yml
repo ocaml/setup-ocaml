@@ -1,5 +1,5 @@
 name: Lint doc
-description: Check if your doc comments are error-and-warning-free
+description: Performs several quality checks on the doc comment
 author: Sora Morimoto
 branding:
   icon: package

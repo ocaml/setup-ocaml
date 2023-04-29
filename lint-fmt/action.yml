@@ -1,5 +1,5 @@
 name: Lint fmt
-description: Check if your files are well-formatted
+description: Performs several quality checks for OCaml code
 author: Sora Morimoto
 branding:
   icon: package

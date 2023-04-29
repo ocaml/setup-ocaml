@@ -1,5 +1,11 @@
 # lint-opam
 
+Perform several quality checks on the opam file.
+
+## Usage
+
+### Example workflow
+
 ```yml
 jobs:
   lint-opam:
@@ -17,5 +23,7 @@ jobs:
       - name: Lint opam
         uses: ocaml/setup-ocaml/lint-opam@v2
 ```
+
+## Inputs
 
 See [action.yml](./action.yml) for inputs.

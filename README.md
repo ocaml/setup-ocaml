@@ -83,22 +83,6 @@ jobs:
       - run: opam exec -- dune runtest
 ```
 
-## Extends
-
-**STATUS: EXPERIMENTAL**
-
-Note: All extends are recommended to use in separate jobs run on
-`ubuntu-latest`.
-
-- [deploy-doc](deploy-doc)
-- [lint-doc](lint-doc)
-- [lint-fmt](lint-fmt)
-- [lint-opam](lint-opam)
-
-## Advanced Configurations
-
-See [Examples](examples.md) for more complex patterns.
-
 ## Inputs
 
 | Name                      | Required | Description                                                                                                                                                                                                                      | Type   | Default  |
@@ -112,6 +96,22 @@ See [Examples](examples.md) for more complex patterns.
 | `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                                                                             | bool   | `false`  |
 | `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                                                                           | bool   | `false`  |
 | `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                                                                                    | string | `v1`     |
+
+## Advanced Configurations
+
+See [Examples](examples.md) for more complex patterns.
+
+## Extends
+
+**STATUS: EXPERIMENTAL**
+
+Note: All extends are recommended to use in separate jobs run on
+`ubuntu-latest`.
+
+- [deploy-doc](deploy-doc)
+- [lint-doc](lint-doc)
+- [lint-fmt](lint-fmt)
+- [lint-opam](lint-opam)
 
 ## Roadmap
 

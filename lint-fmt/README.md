@@ -1,7 +1,13 @@
 # lint-fmt
 
-Note: The ocamlformat configuration file must have the version of the
-ocamlformat used in the project.
+Performs several quality checks for OCaml code.
+
+**_First of all, make sure you have an `.ocamlformat` file at the root of your
+project._**
+
+## Usage
+
+### Example workflow
 
 ```yml
 jobs:
@@ -20,5 +26,7 @@ jobs:
       - name: Lint fmt
         uses: ocaml/setup-ocaml/lint-fmt@v2
 ```
+
+## Inputs
 
 See [action.yml](./action.yml) for inputs.

@@ -1,5 +1,5 @@
 name: Lint opam
-description: Check if your dune and opam dependencies are consistent
+description: Perform several quality checks on the opam file
 author: Sora Morimoto
 branding:
   icon: package

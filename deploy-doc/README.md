@@ -1,5 +1,11 @@
 # deploy-doc
 
+## Usage
+
+Generate documentation for your project and deploy it to GitHub Pages.
+
+### Example workflow
+
 ```yml
 name: Deploy odoc
 
@@ -24,5 +30,7 @@ jobs:
       - name: Deploy odoc to GitHub Pages
         uses: ocaml/setup-ocaml/deploy-doc@v2
 ```
+
+## Inputs
 
 See [action.yml](./action.yml) for inputs.

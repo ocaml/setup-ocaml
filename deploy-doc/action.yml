@@ -1,5 +1,5 @@
 name: Deploy odoc
-description: Deploy odoc to GitHub Pages
+description: Generate documentation for your project and deploy it to GitHub Pages
 author: Sora Morimoto
 branding:
   icon: package

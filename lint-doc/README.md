@@ -1,5 +1,11 @@
 # lint-doc
 
+Performs several quality checks on the _doc comment_.
+
+## Usage
+
+### Example workflow
+
 ```yml
 jobs:
   lint-doc:
@@ -17,5 +23,7 @@ jobs:
       - name: Lint doc
         uses: ocaml/setup-ocaml/lint-doc@v2
 ```
+
+## Inputs
 
 See [action.yml](./action.yml) for inputs.
