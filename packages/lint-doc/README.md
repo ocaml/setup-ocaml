@@ -1,1 +1,1 @@
-# lint-doc
+../../lint-opam/README.md

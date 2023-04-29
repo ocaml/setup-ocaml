@@ -1,1 +1,1 @@
-# lint-fmt
+../../lint-fmt/README.md
