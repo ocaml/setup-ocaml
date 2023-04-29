@@ -1,8 +1,8 @@
 # deploy-doc
 
-## Usage
-
 Generate documentation for your project and deploy it to GitHub Pages.
+
+## Usage
 
 ### Example workflow
 
