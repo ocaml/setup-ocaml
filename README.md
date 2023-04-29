@@ -63,7 +63,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - 5.0
+          - "5.0"
 
     runs-on: ${{ matrix.os }}
 

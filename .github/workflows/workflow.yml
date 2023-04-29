@@ -64,10 +64,10 @@ jobs:
           - macos-12 # macos-latest
           - ubuntu-latest
         ocaml-compiler:
-          - 5.0
+          - "5.0"
         include:
           - os: windows-latest
-            ocaml-compiler: 4.14
+            ocaml-compiler: "4.14"
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.0.0+options,ocaml-option-32bit
           - os: ubuntu-latest

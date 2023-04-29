@@ -104,7 +104,7 @@ strategy:
       - debian:latest
       - ubuntu:latest
     ocaml-compiler:
-      - 5.0
+      - "5.0"
 
 container: ${{ matrix.container }}
 
