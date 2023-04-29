@@ -2,8 +2,8 @@
 
 Performs several quality checks for OCaml code.
 
-**_First of all, make sure you have an `.ocamlformat` file at the root of your
-project._**
+> **Warning** First of all, make sure you have an `.ocamlformat` file at the
+> root of your project.
 
 ## Usage
 
