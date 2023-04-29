@@ -64,10 +64,10 @@ jobs:
           - macos-12 # macos-latest
           - ubuntu-latest
         ocaml-compiler:
-          - 5.0.x
+          - 5.0
         include:
           - os: windows-latest
-            ocaml-compiler: 4.14.x
+            ocaml-compiler: 4.14
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.0.0+options,ocaml-option-32bit
           - os: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@v3
 
-      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+      - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}

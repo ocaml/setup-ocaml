@@ -2,7 +2,6 @@
 
 ## Using the strategy matrix
 
-<!-- prettier-ignore-start -->
 ```yml
 strategy:
   fail-fast: false
@@ -10,55 +9,49 @@ strategy:
     os:
       - macos-latest
       - ubuntu-latest
+      - windows-latest
     ocaml-compiler:
-      - ocaml-base-compiler.4.13.0
-    include:
-      - os: windows-latest
-        ocaml-compiler: ocaml-variants.4.13.0+mingw64c
+      - 4.14
 
 runs-on: ${{ matrix.os }}
 
 steps:
-  - name: Checkout code
+  - name: Checkout tree
     uses: actions/checkout@v3
 
-  - name: Use OCaml ${{ matrix.ocaml-compiler }}
+  - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
     uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
 ```
-<!-- prettier-ignore-end -->
 
 ## Using several conditional setup steps
 
-<!-- prettier-ignore-start -->
 ```yml
 steps:
-  - name: Checkout code
+  - name: Checkout tree
     uses: actions/checkout@v3
 
-  - name: Use OCaml on Windows
+  - name: Set-up OCaml on Windows
     uses: ocaml/setup-ocaml@v2
     if: runner.os == 'Windows'
     with:
       opam-repositories: |
-        default: https://github.com/fdopen/opam-repository-mingw.git#opam2
+        default: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
 
-  - name: Use OCaml on Unix
+  - name: Set-up OCaml on Unix
     uses: ocaml/setup-ocaml@v2
     if: runner.os != 'Windows'
     with:
       opam-repositories: |
         default: https://github.com/ocaml/opam-repository.git
 ```
-<!-- prettier-ignore-end -->
 
 ## Using a custom step to choose between the values
 
-<!-- prettier-ignore-start -->
 ```yml
 steps:
-  - name: Checkout code
+  - name: Checkout tree
     uses: actions/checkout@v3
 
   - name: Set opam repository url
@@ -66,20 +59,19 @@ steps:
     shell: bash
     run: |
       if [ "$RUNNER_OS" == "Windows" ]; then
-        echo "::set-output name=url::https://github.com/fdopen/opam-repository-mingw.git#opam2"
+        echo "::set-output name=url::https://github.com/ocaml-opam/opam-repository-mingw.git#sunset"
       elif [ "$RUNNER_OS" == "macOS" ]; then
         echo "::set-output name=url::https://github.com/custom/opam-repository.git#macOS"
       else
         echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
       fi
 
-  - name: Use OCaml with repository ${{ steps.repository.outputs.url }}
+  - name: Set-up OCaml with repository ${{ steps.repository.outputs.url }}
     uses: ocaml/setup-ocaml@v2
     with:
       opam-repositories: |
         default: ${{ steps.repository.outputs.url }}
 ```
-<!-- prettier-ignore-end -->
 
 ## Using glob patterns to filter local packages
 
@@ -87,13 +79,12 @@ See
 [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob)
 for supported patterns.
 
-<!-- prettier-ignore-start -->
 ```yml
 steps:
-  - name: Checkout code
+  - name: Checkout tree
     uses: actions/checkout@v3
 
-  - name: Use OCaml ${{ matrix.ocaml-compiler }}
+  - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
     uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -101,7 +92,6 @@ steps:
         *.opam
         !exclude.opam
 ```
-<!-- prettier-ignore-end -->
 
 ## Using with [Containers](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontainer)
 
@@ -114,23 +104,23 @@ strategy:
       - debian:latest
       - ubuntu:latest
     ocaml-compiler:
-      - ocaml-base-compiler.4.13.0
+      - 5.0
 
 container: ${{ matrix.container }}
 
 runs-on: ubuntu-latest
 
 steps:
-  - name: Checkout code
+  - name: Checkout tree
     uses: actions/checkout@v3
 
   - name: Retrieve new lists of system packages
     run: apt-get update
 
   - name: Install system packages
-    run: apt-get install bubblewrap curl darcs gcc git m4 make mercurial patch rsync sudo unzip --yes
+    run: apt-get --yes install bubblewrap curl darcs gcc git m4 make mercurial patch rsync sudo unzip
 
-  - name: Use OCaml ${{ matrix.ocaml-compiler }}
+  - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
     uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}

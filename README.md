@@ -14,7 +14,7 @@ break your workflow when we publish a breaking update and increase the major
 version.
 
 ```yml
-- name: Use OCaml ${{ matrix.ocaml-compiler }}
+- name: Set-up OCaml ${{ matrix.ocaml-compiler }}
   uses: ocaml/setup-ocaml@v2
   #                      ^^^
   with:
@@ -63,15 +63,15 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - 5.0.x
+          - 5.0
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout tree
         uses: actions/checkout@v3
 
-      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+      - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -85,17 +85,17 @@ jobs:
 
 ## Inputs
 
-| Name                      | Required | Description                                                                                                                                                                                                                      | Type   | Default  |
-| ------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. The packages must be separated by the comma. (e.g. `5.0.x`, `ocaml-base-compiler.4.13.0`, `ocaml-variants.4.13.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) | string |          |
-| `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                                              | string |          |
-| `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                                                      | bool   | `true`   |
-| `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                                                   | bool   | `true`   |
-| `opam-depext-flags`       | No       | The flags for the opam depext command. The flags must be separated by the comma.                                                                                                                                                 | string |          |
-| `opam-local-packages`     | No       | The local packages to be used by `opam-pin` or `opam-depext`. See [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob) for supported patterns.                                                          | string | `*.opam` |
-| `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                                                                             | bool   | `false`  |
-| `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                                                                           | bool   | `false`  |
-| `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                                                                                    | string | `v1`     |
+| Name                      | Required | Description                                                                                                                                                                                                                                                                                                                                                                 | Type   | Default  |
+| ------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
+| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. (e.g. `ocaml-base-compiler.5.0.0`, `ocaml-variants.4.14.0+mingw64c`) The packages must be separated by the comma. (e.g. `ocaml-variants.5.0.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`) [Semver syntax](https://github.com/npm/node-semver#ranges) is also supported. (e.g. `5.0`, `5.0.x`, `~5.0.0`) | string |          |
+| `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                                                                                                                                                                                         | string |          |
+| `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                                                                                                                                                                                                 | bool   | `true`   |
+| `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                                                                                                                                                                                              | bool   | `true`   |
+| `opam-depext-flags`       | No       | The flags for the opam depext command. The flags must be separated by the comma.                                                                                                                                                                                                                                                                                            | string |          |
+| `opam-local-packages`     | No       | The local packages to be used by `opam-pin` or `opam-depext`. See [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob) for supported patterns.                                                                                                                                                                                                     | string | `*.opam` |
+| `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                                                                                                                                                                                                                        | bool   | `false`  |
+| `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                                                                                                                                                                                                                      | bool   | `false`  |
+| `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                                                                                                                                                                                                                               | string | `v1`     |
 
 ## Advanced Configurations
 

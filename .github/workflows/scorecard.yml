@@ -20,7 +20,7 @@ jobs:
       security-events: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout tree
         uses: actions/checkout@v3
         with:
           persist-credentials: false

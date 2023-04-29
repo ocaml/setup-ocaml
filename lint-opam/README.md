@@ -11,13 +11,13 @@ jobs:
   lint-opam:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout tree
         uses: actions/checkout@v3
 
-      - name: Use OCaml 4.14.x
+      - name: Set-up OCaml 4.14
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.14.x
+          ocaml-compiler: 4.14
           dune-cache: true
 
       - name: Lint opam
