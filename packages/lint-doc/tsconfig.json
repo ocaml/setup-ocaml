@@ -1,11 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@tsconfig/strictest/tsconfig.json",
+  "extends": [
+    "@tsconfig/esm/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "node",
     "noEmit": true,
-    "resolveJsonModule": true,
     "target": "ESNext"
   },
   "exclude": ["node_modules"]

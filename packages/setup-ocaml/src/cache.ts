@@ -8,7 +8,6 @@ import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 import * as datefns from "date-fns";
 
-import { version as actionVersion } from "../package.json";
 import {
   CACHE_PREFIX,
   GITHUB_TOKEN,
@@ -37,10 +36,10 @@ function composeDate() {
 async function composeCygwinCacheKeys() {
   const cygwinVersion = await getCygwinVersion();
   const { year, week } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${week}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}-${year}-${week}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-${week}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-cygwin-${cygwinVersion}-${year}-`,
+    `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}-${year}-${week}`,
+    `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}-${year}-`,
   ];
   return { key, restoreKeys };
 }
@@ -52,11 +51,11 @@ function composeDuneCacheKeys() {
   const workflow = _workflow.toLowerCase().replace(/\W/g, "_");
   const job = _job.replace(/\W/g, "_");
   const ocamlVersion = OCAML_COMPILER.toLowerCase().replace(/\W/g, "_");
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-`,
+    `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`,
+    `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-`,
+    `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-`,
   ];
   return { key, restoreKeys };
 }
@@ -80,11 +79,11 @@ async function composeOpamCacheKeys() {
   const ocamlVersion = ocamlCompiler.toLowerCase().replace(/\W/g, "_");
   const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const { year, week } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-`,
   ];
   return { key, restoreKeys };
 }
@@ -102,12 +101,12 @@ function composeOpamDownloadCacheKeys() {
   const ocamlVersion = OCAML_COMPILER.toLowerCase().replace(/\W/g, "_");
   const { year, month, date } = composeDate();
   const { runId, runNumber } = github.context;
-  const key = `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-`,
-    `${CACHE_PREFIX}-setup-ocaml-${actionVersion}-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-`,
   ];
   return { key, restoreKeys };
 }
