@@ -9,13 +9,13 @@ const {
   runId: run_id,
 } = github.context;
 
-export async function installDune(): Promise<void> {
+export async function installDune() {
   core.startGroup("Install dune");
   await exec("opam", ["depext", "--install", "dune"]);
   core.endGroup();
 }
 
-export async function trimDuneCache(): Promise<void> {
+export async function trimDuneCache() {
   core.startGroup("Remove oldest files from the dune cache to free space");
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const {

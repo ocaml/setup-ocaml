@@ -5,7 +5,7 @@ import { exec, getExecOutput } from "@actions/exec";
 
 import { Architecture, Platform } from "./constants";
 
-export function getArchitecture(): Architecture {
+export function getArchitecture() {
   switch (os.arch()) {
     case "x64": {
       return Architecture.X86_64;
@@ -19,7 +19,7 @@ export function getArchitecture(): Architecture {
   }
 }
 
-export function getPlatform(): Platform {
+export function getPlatform() {
   switch (os.platform()) {
     case "linux": {
       return Platform.Linux;
@@ -36,10 +36,7 @@ export function getPlatform(): Platform {
   }
 }
 
-export async function getSystemIdentificationInfo(): Promise<{
-  id: string;
-  version: string;
-}> {
+export async function getSystemIdentificationInfo() {
   const platform = getPlatform();
   if (platform === Platform.Linux) {
     const osRelease = await fs.readFile("/etc/os-release", "utf8");

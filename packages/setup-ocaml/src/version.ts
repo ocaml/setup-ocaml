@@ -6,24 +6,20 @@ import * as semver from "semver";
 import { GITHUB_TOKEN, Platform } from "./constants";
 import { getPlatform } from "./system";
 
-export function isSemverStyle(semverVersion: string): boolean {
-  const result = semver.validRange(semverVersion, { loose: true });
-  if (
-    result === null ||
-    semverVersion.includes("+") ||
-    semverVersion.includes("~")
-  ) {
-    return false;
-  } else {
-    return true;
-  }
+function isSemverValidRange(semverVersion: string) {
+  const isValidSemver =
+    semver.validRange(semverVersion, { loose: true }) !== null;
+  // [NOTE] explicitly deny compilers like "4.14.0+mingw64c" as invalid semver
+  // syntax even though it's valid...
+  const plus = !semverVersion.includes("+");
+  return isValidSemver && plus;
 }
 
 function unique(array: string[]) {
   return [...new Set(array)];
 }
 
-async function getAllCompilerVersions(): Promise<string[]> {
+async function getAllCompilerVersions() {
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const platform = getPlatform();
   const owner = platform === Platform.Win32 ? "ocaml-opam" : "ocaml";
@@ -56,7 +52,7 @@ async function getAllCompilerVersions(): Promise<string[]> {
   }
 }
 
-export async function resolveVersion(semverVersion: string): Promise<string> {
+async function resolveVersion(semverVersion: string) {
   const compilerVersions = await getAllCompilerVersions();
   const matchedFullCompilerVersion = semver.maxSatisfying(
     compilerVersions,
@@ -70,4 +66,14 @@ export async function resolveVersion(semverVersion: string): Promise<string> {
   } else {
     return matchedFullCompilerVersion;
   }
+}
+
+export async function resolveCompiler(compiler: string) {
+  const platform = getPlatform();
+  const resolvedCompiler = isSemverValidRange(compiler)
+    ? platform === Platform.Win32
+      ? `ocaml-variants.${await resolveVersion(compiler)}+mingw64c`
+      : `ocaml-base-compiler.${await resolveVersion(compiler)}`
+    : compiler;
+  return resolvedCompiler;
 }

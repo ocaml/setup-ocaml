@@ -22,7 +22,7 @@ import {
   getPlatform,
   getSystemIdentificationInfo,
 } from "./system";
-import { isSemverStyle, resolveVersion } from "./version";
+import { resolveCompiler } from "./version";
 import { getCygwinVersion } from "./win32";
 
 function composeDate() {
@@ -76,11 +76,7 @@ async function composeOpamCacheKeys() {
     owner: "ocaml",
     repo: "opam",
   });
-  const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
-    ? platform === Platform.Win32
-      ? `ocaml-variants.${await resolveVersion(OCAML_COMPILER)}+mingw64c`
-      : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
-    : OCAML_COMPILER;
+  const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
   const ocamlVersion = ocamlCompiler.toLowerCase().replace(/\W/g, "_");
   const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const { year, week } = composeDate();
@@ -223,7 +219,7 @@ async function saveCache(key: string, paths: string[]) {
   }
 }
 
-export async function restoreCygwinCache(): Promise<void> {
+export async function restoreCygwinCache() {
   core.startGroup("Retrieve the Cygwin cache");
   const { key, restoreKeys } = await composeCygwinCacheKeys();
   const paths = composeCygwinCachePaths();
@@ -231,7 +227,7 @@ export async function restoreCygwinCache(): Promise<void> {
   core.endGroup();
 }
 
-export async function saveCygwinCache(): Promise<void> {
+export async function saveCygwinCache() {
   core.startGroup("Save the Cygwin cache");
   const { key } = await composeCygwinCacheKeys();
   const paths = composeCygwinCachePaths();
@@ -239,7 +235,7 @@ export async function saveCygwinCache(): Promise<void> {
   core.endGroup();
 }
 
-export async function restoreDuneCache(): Promise<void> {
+export async function restoreDuneCache() {
   core.startGroup("Retrieve the dune cache");
   const { key, restoreKeys } = composeDuneCacheKeys();
   const paths = composeDuneCachePaths();
@@ -247,7 +243,7 @@ export async function restoreDuneCache(): Promise<void> {
   core.endGroup();
 }
 
-export async function saveDuneCache(): Promise<void> {
+export async function saveDuneCache() {
   core.startGroup("Save the dune cache");
   const { key } = composeDuneCacheKeys();
   const paths = composeDuneCachePaths();
@@ -255,7 +251,7 @@ export async function saveDuneCache(): Promise<void> {
   core.endGroup();
 }
 
-export async function restoreOpamCache(): Promise<string | undefined> {
+export async function restoreOpamCache() {
   core.startGroup("Retrieve the opam cache");
   const { key, restoreKeys } = await composeOpamCacheKeys();
   const paths = composeOpamCachePaths();
@@ -264,7 +260,7 @@ export async function restoreOpamCache(): Promise<string | undefined> {
   return cacheKey;
 }
 
-export async function saveOpamCache(): Promise<void> {
+export async function saveOpamCache() {
   core.startGroup("Save the opam cache");
   await exec("opam", [
     "clean",
@@ -280,7 +276,7 @@ export async function saveOpamCache(): Promise<void> {
   core.endGroup();
 }
 
-export async function restoreOpamDownloadCache(): Promise<string | undefined> {
+export async function restoreOpamDownloadCache() {
   core.startGroup("Retrieve the opam download cache");
   const { key, restoreKeys } = composeOpamDownloadCacheKeys();
   const paths = composeOpamDownloadCachePaths();
@@ -289,7 +285,7 @@ export async function restoreOpamDownloadCache(): Promise<string | undefined> {
   return cacheKey;
 }
 
-export async function saveOpamDownloadCache(): Promise<void> {
+export async function saveOpamDownloadCache() {
   core.startGroup("Save the opam download cache");
   const { key } = composeOpamDownloadCacheKeys();
   const paths = composeOpamDownloadCachePaths();

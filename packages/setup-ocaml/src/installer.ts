@@ -31,9 +31,9 @@ import {
 } from "./opam";
 import { getOpamLocalPackages } from "./packages";
 import { getPlatform, updateUnixPackageIndexFiles } from "./system";
-import { isSemverStyle, resolveVersion } from "./version";
+import { resolveCompiler } from "./version";
 
-export async function installer(): Promise<void> {
+export async function installer() {
   const platform = getPlatform();
   const numberOfProcessors = os.cpus().length;
   const isDebug = core.isDebug();
@@ -77,11 +77,7 @@ export async function installer(): Promise<void> {
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
   if (!opamCacheHit) {
-    const ocamlCompiler = isSemverStyle(OCAML_COMPILER)
-      ? platform === Platform.Win32
-        ? `ocaml-variants.${await resolveVersion(OCAML_COMPILER)}+mingw64c`
-        : `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
-      : OCAML_COMPILER;
+    const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
     await installOcaml(ocamlCompiler);
     await saveOpamCache();
   }

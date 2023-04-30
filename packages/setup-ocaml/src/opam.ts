@@ -27,10 +27,7 @@ import {
 } from "./system";
 import { getCygwinVersion } from "./win32";
 
-async function getLatestOpamRelease(): Promise<{
-  version: string;
-  browserDownloadUrl: string;
-}> {
+async function getLatestOpamRelease() {
   const semverRange = "<2.2.0";
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { data: releases } = await octokit.rest.repos.listReleases({
@@ -269,7 +266,7 @@ async function setupOpamWindows() {
   process.env["PATH"] = originalPath.join(path.delimiter);
 }
 
-export async function setupOpam(): Promise<void> {
+export async function setupOpam() {
   const platform = getPlatform();
   if (platform === Platform.Win32) {
     await setupOpamWindows();
@@ -278,7 +275,7 @@ export async function setupOpam(): Promise<void> {
   }
 }
 
-export async function installOcaml(ocamlCompiler: string): Promise<void> {
+export async function installOcaml(ocamlCompiler: string) {
   core.startGroup("Install OCaml");
   const platform = getPlatform();
   if (platform === Platform.Win32) {
@@ -308,7 +305,7 @@ export async function installOcaml(ocamlCompiler: string): Promise<void> {
   core.endGroup();
 }
 
-export async function pin(fpaths: string[]): Promise<void> {
+export async function pin(fpaths: string[]) {
   core.startGroup("Pin local packages");
   const opam = await findOpam();
   for (const fpath of fpaths) {
@@ -333,9 +330,7 @@ async function repositoryAdd(name: string, address: string) {
   ]);
 }
 
-export async function repositoryAddAll(
-  repositories: [string, string][]
-): Promise<void> {
+export async function repositoryAddAll(repositories: [string, string][]) {
   const platform = getPlatform();
   let restore_autocrlf;
   core.startGroup("Initialise the opam repositories");
@@ -374,12 +369,12 @@ export async function repositoryAddAll(
   core.endGroup();
 }
 
-async function repositoryRemove(name: string): Promise<void> {
+async function repositoryRemove(name: string) {
   const opam = await findOpam();
   await exec(opam, ["repository", "remove", name, "--all-switches"]);
 }
 
-async function repositoryList(): Promise<string[]> {
+async function repositoryList() {
   let output = "";
   const opam = await findOpam();
   await exec(opam, ["repository", "list", "--all-switches", "--short"], {
@@ -392,7 +387,7 @@ async function repositoryList(): Promise<string[]> {
   return result;
 }
 
-export async function repositoryRemoveAll(): Promise<void> {
+export async function repositoryRemoveAll() {
   core.startGroup("Remove the opam repositories");
   const repositories = await repositoryList();
   for (const repository of repositories) {

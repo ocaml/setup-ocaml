@@ -6,7 +6,7 @@ import { exec } from "@actions/exec";
 import { OPAM_DEPEXT_FLAGS, Platform } from "./constants";
 import { getPlatform } from "./system";
 
-export async function installDepext(ocamlVersion: string): Promise<void> {
+export async function installDepext(ocamlVersion: string) {
   core.startGroup("Install depext");
   const platform = getPlatform();
   const depextCygwinports =
@@ -24,7 +24,7 @@ export async function installDepext(ocamlVersion: string): Promise<void> {
   core.endGroup();
 }
 
-export async function installDepextPackages(fpaths: string[]): Promise<void> {
+export async function installDepextPackages(fpaths: string[]) {
   core.startGroup("Install system packages required by opam packages");
   const fnames = fpaths.map((fpath) => path.basename(fpath, ".opam"));
   await exec("opam", ["depext", ...fnames, ...OPAM_DEPEXT_FLAGS]);
