@@ -29,4 +29,4 @@ jobs:
 
 ## Inputs
 
-See [action.yml](./action.yml) for inputs.
+Consult the [action.yml](./action.yml) for inputs.
