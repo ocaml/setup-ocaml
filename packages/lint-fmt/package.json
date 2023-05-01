@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
+    "@tsconfig/esm": "1.0.3",
     "@tsconfig/strictest": "2.0.1",
     "@types/node": "18.16.1",
     "@types/prettier": "2.7.2",

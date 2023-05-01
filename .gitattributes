@@ -5,8 +5,8 @@
 # displayed by default in pull requests.
 /.yarn/** linguist-vendored
 
-/dist/*.js -diff linguist-generated
-/dist/*.txt -diff linguist-generated
+/dist/**/*.js -diff linguist-generated
+/dist/**/*.txt -diff linguist-generated
 /lint-doc/dist/*.js -diff linguist-generated
 /lint-doc/dist/*.txt -diff linguist-generated
 /lint-fmt/dist/*.js -diff linguist-generated
