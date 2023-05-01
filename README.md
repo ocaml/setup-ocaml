@@ -80,7 +80,7 @@ workflow references an action using a ref.
     ocaml-compiler: ${{ matrix.ocaml-compiler }}
 ```
 
-> Warning: do not reference `master` since that is the latest code and can be
+> **Warning** do not reference `master` since that is the latest code and can be
 > carrying breaking changes of the next major version.
 
 Major version binding allows you to take advantage of bug fixes and critical
