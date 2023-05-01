@@ -1,6 +1,5 @@
 {
   "name": "setup-ocaml",
-  "version": "2.0.14",
   "workspaces": [
     "packages/*"
   ],

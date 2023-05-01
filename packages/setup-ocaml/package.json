@@ -1,6 +1,5 @@
 {
   "name": "@ocaml/setup-ocaml",
-  "version": "2.0.14",
   "scripts": {
     "build:main": "ncc build src/index.ts --license=LICENSE.txt --out ../../dist",
     "build:post": "ncc build src/post.ts --license=LICENSE.txt --out ../../dist/post",

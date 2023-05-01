@@ -1,6 +1,5 @@
 {
   "name": "@ocaml/eslint-config-ocaml",
-  "version": "2.0.14",
   "main": "index.js",
   "scripts": {
     "format": "prettier . --write",

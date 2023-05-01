@@ -30,6 +30,8 @@ on:
     # Prime the caches every Monday
     - cron: 0 1 * * MON
 
+permissions: read-all
+
 jobs:
   build:
     strategy:

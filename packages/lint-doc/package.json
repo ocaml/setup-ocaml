@@ -1,6 +1,5 @@
 {
   "name": "@ocaml/lint-doc",
-  "version": "2.0.14",
   "scripts": {
     "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../lint-doc/dist",
     "format": "prettier . --write",
