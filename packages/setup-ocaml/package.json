@@ -20,7 +20,7 @@
     "@actions/io": "1.1.3",
     "@actions/tool-cache": "2.0.1",
     "cheerio": "1.0.0-rc.12",
-    "date-fns": "2.29.3",
+    "date-fns": "2.30.0",
     "semver": "7.5.0",
     "yaml": "2.2.2"
   },
@@ -28,7 +28,7 @@
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/esm": "1.0.3",
     "@tsconfig/strictest": "2.0.1",
-    "@types/node": "18.16.1",
+    "@types/node": "18.16.3",
     "@types/prettier": "2.7.2",
     "@types/semver": "7.3.13",
     "@vercel/ncc": "0.36.1",
