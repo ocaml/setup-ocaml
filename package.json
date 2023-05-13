@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "prettier": "2.8.8",
-    "turbo": "1.9.3"
+    "turbo": "1.9.4"
   },
   "resolutions": {
     "tsconfig-paths": "4.2.0"

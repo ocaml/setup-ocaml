@@ -45,12 +45,12 @@ async function composeCygwinCacheKeys() {
 }
 
 function composeDuneCacheKeys() {
-  const platform = getPlatform().replace(/\W/g, "_");
-  const architecture = getArchitecture().replace(/\W/g, "_");
+  const platform = getPlatform().replaceAll(/\W/g, "_");
+  const architecture = getArchitecture().replaceAll(/\W/g, "_");
   const { workflow: _workflow, job: _job, runId, runNumber } = github.context;
-  const workflow = _workflow.toLowerCase().replace(/\W/g, "_");
-  const job = _job.replace(/\W/g, "_");
-  const ocamlVersion = OCAML_COMPILER.toLowerCase().replace(/\W/g, "_");
+  const workflow = _workflow.toLowerCase().replaceAll(/\W/g, "_");
+  const job = _job.replaceAll(/\W/g, "_");
+  const ocamlVersion = OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
   const key = `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`;
   const restoreKeys = [
     `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`,
@@ -76,7 +76,7 @@ async function composeOpamCacheKeys() {
     repo: "opam",
   });
   const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
-  const ocamlVersion = ocamlCompiler.toLowerCase().replace(/\W/g, "_");
+  const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
   const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const { year, week } = composeDate();
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
@@ -98,7 +98,7 @@ function composeOpamDownloadCacheKeys() {
       return path.resolve(u);
     }
   }).join("_");
-  const ocamlVersion = OCAML_COMPILER.toLowerCase().replace(/\W/g, "_");
+  const ocamlVersion = OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
   const { year, month, date } = composeDate();
   const { runId, runNumber } = github.context;
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`;

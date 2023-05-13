@@ -48,7 +48,7 @@ export async function getSystemIdentificationInfo() {
       if (key === "ID" && value !== undefined) {
         id = value.toLowerCase();
       } else if (key === "VERSION_ID" && value !== undefined) {
-        version = value.toLowerCase().replace(/"/g, "");
+        version = value.toLowerCase().replaceAll('"', "");
       }
     }
     return { id, version };
