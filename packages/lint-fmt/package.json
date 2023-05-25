@@ -15,7 +15,7 @@
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/esm": "1.0.3",
     "@tsconfig/strictest": "2.0.1",
-    "@types/node": "20.2.1",
+    "@types/node": "20.2.3",
     "@types/prettier": "2.7.2",
     "@vercel/ncc": "0.36.1",
     "eslint": "8.41.0",
