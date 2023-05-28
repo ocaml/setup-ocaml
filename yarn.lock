@@ -256,11 +256,11 @@ __metadata:
   linkType: hard
 
 "@babel/runtime@npm:^7.21.0":
-  version: 7.21.5
-  resolution: "@babel/runtime@npm:7.21.5"
+  version: 7.22.3
+  resolution: "@babel/runtime@npm:7.22.3"
   dependencies:
     regenerator-runtime: ^0.13.11
-  checksum: 358f2779d3187f5c67ad302e8f8d435412925d0b991d133c7d4a7b1ddd5a3fda1b6f34537cb64628dfd96a27ae46df105bed3895b8d754b88cacdded8d1129dd
+  checksum: 8fc50785ca4cba749fed90bffca7e6fd52d4709755654e95b8d2a945fc034b56fb8c2e8a0183fea7c4abb86bf5fa77678c0ea35163b6920649833d180c34c234
   languageName: node
   linkType: hard
 
@@ -415,7 +415,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/esm": 1.0.3
     "@tsconfig/strictest": 2.0.1
-    "@types/node": 20.2.3
+    "@types/node": 20.2.5
     "@types/prettier": 2.7.2
     "@vercel/ncc": 0.36.1
     eslint: 8.41.0
@@ -433,7 +433,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/esm": 1.0.3
     "@tsconfig/strictest": 2.0.1
-    "@types/node": 20.2.3
+    "@types/node": 20.2.5
     "@types/prettier": 2.7.2
     "@vercel/ncc": 0.36.1
     eslint: 8.41.0
@@ -451,7 +451,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/esm": 1.0.3
     "@tsconfig/strictest": 2.0.1
-    "@types/node": 20.2.3
+    "@types/node": 20.2.5
     "@types/prettier": 2.7.2
     "@vercel/ncc": 0.36.1
     eslint: 8.41.0
@@ -475,7 +475,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/esm": 1.0.3
     "@tsconfig/strictest": 2.0.1
-    "@types/node": 20.2.3
+    "@types/node": 20.2.5
     "@types/prettier": 2.7.2
     "@types/semver": 7.5.0
     "@vercel/ncc": 0.36.1
@@ -485,7 +485,7 @@ __metadata:
     prettier: 2.8.8
     semver: 7.5.1
     typescript: 5.0.4
-    yaml: 2.3.0
+    yaml: 2.3.1
   languageName: unknown
   linkType: soft
 
@@ -659,9 +659,9 @@ __metadata:
   linkType: hard
 
 "@types/json-schema@npm:*, @types/json-schema@npm:^7.0.9":
-  version: 7.0.11
-  resolution: "@types/json-schema@npm:7.0.11"
-  checksum: 527bddfe62db9012fccd7627794bd4c71beb77601861055d87e3ee464f2217c85fca7a4b56ae677478367bbd248dbde13553312b7d4dbc702a2f2bbf60c4018d
+  version: 7.0.12
+  resolution: "@types/json-schema@npm:7.0.12"
+  checksum: 00239e97234eeb5ceefb0c1875d98ade6e922bfec39dd365ec6bd360b5c2f825e612ac4f6e5f1d13601b8b30f378f15e6faa805a3a732f4a1bbe61915163d293
   languageName: node
   linkType: hard
 
@@ -675,10 +675,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:20.2.3":
-  version: 20.2.3
-  resolution: "@types/node@npm:20.2.3"
-  checksum: 576065e8fc1fa45798c8f59a6bf809169582d04abc2e25fab1a048ffc734975b9992ae31be0d960cf705a21fb37112f7fcde11aa322beddf7491e73d5a5a988c
+"@types/node@npm:*, @types/node@npm:20.2.5":
+  version: 20.2.5
+  resolution: "@types/node@npm:20.2.5"
+  checksum: 38ce7c7e9d76880dc632f71d71e0d5914fcda9d5e9a7095d6c339abda55ca4affb0f2a882aeb29398f8e09d2c5151f0b6586c81c8ccdfe529c34b1ea3337425e
   languageName: node
   linkType: hard
 
@@ -4491,10 +4491,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:2.3.0":
-  version: 2.3.0
-  resolution: "yaml@npm:2.3.0"
-  checksum: 9c3d16c226472041fbdc9fb55e1645786d3a3e8d4fde67a502ed7bfbd9067b811e466679db590a0731b4405d4a3bef1f35d098fb650d2cf4bc24732fc829b961
+"yaml@npm:2.3.1":
+  version: 2.3.1
+  resolution: "yaml@npm:2.3.1"
+  checksum: 2c7bc9a7cd4c9f40d3b0b0a98e370781b68b8b7c4515720869aced2b00d92f5da1762b4ffa947f9e795d6cd6b19f410bd4d15fdd38aca7bd96df59bd9486fb54
   languageName: node
   linkType: hard
 
