@@ -15,10 +15,6 @@ function isSemverValidRange(semverVersion: string) {
   return isValidSemver && plus;
 }
 
-function unique(array: string[]) {
-  return [...new Set(array)];
-}
-
 async function getAllCompilerVersions() {
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const platform = getPlatform();
@@ -32,8 +28,8 @@ async function getAllCompilerVersions() {
     repo,
     path: `packages/${prefix}`,
   });
+  const versions = new Set<string>();
   if (Array.isArray(packages)) {
-    const versions = [];
     for (const { path: p } of packages) {
       const basename = path.basename(p);
       const version = basename.replace(`${prefix}.`, "");
@@ -42,14 +38,11 @@ async function getAllCompilerVersions() {
         const { major, minor: _minor, patch } = parsed;
         const minor = _minor.toString().length > 1 ? _minor : `0${_minor}`;
         const version = `${major}.${minor}.${patch}`;
-        versions.push(version);
+        versions.add(version);
       }
     }
-    return unique(versions);
-  } else {
-    // eslint-disable-next-line unicorn/prefer-type-error
-    throw new Error("Failed to get compiler list from opam-repository.");
   }
+  return [...versions];
 }
 
 async function resolveVersion(semverVersion: string) {
