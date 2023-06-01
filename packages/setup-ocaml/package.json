@@ -28,7 +28,7 @@
     "@tsconfig/esm": "1.0.3",
     "@tsconfig/strictest": "2.0.1",
     "@types/node": "20.2.5",
-    "@types/prettier": "2.7.2",
+    "@types/prettier": "2.7.3",
     "@types/semver": "7.5.0",
     "@vercel/ncc": "0.36.1",
     "eslint": "8.41.0",
