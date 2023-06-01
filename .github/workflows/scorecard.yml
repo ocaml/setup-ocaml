@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: 0 1 * * MON
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: read-all
 
 jobs:
