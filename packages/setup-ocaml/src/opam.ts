@@ -130,7 +130,9 @@ async function initializeOpamUnix() {
     await installUnixSystemPackages();
   } catch (error) {
     if (error instanceof Error) {
-      core.error(error.message);
+      core.notice(
+        `An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`
+      );
     }
     await updateUnixPackageIndexFiles();
     await installUnixSystemPackages();

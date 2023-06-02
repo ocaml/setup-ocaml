@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Make logs around system packages more polite.
+
 ## [2.0.15]
 
 ### Changed
