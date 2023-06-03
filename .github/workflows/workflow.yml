@@ -7,8 +7,14 @@ on:
     # Prime the caches every Monday
     - cron: 0 1 * * MON
 
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+# Concurrent workflows are grouped by the PR or branch that triggered them
+# (github.ref) and the name of the workflow (github.workflow). The
+# 'cancel-in-progress' option then make sure that only one workflow is running
+# at a time. This doesn't prevent new jobs from running, rather it cancels
+# already running jobs before scheduling new jobs.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'pull_request' || github.sha }}
   cancel-in-progress: true
 
 permissions: read-all
@@ -28,24 +34,34 @@ jobs:
         with:
           node-version: 16
 
+      - name: Get yarn cache folder path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >>"$GITHUB_OUTPUT"
+
+      - name: Retrieve yarn cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
       - name: Install npm packages
-        if: runner.os == 'Linux'
         run: yarn install --immutable
 
       - name: Check formatting
-        if: runner.os == 'Linux'
+        if: always()
         run: yarn format:check
 
       - name: Check lint
-        if: runner.os == 'Linux'
+        if: always()
         run: yarn lint
 
       - name: Check type
-        if: runner.os == 'Linux'
+        if: always()
         run: yarn typecheck
 
       - name: Ensure dist directory is up-to-date
-        if: runner.os == 'Linux'
         shell: bash
         run: |
           yarn build
@@ -73,8 +89,6 @@ jobs:
           - os: windows-latest
             ocaml-compiler: "4.14"
           - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.5.0.0+options,ocaml-option-32bit
-          - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.0.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.2.0+trunk
@@ -94,4 +108,4 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-repositories: ${{ matrix.opam-repositories }}
 
-      - run: opam depext uri --install
+      - run: opam depext --install uri
