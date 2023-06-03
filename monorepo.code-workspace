@@ -9,5 +9,13 @@
     { "name": "packages/lint-opam", "path": "packages/lint-opam" },
     { "name": "packages/setup-ocaml", "path": "packages/setup-ocaml" },
     { "name": "root", "path": "." }
-  ]
+  ],
+  "settings": {
+    "search.exclude": {
+      "**/dist": true,
+      "**/node_modules": true,
+      ".yarn": true,
+      "yarn.lock": true
+    }
+  }
 }
