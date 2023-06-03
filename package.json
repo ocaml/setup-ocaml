@@ -17,6 +17,6 @@
   "resolutions": {
     "tsconfig-paths": "4.2.0"
   },
-  "packageManager": "yarn@3.5.1",
+  "packageManager": "yarn@3.6.0",
   "private": true
 }
