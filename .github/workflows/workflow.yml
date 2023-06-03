@@ -107,5 +107,6 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-repositories: ${{ matrix.opam-repositories }}
+          dune-cache: ${{ matrix.os != 'windows-latest' }}
 
       - run: opam depext --install uri
