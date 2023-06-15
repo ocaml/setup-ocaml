@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.16]
+
 ### Changed
 
 - Make logs around system packages more polite.
@@ -430,7 +432,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.15...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.16...HEAD
+[2.0.16]: https://github.com/ocaml/setup-ocaml/compare/v2.0.15...v2.0.16
 [2.0.15]: https://github.com/ocaml/setup-ocaml/compare/v2.0.14...v2.0.15
 [2.0.14]: https://github.com/ocaml/setup-ocaml/compare/v2.0.13...v2.0.14
 [2.0.13]: https://github.com/ocaml/setup-ocaml/compare/v2.0.12...v2.0.13
