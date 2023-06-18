@@ -20,7 +20,7 @@
     "@actions/tool-cache": "2.0.1",
     "cheerio": "1.0.0-rc.12",
     "date-fns": "2.30.0",
-    "semver": "7.5.1",
+    "semver": "7.5.2",
     "yaml": "2.3.1"
   },
   "devDependencies": {
@@ -31,7 +31,7 @@
     "@types/prettier": "2.7.3",
     "@types/semver": "7.5.0",
     "@vercel/ncc": "0.36.1",
-    "eslint": "8.42.0",
+    "eslint": "8.43.0",
     "prettier": "2.8.8",
     "typescript": "5.1.3"
   },
