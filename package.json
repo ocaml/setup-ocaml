@@ -12,11 +12,11 @@
   },
   "devDependencies": {
     "prettier": "2.8.8",
-    "turbo": "1.10.3"
+    "turbo": "1.10.4"
   },
   "resolutions": {
     "tsconfig-paths": "4.2.0"
   },
-  "packageManager": "yarn@3.6.0",
-  "private": true
+  "private": true,
+  "packageManager": "yarn@3.6.0"
 }
