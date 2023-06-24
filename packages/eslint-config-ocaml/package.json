@@ -15,7 +15,7 @@
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-simple-import-sort": "10.0.0",
-    "eslint-plugin-turbo": "1.10.4",
+    "eslint-plugin-turbo": "1.10.6",
     "eslint-plugin-unicorn": "47.0.0"
   },
   "devDependencies": {
