@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Cygwin pin to v3.4.6 workaround removed.
+
 ## [2.0.17]
 
 ### Fixed
