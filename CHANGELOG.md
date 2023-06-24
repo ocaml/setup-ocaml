@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.17]
+
 ### Fixed
 
 - Temporarily hold Cygwin at 3.4.6 to workaround upstream tar packaging issue.
@@ -436,7 +438,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.16...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.17...HEAD
+[2.0.17]: https://github.com/ocaml/setup-ocaml/compare/v2.0.16...v2.0.17
 [2.0.16]: https://github.com/ocaml/setup-ocaml/compare/v2.0.15...v2.0.16
 [2.0.15]: https://github.com/ocaml/setup-ocaml/compare/v2.0.14...v2.0.15
 [2.0.14]: https://github.com/ocaml/setup-ocaml/compare/v2.0.13...v2.0.14
