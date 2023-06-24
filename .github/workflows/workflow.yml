@@ -110,3 +110,5 @@ jobs:
           dune-cache: ${{ matrix.os != 'windows-latest' }}
 
       - run: opam depext --install uri
+
+      - run: opam install ocamlbuild
