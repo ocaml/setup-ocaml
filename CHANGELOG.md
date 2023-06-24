@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Temporarily hold Cygwin at 3.4.6 to workaround upstream tar packaging issue.
+
 ## [2.0.16]
 
 ### Changed

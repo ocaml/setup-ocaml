@@ -179,6 +179,7 @@ async function setupCygwin() {
   }
   const site = "https://mirrors.kernel.org/sourceware/cygwin";
   const packages = [
+    "cygwin=3.4.6-1",
     "curl",
     "diffutils",
     "m4",
