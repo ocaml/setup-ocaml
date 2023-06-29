@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Unlock opam 2.2.0 pre-release.
+
 ## [2.0.18]
 
 ### Fixed

@@ -28,7 +28,7 @@ import {
 import { getCygwinVersion } from "./win32";
 
 async function getLatestOpamRelease() {
-  const semverRange = "<2.2.0";
+  const semverRange = "<2.3.0";
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
@@ -37,7 +37,10 @@ async function getLatestOpamRelease() {
   });
   const matchedReleases = releases
     .filter((release) =>
-      semver.satisfies(release.tag_name, semverRange, { loose: true })
+      semver.satisfies(release.tag_name, semverRange, {
+        includePrerelease: true,
+        loose: true,
+      })
     )
     .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
       semver.rcompare(v1, v2, { loose: true })
