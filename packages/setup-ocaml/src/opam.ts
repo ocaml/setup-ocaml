@@ -28,7 +28,7 @@ import {
 } from "./system";
 import { getCygwinVersion } from "./win32";
 
-async function getLatestOpamRelease() {
+export async function getLatestOpamRelease() {
   const semverRange = "<2.3.0";
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { data: releases } = await octokit.rest.repos.listReleases({

@@ -10,12 +10,12 @@ import * as datefns from "date-fns";
 
 import {
   CACHE_PREFIX,
-  GITHUB_TOKEN,
   OCAML_COMPILER,
   OPAM_DISABLE_SANDBOXING,
   OPAM_REPOSITORIES,
   Platform,
 } from "./constants";
+import { getLatestOpamRelease } from "./opam";
 import {
   getArchitecture,
   getPlatform,
@@ -71,13 +71,11 @@ async function composeOpamCacheKeys() {
       : // eslint-disable-next-line unicorn/no-await-expression-member
         `${platform}-${(await getSystemIdentificationInfo()).version}`;
   const architecture = getArchitecture();
-  const octokit = github.getOctokit(GITHUB_TOKEN);
-  const {
-    data: { tag_name: opamVersion },
-  } = await octokit.rest.repos.getLatestRelease({
-    owner: "ocaml",
-    repo: "opam",
-  });
+  const opamVersion =
+    platform === Platform.Win32
+      ? "0.0.0.2"
+      : // eslint-disable-next-line unicorn/no-await-expression-member
+        (await getLatestOpamRelease()).version;
   const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
   const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
   const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
