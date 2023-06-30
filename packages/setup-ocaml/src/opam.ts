@@ -12,6 +12,7 @@ import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache";
 import {
+  ALLOW_PRELEASE_OPAM,
   CYGWIN_ROOT,
   CYGWIN_ROOT_BIN,
   CYGWIN_ROOT_WRAPPERBIN,
@@ -38,7 +39,7 @@ async function getLatestOpamRelease() {
   const matchedReleases = releases
     .filter((release) =>
       semver.satisfies(release.tag_name, semverRange, {
-        includePrerelease: true,
+        includePrerelease: ALLOW_PRELEASE_OPAM,
         loose: true,
       })
     )

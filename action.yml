@@ -40,6 +40,10 @@ inputs:
     description: The prefix of the cache keys.
     required: false
     default: v1
+  allow-prelease-opam:
+    description: Allow to use a pre-release version of opam.
+    required: false
+    default: false
   github-token:
     description: DO NOT SET THIS.
     required: false

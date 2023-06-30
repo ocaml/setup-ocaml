@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Add `allow-prelease-opam` input.
+
 ### Changed
 
 - Unlock opam 2.2.0 pre-release.
