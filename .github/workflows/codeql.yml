@@ -8,8 +8,14 @@ on:
     branches:
       - master
 
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+# Concurrent workflows are grouped by the PR or branch that triggered them
+# (github.ref) and the name of the workflow (github.workflow). The
+# 'cancel-in-progress' option then make sure that only one workflow is running
+# at a time. This doesn't prevent new jobs from running, rather it cancels
+# already running jobs before scheduling new jobs.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'pull_request' || github.sha }}
   cancel-in-progress: true
 
 permissions: read-all
@@ -25,15 +31,15 @@ jobs:
 
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@46ed16ded91731b2df79a2893d3aea8e9f03b5c4 # v2.20.3
         with:
           config-file: .github/codeql/codeql-configuration.yml
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@46ed16ded91731b2df79a2893d3aea8e9f03b5c4 # v2.20.3
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@46ed16ded91731b2df79a2893d3aea8e9f03b5c4 # v2.20.3
