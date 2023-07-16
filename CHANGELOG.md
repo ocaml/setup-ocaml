@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Workaround dune cache hardlink failures by using copy mode always
+
 ## [2.0.18]
 
 ### Fixed
