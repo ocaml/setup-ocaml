@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Changed
 
-- Workaround dune cache hardlink failures by using copy mode always
+- Workaround dune cache hardlink failures by using copy mode always.
 
 ## [2.0.18]
 
