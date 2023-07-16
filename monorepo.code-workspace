@@ -8,6 +8,7 @@
     { "name": "packages/lint-fmt", "path": "packages/lint-fmt" },
     { "name": "packages/lint-opam", "path": "packages/lint-opam" },
     { "name": "packages/setup-ocaml", "path": "packages/setup-ocaml" },
+    { "name": "eslint-config-ocaml", "path": "packages/eslint-config-ocaml" },
     { "name": "root", "path": "." }
   ],
   "settings": {

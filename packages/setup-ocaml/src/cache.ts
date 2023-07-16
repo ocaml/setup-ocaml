@@ -122,7 +122,7 @@ function composeCygwinCachePaths() {
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
   paths.push(cygwinRootSymlinkPath);
   const cygwinEncodedUri = encodeURIComponent(
-    "https://mirrors.kernel.org/sourceware/cygwin/"
+    "https://mirrors.kernel.org/sourceware/cygwin/",
   ).toLowerCase();
   const cygwinPackageRoot = path.join(githubWorkspace, cygwinEncodedUri);
   paths.push(cygwinPackageRoot);
@@ -161,7 +161,7 @@ function composeOpamCachePaths() {
       "a",
       repo,
       repo,
-      "_opam"
+      "_opam",
     );
     paths.push(opamCygwinLocalCachePath);
   } else {
@@ -192,14 +192,14 @@ function composeOpamDownloadCachePaths() {
 async function restoreCache(
   key: string,
   restoreKeys: string[],
-  paths: string[]
+  paths: string[],
 ) {
   const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
   if (cacheKey) {
     core.info(`Cache restored from key: ${cacheKey}`);
   } else {
     core.info(
-      `Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`
+      `Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`,
     );
   }
   return cacheKey;

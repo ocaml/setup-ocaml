@@ -50,11 +50,11 @@ async function resolveVersion(semverVersion: string) {
   const matchedFullCompilerVersion = semver.maxSatisfying(
     compilerVersions,
     semverVersion,
-    { loose: true }
+    { loose: true },
   );
   if (matchedFullCompilerVersion === null) {
     throw new Error(
-      `No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`
+      `No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`,
     );
   } else {
     return matchedFullCompilerVersion;

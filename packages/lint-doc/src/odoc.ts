@@ -12,7 +12,7 @@ export async function lintOdoc() {
   const exitCode = await exec(
     "opam",
     ["exec", "--", "dune", "build", "@doc"],
-    options
+    options,
   );
   if (exitCode !== 0) {
     throw new Error("dune build @doc failed");

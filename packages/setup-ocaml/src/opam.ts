@@ -37,10 +37,10 @@ async function getLatestOpamRelease() {
   });
   const matchedReleases = releases
     .filter((release) =>
-      semver.satisfies(release.tag_name, semverRange, { loose: true })
+      semver.satisfies(release.tag_name, semverRange, { loose: true }),
     )
     .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
-      semver.rcompare(v1, v2, { loose: true })
+      semver.rcompare(v1, v2, { loose: true }),
     );
   const latestRelease = matchedReleases[0];
   if (latestRelease === undefined) {
@@ -50,7 +50,7 @@ async function getLatestOpamRelease() {
     const architecture = getArchitecture();
     const platform = getPlatform();
     const matchedAssets = assets.find(({ browser_download_url }) =>
-      browser_download_url.includes(`${architecture}-${platform}`)
+      browser_download_url.includes(`${architecture}-${platform}`),
     );
     if (matchedAssets === undefined) {
       throw new Error("matchedAssets not found");
@@ -84,7 +84,7 @@ async function acquireOpamUnix() {
       "opam",
       "opam",
       version,
-      architecture
+      architecture,
     );
     core.info(`Successfully cached opam to ${cachedPath}`);
     await fs.chmod(`${cachedPath}/opam`, 0o755);
@@ -131,7 +131,7 @@ async function initializeOpamUnix() {
   } catch (error) {
     if (error instanceof Error) {
       core.notice(
-        `An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`
+        `An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`,
       );
     }
     await updateUnixPackageIndexFiles();
@@ -164,14 +164,14 @@ async function setupCygwin() {
   const cachedPath = tc.find("cygwin", version, "x86_64");
   if (cachedPath === "") {
     const downloadedPath = await tc.downloadTool(
-      "https://cygwin.com/setup-x86_64.exe"
+      "https://cygwin.com/setup-x86_64.exe",
     );
     const cachedPath = await tc.cacheFile(
       downloadedPath,
       "setup-x86_64.exe",
       "cygwin",
       version,
-      "x86_64"
+      "x86_64",
     );
     core.addPath(cachedPath);
   } else {
@@ -211,7 +211,7 @@ async function acquireOpamWindows() {
   const cachedPath = tc.find("opam", opamVersion);
   if (cachedPath === "") {
     const downloadedPath = await tc.downloadTool(
-      `https://github.com/fdopen/opam-repository-mingw/releases/download/${opamVersion}/opam64.zip`
+      `https://github.com/fdopen/opam-repository-mingw/releases/download/${opamVersion}/opam64.zip`,
     );
     const extractedPath = await tc.extractZip(downloadedPath);
     const cachedPath = await tc.cacheDir(extractedPath, "opam", opamVersion);
@@ -343,7 +343,7 @@ export async function repositoryAddAll(repositories: [string, string][]) {
     const autocrlf = await getExecOutput(
       "git",
       ["config", "--global", "core.autocrlf"],
-      { ignoreReturnCode: true }
+      { ignoreReturnCode: true },
     );
     if (autocrlf.stdout.trim() !== "input") {
       if (autocrlf.exitCode === 0) {

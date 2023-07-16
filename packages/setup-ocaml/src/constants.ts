@@ -55,7 +55,7 @@ export const OPAM_DEPEXT_FLAGS = core
 
 export const OPAM_DISABLE_SANDBOXING = core.getBooleanInput(
   "opam-disable-sandboxing",
-  { required: false, trimWhitespace: true }
+  { required: false, trimWhitespace: true },
 );
 
 export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages", {
@@ -69,7 +69,7 @@ export const OPAM_PIN = core.getBooleanInput("opam-pin", {
 });
 
 const repositories_yaml = yaml.parse(
-  core.getInput("opam-repositories", { required: false, trimWhitespace: true })
+  core.getInput("opam-repositories", { required: false, trimWhitespace: true }),
 ) as Record<string, string> | null;
 
 const platform = getPlatform();

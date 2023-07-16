@@ -6,7 +6,7 @@ function createHttpClient() {
   return new HttpClient(
     "OCamlBot (+https://github.com/ocaml/setup-ocaml)",
     [],
-    { allowRetries: true, maxRetries: 5 }
+    { allowRetries: true, maxRetries: 5 },
   );
 }
 
