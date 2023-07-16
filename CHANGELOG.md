@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.19]
+
 ### Changed
 
 - Workaround dune cache hardlink failures by using copy mode always.
@@ -448,8 +450,9 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.18...HEAD
-[2.0.17]: https://github.com/ocaml/setup-ocaml/compare/v2.0.17...v2.0.18
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.19...HEAD
+[2.0.19]: https://github.com/ocaml/setup-ocaml/compare/v2.0.18...v2.0.19
+[2.0.18]: https://github.com/ocaml/setup-ocaml/compare/v2.0.17...v2.0.18
 [2.0.17]: https://github.com/ocaml/setup-ocaml/compare/v2.0.16...v2.0.17
 [2.0.16]: https://github.com/ocaml/setup-ocaml/compare/v2.0.15...v2.0.16
 [2.0.15]: https://github.com/ocaml/setup-ocaml/compare/v2.0.14...v2.0.15
