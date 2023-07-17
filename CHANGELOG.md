@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Fix opam calls to support testing GitHub actions in local containers
+  by using the act tool from https://github.com/nektos/act
+
 ## [2.0.18]
 
 ### Fixed

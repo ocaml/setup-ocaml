@@ -4,6 +4,7 @@ import * as process from "node:process";
 
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
+import * as github from "@actions/github";
 
 import {
   restoreCygwinCache,
@@ -47,11 +48,13 @@ export async function installer() {
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMVERBOSE", isDebug);
   core.exportVariable("OPAMYES", 1);
+  # Silence opam warnings triggered in act containers using root:
+  if (github.context.actor === "nektos/act") {
+    core.exportVariable("OPAMROOTISOK", 1);
+  }
   if (platform === Platform.Win32) {
     const opamRoot = path.join("D:", ".opam");
     core.exportVariable("OPAMROOT", opamRoot);
-  }
-  if (platform === Platform.Win32) {
     core.startGroup("Change the file system behavior parameters");
     await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
@@ -64,12 +67,8 @@ export async function installer() {
     ]);
     await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     core.endGroup();
-  }
-  if (platform === Platform.Win32) {
     core.exportVariable("HOME", process.env["USERPROFILE"]);
     core.exportVariable("MSYS", "winsymlinks:native");
-  }
-  if (platform === Platform.Win32) {
     await restoreCygwinCache();
   }
   const opamCacheHit = await restoreOpamCache();

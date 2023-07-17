@@ -138,7 +138,8 @@ async function initializeOpamUnix() {
     await installUnixSystemPackages();
   }
   const disableSandboxing = [];
-  if (OPAM_DISABLE_SANDBOXING) {
+  # Fix opam to run in act containers which have no /dev/pts for bubblewrap:
+  if (OPAM_DISABLE_SANDBOXING || github.context.actor === "nektos/act") {
     disableSandboxing.push("--disable-sandboxing");
   }
   await exec("opam", [
