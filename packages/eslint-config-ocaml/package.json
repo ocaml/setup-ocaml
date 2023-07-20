@@ -8,14 +8,14 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "6.0.0",
-    "@typescript-eslint/parser": "6.0.0",
+    "@typescript-eslint/eslint-plugin": "6.1.0",
+    "@typescript-eslint/parser": "6.1.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-import-resolver-typescript": "3.5.5",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-prettier": "5.0.0",
     "eslint-plugin-simple-import-sort": "10.0.0",
-    "eslint-plugin-turbo": "1.10.7",
+    "eslint-plugin-turbo": "1.10.9",
     "eslint-plugin-unicorn": "48.0.0"
   },
   "devDependencies": {
