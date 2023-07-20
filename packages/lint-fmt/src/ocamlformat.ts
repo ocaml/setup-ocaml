@@ -17,7 +17,10 @@ async function parse() {
 
 export async function getOcamlformatVersion() {
   const config = await parse();
-  const version = config.filter((line) => line[0] === "version").flat()[1];
+  const version = config
+    .filter((line) => line.at(0) === "version")
+    .flat()
+    .at(1);
   if (version) {
     return version;
   } else {

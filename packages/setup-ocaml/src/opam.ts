@@ -42,7 +42,7 @@ async function getLatestOpamRelease() {
     .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
       semver.rcompare(v1, v2, { loose: true }),
     );
-  const latestRelease = matchedReleases[0];
+  const latestRelease = matchedReleases.at(0);
   if (latestRelease === undefined) {
     throw new Error("latestRelease not found");
   } else {
