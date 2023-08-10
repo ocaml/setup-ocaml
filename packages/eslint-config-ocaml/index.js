@@ -1,6 +1,6 @@
 /** @type {import('eslint').Linter.Config} */
 
-// eslint-disable-next-line unicorn/no-empty-file, unicorn/prefer-module
+// eslint-disable-next-line unicorn/prefer-module
 module.exports = {
   extends: [
     "eslint:recommended",

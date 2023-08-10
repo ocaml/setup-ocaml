@@ -11,8 +11,8 @@
     "build": "turbo run build"
   },
   "devDependencies": {
-    "prettier": "3.0.0",
-    "turbo": "1.10.9"
+    "prettier": "3.0.1",
+    "turbo": "1.10.12"
   },
   "resolutions": {
     "tsconfig-paths": "4.2.0"

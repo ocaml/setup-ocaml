@@ -15,11 +15,11 @@
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/node16": "16.1.0",
     "@tsconfig/strictest": "2.0.1",
-    "@types/node": "20.4.2",
-    "@types/prettier": "2.7.3",
+    "@types/node": "20.4.9",
+    "@types/prettier": "3.0.0",
     "@vercel/ncc": "0.36.1",
-    "eslint": "8.45.0",
-    "prettier": "3.0.0",
+    "eslint": "8.46.0",
+    "prettier": "3.0.1",
     "typescript": "5.1.6"
   },
   "private": true
