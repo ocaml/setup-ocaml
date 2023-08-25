@@ -14,6 +14,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   deploy-doc:
     runs-on: ubuntu-latest
