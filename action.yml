@@ -11,19 +11,19 @@ inputs:
   opam-repositories:
     description: The name and URL pair of the repository to fetch the packages from.
     required: false
-    default:
+    default: ""
   opam-pin:
     description: Enable the automation feature for opam pin.
     required: false
-    default: true
+    default: "true"
   opam-depext:
     description: Enable the automation feature for opam depext.
     required: false
-    default: true
+    default: "true"
   opam-depext-flags:
     description: The flags for the opam depext command.
     required: false
-    default:
+    default: ""
   opam-local-packages:
     description: The local packages to be used by `opam-pin` or `opam-depext`.
     required: false
@@ -31,11 +31,11 @@ inputs:
   opam-disable-sandboxing:
     description: Disable the opam sandboxing feature.
     required: false
-    default: false
+    default: "false"
   dune-cache:
     description: Enable the dune cache feature.
     required: false
-    default: false
+    default: "false"
   cache-prefix:
     description: The prefix of the cache keys.
     required: false
@@ -45,7 +45,7 @@ inputs:
     required: false
     default: ${{ github.token }}
 runs:
-  using: node16
+  using: node20
   main: dist/index.js
   post: dist/post/index.js
   post-if: success()
