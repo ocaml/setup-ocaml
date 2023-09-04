@@ -17,7 +17,7 @@ runs-on: ${{ matrix.os }}
 
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
 
   - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
     uses: ocaml/setup-ocaml@v2
@@ -30,7 +30,7 @@ steps:
 ```yml
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
 
   - name: Set-up OCaml on Windows
     uses: ocaml/setup-ocaml@v2
@@ -52,7 +52,7 @@ steps:
 ```yml
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
 
   - name: Set opam repository url
     id: repository
@@ -82,7 +82,7 @@ package for supported patterns.
 ```yml
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
 
   - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
     uses: ocaml/setup-ocaml@v2
@@ -112,7 +112,7 @@ runs-on: ubuntu-latest
 
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
 
   - name: Retrieve new lists of system packages
     run: apt-get update
