@@ -14,13 +14,13 @@
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/node20": "20.1.2",
-    "@tsconfig/strictest": "2.0.1",
-    "@types/node": "20.4.9",
+    "@tsconfig/strictest": "2.0.2",
+    "@types/node": "20.5.9",
     "@types/prettier": "3.0.0",
     "@vercel/ncc": "0.36.1",
-    "eslint": "8.46.0",
-    "prettier": "3.0.1",
-    "typescript": "5.1.6"
+    "eslint": "8.48.0",
+    "prettier": "3.0.3",
+    "typescript": "5.2.2"
   },
   "private": true
 }
