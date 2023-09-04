@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
-    "@tsconfig/node16": "16.1.0",
+    "@tsconfig/node20": "20.1.2",
     "@tsconfig/strictest": "2.0.1",
     "@types/node": "20.4.9",
     "@types/prettier": "3.0.0",
