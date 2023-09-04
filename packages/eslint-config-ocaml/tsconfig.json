@@ -3,7 +3,7 @@
   "extends": ["@tsconfig/strictest/tsconfig.json"],
   "compilerOptions": {
     "isolatedModules": true,
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleDetection": "force",
     "moduleResolution": "NodeNext",
     "noEmit": true
