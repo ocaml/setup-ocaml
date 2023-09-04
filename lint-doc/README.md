@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set-up OCaml 5.0
         uses: ocaml/setup-ocaml@v2
