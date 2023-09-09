@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.0.20]
+
 ### Changed
 
 - Update default runtime to node20.
@@ -454,7 +456,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.19...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.20...HEAD
+[2.0.20]: https://github.com/ocaml/setup-ocaml/compare/v2.0.19...v2.0.20
 [2.0.19]: https://github.com/ocaml/setup-ocaml/compare/v2.0.18...v2.0.19
 [2.0.18]: https://github.com/ocaml/setup-ocaml/compare/v2.0.17...v2.0.18
 [2.0.17]: https://github.com/ocaml/setup-ocaml/compare/v2.0.16...v2.0.17
