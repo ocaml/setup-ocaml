@@ -29,10 +29,10 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
 
-      - name: Set-up Node.js 16
+      - name: Set-up Node.js 20
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Get yarn cache folder path
         id: yarn-cache-dir-path
@@ -80,8 +80,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-13
-          - macos-12 # macos-latest
+          - macos-latest
           - ubuntu-latest
         ocaml-compiler:
           - "5.0"
@@ -90,11 +89,6 @@ jobs:
             ocaml-compiler: "4.14"
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.0.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static
-          - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.5.2.0+trunk
-            opam-repositories: |
-              beta: https://github.com/ocaml/ocaml-beta-repository.git
-              default: https://github.com/ocaml/opam-repository.git
 
     runs-on: ${{ matrix.os }}
 
@@ -106,7 +100,6 @@ jobs:
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          opam-repositories: ${{ matrix.opam-repositories }}
           dune-cache: ${{ matrix.os != 'windows-latest' }}
 
       - run: opam depext --install uri
