@@ -15,7 +15,7 @@
     "turbo": "1.10.13"
   },
   "resolutions": {
-    "tsconfig-paths": "4.2.0"
+    "eslint-plugin-import/tsconfig-paths": "4.2.0"
   },
   "private": true,
   "packageManager": "yarn@3.6.3"
