@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Add the OCaml problem matcher.
+
 ## [2.0.20]
 
 ### Changed

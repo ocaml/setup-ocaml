@@ -3,6 +3,7 @@ import * as path from "node:path";
 import * as process from "node:process";
 
 import * as core from "@actions/core";
+import { issueCommand } from "@actions/core/lib/command";
 import { exec } from "@actions/exec";
 
 import {
@@ -36,7 +37,6 @@ import { resolveCompiler } from "./version";
 export async function installer() {
   const platform = getPlatform();
   const numberOfProcessors = os.cpus().length;
-  const isDebug = core.isDebug();
   core.exportVariable("OPAMCLI", "2.0");
   core.exportVariable("OPAMCOLOR", "always");
   core.exportVariable("OPAMERRLOGLEN", 0);
@@ -45,7 +45,6 @@ export async function installer() {
   // [todo] remove this line once we unlock opam 2.2
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
-  core.exportVariable("OPAMVERBOSE", isDebug);
   core.exportVariable("OPAMYES", 1);
   if (platform === Platform.Win32) {
     const opamRoot = path.join("D:", ".opam");
@@ -112,6 +111,14 @@ export async function installer() {
       }
     }
   }
+  const ocamlMatcherPath = path.join(
+    // eslint-disable-next-line unicorn/prefer-module
+    __dirname,
+    "..",
+    "matchers",
+    "ocaml.json",
+  );
+  issueCommand("add-matcher", {}, ocamlMatcherPath);
   await exec("opam", ["--version"]);
   if (OPAM_DEPEXT) {
     await exec("opam", ["depext", "--version"]);

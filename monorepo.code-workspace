@@ -4,11 +4,12 @@
     { "name": "lint-doc", "path": "lint-doc" },
     { "name": "lint-fmt", "path": "lint-fmt" },
     { "name": "lint-opam", "path": "lint-opam" },
+    { "name": "matchers", "path": "matchers" },
+    { "name": "eslint-config-ocaml", "path": "packages/eslint-config-ocaml" },
     { "name": "packages/lint-doc", "path": "packages/lint-doc" },
     { "name": "packages/lint-fmt", "path": "packages/lint-fmt" },
     { "name": "packages/lint-opam", "path": "packages/lint-opam" },
     { "name": "packages/setup-ocaml", "path": "packages/setup-ocaml" },
-    { "name": "eslint-config-ocaml", "path": "packages/eslint-config-ocaml" },
     { "name": "root", "path": "." }
   ],
   "settings": {

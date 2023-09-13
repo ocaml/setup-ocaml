@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/lint-opam",
   "scripts": {
+    "clean": "shx rm -rf ../../lint-opam/dist",
     "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../lint-opam/dist",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
@@ -19,6 +20,7 @@
     "@vercel/ncc": "0.38.0",
     "eslint": "8.49.0",
     "prettier": "3.0.3",
+    "shx": "0.3.4",
     "typescript": "5.2.2"
   },
   "private": true
