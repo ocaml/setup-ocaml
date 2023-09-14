@@ -17,7 +17,7 @@ jobs:
       - name: Set-up OCaml 4.14
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.14
+          ocaml-compiler: "4.14"
           dune-cache: true
 
       - name: Lint opam

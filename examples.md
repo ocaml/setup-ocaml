@@ -11,7 +11,7 @@ strategy:
       - ubuntu-latest
       - windows-latest
     ocaml-compiler:
-      - 4.14
+      - "5.1"
 
 runs-on: ${{ matrix.os }}
 
@@ -104,7 +104,7 @@ strategy:
       - debian:latest
       - ubuntu:latest
     ocaml-compiler:
-      - "5.0"
+      - "5.1"
 
 container: ${{ matrix.container }}
 
