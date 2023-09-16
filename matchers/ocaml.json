@@ -1,0 +1,17 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "ocaml",
+      "pattern": [
+        {
+          "regexp": "^(\\bFile\\b\\s\"(.+)\",\\s\\bline\\b\\s(\\d+),\\s\\bcharacters\\b\\s(\\d+)\\b-\\b(\\d+):)$",
+          "message": 1,
+          "file": 2,
+          "line": 3,
+          "column": 4,
+          "loop": true
+        }
+      ]
+    }
+  ]
+}
