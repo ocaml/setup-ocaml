@@ -42,7 +42,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - "5.0"
+          - "5.1"
 
     runs-on: ${{ matrix.os }}
 
@@ -128,12 +128,12 @@ more detailed examples please refer to the
 
 Examples:
 
-- Exact package name: `ocaml-base-compiler.5.0.0`,
+- Exact package name: `ocaml-base-compiler.5.1.0`,
   `ocaml-variants.4.14.0+mingw64c`
 - Combine multiple packages:
-  `ocaml-variants.5.0.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
-- Minor versions: `4.08`, `4.14`, `5.0`, `5.0.x`
-- More specific versions: `~4.02.2`, `5.0.0`,
+  `ocaml-variants.5.1.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
+- Minor versions: `4.08`, `4.14`, `5.1`, `5.1.x`
+- More specific versions: `~4.02.2`, `5.1.0`,
 
 ## Advanced Configurations
 
