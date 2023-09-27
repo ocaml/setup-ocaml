@@ -35,17 +35,14 @@ import { resolveCompiler } from "./version";
 
 export async function installer() {
   const platform = getPlatform();
-  const numberOfProcessors = os.cpus().length;
-  const isDebug = core.isDebug();
   core.exportVariable("OPAMCLI", "2.0");
   core.exportVariable("OPAMCOLOR", "always");
   core.exportVariable("OPAMERRLOGLEN", 0);
-  core.exportVariable("OPAMJOBS", numberOfProcessors);
+  core.exportVariable("OPAMJOBS", os.cpus().length);
   core.exportVariable("OPAMPRECISETRACKING", 1);
   // [todo] remove this line once we unlock opam 2.2
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
-  core.exportVariable("OPAMVERBOSE", isDebug);
   core.exportVariable("OPAMYES", 1);
   if (platform === Platform.Win32) {
     const opamRoot = path.join("D:", ".opam");
