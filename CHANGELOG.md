@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Prevent opam bug by leaving verbose mode undefined.
+
 ## [2.0.20]
 
 ### Changed
