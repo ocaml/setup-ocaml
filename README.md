@@ -21,7 +21,7 @@ the runner. The syntax of GitHub's workflows is flexible enough to offer several
 methods to do this.
 
 ```yml
-name: Main workflow
+name: Builds, tests & co
 
 on:
   pull_request:
