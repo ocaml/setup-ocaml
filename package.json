@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "prettier": "3.0.3",
-    "turbo": "1.10.14"
+    "turbo": "1.10.15"
   },
   "resolutions": {
     "eslint-plugin-import/tsconfig-paths": "4.2.0"
