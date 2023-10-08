@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Add `allow-prelease-opam` input.
+
 ## [2.0.21]
 
 ### Fixed

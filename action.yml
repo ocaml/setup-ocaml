@@ -5,6 +5,10 @@ branding:
   icon: package
   color: orange
 inputs:
+  allow-prelease-opam:
+    description: Allow to use a pre-release version of opam.
+    required: false
+    default: "false"
   ocaml-compiler:
     description: The OCaml compiler packages to initialise.
     required: true
