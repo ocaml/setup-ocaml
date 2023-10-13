@@ -19,6 +19,7 @@
     "@vercel/ncc": "0.38.0",
     "eslint": "8.51.0",
     "prettier": "3.0.3",
+    "prettier-plugin-packagejson": "2.4.6",
     "typescript": "5.2.2"
   },
   "private": true

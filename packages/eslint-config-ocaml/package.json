@@ -1,5 +1,6 @@
 {
   "name": "@ocaml/eslint-config-ocaml",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "format": "prettier . --write",
@@ -23,7 +24,7 @@
     "@types/eslint": "8.44.3",
     "eslint": "8.51.0",
     "prettier": "3.0.3",
+    "prettier-plugin-packagejson": "2.4.6",
     "typescript": "5.2.2"
-  },
-  "private": true
+  }
 }

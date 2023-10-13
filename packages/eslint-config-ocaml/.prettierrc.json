@@ -7,5 +7,6 @@
         "proseWrap": "always"
       }
     }
-  ]
+  ],
+  "plugins": ["prettier-plugin-packagejson"]
 }
