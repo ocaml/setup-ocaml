@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.1.0]
+
 ### Added
 
 - Add `allow-prelease-opam` input.
@@ -466,7 +468,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.0.21...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/ocaml/setup-ocaml/compare/v2.0.21...v2.1.0
 [2.0.21]: https://github.com/ocaml/setup-ocaml/compare/v2.0.20...v2.0.21
 [2.0.20]: https://github.com/ocaml/setup-ocaml/compare/v2.0.19...v2.0.20
 [2.0.19]: https://github.com/ocaml/setup-ocaml/compare/v2.0.18...v2.0.19
