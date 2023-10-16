@@ -22,6 +22,11 @@ export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
 export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
+export const ALLOW_PRELEASE_OPAM = core.getBooleanInput("allow-prelease-opam", {
+  required: false,
+  trimWhitespace: true,
+});
+
 export const CACHE_PREFIX = core.getInput("cache-prefix", {
   required: false,
   trimWhitespace: true,
