@@ -16,16 +16,21 @@ export enum Platform {
   Win32 = "win32",
 }
 
+const platform = getPlatform();
+
 export const CYGWIN_ROOT = path.join("D:", "cygwin");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
 export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
-export const ALLOW_PRELEASE_OPAM = core.getBooleanInput("allow-prelease-opam", {
-  required: false,
-  trimWhitespace: true,
-});
+// [todo] remove the branch for Windows once opam 2.2 is released as stable.
+export const ALLOW_PRELEASE_OPAM =
+  platform !== Platform.Win32 &&
+  core.getBooleanInput("allow-prelease-opam", {
+    required: false,
+    trimWhitespace: true,
+  });
 
 export const CACHE_PREFIX = core.getInput("cache-prefix", {
   required: false,
@@ -47,10 +52,13 @@ export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   trimWhitespace: true,
 });
 
-export const OPAM_DEPEXT = core.getBooleanInput("opam-depext", {
-  required: false,
-  trimWhitespace: true,
-});
+// [todo] remove this once opam 2.2 is released as stable.
+export const OPAM_DEPEXT =
+  !ALLOW_PRELEASE_OPAM &&
+  core.getBooleanInput("opam-depext", {
+    required: false,
+    trimWhitespace: true,
+  });
 
 export const OPAM_DEPEXT_FLAGS = core
   .getInput("opam-depext-flags", { required: false, trimWhitespace: true })
@@ -76,8 +84,6 @@ export const OPAM_PIN = core.getBooleanInput("opam-pin", {
 const repositories_yaml = yaml.parse(
   core.getInput("opam-repositories", { required: false, trimWhitespace: true }),
 ) as Record<string, string> | null;
-
-const platform = getPlatform();
 
 const defaultRepository =
   platform === Platform.Win32
