@@ -40,7 +40,7 @@ export async function installer() {
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", os.cpus().length);
   core.exportVariable("OPAMPRECISETRACKING", 1);
-  // [todo] remove this line once we unlock opam 2.2
+  // [todo] remove this once opam 2.2 is released as stable.
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMYES", 1);

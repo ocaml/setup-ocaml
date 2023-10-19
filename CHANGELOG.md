@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Do not install `opam-depext` if using opam 2.2 or later.
+
 ## [2.1.0]
 
 ### Added
