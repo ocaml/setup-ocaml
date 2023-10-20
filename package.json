@@ -17,7 +17,7 @@
   "devDependencies": {
     "prettier": "3.0.3",
     "prettier-plugin-packagejson": "2.4.6",
-    "turbo": "1.10.15"
+    "turbo": "1.10.16"
   },
   "packageManager": "yarn@3.6.4+sha256.7f7d51b38db0d94adf25c512e3f3d3b47d23c97922eecc540f7440f116bdb99a"
 }
