@@ -12,6 +12,10 @@ and this project adheres to
 
 - Do not install `opam-depext` if using opam 2.2 or later.
 
+### Fixed
+
+- Do not set `OPAMCLI` if pre-release opam is allowed.
+
 ## [2.1.0]
 
 ### Added

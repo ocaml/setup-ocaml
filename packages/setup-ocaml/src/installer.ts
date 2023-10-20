@@ -13,6 +13,7 @@ import {
   saveOpamCache,
 } from "./cache";
 import {
+  ALLOW_PRELEASE_OPAM,
   DUNE_CACHE,
   OCAML_COMPILER,
   OPAM_DEPEXT,
@@ -35,7 +36,11 @@ import { resolveCompiler } from "./version";
 
 export async function installer() {
   const platform = getPlatform();
-  core.exportVariable("OPAMCLI", "2.0");
+  if (!ALLOW_PRELEASE_OPAM) {
+    // [todo] remove this once opam 2.2 is released as stable.
+    // https://github.com/ocaml/setup-ocaml/issues/299
+    core.exportVariable("OPAMCLI", "2.0");
+  }
   core.exportVariable("OPAMCOLOR", "always");
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", os.cpus().length);
