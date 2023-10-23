@@ -34,7 +34,6 @@ export async function getLatestOpamRelease() {
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam",
-    per_page: 100,
   });
   const matchedReleases = releases
     .filter((release) =>
@@ -47,22 +46,25 @@ export async function getLatestOpamRelease() {
       semver.rcompare(v1, v2, { loose: true }),
     );
   const latestRelease = matchedReleases.at(0);
-  if (latestRelease === undefined) {
-    throw new Error("latestRelease not found");
-  } else {
-    const { assets, tag_name: version } = latestRelease;
-    const architecture = getArchitecture();
-    const platform = getPlatform();
-    const matchedAssets = assets.find(({ browser_download_url }) =>
-      browser_download_url.includes(`${architecture}-${platform}`),
+  if (!latestRelease) {
+    throw new Error(
+      "Could not retrieve the opam release matching the version constraint",
     );
-    if (matchedAssets === undefined) {
-      throw new Error("matchedAssets not found");
-    } else {
-      const { browser_download_url: browserDownloadUrl } = matchedAssets;
-      return { version, browserDownloadUrl };
-    }
   }
+  const architecture = getArchitecture();
+  const platform = getPlatform();
+  const matchedAssets = latestRelease.assets.find((asset) =>
+    asset.browser_download_url.includes(`${architecture}-${platform}`),
+  );
+  if (!matchedAssets) {
+    throw new Error(
+      "Could not find any assets matching the current platform or architecture",
+    );
+  }
+  return {
+    version: latestRelease.tag_name,
+    browserDownloadUrl: matchedAssets.browser_download_url,
+  };
 }
 
 async function findOpam() {
@@ -381,16 +383,20 @@ async function repositoryRemove(name: string) {
 }
 
 async function repositoryList() {
-  let output = "";
   const opam = await findOpam();
-  await exec(opam, ["repository", "list", "--all-switches", "--short"], {
-    listeners: { stdout: (data) => (output += data.toString()) },
-  });
-  const result = output
-    .split("\n")
-    .map((repository) => repository.trim())
-    .filter((repository) => repository.length > 0);
-  return result;
+  const repositoryList = await getExecOutput(
+    opam,
+    ["repository", "list", "--all-switches", "--short"],
+    { ignoreReturnCode: true },
+  );
+  if (repositoryList.exitCode === 0) {
+    return repositoryList.stdout
+      .split("\n")
+      .map((repository) => repository.trim())
+      .filter((repository) => repository.length > 0);
+  } else {
+    return [];
+  }
 }
 
 export async function repositoryRemoveAll() {
