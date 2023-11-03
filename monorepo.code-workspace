@@ -13,9 +13,9 @@
   ],
   "settings": {
     "search.exclude": {
+      "**/.turbo": true,
       "**/dist": true,
       "**/node_modules": true,
-      ".yarn": true,
       "yarn.lock": true
     }
   }
