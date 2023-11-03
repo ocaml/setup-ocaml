@@ -3,7 +3,14 @@
   "extends": ["//"],
   "pipeline": {
     "build": {
-      "outputs": ["../../dist/**"]
+      "outputs": ["../../dist/**"],
+      "passThroughEnv": [
+        "GITHUB_WORKSPACE",
+        "ImageOS",
+        "PATH",
+        "USERPROFILE",
+        "XDG_CACHE_HOME"
+      ]
     }
   }
 }
