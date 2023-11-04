@@ -10,30 +10,33 @@ const {
 } = github.context;
 
 export async function installDune() {
-  core.startGroup("Install dune");
-  await exec("opam", ["depext", "--install", "dune"]);
-  core.endGroup();
+  await core.group("Install dune", async () => {
+    await exec("opam", ["depext", "--install", "dune"]);
+  });
 }
 
 export async function trimDuneCache() {
-  core.startGroup("Remove oldest files from the dune cache to free space");
-  const octokit = github.getOctokit(GITHUB_TOKEN);
-  const {
-    data: { total_count: totalCount },
-  } = await octokit.rest.actions.listJobsForWorkflowRun({
-    owner,
-    repo,
-    run_id,
-  });
-  const cacheSize = Math.floor(5000 / totalCount);
-  await exec("opam", [
-    "exec",
-    "--",
-    "dune",
-    "cache",
-    "trim",
-    "--size",
-    `${cacheSize}MB`,
-  ]);
-  core.endGroup();
+  await core.group(
+    "Remove oldest files from the dune cache to free space",
+    async () => {
+      const octokit = github.getOctokit(GITHUB_TOKEN);
+      const {
+        data: { total_count: totalCount },
+      } = await octokit.rest.actions.listJobsForWorkflowRun({
+        owner,
+        repo,
+        run_id,
+      });
+      const cacheSize = Math.floor(5000 / totalCount);
+      await exec("opam", [
+        "exec",
+        "--",
+        "dune",
+        "cache",
+        "trim",
+        "--size",
+        `${cacheSize}MB`,
+      ]);
+    },
+  );
 }

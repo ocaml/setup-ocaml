@@ -54,18 +54,18 @@ export async function installer() {
     core.exportVariable("OPAMROOT", opamRoot);
   }
   if (platform === Platform.Win32) {
-    core.startGroup("Change the file system behavior parameters");
-    await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-    // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
-    await exec("fsutil", [
-      "behavior",
-      "set",
-      "symlinkEvaluation",
-      "R2L:1",
-      "R2R:1",
-    ]);
-    await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-    core.endGroup();
+    await core.group("Change the file system behavior parameters", async () => {
+      await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
+      // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
+      await exec("fsutil", [
+        "behavior",
+        "set",
+        "symlinkEvaluation",
+        "R2L:1",
+        "R2R:1",
+      ]);
+      await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
+    });
   }
   if (platform === Platform.Win32) {
     core.exportVariable("HOME", process.env["USERPROFILE"]);

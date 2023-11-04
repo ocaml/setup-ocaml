@@ -157,12 +157,12 @@ async function initializeOpamUnix() {
 }
 
 async function setupOpamUnix() {
-  core.startGroup("Install opam");
-  await acquireOpamUnix();
-  core.endGroup();
-  core.startGroup("Initialise the opam state");
-  await initializeOpamUnix();
-  core.endGroup();
+  await core.group("Install opam", async () => {
+    await acquireOpamUnix();
+  });
+  await core.group("Initialise the opam state", async () => {
+    await initializeOpamUnix();
+  });
 }
 
 async function setupCygwin() {
@@ -252,25 +252,25 @@ async function initializeOpamWindows() {
 }
 
 async function setupOpamWindows() {
-  core.startGroup("Prepare the Cygwin environment");
-  core.exportVariable("CYGWIN", "winsymlinks:native");
-  core.exportVariable("CYGWIN_ROOT", CYGWIN_ROOT);
-  core.exportVariable("CYGWIN_ROOT_BIN", CYGWIN_ROOT_BIN);
-  core.exportVariable("CYGWIN_ROOT_WRAPPERBIN", CYGWIN_ROOT_WRAPPERBIN);
-  core.addPath(CYGWIN_ROOT_WRAPPERBIN);
-  await setupCygwin();
-  core.endGroup();
+  await core.group("Prepare the Cygwin environment", async () => {
+    core.exportVariable("CYGWIN", "winsymlinks:native");
+    core.exportVariable("CYGWIN_ROOT", CYGWIN_ROOT);
+    core.exportVariable("CYGWIN_ROOT_BIN", CYGWIN_ROOT_BIN);
+    core.exportVariable("CYGWIN_ROOT_WRAPPERBIN", CYGWIN_ROOT_WRAPPERBIN);
+    core.addPath(CYGWIN_ROOT_WRAPPERBIN);
+    await setupCygwin();
+  });
   await saveCygwinCache();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const originalPath = process.env["PATH"]!.split(path.delimiter);
   const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
   process.env["PATH"] = patchedPath.join(path.delimiter);
-  core.startGroup("Install opam");
-  await acquireOpamWindows();
-  core.endGroup();
-  core.startGroup("Initialise the opam state");
-  await initializeOpamWindows();
-  core.endGroup();
+  await core.group("Install opam", async () => {
+    await acquireOpamWindows();
+  });
+  await core.group("Initialise the opam state", async () => {
+    await initializeOpamWindows();
+  });
   process.env["PATH"] = originalPath.join(path.delimiter);
 }
 
@@ -284,46 +284,46 @@ export async function setupOpam() {
 }
 
 export async function installOcaml(ocamlCompiler: string) {
-  core.startGroup("Install OCaml");
-  const platform = getPlatform();
-  if (platform === Platform.Win32) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const originalPath = process.env["PATH"]!.split(path.delimiter);
-    const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
-    process.env["PATH"] = patchedPath.join(path.delimiter);
-    await exec("opam", [
-      "switch",
-      "create",
-      ".",
-      "--no-install",
-      "--packages",
-      ocamlCompiler,
-    ]);
-    process.env["PATH"] = originalPath.join(path.delimiter);
-  } else {
-    await exec("opam", [
-      "switch",
-      "create",
-      ".",
-      "--no-install",
-      "--packages",
-      ocamlCompiler,
-    ]);
-  }
-  core.endGroup();
+  await core.group("Install OCaml", async () => {
+    const platform = getPlatform();
+    if (platform === Platform.Win32) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const originalPath = process.env["PATH"]!.split(path.delimiter);
+      const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
+      process.env["PATH"] = patchedPath.join(path.delimiter);
+      await exec("opam", [
+        "switch",
+        "create",
+        ".",
+        "--no-install",
+        "--packages",
+        ocamlCompiler,
+      ]);
+      process.env["PATH"] = originalPath.join(path.delimiter);
+    } else {
+      await exec("opam", [
+        "switch",
+        "create",
+        ".",
+        "--no-install",
+        "--packages",
+        ocamlCompiler,
+      ]);
+    }
+  });
 }
 
 export async function pin(fpaths: string[]) {
-  core.startGroup("Pin local packages");
-  const opam = await findOpam();
-  for (const fpath of fpaths) {
-    const fname = path.basename(fpath, ".opam");
-    const dname = path.dirname(fpath);
-    await exec(opam, ["pin", "add", `${fname}.dev`, ".", "--no-action"], {
-      cwd: dname,
-    });
-  }
-  core.endGroup();
+  await core.group("Pin local packages", async () => {
+    const opam = await findOpam();
+    for (const fpath of fpaths) {
+      const fname = path.basename(fpath, ".opam");
+      const dname = path.dirname(fpath);
+      await exec(opam, ["pin", "add", `${fname}.dev`, ".", "--no-action"], {
+        cwd: dname,
+      });
+    }
+  });
 }
 
 async function repositoryAdd(name: string, address: string) {
@@ -339,42 +339,42 @@ async function repositoryAdd(name: string, address: string) {
 }
 
 export async function repositoryAddAll(repositories: [string, string][]) {
-  const platform = getPlatform();
-  let restore_autocrlf;
-  core.startGroup("Initialise the opam repositories");
-  // Works around the lack of https://github.com/ocaml/opam/pull/3882 when
-  // adding ocaml/opam-repository on Windows. Can be removed when the action
-  // switches to opam 2.2
-  if (platform === Platform.Win32) {
-    const autocrlf = await getExecOutput(
-      "git",
-      ["config", "--global", "core.autocrlf"],
-      { ignoreReturnCode: true },
-    );
-    if (autocrlf.stdout.trim() !== "input") {
-      if (autocrlf.exitCode === 0) {
-        restore_autocrlf = autocrlf.stdout.trim();
-      } else {
-        // eslint-disable-next-line unicorn/no-null
-        restore_autocrlf = null; // Unset the value at the end
+  await core.group("Initialise the opam repositories", async () => {
+    const platform = getPlatform();
+    let restore_autocrlf;
+    // Works around the lack of https://github.com/ocaml/opam/pull/3882 when
+    // adding ocaml/opam-repository on Windows. Can be removed when the action
+    // switches to opam 2.2
+    if (platform === Platform.Win32) {
+      const autocrlf = await getExecOutput(
+        "git",
+        ["config", "--global", "core.autocrlf"],
+        { ignoreReturnCode: true },
+      );
+      if (autocrlf.stdout.trim() !== "input") {
+        if (autocrlf.exitCode === 0) {
+          restore_autocrlf = autocrlf.stdout.trim();
+        } else {
+          // eslint-disable-next-line unicorn/no-null
+          restore_autocrlf = null; // Unset the value at the end
+        }
       }
+      await exec("git", ["config", "--global", "core.autocrlf", "input"]);
     }
-    await exec("git", ["config", "--global", "core.autocrlf", "input"]);
-  }
-  for (const [name, address] of repositories) {
-    await repositoryAdd(name, address);
-  }
-  if (restore_autocrlf === null) {
-    await exec("git", ["config", "--global", "--unset", "core.autocrlf"]);
-  } else if (restore_autocrlf !== undefined) {
-    await exec("git", [
-      "config",
-      "--global",
-      "core.autocrlf",
-      restore_autocrlf,
-    ]);
-  }
-  core.endGroup();
+    for (const [name, address] of repositories) {
+      await repositoryAdd(name, address);
+    }
+    if (restore_autocrlf === null) {
+      await exec("git", ["config", "--global", "--unset", "core.autocrlf"]);
+    } else if (restore_autocrlf !== undefined) {
+      await exec("git", [
+        "config",
+        "--global",
+        "core.autocrlf",
+        restore_autocrlf,
+      ]);
+    }
+  });
 }
 
 async function repositoryRemove(name: string) {
@@ -400,10 +400,10 @@ async function repositoryList() {
 }
 
 export async function repositoryRemoveAll() {
-  core.startGroup("Remove the opam repositories");
-  const repositories = await repositoryList();
-  for (const repository of repositories) {
-    await repositoryRemove(repository);
-  }
-  core.endGroup();
+  await core.group("Remove the opam repositories", async () => {
+    const repositories = await repositoryList();
+    for (const repository of repositories) {
+      await repositoryRemove(repository);
+    }
+  });
 }

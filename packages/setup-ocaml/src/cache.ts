@@ -220,75 +220,75 @@ async function saveCache(key: string, paths: string[]) {
 }
 
 export async function restoreCygwinCache() {
-  core.startGroup("Retrieve the Cygwin cache");
-  const { key, restoreKeys } = await composeCygwinCacheKeys();
-  const paths = composeCygwinCachePaths();
-  await restoreCache(key, restoreKeys, paths);
-  core.endGroup();
+  await core.group("Retrieve the Cygwin cache", async () => {
+    const { key, restoreKeys } = await composeCygwinCacheKeys();
+    const paths = composeCygwinCachePaths();
+    await restoreCache(key, restoreKeys, paths);
+  });
 }
 
 export async function saveCygwinCache() {
-  core.startGroup("Save the Cygwin cache");
-  const { key } = await composeCygwinCacheKeys();
-  const paths = composeCygwinCachePaths();
-  await saveCache(key, paths);
-  core.endGroup();
+  await core.group("Save the Cygwin cache", async () => {
+    const { key } = await composeCygwinCacheKeys();
+    const paths = composeCygwinCachePaths();
+    await saveCache(key, paths);
+  });
 }
 
 export async function restoreDuneCache() {
-  core.startGroup("Retrieve the dune cache");
-  const { key, restoreKeys } = composeDuneCacheKeys();
-  const paths = composeDuneCachePaths();
-  await restoreCache(key, restoreKeys, paths);
-  core.endGroup();
+  await core.group("Retrieve the dune cache", async () => {
+    const { key, restoreKeys } = composeDuneCacheKeys();
+    const paths = composeDuneCachePaths();
+    await restoreCache(key, restoreKeys, paths);
+  });
 }
 
 export async function saveDuneCache() {
-  core.startGroup("Save the dune cache");
-  const { key } = composeDuneCacheKeys();
-  const paths = composeDuneCachePaths();
-  await saveCache(key, paths);
-  core.endGroup();
+  await core.group("Save the dune cache", async () => {
+    const { key } = composeDuneCacheKeys();
+    const paths = composeDuneCachePaths();
+    await saveCache(key, paths);
+  });
 }
 
 export async function restoreOpamCache() {
-  core.startGroup("Retrieve the opam cache");
-  const { key, restoreKeys } = await composeOpamCacheKeys();
-  const paths = composeOpamCachePaths();
-  const cacheKey = await restoreCache(key, restoreKeys, paths);
-  core.endGroup();
-  return cacheKey;
+  return await core.group("Retrieve the opam cache", async () => {
+    const { key, restoreKeys } = await composeOpamCacheKeys();
+    const paths = composeOpamCachePaths();
+    const cacheKey = await restoreCache(key, restoreKeys, paths);
+    return cacheKey;
+  });
 }
 
 export async function saveOpamCache() {
-  core.startGroup("Save the opam cache");
-  await exec("opam", [
-    "clean",
-    "--all-switches",
-    "--download-cache",
-    "--logs",
-    "--repo-cache",
-    "--unused-repositories",
-  ]);
-  const { key } = await composeOpamCacheKeys();
-  const paths = composeOpamCachePaths();
-  await saveCache(key, paths);
-  core.endGroup();
+  await core.group("Save the opam cache", async () => {
+    await exec("opam", [
+      "clean",
+      "--all-switches",
+      "--download-cache",
+      "--logs",
+      "--repo-cache",
+      "--unused-repositories",
+    ]);
+    const { key } = await composeOpamCacheKeys();
+    const paths = composeOpamCachePaths();
+    await saveCache(key, paths);
+  });
 }
 
 export async function restoreOpamDownloadCache() {
-  core.startGroup("Retrieve the opam download cache");
-  const { key, restoreKeys } = composeOpamDownloadCacheKeys();
-  const paths = composeOpamDownloadCachePaths();
-  const cacheKey = await restoreCache(key, restoreKeys, paths);
-  core.endGroup();
-  return cacheKey;
+  return await core.group("Retrieve the opam download cache", async () => {
+    const { key, restoreKeys } = composeOpamDownloadCacheKeys();
+    const paths = composeOpamDownloadCachePaths();
+    const cacheKey = await restoreCache(key, restoreKeys, paths);
+    return cacheKey;
+  });
 }
 
 export async function saveOpamDownloadCache() {
-  core.startGroup("Save the opam download cache");
-  const { key } = composeOpamDownloadCacheKeys();
-  const paths = composeOpamDownloadCachePaths();
-  await saveCache(key, paths);
-  core.endGroup();
+  await core.group("Save the opam download cache", async () => {
+    const { key } = composeOpamDownloadCacheKeys();
+    const paths = composeOpamDownloadCachePaths();
+    await saveCache(key, paths);
+  });
 }
