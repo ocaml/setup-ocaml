@@ -22,16 +22,16 @@
     "cheerio": "1.0.0-rc.12",
     "date-fns": "2.30.0",
     "semver": "7.5.4",
-    "yaml": "2.3.3"
+    "yaml": "2.3.4"
   },
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/node20": "20.1.2",
     "@tsconfig/strictest": "2.0.2",
-    "@types/node": "20.8.7",
+    "@types/node": "20.8.10",
     "@types/semver": "7.5.4",
     "@vercel/ncc": "0.38.1",
-    "eslint": "8.51.0",
+    "eslint": "8.53.0",
     "prettier": "3.0.3",
     "prettier-plugin-packagejson": "2.4.6",
     "typescript": "5.2.2"
