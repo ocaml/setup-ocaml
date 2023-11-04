@@ -27186,9 +27186,9 @@ async function getOcamlformatVersion() {
 
 
 async function installOcamlformat(version) {
-    core.startGroup("Install ocamlformat");
-    await (0,exec.exec)("opam", ["depext", "--install", `ocamlformat=${version}`]);
-    core.endGroup();
+    await core.group("Install ocamlformat", async () => {
+        await (0,exec.exec)("opam", ["depext", "--install", `ocamlformat=${version}`]);
+    });
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts

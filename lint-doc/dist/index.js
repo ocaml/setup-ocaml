@@ -27156,14 +27156,20 @@ async function lintOdoc() {
 
 
 async function installOpamPackages() {
-    core.startGroup("Install opam packages");
-    await (0,exec.exec)("opam", ["install", ".", "--deps-only", "--with-doc"]);
-    core.endGroup();
+    await core.group("Install opam packages", async () => {
+        await (0,exec.exec)("opam", ["install", ".", "--deps-only", "--with-doc"]);
+    });
 }
 async function installOdoc() {
-    core.startGroup("Install odoc");
-    await (0,exec.exec)("opam", ["depext", "--install", "conf-m4", "dune", "odoc>=1.5.0"]);
-    core.endGroup();
+    await core.group("Install odoc", async () => {
+        await (0,exec.exec)("opam", [
+            "depext",
+            "--install",
+            "conf-m4",
+            "dune",
+            "odoc>=1.5.0",
+        ]);
+    });
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts

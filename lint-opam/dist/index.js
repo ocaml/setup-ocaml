@@ -27149,20 +27149,20 @@ async function opamDuneLint() {
 
 
 async function installOpamPackages() {
-    core.startGroup("Install opam packages");
-    await (0,exec.exec)("opam", [
-        "install",
-        ".",
-        "--deps-only",
-        "--with-test",
-        "--with-doc",
-    ]);
-    core.endGroup();
+    await core.group("Install opam packages", async () => {
+        await (0,exec.exec)("opam", [
+            "install",
+            ".",
+            "--deps-only",
+            "--with-test",
+            "--with-doc",
+        ]);
+    });
 }
 async function installOpamDuneLint() {
-    core.startGroup("Install opam-dune-lint");
-    await (0,exec.exec)("opam", ["depext", "--install", "opam-dune-lint"]);
-    core.endGroup();
+    await core.group("Install opam-dune-lint", async () => {
+        await (0,exec.exec)("opam", ["depext", "--install", "opam-dune-lint"]);
+    });
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
