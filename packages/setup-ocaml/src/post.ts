@@ -1,3 +1,6 @@
+/* eslint-disable unicorn/no-process-exit */
+import * as process from "node:process";
+
 import * as core from "@actions/core";
 
 import { saveDuneCache, saveOpamDownloadCache } from "./cache";
@@ -11,10 +14,12 @@ async function run() {
       await saveDuneCache();
     }
     await saveOpamDownloadCache();
+    process.exit(0);
   } catch (error) {
     if (error instanceof Error) {
       core.error(error.message);
     }
+    process.exit(1);
   }
 }
 
