@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Force post-process exit with `process.exit`.
+
 ## [2.1.1]
 
 ### Changed
