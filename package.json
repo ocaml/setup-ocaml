@@ -19,5 +19,5 @@
     "prettier-plugin-packagejson": "2.4.6",
     "turbo": "1.10.16"
   },
-  "packageManager": "yarn@4.0.1+sha256.5a9d054e67fbbae8774cd3667736fd74407ffbbb336898523ca1fe87b3fc4ee3"
+  "packageManager": "yarn@4.0.2+sha256.825003a0f561ad09a3b1ac4a3b3ea6207af2796d54f62a9420520915721f5186"
 }
