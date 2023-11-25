@@ -4,6 +4,7 @@
     "@tsconfig/node20/tsconfig.json"
   ],
   "compilerOptions": {
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
