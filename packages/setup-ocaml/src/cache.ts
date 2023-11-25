@@ -14,15 +14,15 @@ import {
   OPAM_DISABLE_SANDBOXING,
   OPAM_REPOSITORIES,
   Platform,
-} from "./constants";
-import { getLatestOpamRelease } from "./opam";
+} from "./constants.js";
+import { getLatestOpamRelease } from "./opam.js";
 import {
   getArchitecture,
   getPlatform,
   getSystemIdentificationInfo,
-} from "./system";
-import { resolveCompiler } from "./version";
-import { getCygwinVersion } from "./win32";
+} from "./system.js";
+import { resolveCompiler } from "./version.js";
+import { getCygwinVersion } from "./win32.js";
 
 function composeDate() {
   const d = new Date();

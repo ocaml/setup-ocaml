@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/lint-fmt",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../lint-fmt/dist",
     "format": "prettier . --write",

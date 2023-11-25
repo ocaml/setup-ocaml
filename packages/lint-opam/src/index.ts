@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 
-import { opamDuneLint, opamLint } from "./lint";
-import { installOpamDuneLint, installOpamPackages } from "./opam";
+import { opamDuneLint, opamLint } from "./lint.js";
+import { installOpamDuneLint, installOpamPackages } from "./opam.js";
 
 async function run() {
   try {

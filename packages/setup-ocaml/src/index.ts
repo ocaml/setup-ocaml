@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 
-import { installer } from "./installer";
+import { installer } from "./installer.js";
 
 async function run() {
   try {

@@ -3,7 +3,7 @@ import * as os from "node:os";
 
 import { exec, getExecOutput } from "@actions/exec";
 
-import { Architecture, Platform } from "./constants";
+import { Architecture, Platform } from "./constants.js";
 
 export function getArchitecture() {
   switch (os.arch()) {

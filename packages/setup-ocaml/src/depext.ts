@@ -3,8 +3,8 @@ import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
-import { OPAM_DEPEXT_FLAGS, Platform } from "./constants";
-import { getPlatform } from "./system";
+import { OPAM_DEPEXT_FLAGS, Platform } from "./constants.js";
+import { getPlatform } from "./system.js";
 
 export async function installDepext(ocamlVersion: string) {
   await core.group("Install depext", async () => {

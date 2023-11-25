@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/setup-ocaml",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "yarn build:main & yarn build:post",
     "build:main": "ncc build src/index.ts --license=LICENSE.txt --out ../../dist",

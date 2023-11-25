@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 
-import { lintOdoc } from "./odoc";
-import { installOdoc, installOpamPackages } from "./opam";
+import { lintOdoc } from "./odoc.js";
+import { installOdoc, installOpamPackages } from "./opam.js";
 
 async function run() {
   try {
