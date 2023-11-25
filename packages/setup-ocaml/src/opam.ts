@@ -10,7 +10,7 @@ import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as semver from "semver";
 
-import { saveCygwinCache } from "./cache";
+import { saveCygwinCache } from "./cache.js";
 import {
   ALLOW_PRELEASE_OPAM,
   CYGWIN_ROOT,
@@ -19,14 +19,14 @@ import {
   GITHUB_TOKEN,
   OPAM_DISABLE_SANDBOXING,
   Platform,
-} from "./constants";
+} from "./constants.js";
 import {
   getArchitecture,
   getPlatform,
   getSystemIdentificationInfo,
   updateUnixPackageIndexFiles,
-} from "./system";
-import { getCygwinVersion } from "./win32";
+} from "./system.js";
+import { getCygwinVersion } from "./win32.js";
 
 export async function getLatestOpamRelease() {
   const semverRange = ALLOW_PRELEASE_OPAM ? "*" : "<2.2.0";

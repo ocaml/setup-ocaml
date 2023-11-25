@@ -11,7 +11,7 @@ import {
   restoreOpamCache,
   restoreOpamDownloadCache,
   saveOpamCache,
-} from "./cache";
+} from "./cache.js";
 import {
   ALLOW_PRELEASE_OPAM,
   DUNE_CACHE,
@@ -20,19 +20,19 @@ import {
   OPAM_PIN,
   OPAM_REPOSITORIES,
   Platform,
-} from "./constants";
-import { installDepext, installDepextPackages } from "./depext";
-import { installDune } from "./dune";
+} from "./constants.js";
+import { installDepext, installDepextPackages } from "./depext.js";
+import { installDune } from "./dune.js";
 import {
   installOcaml,
   pin,
   repositoryAddAll,
   repositoryRemoveAll,
   setupOpam,
-} from "./opam";
-import { getOpamLocalPackages } from "./packages";
-import { getPlatform, updateUnixPackageIndexFiles } from "./system";
-import { resolveCompiler } from "./version";
+} from "./opam.js";
+import { getOpamLocalPackages } from "./packages.js";
+import { getPlatform, updateUnixPackageIndexFiles } from "./system.js";
+import { resolveCompiler } from "./version.js";
 
 export async function installer() {
   const platform = getPlatform();

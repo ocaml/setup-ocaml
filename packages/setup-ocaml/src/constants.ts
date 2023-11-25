@@ -3,7 +3,7 @@ import * as path from "node:path";
 import * as core from "@actions/core";
 import * as yaml from "yaml";
 
-import { getPlatform } from "./system";
+import { getPlatform } from "./system.js";
 
 export enum Architecture {
   X86_64 = "x86_64",

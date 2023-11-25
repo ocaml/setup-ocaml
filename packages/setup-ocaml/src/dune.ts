@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 
-import { GITHUB_TOKEN } from "./constants";
+import { GITHUB_TOKEN } from "./constants.js";
 
 const {
   repo: { owner, repo },

@@ -1,8 +1,8 @@
 import * as core from "@actions/core";
 
-import { checkFmt } from "./lint";
-import { getOcamlformatVersion } from "./ocamlformat";
-import { installOcamlformat } from "./opam";
+import { checkFmt } from "./lint.js";
+import { getOcamlformatVersion } from "./ocamlformat.js";
+import { installOcamlformat } from "./opam.js";
 
 async function run() {
   try {

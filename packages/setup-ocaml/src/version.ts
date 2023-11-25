@@ -3,8 +3,8 @@ import * as path from "node:path";
 import * as github from "@actions/github";
 import * as semver from "semver";
 
-import { GITHUB_TOKEN, Platform } from "./constants";
-import { getPlatform } from "./system";
+import { GITHUB_TOKEN, Platform } from "./constants.js";
+import { getPlatform } from "./system.js";
 
 function isSemverValidRange(semverVersion: string) {
   const isValidSemver =

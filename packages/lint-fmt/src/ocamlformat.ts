@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 
-import { convertToUnix } from "./compat";
+import { convertToUnix } from "./compat.js";
 
 async function parse() {
   const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();

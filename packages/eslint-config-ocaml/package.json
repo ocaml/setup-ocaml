@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/eslint-config-ocaml",
   "private": true,
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "format": "prettier . --write",
