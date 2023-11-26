@@ -60,15 +60,15 @@ jobs:
           - ubuntu-latest
         ocaml-compiler:
           - "5.1"
-        allow-prelease-opam:
+        allow-prerelease-opam:
           - false
         include:
           - os: windows-latest
             ocaml-compiler: "4.14"
-            allow-prelease-opam: false
+            allow-prerelease-opam: false
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.1.0+options,ocaml-option-flambda
-            allow-prelease-opam: true
+            allow-prerelease-opam: true
 
     runs-on: ${{ matrix.os }}
 
@@ -80,7 +80,7 @@ jobs:
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          allow-prelease-opam: ${{ matrix.allow-prelease-opam }}
+          allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
           dune-cache: ${{ matrix.os != 'windows-latest' }}
 
       - run: opam depext --install uri
