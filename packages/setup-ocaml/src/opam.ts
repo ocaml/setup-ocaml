@@ -7,7 +7,7 @@ import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import * as io from "@actions/io";
-import * as tc from "@actions/tool-cache";
+import * as toolCache from "@actions/tool-cache";
 import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache.js";
@@ -76,11 +76,11 @@ async function findOpam() {
 
 async function acquireOpamUnix() {
   const { version, browserDownloadUrl } = await getLatestOpamRelease();
-  const cachedPath = tc.find("opam", version, ARCHITECTURE);
+  const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
   if (cachedPath === "") {
-    const downloadedPath = await tc.downloadTool(browserDownloadUrl);
+    const downloadedPath = await toolCache.downloadTool(browserDownloadUrl);
     core.info(`Acquired ${version} from ${browserDownloadUrl}`);
-    const cachedPath = await tc.cacheFile(
+    const cachedPath = await toolCache.cacheFile(
       downloadedPath,
       "opam",
       "opam",
@@ -161,12 +161,12 @@ async function setupOpamUnix() {
 
 async function setupCygwin() {
   const version = await getCygwinVersion();
-  const cachedPath = tc.find("cygwin", version, "x86_64");
+  const cachedPath = toolCache.find("cygwin", version, "x86_64");
   if (cachedPath === "") {
-    const downloadedPath = await tc.downloadTool(
+    const downloadedPath = await toolCache.downloadTool(
       "https://cygwin.com/setup-x86_64.exe",
     );
-    const cachedPath = await tc.cacheFile(
+    const cachedPath = await toolCache.cacheFile(
       downloadedPath,
       "setup-x86_64.exe",
       "cygwin",
@@ -208,13 +208,17 @@ async function setupCygwin() {
 
 async function acquireOpamWindows() {
   const opamVersion = "0.0.0.2";
-  const cachedPath = tc.find("opam", opamVersion);
+  const cachedPath = toolCache.find("opam", opamVersion);
   if (cachedPath === "") {
-    const downloadedPath = await tc.downloadTool(
+    const downloadedPath = await toolCache.downloadTool(
       `https://github.com/fdopen/opam-repository-mingw/releases/download/${opamVersion}/opam64.zip`,
     );
-    const extractedPath = await tc.extractZip(downloadedPath);
-    const cachedPath = await tc.cacheDir(extractedPath, "opam", opamVersion);
+    const extractedPath = await toolCache.extractZip(downloadedPath);
+    const cachedPath = await toolCache.cacheDir(
+      extractedPath,
+      "opam",
+      opamVersion,
+    );
     const installSh = path.join(cachedPath, "opam64", "install.sh");
     await fs.chmod(installSh, 0o755);
     await exec("bash", [installSh, "--prefix", "/usr"]);
