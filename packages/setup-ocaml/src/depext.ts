@@ -3,16 +3,14 @@ import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
-import { OPAM_DEPEXT_FLAGS, Platform } from "./constants.js";
-import { getPlatform } from "./system.js";
+import { OPAM_DEPEXT_FLAGS, PLATFORM } from "./constants.js";
 
 export async function installDepext(ocamlVersion: string) {
   await core.group("Install depext", async () => {
-    const platform = getPlatform();
     const depextCygwinports =
-      platform === Platform.Win32 ? ["depext-cygwinports"] : [];
+      PLATFORM === "win32" ? ["depext-cygwinports"] : [];
     await exec("opam", ["install", "opam-depext", ...depextCygwinports]);
-    if (platform === Platform.Win32) {
+    if (PLATFORM === "win32") {
       let base = "";
       if (ocamlVersion.includes("mingw64")) {
         base = "x86_64-w64-mingw32";

@@ -3,42 +3,10 @@ import * as os from "node:os";
 
 import { exec, getExecOutput } from "@actions/exec";
 
-import { Architecture, Platform } from "./constants.js";
-
-export function getArchitecture() {
-  switch (os.arch()) {
-    case "x64": {
-      return Architecture.X86_64;
-    }
-    case "arm64": {
-      return Architecture.ARM;
-    }
-    default: {
-      throw new Error("The architecture is not supported.");
-    }
-  }
-}
-
-export function getPlatform() {
-  switch (os.platform()) {
-    case "linux": {
-      return Platform.Linux;
-    }
-    case "darwin": {
-      return Platform.MacOS;
-    }
-    case "win32": {
-      return Platform.Win32;
-    }
-    default: {
-      throw new Error("The platform is not supported.");
-    }
-  }
-}
+import { PLATFORM } from "./constants.js";
 
 export async function getSystemIdentificationInfo() {
-  const platform = getPlatform();
-  if (platform === Platform.Linux) {
+  if (PLATFORM === "linux") {
     const osRelease = await fs.readFile("/etc/os-release", "utf8");
     const lines = osRelease.split(os.EOL);
     let id = "";
@@ -52,7 +20,7 @@ export async function getSystemIdentificationInfo() {
       }
     }
     return { id, version };
-  } else if (platform === Platform.MacOS) {
+  } else if (PLATFORM === "macos") {
     const swVers = await getExecOutput("sw_vers");
     const lines = swVers.stdout.split(os.EOL);
     let version = "";
@@ -70,11 +38,10 @@ export async function getSystemIdentificationInfo() {
 
 export async function updateUnixPackageIndexFiles() {
   const isGitHubRunner = process.env["ImageOS"] !== undefined;
-  const platform = getPlatform();
   if (isGitHubRunner) {
-    if (platform === Platform.Linux) {
+    if (PLATFORM === "linux") {
       await exec("sudo", ["apt-get", "update"]);
-    } else if (platform === Platform.MacOS) {
+    } else if (PLATFORM === "macos") {
       await exec("brew", ["update"]);
     }
   }

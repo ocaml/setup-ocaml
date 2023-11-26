@@ -9,18 +9,15 @@ import * as github from "@actions/github";
 import * as datefns from "date-fns";
 
 import {
+  ARCHITECTURE,
   CACHE_PREFIX,
   OCAML_COMPILER,
   OPAM_DISABLE_SANDBOXING,
   OPAM_REPOSITORIES,
-  Platform,
+  PLATFORM,
 } from "./constants.js";
 import { getLatestOpamRelease } from "./opam.js";
-import {
-  getArchitecture,
-  getPlatform,
-  getSystemIdentificationInfo,
-} from "./system.js";
+import { getSystemIdentificationInfo } from "./system.js";
 import { resolveCompiler } from "./version.js";
 import { getCygwinVersion } from "./win32.js";
 
@@ -48,8 +45,8 @@ async function composeCygwinCacheKeys() {
 }
 
 function composeDuneCacheKeys() {
-  const platform = getPlatform().replaceAll(/\W/g, "_");
-  const architecture = getArchitecture().replaceAll(/\W/g, "_");
+  const platform = PLATFORM.replaceAll(/\W/g, "_");
+  const architecture = ARCHITECTURE.replaceAll(/\W/g, "_");
   const { workflow: _workflow, job: _job, runId, runNumber } = github.context;
   const workflow = _workflow.toLowerCase().replaceAll(/\W/g, "_");
   const job = _job.replaceAll(/\W/g, "_");
@@ -64,15 +61,13 @@ function composeDuneCacheKeys() {
 }
 
 async function composeOpamCacheKeys() {
-  const platform = getPlatform();
   const fullPlatform =
-    platform === Platform.Win32
-      ? platform
+    PLATFORM === "win32"
+      ? PLATFORM
       : // eslint-disable-next-line unicorn/no-await-expression-member
-        `${platform}-${(await getSystemIdentificationInfo()).version}`;
-  const architecture = getArchitecture();
+        `${PLATFORM}-${(await getSystemIdentificationInfo()).version}`;
   const opamVersion =
-    platform === Platform.Win32
+    PLATFORM === "win32"
       ? "0.0.0.2"
       : // eslint-disable-next-line unicorn/no-await-expression-member
         (await getLatestOpamRelease()).version;
@@ -80,11 +75,11 @@ async function composeOpamCacheKeys() {
   const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
   const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const { year, week } = composeDate();
-  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-${week}`;
   const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-${week}`,
-    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-${year}-`,
-    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${architecture}-${ocamlVersion}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-${week}`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-`,
+    `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-`,
   ];
   return { key, restoreKeys };
 }
@@ -130,8 +125,7 @@ function composeCygwinCachePaths() {
 function composeDuneCachePaths() {
   const paths = [];
   const homeDir = os.homedir();
-  const platform = getPlatform();
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     const duneCacheDir = path.join(homeDir, "Local Settings", "Cache", "dune");
     paths.push(duneCacheDir);
   } else {
@@ -146,8 +140,7 @@ function composeDuneCachePaths() {
 
 function composeOpamCachePaths() {
   const paths = [];
-  const platform = getPlatform();
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     const opamRootCachePath = path.join("D:", ".opam");
     paths.push(opamRootCachePath);
     const {
@@ -175,8 +168,7 @@ function composeOpamCachePaths() {
 
 function composeOpamDownloadCachePaths() {
   const paths = [];
-  const platform = getPlatform();
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     const opamDownloadCachePath = path.join("D:", ".opam", "download-cache");
     paths.push(opamDownloadCachePath);
   } else {
