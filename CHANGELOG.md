@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.1.3]
+
+### Changed
+
+- Adopt native ESM for runtime environment.
+- Reduce system-related internal calls as much as possible.
+
 ## [2.1.2]
 
 ### Fixed
@@ -319,9 +326,9 @@ and this project adheres to
   for the most efficient use in CI (exports `DUNE_CACHE=enabled`,
   `DUNE_CACHE_TRANSPORT=direct`. TRANSPORT must be `direct`, not `daemon`, to
   speed up the opam install process and to support Windows:
-  https://github.com/ocaml/dune/issues/4166,
-  https://github.com/ocaml/dune/issues/4167), and share the dune cache directory
-  for each run.
+  <https://github.com/ocaml/dune/issues/4166>,
+  <https://github.com/ocaml/dune/issues/4167>), and share the dune cache
+  directory for each run.
 - If `opam-pin` is enabled, pin the local packages specified by
   `opam-local-packages`.
 - If `opam-depext` is enabled, install the system dependencies specified by
@@ -331,7 +338,7 @@ and this project adheres to
   runners due to limitations of opam.)
 - The profiling functionality allows us to check the duration of each group if
   debug mode is enabled.
-  (https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging)
+  (<https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging>)
 
 ### Changed
 
@@ -351,7 +358,7 @@ and this project adheres to
 - Export `OPAMSOLVERTIMEOUT=500`.
 - Export `OPAMROOT=D:\.opam` on the Windows runners.
 - Export `OPAMVERBOSE=true` if the actions debug mode is enabled.
-  (https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging)
+  (<https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging>)
 - Export `MSYS=winsymlinks:native` for `@actions/cache` on the Windows runners.
 - Export `HOME=%USERPROFILE%` for opam on the Windows runners.
 
@@ -484,7 +491,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.2...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.3...HEAD
+[2.1.3]: https://github.com/ocaml/setup-ocaml/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/ocaml/setup-ocaml/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/ocaml/setup-ocaml/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/ocaml/setup-ocaml/compare/v2.0.21...v2.1.0
