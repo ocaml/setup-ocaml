@@ -13,16 +13,15 @@ import * as semver from "semver";
 import { saveCygwinCache } from "./cache.js";
 import {
   ALLOW_PRELEASE_OPAM,
+  ARCHITECTURE,
   CYGWIN_ROOT,
   CYGWIN_ROOT_BIN,
   CYGWIN_ROOT_WRAPPERBIN,
   GITHUB_TOKEN,
   OPAM_DISABLE_SANDBOXING,
-  Platform,
+  PLATFORM,
 } from "./constants.js";
 import {
-  getArchitecture,
-  getPlatform,
   getSystemIdentificationInfo,
   updateUnixPackageIndexFiles,
 } from "./system.js";
@@ -51,10 +50,8 @@ export async function getLatestOpamRelease() {
       "Could not retrieve the opam release matching the version constraint",
     );
   }
-  const architecture = getArchitecture();
-  const platform = getPlatform();
   const matchedAssets = latestRelease.assets.find((asset) =>
-    asset.browser_download_url.includes(`${architecture}-${platform}`),
+    asset.browser_download_url.includes(`${ARCHITECTURE}-${PLATFORM}`),
   );
   if (!matchedAssets) {
     throw new Error(
@@ -68,8 +65,7 @@ export async function getLatestOpamRelease() {
 }
 
 async function findOpam() {
-  const platform = getPlatform();
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     const opamPath = path.join(CYGWIN_ROOT, "bin", "opam.exe");
     return opamPath;
   } else {
@@ -80,8 +76,7 @@ async function findOpam() {
 
 async function acquireOpamUnix() {
   const { version, browserDownloadUrl } = await getLatestOpamRelease();
-  const architecture = getArchitecture();
-  const cachedPath = tc.find("opam", version, architecture);
+  const cachedPath = tc.find("opam", version, ARCHITECTURE);
   if (cachedPath === "") {
     const downloadedPath = await tc.downloadTool(browserDownloadUrl);
     core.info(`Acquired ${version} from ${browserDownloadUrl}`);
@@ -90,7 +85,7 @@ async function acquireOpamUnix() {
       "opam",
       "opam",
       version,
-      architecture,
+      ARCHITECTURE,
     );
     core.info(`Successfully cached opam to ${cachedPath}`);
     await fs.chmod(`${cachedPath}/opam`, 0o755);
@@ -104,9 +99,8 @@ async function acquireOpamUnix() {
 
 async function installUnixSystemPackages() {
   const isGitHubRunner = process.env["ImageOS"] !== undefined;
-  const platform = getPlatform();
   if (isGitHubRunner) {
-    if (platform === Platform.Linux) {
+    if (PLATFORM === "linux") {
       const { version: systemVersion } = await getSystemIdentificationInfo();
       if (systemVersion === "18.04") {
         // [info]: musl-tools bug in ubuntu 18.04;
@@ -125,7 +119,7 @@ async function installUnixSystemPackages() {
         "musl-tools",
         "rsync",
       ]);
-    } else if (platform === Platform.MacOS) {
+    } else if (PLATFORM === "macos") {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
     }
   }
@@ -275,8 +269,7 @@ async function setupOpamWindows() {
 }
 
 export async function setupOpam() {
-  const platform = getPlatform();
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     await setupOpamWindows();
   } else {
     await setupOpamUnix();
@@ -285,8 +278,7 @@ export async function setupOpam() {
 
 export async function installOcaml(ocamlCompiler: string) {
   await core.group("Install OCaml", async () => {
-    const platform = getPlatform();
-    if (platform === Platform.Win32) {
+    if (PLATFORM === "win32") {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const originalPath = process.env["PATH"]!.split(path.delimiter);
       const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
@@ -340,12 +332,11 @@ async function repositoryAdd(name: string, address: string) {
 
 export async function repositoryAddAll(repositories: [string, string][]) {
   await core.group("Initialise the opam repositories", async () => {
-    const platform = getPlatform();
     let restore_autocrlf;
     // Works around the lack of https://github.com/ocaml/opam/pull/3882 when
     // adding ocaml/opam-repository on Windows. Can be removed when the action
     // switches to opam 2.2
-    if (platform === Platform.Win32) {
+    if (PLATFORM === "win32") {
       const autocrlf = await getExecOutput(
         "git",
         ["config", "--global", "core.autocrlf"],

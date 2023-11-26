@@ -1,22 +1,39 @@
+import * as os from "node:os";
 import * as path from "node:path";
 
 import * as core from "@actions/core";
 import * as yaml from "yaml";
 
-import { getPlatform } from "./system.js";
+export const ARCHITECTURE = (() => {
+  switch (os.arch()) {
+    case "x64": {
+      return "x86_64";
+    }
+    case "arm64": {
+      return "arm64";
+    }
+    default: {
+      throw new Error("The architecture is not supported.");
+    }
+  }
+})();
 
-export enum Architecture {
-  X86_64 = "x86_64",
-  ARM = "arm64",
-}
-
-export enum Platform {
-  Linux = "linux",
-  MacOS = "macos",
-  Win32 = "win32",
-}
-
-const platform = getPlatform();
+export const PLATFORM = (() => {
+  switch (os.platform()) {
+    case "linux": {
+      return "linux";
+    }
+    case "darwin": {
+      return "macos";
+    }
+    case "win32": {
+      return "win32";
+    }
+    default: {
+      throw new Error("The platform is not supported.");
+    }
+  }
+})();
 
 export const CYGWIN_ROOT = path.join("D:", "cygwin");
 
@@ -26,7 +43,7 @@ export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
 // [todo] remove the branch for Windows once opam 2.2 is released as stable.
 export const ALLOW_PRELEASE_OPAM =
-  platform !== Platform.Win32 &&
+  PLATFORM !== "win32" &&
   core.getBooleanInput("allow-prelease-opam", {
     required: false,
     trimWhitespace: true,
@@ -86,7 +103,7 @@ const repositories_yaml = yaml.parse(
 ) as Record<string, string> | null;
 
 const defaultRepository =
-  platform === Platform.Win32
+  PLATFORM === "win32"
     ? "https://github.com/ocaml-opam/opam-repository-mingw.git#sunset"
     : "https://github.com/ocaml/opam-repository.git";
 

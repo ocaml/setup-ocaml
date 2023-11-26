@@ -19,7 +19,7 @@ import {
   OPAM_DEPEXT,
   OPAM_PIN,
   OPAM_REPOSITORIES,
-  Platform,
+  PLATFORM,
 } from "./constants.js";
 import { installDepext, installDepextPackages } from "./depext.js";
 import { installDune } from "./dune.js";
@@ -31,11 +31,10 @@ import {
   setupOpam,
 } from "./opam.js";
 import { getOpamLocalPackages } from "./packages.js";
-import { getPlatform, updateUnixPackageIndexFiles } from "./system.js";
+import { updateUnixPackageIndexFiles } from "./system.js";
 import { resolveCompiler } from "./version.js";
 
 export async function installer() {
-  const platform = getPlatform();
   if (!ALLOW_PRELEASE_OPAM) {
     // [todo] remove this once opam 2.2 is released as stable.
     // https://github.com/ocaml/setup-ocaml/issues/299
@@ -49,11 +48,11 @@ export async function installer() {
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMYES", 1);
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     const opamRoot = path.join("D:", ".opam");
     core.exportVariable("OPAMROOT", opamRoot);
   }
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     await core.group("Change the file system behavior parameters", async () => {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
       // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
@@ -67,25 +66,25 @@ export async function installer() {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     });
   }
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     core.exportVariable("HOME", process.env["USERPROFILE"]);
     core.exportVariable("MSYS", "winsymlinks:native");
   }
-  if (platform === Platform.Win32) {
+  if (PLATFORM === "win32") {
     await restoreCygwinCache();
   }
   const opamCacheHit = await restoreOpamCache();
   await setupOpam();
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
+  const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
   if (!opamCacheHit) {
-    const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
     await installOcaml(ocamlCompiler);
     await saveOpamCache();
   }
   await restoreOpamDownloadCache();
   if (OPAM_DEPEXT) {
-    await installDepext(platform);
+    await installDepext(ocamlCompiler);
   }
   if (DUNE_CACHE) {
     await restoreDuneCache();

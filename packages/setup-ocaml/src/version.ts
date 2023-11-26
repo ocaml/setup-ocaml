@@ -3,8 +3,7 @@ import * as path from "node:path";
 import * as github from "@actions/github";
 import * as semver from "semver";
 
-import { GITHUB_TOKEN, Platform } from "./constants.js";
-import { getPlatform } from "./system.js";
+import { GITHUB_TOKEN, PLATFORM } from "./constants.js";
 
 function isSemverValidRange(semverVersion: string) {
   const isValidSemver =
@@ -17,12 +16,12 @@ function isSemverValidRange(semverVersion: string) {
 
 async function getAllCompilerVersions() {
   const octokit = github.getOctokit(GITHUB_TOKEN);
-  const platform = getPlatform();
-  const owner = platform === Platform.Win32 ? "ocaml-opam" : "ocaml";
+
+  const owner = PLATFORM === "win32" ? "ocaml-opam" : "ocaml";
   const repo =
-    platform === Platform.Win32 ? "opam-repository-mingw" : "opam-repository";
+    PLATFORM === "win32" ? "opam-repository-mingw" : "opam-repository";
   const prefix =
-    platform === Platform.Win32 ? "ocaml-variants" : "ocaml-base-compiler";
+    PLATFORM === "win32" ? "ocaml-variants" : "ocaml-base-compiler";
   const { data: packages } = await octokit.rest.repos.getContent({
     owner,
     repo,
@@ -62,9 +61,8 @@ async function resolveVersion(semverVersion: string) {
 }
 
 export async function resolveCompiler(compiler: string) {
-  const platform = getPlatform();
   const resolvedCompiler = isSemverValidRange(compiler)
-    ? platform === Platform.Win32
+    ? PLATFORM === "win32"
       ? `ocaml-variants.${await resolveVersion(compiler)}+mingw64c`
       : `ocaml-base-compiler.${await resolveVersion(compiler)}`
     : compiler;
