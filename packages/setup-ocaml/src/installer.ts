@@ -13,7 +13,7 @@ import {
   saveOpamCache,
 } from "./cache.js";
 import {
-  ALLOW_PRELEASE_OPAM,
+  ALLOW_PRERELEASE_OPAM,
   DUNE_CACHE,
   OCAML_COMPILER,
   OPAM_DEPEXT,
@@ -35,7 +35,7 @@ import { updateUnixPackageIndexFiles } from "./system.js";
 import { resolveCompiler } from "./version.js";
 
 export async function installer() {
-  if (!ALLOW_PRELEASE_OPAM) {
+  if (!ALLOW_PRERELEASE_OPAM) {
     // [todo] remove this once opam 2.2 is released as stable.
     // https://github.com/ocaml/setup-ocaml/issues/299
     core.exportVariable("OPAMCLI", "2.0");

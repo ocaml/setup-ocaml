@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Fix a typo in the key of `allow-prerelease-opam` input.
+
 ## [2.1.3]
 
 ### Changed

@@ -5,7 +5,7 @@ branding:
   icon: package
   color: orange
 inputs:
-  allow-prelease-opam:
+  allow-prerelease-opam:
     description: Allow to use a pre-release version of opam.
     required: false
     default: "false"

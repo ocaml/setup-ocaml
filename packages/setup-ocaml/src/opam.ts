@@ -12,7 +12,7 @@ import * as semver from "semver";
 
 import { saveCygwinCache } from "./cache.js";
 import {
-  ALLOW_PRELEASE_OPAM,
+  ALLOW_PRERELEASE_OPAM,
   ARCHITECTURE,
   CYGWIN_ROOT,
   CYGWIN_ROOT_BIN,
@@ -28,7 +28,7 @@ import {
 import { getCygwinVersion } from "./win32.js";
 
 export async function getLatestOpamRelease() {
-  const semverRange = ALLOW_PRELEASE_OPAM ? "*" : "<2.2.0";
+  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.2.0";
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
@@ -37,7 +37,7 @@ export async function getLatestOpamRelease() {
   const matchedReleases = releases
     .filter((release) =>
       semver.satisfies(release.tag_name, semverRange, {
-        includePrerelease: ALLOW_PRELEASE_OPAM,
+        includePrerelease: ALLOW_PRERELEASE_OPAM,
         loose: true,
       }),
     )
