@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.1.4]
+
 ### Fixed
 
 - Fix a typo in the key of `allow-prerelease-opam` input.
@@ -495,7 +497,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.3...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.4...HEAD
+[2.1.4]: https://github.com/ocaml/setup-ocaml/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/ocaml/setup-ocaml/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/ocaml/setup-ocaml/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/ocaml/setup-ocaml/compare/v2.1.0...v2.1.1
