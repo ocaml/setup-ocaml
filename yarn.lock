@@ -424,7 +424,7 @@ __metadata:
     eslint-plugin-import: "npm:2.29.0"
     eslint-plugin-prettier: "npm:5.0.1"
     eslint-plugin-simple-import-sort: "npm:10.0.0"
-    eslint-plugin-turbo: "npm:1.10.17-canary.4"
+    eslint-plugin-turbo: "npm:1.10.17-canary.5"
     eslint-plugin-unicorn: "npm:49.0.0"
     prettier: "npm:3.1.0"
     prettier-plugin-packagejson: "npm:2.4.6"
@@ -441,7 +441,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/node20": "npm:20.1.2"
     "@tsconfig/strictest": "npm:2.0.2"
-    "@types/node": "npm:20.9.3"
+    "@types/node": "npm:20.10.0"
     "@vercel/ncc": "npm:0.38.1"
     eslint: "npm:8.54.0"
     prettier: "npm:3.1.0"
@@ -459,7 +459,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/node20": "npm:20.1.2"
     "@tsconfig/strictest": "npm:2.0.2"
-    "@types/node": "npm:20.9.3"
+    "@types/node": "npm:20.10.0"
     "@vercel/ncc": "npm:0.38.1"
     eslint: "npm:8.54.0"
     prettier: "npm:3.1.0"
@@ -477,7 +477,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/node20": "npm:20.1.2"
     "@tsconfig/strictest": "npm:2.0.2"
-    "@types/node": "npm:20.9.3"
+    "@types/node": "npm:20.10.0"
     "@vercel/ncc": "npm:0.38.1"
     eslint: "npm:8.54.0"
     prettier: "npm:3.1.0"
@@ -501,7 +501,7 @@ __metadata:
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/node20": "npm:20.1.2"
     "@tsconfig/strictest": "npm:2.0.2"
-    "@types/node": "npm:20.9.3"
+    "@types/node": "npm:20.10.0"
     "@types/semver": "npm:7.5.6"
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
@@ -523,8 +523,8 @@ __metadata:
   linkType: hard
 
 "@octokit/core@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "@octokit/core@npm:5.0.1"
+  version: 5.0.2
+  resolution: "@octokit/core@npm:5.0.2"
   dependencies:
     "@octokit/auth-token": "npm:^4.0.0"
     "@octokit/graphql": "npm:^7.0.0"
@@ -533,18 +533,17 @@ __metadata:
     "@octokit/types": "npm:^12.0.0"
     before-after-hook: "npm:^2.2.0"
     universal-user-agent: "npm:^6.0.0"
-  checksum: 3d29d3be4e7e66c397d535876e867ca0eb7e0034175202cd5061237cb21267fdf062c9b15e6511309917f6cc4ad544e97be15e910945270289b509b9a1ce06fb
+  checksum: f3b3cb72f8f374e763e60922eacad56cb08fc05ee0be26f2a7b61937f89a377a8fd1b54f3d621a2b9627a9402c595d4b7e24900602e401b8a8edaffd995fa98f
   languageName: node
   linkType: hard
 
 "@octokit/endpoint@npm:^9.0.0":
-  version: 9.0.2
-  resolution: "@octokit/endpoint@npm:9.0.2"
+  version: 9.0.3
+  resolution: "@octokit/endpoint@npm:9.0.3"
   dependencies:
     "@octokit/types": "npm:^12.0.0"
-    is-plain-object: "npm:^5.0.0"
     universal-user-agent: "npm:^6.0.0"
-  checksum: 325ad5f2f4aaba0ef90436809dad423faf5f373dac5754af050bd117e70b6ded3a370745dfa4c860a8aa8161bc31cd7706f4b647aef8602f23a355d0cfbe3907
+  checksum: 82dceb0ab8018f82f230e76ecc7ce188e1bd6267b1dead8dcbf0be007063ce6020786a648ed02f97f874121777cf84ed10e0983a8b635baed0836e78f1c31c28
   languageName: node
   linkType: hard
 
@@ -600,15 +599,14 @@ __metadata:
   linkType: hard
 
 "@octokit/request@npm:^8.0.1, @octokit/request@npm:^8.0.2":
-  version: 8.1.5
-  resolution: "@octokit/request@npm:8.1.5"
+  version: 8.1.6
+  resolution: "@octokit/request@npm:8.1.6"
   dependencies:
     "@octokit/endpoint": "npm:^9.0.0"
     "@octokit/request-error": "npm:^5.0.0"
     "@octokit/types": "npm:^12.0.0"
-    is-plain-object: "npm:^5.0.0"
     universal-user-agent: "npm:^6.0.0"
-  checksum: 861f8aea5715d2341e0ebf275548856d6874d814898bf8848252e33a01312bcfacfd9e36c63845cb9b5fe9e4e950809c3f378ab218222a51efacf6018a0e06a8
+  checksum: ef84418e0b1f28335c105bca2b1518b04797791761024d26f80f60a528cdcf468baf9897fd34f535c42af0643a598884f882bc832e68edbfe1ea530c2df563a4
   languageName: node
   linkType: hard
 
@@ -697,12 +695,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:20.9.3":
-  version: 20.9.3
-  resolution: "@types/node@npm:20.9.3"
+"@types/node@npm:*, @types/node@npm:20.10.0":
+  version: 20.10.0
+  resolution: "@types/node@npm:20.10.0"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 0f61809f00241d0f1db23f8d938ef287138754819150d026e57d2246fec0330ba4b771781ff0d2ed1ea0dd42953850424b495956ff89d06d0bf3995d53da75b1
+  checksum: f379e57d9d28cb5f3d8eab943de0c54a0ca2f95ee356e1fe2a1a4fa718b740103ae522c50ce107cffd52c3642ef3244cfc55bf5369081dd6c48369c8587b21ae
   languageName: node
   linkType: hard
 
@@ -1091,9 +1089,9 @@ __metadata:
   linkType: hard
 
 "big-integer@npm:^1.6.44":
-  version: 1.6.51
-  resolution: "big-integer@npm:1.6.51"
-  checksum: c8139662d57f8833a44802f4b65be911679c569535ea73c5cfd3c1c8994eaead1b84b6f63e1db63833e4d4cacb6b6a9e5522178113dfdc8e4c81ed8436f1e8cc
+  version: 1.6.52
+  resolution: "big-integer@npm:1.6.52"
+  checksum: 9604224b4c2ab3c43c075d92da15863077a9f59e5d4205f4e7e76acd0cd47e8d469ec5e5dba8d9b32aa233951893b29329ca56ac80c20ce094b4a647a66abae0
   languageName: node
   linkType: hard
 
@@ -1811,14 +1809,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-turbo@npm:1.10.17-canary.4":
-  version: 1.10.17-canary.4
-  resolution: "eslint-plugin-turbo@npm:1.10.17-canary.4"
+"eslint-plugin-turbo@npm:1.10.17-canary.5":
+  version: 1.10.17-canary.5
+  resolution: "eslint-plugin-turbo@npm:1.10.17-canary.5"
   dependencies:
     dotenv: "npm:16.0.3"
   peerDependencies:
     eslint: ">6.6.0"
-  checksum: f17b2ae7c10d43047534dadbabfef4469523d9d8b964b4e8404a796a34f5ab5e01b064d79288fd2b5eb7d6c17c23eb2b89e2d9ee13cc99403304e1911a52700c
+  checksum: 435e77adfa43355102429fca6648a13179883332771677c78e2f3c058316594da9b9acf30c50af1db8967ea37f7947506522238e5b5cfbd4b986f16f1cf55a64
   languageName: node
   linkType: hard
 
@@ -2738,13 +2736,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-plain-object@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "is-plain-object@npm:5.0.0"
-  checksum: 893e42bad832aae3511c71fd61c0bf61aa3a6d853061c62a307261842727d0d25f761ce9379f7ba7226d6179db2a3157efa918e7fe26360f3bf0842d9f28942c
-  languageName: node
-  linkType: hard
-
 "is-regex@npm:^1.1.4":
   version: 1.1.4
   resolution: "is-regex@npm:1.1.4"
@@ -2982,9 +2973,9 @@ __metadata:
   linkType: hard
 
 "lru-cache@npm:^10.0.1, lru-cache@npm:^9.1.1 || ^10.0.0":
-  version: 10.0.3
-  resolution: "lru-cache@npm:10.0.3"
-  checksum: e1745db7682df7ea890aced922975528e9fd85897459e003ff3b71d7f69656792ddd9c50e852b7c461000b9c08a9370b110bfbe6e44de3d81f43c197eaa652b1
+  version: 10.1.0
+  resolution: "lru-cache@npm:10.1.0"
+  checksum: 778bc8b2626daccd75f24c4b4d10632496e21ba064b126f526c626fbdbc5b28c472013fccd45d7646b9e1ef052444824854aed617b59cd570d01a8b7d651fc1e
   languageName: node
   linkType: hard
 
@@ -4481,11 +4472,11 @@ __metadata:
   linkType: hard
 
 "undici@npm:^5.25.4":
-  version: 5.27.2
-  resolution: "undici@npm:5.27.2"
+  version: 5.28.0
+  resolution: "undici@npm:5.28.0"
   dependencies:
     "@fastify/busboy": "npm:^2.0.0"
-  checksum: 0cb62c57edc938f242c116e41fb2a74f81ed20e7e2e554cf1ceae548520df0592385b53d444f8cf59e1e10e6b27acd153198d8a2353b3040d0a778a099aac92c
+  checksum: ad49ebe742bbfcb389a46d20e1ac38100856b7126c53c7083bdf4a85eba5c3e4df1955bc99226d004157017d52a0e158b7b58a9d1fab2db8158c6a4704b49193
   languageName: node
   linkType: hard
 
