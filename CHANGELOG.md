@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.1.6]
+
 ### Changed
 
 - Do not install dune for dune cache with depext.
@@ -507,7 +509,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.5...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.6...HEAD
+[2.1.6]: https://github.com/ocaml/setup-ocaml/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/ocaml/setup-ocaml/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/ocaml/setup-ocaml/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/ocaml/setup-ocaml/compare/v2.1.2...v2.1.3
