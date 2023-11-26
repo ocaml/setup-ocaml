@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Expose `OPAMCONFIRMLEVEL` as `unsafe-yes`.
+
 ## [2.1.4]
 
 ### Fixed

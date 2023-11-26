@@ -48,6 +48,7 @@ export async function installer() {
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMYES", 1);
+  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   if (PLATFORM === "win32") {
     const opamRoot = path.join("D:", ".opam");
     core.exportVariable("OPAMROOT", opamRoot);
