@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Do not install dune for dune cache with depext.
+
 ## [2.1.5]
 
 ### Added

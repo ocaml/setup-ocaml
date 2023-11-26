@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 
-import { GITHUB_TOKEN } from "./constants.js";
+import { GITHUB_TOKEN, OPAM_DEPEXT } from "./constants.js";
 
 const {
   repo: { owner, repo },
@@ -11,7 +11,11 @@ const {
 
 export async function installDune() {
   await core.group("Install dune", async () => {
-    await exec("opam", ["depext", "--install", "dune"]);
+    if (OPAM_DEPEXT) {
+      await exec("opam", ["depext", "--install", "dune"]);
+    } else {
+      await exec("opam", ["install", "dune"]);
+    }
   });
 }
 
