@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.1.7]
+
+### Changed
+
+- Expose `OPAMCONFIRMLEVEL` if `allow-prerelease-opam` is enabled.
+
 ## [2.1.6]
 
 ### Changed
@@ -509,7 +515,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.6...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.7...HEAD
+[2.1.7]: https://github.com/ocaml/setup-ocaml/compare/v2.1.6...v2.1.7
 [2.1.6]: https://github.com/ocaml/setup-ocaml/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/ocaml/setup-ocaml/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/ocaml/setup-ocaml/compare/v2.1.3...v2.1.4
