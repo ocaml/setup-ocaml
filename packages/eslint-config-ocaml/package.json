@@ -10,14 +10,14 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "6.12.0",
-    "@typescript-eslint/parser": "6.12.0",
+    "@typescript-eslint/eslint-plugin": "6.13.1",
+    "@typescript-eslint/parser": "6.13.1",
     "eslint-config-prettier": "9.0.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.29.0",
     "eslint-plugin-prettier": "5.0.1",
     "eslint-plugin-simple-import-sort": "10.0.0",
-    "eslint-plugin-turbo": "1.10.17-canary.5",
+    "eslint-plugin-turbo": "1.10.17-canary.6",
     "eslint-plugin-unicorn": "49.0.0"
   },
   "devDependencies": {
