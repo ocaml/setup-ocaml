@@ -35,7 +35,9 @@ import { updateUnixPackageIndexFiles } from "./system.js";
 import { resolveCompiler } from "./version.js";
 
 export async function installer() {
-  if (!ALLOW_PRERELEASE_OPAM) {
+  if (ALLOW_PRERELEASE_OPAM) {
+    core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
+  } else {
     // [todo] remove this once opam 2.2 is released as stable.
     // https://github.com/ocaml/setup-ocaml/issues/299
     core.exportVariable("OPAMCLI", "2.0");
@@ -48,7 +50,6 @@ export async function installer() {
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMYES", 1);
-  core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   if (PLATFORM === "win32") {
     const opamRoot = path.join("D:", ".opam");
     core.exportVariable("OPAMROOT", opamRoot);
