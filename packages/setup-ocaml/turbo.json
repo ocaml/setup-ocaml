@@ -5,8 +5,8 @@
     "build": {
       "outputs": ["../../dist/**"],
       "passThroughEnv": [
+        "GITHUB_ACTIONS",
         "GITHUB_WORKSPACE",
-        "ImageOS",
         "PATH",
         "USERPROFILE",
         "XDG_CACHE_HOME"

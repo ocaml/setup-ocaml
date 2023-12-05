@@ -98,7 +98,7 @@ async function acquireOpamUnix() {
 }
 
 async function installUnixSystemPackages() {
-  const isGitHubRunner = process.env["ImageOS"] !== undefined;
+  const isGitHubRunner = process.env["GITHUB_ACTIONS"] === "true";
   if (isGitHubRunner) {
     if (PLATFORM === "linux") {
       const { version: systemVersion } = await getSystemIdentificationInfo();

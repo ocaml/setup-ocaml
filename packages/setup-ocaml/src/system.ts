@@ -37,7 +37,7 @@ export async function getSystemIdentificationInfo() {
 }
 
 export async function updateUnixPackageIndexFiles() {
-  const isGitHubRunner = process.env["ImageOS"] !== undefined;
+  const isGitHubRunner = process.env["GITHUB_ACTIONS"] === "true";
   if (isGitHubRunner) {
     if (PLATFORM === "linux") {
       await exec("sudo", ["apt-get", "update"]);
