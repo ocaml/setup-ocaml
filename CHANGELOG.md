@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.1.8]
+
 ### Fixed
 
 - Force all actions to exit with `process.exit`.
@@ -519,7 +521,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.7...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.1.8...HEAD
+[2.1.8]: https://github.com/ocaml/setup-ocaml/compare/v2.1.7...v2.1.8
 [2.1.7]: https://github.com/ocaml/setup-ocaml/compare/v2.1.6...v2.1.7
 [2.1.6]: https://github.com/ocaml/setup-ocaml/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/ocaml/setup-ocaml/compare/v2.1.4...v2.1.5
