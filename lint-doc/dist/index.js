@@ -27691,6 +27691,8 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
+;// CONCATENATED MODULE: external "node:process"
+const external_node_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:process");
 // EXTERNAL MODULE: ../../node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(7117);
 // EXTERNAL MODULE: ../../node_modules/@actions/exec/lib/exec.js
@@ -27732,6 +27734,8 @@ async function installOdoc() {
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
+/* eslint-disable unicorn/no-process-exit */
+
 
 
 
@@ -27740,11 +27744,13 @@ async function run() {
         await installOpamPackages();
         await installOdoc();
         await lintOdoc();
+        external_node_process_namespaceObject.exit(0);
     }
     catch (error) {
         if (error instanceof Error) {
             core.setFailed(error.message);
         }
+        external_node_process_namespaceObject.exit(1);
     }
 }
 void run();

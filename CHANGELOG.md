@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Force all actions to exit with `process.exit`.
+
 ## [2.1.7]
 
 ### Changed

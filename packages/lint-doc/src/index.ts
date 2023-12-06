@@ -1,3 +1,6 @@
+/* eslint-disable unicorn/no-process-exit */
+import * as process from "node:process";
+
 import * as core from "@actions/core";
 
 import { lintOdoc } from "./odoc.js";
@@ -8,10 +11,12 @@ async function run() {
     await installOpamPackages();
     await installOdoc();
     await lintOdoc();
+    process.exit(0);
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);
     }
+    process.exit(1);
   }
 }
 
