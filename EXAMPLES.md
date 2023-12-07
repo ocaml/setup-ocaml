@@ -1,5 +1,64 @@
 # Examples
 
+## Using the official GitHub Pages actions to deploy odoc to GitHub Pages
+
+```yml
+name: Deploy odoc to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions: read-all
+
+concurrency:
+  group: deploy-odoc
+  cancel-in-progress: true
+
+jobs:
+  deploy-odoc:
+    name: Deploy odoc to GitHub Pages
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      contents: read
+      id-token: write
+      pages: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v4
+
+      - name: Set-up OCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: "5.1"
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-doc
+
+      - name: Build documentation
+        run: opam exec -- dune build @doc
+
+      - name: Set-up Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: _build/default/_doc/_html
+
+      - name: Deploy odoc to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
+```
+
 ## Using the strategy matrix
 
 ```yml
@@ -95,7 +154,6 @@ steps:
 
 ## Using with [Containers](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontainer)
 
-<!-- prettier-ignore-start -->
 ```yml
 strategy:
   fail-fast: false
@@ -127,4 +185,3 @@ steps:
       cache-prefix: v1-${{ matrix.container }}
       opam-disable-sandboxing: true
 ```
-<!-- prettier-ignore-end -->
