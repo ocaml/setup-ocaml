@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Add opam support for the Dependency submission API.
+
 ## [2.1.8]
 
 ### Fixed
