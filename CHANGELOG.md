@@ -12,6 +12,10 @@ and this project adheres to
 
 - Add opam support for the Dependency submission API.
 
+### Removed
+
+- Since decent official support is now available to deploy natively to GitHub Pages, `deploy-doc` has been deprecated and removed.
+
 ## [2.1.8]
 
 ### Fixed
@@ -557,34 +561,20 @@ that require it.
 [2.0.2]: https://github.com/ocaml/setup-ocaml/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta13...v2.0.0
-[2.0.0-beta13]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...v2.0.0-beta13
-[2.0.0-beta12]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta11...v2.0.0-beta12
-[2.0.0-beta11]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta10...v2.0.0-beta11
-[2.0.0-beta10]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta9...v2.0.0-beta10
-[2.0.0-beta9]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta8...v2.0.0-beta9
-[2.0.0-beta8]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta7...v2.0.0-beta8
-[2.0.0-beta7]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta6...v2.0.0-beta7
-[2.0.0-beta6]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta5...v2.0.0-beta6
-[2.0.0-beta5]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta4...v2.0.0-beta5
-[2.0.0-beta4]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta3...v2.0.0-beta4
-[2.0.0-beta3]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
-[2.0.0-beta2]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
-[2.0.0-beta]:
-  https://github.com/ocaml/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
-[2.0.0-alpha]:
-  https://github.com/ocaml/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
+[2.0.0-beta13]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta12...v2.0.0-beta13
+[2.0.0-beta12]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta11...v2.0.0-beta12
+[2.0.0-beta11]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta10...v2.0.0-beta11
+[2.0.0-beta10]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta9...v2.0.0-beta10
+[2.0.0-beta9]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta8...v2.0.0-beta9
+[2.0.0-beta8]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta7...v2.0.0-beta8
+[2.0.0-beta7]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta6...v2.0.0-beta7
+[2.0.0-beta6]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta5...v2.0.0-beta6
+[2.0.0-beta5]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta4...v2.0.0-beta5
+[2.0.0-beta4]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta3...v2.0.0-beta4
+[2.0.0-beta3]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta2...v2.0.0-beta3
+[2.0.0-beta2]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-beta...v2.0.0-beta2
+[2.0.0-beta]: https://github.com/ocaml/setup-ocaml/compare/v2.0.0-alpha...v2.0.0-beta
+[2.0.0-alpha]: https://github.com/ocaml/setup-ocaml/compare/v1.1.11...v2.0.0-alpha
 [1.1.11]: https://github.com/ocaml/setup-ocaml/compare/v1.1.10...v1.1.11
 [1.1.10]: https://github.com/ocaml/setup-ocaml/compare/v1.1.9...v1.1.10
 [1.1.9]: https://github.com/ocaml/setup-ocaml/compare/v1.1.8...v1.1.9
