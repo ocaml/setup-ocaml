@@ -103,7 +103,7 @@ async function installUnixSystemPackages() {
     if (PLATFORM === "linux") {
       const { version: systemVersion } = await getSystemIdentificationInfo();
       if (systemVersion === "18.04") {
-        // [info]: musl-tools bug in ubuntu 18.04;
+        // [INFO]: musl-tools bug in ubuntu 18.04;
         // <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
         await exec("sudo", ["add-apt-repository", "ppa:avsm/musl"]);
       }
@@ -138,7 +138,9 @@ async function initializeOpamUnix() {
     await installUnixSystemPackages();
   }
   const disableSandboxing = [];
-  if (OPAM_DISABLE_SANDBOXING) {
+  // [NOTE] fix opam to run in act containers which have no "/dev/pts" for
+  // bubblewrap:
+  if (OPAM_DISABLE_SANDBOXING || github.context.actor === "nektos/act") {
     disableSandboxing.push("--disable-sandboxing");
   }
   await exec("opam", [

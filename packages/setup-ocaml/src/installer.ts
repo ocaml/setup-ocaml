@@ -4,6 +4,7 @@ import * as process from "node:process";
 
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
+import * as github from "@actions/github";
 
 import {
   restoreCygwinCache,
@@ -35,10 +36,14 @@ import { updateUnixPackageIndexFiles } from "./system.js";
 import { resolveCompiler } from "./version.js";
 
 export async function installer() {
+  // [NOTE] silence opam warnings triggered in act containers using root
+  if (github.context.actor === "nektos/act") {
+    core.exportVariable("OPAMROOTISOK", 1);
+  }
   if (ALLOW_PRERELEASE_OPAM) {
     core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   } else {
-    // [todo] remove this once opam 2.2 is released as stable.
+    // [TODO] remove this once opam 2.2 is released as stable.
     // https://github.com/ocaml/setup-ocaml/issues/299
     core.exportVariable("OPAMCLI", "2.0");
   }
@@ -46,7 +51,7 @@ export async function installer() {
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMJOBS", os.cpus().length);
   core.exportVariable("OPAMPRECISETRACKING", 1);
-  // [todo] remove this once opam 2.2 is released as stable.
+  // [TODO] remove this once opam 2.2 is released as stable.
   // https://github.com/ocaml/opam/issues/3447
   core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
   core.exportVariable("OPAMYES", 1);

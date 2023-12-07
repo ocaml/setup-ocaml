@@ -12,6 +12,10 @@ and this project adheres to
 
 - Add opam support for the Dependency submission API.
 
+### Fixed
+
+- Fix opam calls to support testing GitHub actions in local containers by using the act tool from [`nektos/act`](https://github.com/nektos/act).
+
 ### Removed
 
 - Since decent official support is now available to deploy natively to GitHub Pages, `deploy-doc` has been deprecated and removed.
