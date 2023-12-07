@@ -25,8 +25,7 @@ The action does the following:
 1. Initialise the opam repositories
 1. Retrieve the opam download cache
 1. Install depext
-   - On Windows, not only `opam-depext` is installed, but `depext-cygwinports`
-     is installed as well
+   - On Windows, not only `opam-depext` is installed, but `depext-cygwinports` is installed as well
 1. Retrieve the dune cache
    - If the dune cache feature is enabled
    - If the cache already exists
@@ -41,9 +40,7 @@ The action does the following:
 
 ### Post
 
-The reason for not caching opam stuff in the post-stage (more precisely, why you
-can't) is due to the size of the cache and repeatability. They should be cached
-immediately after initialisation to minimize the size of the cache.
+The reason for not caching opam stuff in the post-stage (more precisely, why you can't) is due to the size of the cache and repeatability. They should be cached immediately after initialisation to minimize the size of the cache.
 
 1. Remove oldest dune cache files to free space
    - If the dune cache feature is enabled
@@ -54,5 +51,4 @@ immediately after initialisation to minimize the size of the cache.
 ## What is the difference between opam dependencies and depext dependencies?
 
 - opam dependencies: opam packages installed by `opam install`.
-- depext dependencies: System packages installed by `apt-get install`,
-  `yum install`, `brew install`, etc.
+- depext dependencies: System packages installed by `apt-get install`, `yum install`, `brew install`, etc.
