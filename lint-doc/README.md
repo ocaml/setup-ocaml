@@ -1,7 +1,5 @@
 # lint-doc
 
-Performs several quality checks on the _doc comment_.
-
 ## Usage
 
 ### Example workflow
