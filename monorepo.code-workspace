@@ -1,7 +1,6 @@
 {
   "folders": [
     { "name": "analysis", "path": "analysis" },
-    { "name": "deploy-doc", "path": "deploy-doc" },
     { "name": "lint-doc", "path": "lint-doc" },
     { "name": "lint-fmt", "path": "lint-fmt" },
     { "name": "lint-opam", "path": "lint-opam" },
