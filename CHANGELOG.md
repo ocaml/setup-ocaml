@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - Add opam support for the Dependency submission API.
+- Set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` on the runner while installing OCaml.
 
 ### Removed
 
