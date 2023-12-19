@@ -180,6 +180,7 @@ async function setupCygwin() {
   const site = "https://mirrors.kernel.org/sourceware/cygwin";
   const packages = [
     "curl",
+    "libgpg-error0=1.37-1",
     "diffutils",
     "m4",
     "make",

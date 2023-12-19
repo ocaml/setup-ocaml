@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Temporarily pin libgpg-error0 to previous release, working around Cygwin packaging error.
+
 ## [2.2.0]
 
 ### Added
