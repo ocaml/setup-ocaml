@@ -60,8 +60,8 @@ jobs:
 
 The actions are downloaded and run from the GitHub graph of repositories. The workflow references an action using a ref.
 
-> **Note** Binding to a major version is the latest of that major version (e.g. `v2` = `2.*`)
->
+> [!NOTE]
+> Binding to a major version is the latest of that major version (e.g. `v2` = `2.*`)
 > Major versions should guarantee compatibility. A major version can add net new capabilities but should not break existing input compatibility or break existing workflows.
 
 ```yml
@@ -72,7 +72,8 @@ The actions are downloaded and run from the GitHub graph of repositories. The wo
     ocaml-compiler: ${{ matrix.ocaml-compiler }}
 ```
 
-> **Warning** do not reference `master` since that is the latest code and can be carrying breaking changes of the next major version.
+> [!WARNING]
+> Do not reference `master` since that is the latest code and can be carrying breaking changes of the next major version.
 
 Major version binding allows you to take advantage of bug fixes, critical functionality and security fixes. The `master` branch has the latest code and is unstable to bind to since changes get committed to the `master` and released by creating a tag.
 
@@ -106,7 +107,8 @@ steps:
 
 The `ocaml-compiler` input supports the Semantic Versioning Specification, for more detailed examples please refer to the [documentation](https://github.com/npm/node-semver#ranges).
 
-> **Note** With the naughty exception of `4.02.2`, point releases are meant to be strictly compatible, so once we (OCaml dev team) release a new point release, upgrading should be a no-brainer.
+> [!NOTE]
+> With the naughty exception of `4.02.2`, point releases are meant to be strictly compatible, so once we (OCaml dev team) release a new point release, upgrading should be a no-brainer.
 
 Examples:
 
@@ -123,7 +125,8 @@ Consult the [examples](examples.md) page for more complex patterns.
 
 **STATUS: EXPERIMENTAL**
 
-Note: All extends are recommended to be used in separate jobs run on `ubuntu-latest`.
+> [!NOTE]
+> All extends are recommended to be used in separate jobs run on `ubuntu-latest`.
 
 - [analysis](analysis)
 - [deploy-doc](deploy-doc)
@@ -144,7 +147,8 @@ updates:
       interval: weekly
 ```
 
-> **Note** [Renovate](https://github.com/marketplace/renovate) is also available for free as a third-party tool, which is much more flexible than Dependabot - depending on the project and your preferences. If you just want to automate GitHub Actions updates, Dependabot is good enough.
+> [!NOTE]
+> [Renovate](https://github.com/marketplace/renovate) is also available for free as a third-party tool, which is much more flexible than Dependabot - depending on the project and your preferences. If you just want to automate GitHub Actions updates, Dependabot is good enough.
 
 ## Roadmap
 
