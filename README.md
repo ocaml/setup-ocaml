@@ -119,7 +119,7 @@ Examples:
 
 ## Advanced Configurations
 
-Consult the [examples](examples.md) page for more complex patterns.
+Consult the [examples](EXAMPLES.md) page for more complex patterns.
 
 ## Extends
 
@@ -129,7 +129,6 @@ Consult the [examples](examples.md) page for more complex patterns.
 > All extends are recommended to be used in separate jobs run on `ubuntu-latest`.
 
 - [analysis](analysis)
-- [deploy-doc](deploy-doc)
 - [lint-doc](lint-doc)
 - [lint-fmt](lint-fmt)
 - [lint-opam](lint-opam)
