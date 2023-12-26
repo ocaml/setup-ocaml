@@ -41,7 +41,7 @@ export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
 export const CYGWIN_ROOT_WRAPPERBIN = path.join(CYGWIN_ROOT, "wrapperbin");
 
-// [todo] remove the branch for Windows once opam 2.2 is released as stable.
+// [TODO] remove the branch for Windows once opam 2.2 is released as stable.
 export const ALLOW_PRERELEASE_OPAM =
   PLATFORM !== "win32" &&
   core.getBooleanInput("allow-prerelease-opam", {
@@ -69,7 +69,7 @@ export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   trimWhitespace: true,
 });
 
-// [todo] remove this once opam 2.2 is released as stable.
+// [TODO] remove this once opam 2.2 is released as stable.
 export const OPAM_DEPEXT =
   !ALLOW_PRERELEASE_OPAM &&
   core.getBooleanInput("opam-depext", {
