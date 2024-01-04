@@ -55,18 +55,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         os:
-          - macos-latest
-          - ubuntu-latest
+          - macos-13
+          - ubuntu-22.04
         ocaml-compiler:
           - "5.1"
         allow-prerelease-opam:
           - false
         include:
-          - os: windows-latest
+          - os: windows-2022
             ocaml-compiler: "4.14"
             allow-prerelease-opam: false
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             ocaml-compiler: ocaml-variants.5.1.0+options,ocaml-option-flambda
             allow-prerelease-opam: true
 
@@ -81,7 +82,7 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
-          dune-cache: ${{ matrix.os != 'windows-latest' }}
+          dune-cache: ${{ matrix.os != 'windows-2022' }}
 
       - run: opam depext --install uri
 
