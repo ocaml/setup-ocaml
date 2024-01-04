@@ -77,6 +77,10 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
+      - name: Set-up Mold
+        if: runner.os == 'Linux'
+        uses: rui314/setup-mold@v1
+
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
