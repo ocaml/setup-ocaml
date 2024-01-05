@@ -444,7 +444,7 @@ __metadata:
     eslint: "npm:8.56.0"
     packageurl-js: "npm:1.2.1"
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
+    prettier-plugin-packagejson: "npm:2.4.9"
     strip-ansi: "npm:7.1.0"
     typescript: "npm:5.3.3"
   languageName: unknown
@@ -464,10 +464,10 @@ __metadata:
     eslint-plugin-import: "npm:2.29.1"
     eslint-plugin-prettier: "npm:5.1.2"
     eslint-plugin-simple-import-sort: "npm:10.0.0"
-    eslint-plugin-turbo: "npm:1.11.2"
+    eslint-plugin-turbo: "npm:1.11.3"
     eslint-plugin-unicorn: "npm:50.0.1"
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
+    prettier-plugin-packagejson: "npm:2.4.9"
     typescript: "npm:5.3.3"
   languageName: unknown
   linkType: soft
@@ -485,7 +485,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.1"
     eslint: "npm:8.56.0"
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
+    prettier-plugin-packagejson: "npm:2.4.9"
     typescript: "npm:5.3.3"
   languageName: unknown
   linkType: soft
@@ -503,7 +503,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.1"
     eslint: "npm:8.56.0"
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
+    prettier-plugin-packagejson: "npm:2.4.9"
     typescript: "npm:5.3.3"
   languageName: unknown
   linkType: soft
@@ -521,7 +521,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.1"
     eslint: "npm:8.56.0"
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
+    prettier-plugin-packagejson: "npm:2.4.9"
     typescript: "npm:5.3.3"
   languageName: unknown
   linkType: soft
@@ -545,10 +545,10 @@ __metadata:
     "@types/semver": "npm:7.5.6"
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
-    date-fns: "npm:3.0.6"
+    date-fns: "npm:3.1.0"
     eslint: "npm:8.56.0"
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
+    prettier-plugin-packagejson: "npm:2.4.9"
     semver: "npm:7.5.4"
     typescript: "npm:5.3.3"
     yaml: "npm:2.3.4"
@@ -1317,8 +1317,8 @@ __metadata:
   linkType: hard
 
 "cacache@npm:^18.0.0":
-  version: 18.0.1
-  resolution: "cacache@npm:18.0.1"
+  version: 18.0.2
+  resolution: "cacache@npm:18.0.2"
   dependencies:
     "@npmcli/fs": "npm:^3.1.0"
     fs-minipass: "npm:^3.0.0"
@@ -1332,7 +1332,7 @@ __metadata:
     ssri: "npm:^10.0.0"
     tar: "npm:^6.1.11"
     unique-filename: "npm:^3.0.0"
-  checksum: a31666805a80a8b16ad3f85faf66750275a9175a3480896f4f6d31b5d53ef190484fabd71bdb6d2ea5603c717fbef09f4af03d6a65b525c8ef0afaa44c361866
+  checksum: 7992665305cc251a984f4fdbab1449d50e88c635bc43bf2785530c61d239c61b349e5734461baa461caaee65f040ab14e2d58e694f479c0810cffd181ba5eabc
   languageName: node
   linkType: hard
 
@@ -1529,10 +1529,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:3.0.6":
-  version: 3.0.6
-  resolution: "date-fns@npm:3.0.6"
-  checksum: ca6ac81aca623fd6d12a43da59cc216e13a75a2eecf7fac692654524fca625e073f5cd36951ef0deac9621ead564eb06b4c3723f77b34e86f21ca3c0c3b32ff7
+"date-fns@npm:3.1.0":
+  version: 3.1.0
+  resolution: "date-fns@npm:3.1.0"
+  checksum: 60ded37aff397077780bf7b4e545b85041ee97e2acb24ffb99b84dcd8cf64d1c360d1f7bbf7e811840bb8df4f054508fa3dfb438f9e1558ddf5fe7645f4bdbf9
   languageName: node
   linkType: hard
 
@@ -1694,9 +1694,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.601":
-  version: 1.4.620
-  resolution: "electron-to-chromium@npm:1.4.620"
-  checksum: 8e132b906393a9e13638adbbda6b2a47b20120cd3dffef352725e61ef1765971e8f9e1924a4848dd87b4c82a00ca89132b97bc8e6e16e6cd58f9cc1a89fce14d
+  version: 1.4.622
+  resolution: "electron-to-chromium@npm:1.4.622"
+  checksum: 9d4e5ed7bd26cd18c07b0ec2a1644b5e78c56bddaea84fe33558adc45a2f21f39b87d5b13f488d1f09e7baff2deec478decd6b317809c4163263de5b092d2fdb
   languageName: node
   linkType: hard
 
@@ -1970,14 +1970,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-turbo@npm:1.11.2":
-  version: 1.11.2
-  resolution: "eslint-plugin-turbo@npm:1.11.2"
+"eslint-plugin-turbo@npm:1.11.3":
+  version: 1.11.3
+  resolution: "eslint-plugin-turbo@npm:1.11.3"
   dependencies:
     dotenv: "npm:16.0.3"
   peerDependencies:
     eslint: ">6.6.0"
-  checksum: 7296d8a503e91a0d929c2e43b07bf0687561923ec0e03604d8252bdd313a1671d8a65e58d0f13cd9a2d84ac9bef036545e898e1543edd91f115e528caf34ad41
+  checksum: 9212d284b4d501429433f61c572a0791aa0db0ffe5bf51b3365dd6fe4d0d0a91af5831124dc8652a3b4e64d1798e882f49b9ba8fe196040edf234c87009f9abc
   languageName: node
   linkType: hard
 
@@ -3639,18 +3639,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-plugin-packagejson@npm:2.4.8":
-  version: 2.4.8
-  resolution: "prettier-plugin-packagejson@npm:2.4.8"
+"prettier-plugin-packagejson@npm:2.4.9":
+  version: 2.4.9
+  resolution: "prettier-plugin-packagejson@npm:2.4.9"
   dependencies:
     sort-package-json: "npm:2.6.0"
-    synckit: "npm:0.8.8"
+    synckit: "npm:0.9.0"
   peerDependencies:
     prettier: ">= 1.16.0"
   peerDependenciesMeta:
     prettier:
       optional: true
-  checksum: f38580e069234da5f7ab13f72cea20579651037ee52ed07fb12517a2488b5b8f443075749ec6622b3c9e7a66e7ffbac8930516b174eb619e50b4ed49e2b05ef5
+  checksum: 6e1666c00d53dc8d4715e5c96978fc8446f93b7768852e11ff23f140297bc86a491d5ba381ea394d7ce3535b6f7afe64587a20176085491da91f814da3bfbcc9
   languageName: node
   linkType: hard
 
@@ -3932,8 +3932,8 @@ __metadata:
   resolution: "setup-ocaml@workspace:."
   dependencies:
     prettier: "npm:3.1.1"
-    prettier-plugin-packagejson: "npm:2.4.8"
-    turbo: "npm:1.11.2"
+    prettier-plugin-packagejson: "npm:2.4.9"
+    turbo: "npm:1.11.3"
   languageName: unknown
   linkType: soft
 
@@ -4201,7 +4201,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"synckit@npm:0.8.8, synckit@npm:^0.8.6":
+"synckit@npm:0.9.0":
+  version: 0.9.0
+  resolution: "synckit@npm:0.9.0"
+  dependencies:
+    "@pkgr/core": "npm:^0.1.0"
+    tslib: "npm:^2.6.2"
+  checksum: b5c1e7c03fefe3d36a9ab4e71dd21859cb32be4138712c31a893382a568fd00efc59ede8f521dd7e53d43a2fea92bdf717e987ea9ed6ad94f97ef28d71d0ba2f
+  languageName: node
+  linkType: hard
+
+"synckit@npm:^0.8.6":
   version: 0.8.8
   resolution: "synckit@npm:0.8.8"
   dependencies:
@@ -4306,58 +4316,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo-darwin-64@npm:1.11.2"
+"turbo-darwin-64@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo-darwin-64@npm:1.11.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo-darwin-arm64@npm:1.11.2"
+"turbo-darwin-arm64@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo-darwin-arm64@npm:1.11.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo-linux-64@npm:1.11.2"
+"turbo-linux-64@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo-linux-64@npm:1.11.3"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo-linux-arm64@npm:1.11.2"
+"turbo-linux-arm64@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo-linux-arm64@npm:1.11.3"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo-windows-64@npm:1.11.2"
+"turbo-windows-64@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo-windows-64@npm:1.11.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo-windows-arm64@npm:1.11.2"
+"turbo-windows-arm64@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo-windows-arm64@npm:1.11.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:1.11.2":
-  version: 1.11.2
-  resolution: "turbo@npm:1.11.2"
+"turbo@npm:1.11.3":
+  version: 1.11.3
+  resolution: "turbo@npm:1.11.3"
   dependencies:
-    turbo-darwin-64: "npm:1.11.2"
-    turbo-darwin-arm64: "npm:1.11.2"
-    turbo-linux-64: "npm:1.11.2"
-    turbo-linux-arm64: "npm:1.11.2"
-    turbo-windows-64: "npm:1.11.2"
-    turbo-windows-arm64: "npm:1.11.2"
+    turbo-darwin-64: "npm:1.11.3"
+    turbo-darwin-arm64: "npm:1.11.3"
+    turbo-linux-64: "npm:1.11.3"
+    turbo-linux-arm64: "npm:1.11.3"
+    turbo-windows-64: "npm:1.11.3"
+    turbo-windows-arm64: "npm:1.11.3"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -4373,7 +4383,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 88c6e806675734d009421a8adc126d98d66f199d9f0eed458c73596fdffd57be41bdd19f479683ae76ddc0da15068b1d3820c2d5df7bed3d4d336974ae2b34eb
+  checksum: 066bc49650fcb6e3c3e2082fa71940d7123b86cc17a575089364d87d7e28a9f13fffba2f23ce1341fac4e3f78b00eba9aa715a22c1f77ae683f15af096f4d1ed
   languageName: node
   linkType: hard
 
