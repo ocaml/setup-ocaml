@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/lint-opam",
   "private": true,
+  "sideEffects": false,
   "type": "module",
   "scripts": {
     "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../lint-opam/dist",

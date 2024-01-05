@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/eslint-config-ocaml",
   "private": true,
+  "sideEffects": false,
   "type": "commonjs",
   "main": "index.js",
   "scripts": {

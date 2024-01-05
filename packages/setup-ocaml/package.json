@@ -1,6 +1,7 @@
 {
   "name": "@ocaml/setup-ocaml",
   "private": true,
+  "sideEffects": false,
   "type": "module",
   "scripts": {
     "build": "yarn build:main & yarn build:post",
