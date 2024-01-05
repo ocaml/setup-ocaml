@@ -2,7 +2,8 @@
   "name": "@ocaml/analysis",
   "version": "2.0.15",
   "private": true,
-  "type": "module",
+  "sideEffects": false,
+  "type": "commonjs",
   "scripts": {
     "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../analysis/dist",
     "format": "prettier . --write",

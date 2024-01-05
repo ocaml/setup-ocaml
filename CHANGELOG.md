@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Use CJS for runtime environment for `ocaml/setup-ocaml/analysis` again.
+
 ## [2.2.1]
 
 ### Changed
