@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.2.2]
+
 ### Fixed
 
 - Use CJS for runtime environment for `ocaml/setup-ocaml/analysis` again.
@@ -543,7 +545,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.1...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/ocaml/setup-ocaml/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/ocaml/setup-ocaml/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/ocaml/setup-ocaml/compare/v2.1.8...v2.2.0
 [2.1.8]: https://github.com/ocaml/setup-ocaml/compare/v2.1.7...v2.1.8
