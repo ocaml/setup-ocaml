@@ -10,6 +10,8 @@ and this project adheres to
 
 ## [2.2.1]
 
+### Changed
+
 - Update runtime dependencies.
 - Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis`.
 
