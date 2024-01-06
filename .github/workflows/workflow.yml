@@ -70,6 +70,13 @@ jobs:
           - os: ubuntu-22.04
             ocaml-compiler: ocaml-variants.5.1.0+options,ocaml-option-flambda
             allow-prerelease-opam: true
+          - os: windows-2022
+            ocaml-compiler: ocaml-variants.5.1.0+options,ocaml-option-mingw
+            allow-prerelease-opam: false
+            opam-repositories: |
+              windows-5.0: https://github.com/dra27/opam-repository.git#windows-5.0
+              sunset: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
+              default: https://github.com/ocaml/opam-repository.git
 
     runs-on: ${{ matrix.os }}
 
@@ -87,6 +94,7 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
           dune-cache: ${{ matrix.os != 'windows-2022' }}
+          opam-repositories: ${{ matrix.opam-repositories }}
 
       - run: opam depext --install uri
 
