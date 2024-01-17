@@ -1,7 +1,7 @@
 {
   "extends": [
     "@tsconfig/strictest/tsconfig.json",
-    "@tsconfig/node20/tsconfig.json"
+    "@tsconfig/node20/tsconfig.json",
   ],
   "compilerOptions": {
     "lib": ["ESNext"],
@@ -9,7 +9,7 @@
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
     "noEmit": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }
