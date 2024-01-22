@@ -10,6 +10,10 @@ and this project adheres to
 
 ### Changed
 
+## [2.2.4]
+
+- Update runtime dependencies.
+
 ## [2.2.3]
 
 - Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis` again.
@@ -551,7 +555,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.3...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.4...HEAD
+[2.2.4]: https://github.com/ocaml/setup-ocaml/compare/v2.2.3...v2.2.4
 [2.2.3]: https://github.com/ocaml/setup-ocaml/compare/v2.2.2...v2.2.3
 [2.2.2]: https://github.com/ocaml/setup-ocaml/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/ocaml/setup-ocaml/compare/v2.2.0...v2.2.1
