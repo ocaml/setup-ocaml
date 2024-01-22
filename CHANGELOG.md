@@ -8,13 +8,15 @@ and this project adheres to
 
 ## [unreleased]
 
-### Changed
-
 ## [2.2.4]
+
+### Changed
 
 - Update runtime dependencies.
 
 ## [2.2.3]
+
+### Changed
 
 - Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis` again.
 
