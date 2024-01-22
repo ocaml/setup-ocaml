@@ -40,7 +40,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@actions/exec@npm:1.1.1, @actions/exec@npm:^1.0.0, @actions/exec@npm:^1.0.1, @actions/exec@npm:^1.1.1":
+"@actions/exec@npm:1.1.1, @actions/exec@npm:^1.0.0, @actions/exec@npm:^1.0.1":
   version: 1.1.1
   resolution: "@actions/exec@npm:1.1.1"
   dependencies:
@@ -313,17 +313,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@github/dependency-submission-toolkit@npm:2.0.1":
-  version: 2.0.1
-  resolution: "@github/dependency-submission-toolkit@npm:2.0.1"
+"@github/dependency-submission-toolkit@npm:2.0.3":
+  version: 2.0.3
+  resolution: "@github/dependency-submission-toolkit@npm:2.0.3"
   dependencies:
     "@actions/core": "npm:^1.10.1"
-    "@actions/exec": "npm:^1.1.1"
     "@actions/github": "npm:^6.0.0"
-    "@octokit/rest": "npm:^20.0.2"
+    "@octokit/request-error": "npm:^5.0.1"
     "@octokit/webhooks-types": "npm:^7.3.1"
     packageurl-js: "npm:^1.2.1"
-  checksum: 7cea01841058aab1df721e3419e8b94cba103c58050e01e9ed77cfe153ee12fc11a616480fe7ec26a48c01cebd746289454d59162e067420fc17bf69b9657c65
+  checksum: 0ecca5bea44bc0d99b501e20ec814613bee87c98e47459ecf6a175965476bb425b2b802f136cc96a6d1e5ac0cc09557eb3712e30b2dd34b42dfeef79323a03f2
   languageName: node
   linkType: hard
 
@@ -423,7 +422,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@actions/github": "npm:6.0.0"
     "@actions/glob": "npm:0.4.0"
-    "@github/dependency-submission-toolkit": "npm:2.0.1"
+    "@github/dependency-submission-toolkit": "npm:2.0.3"
     "@ocaml/eslint-config-ocaml": "workspace:*"
     "@tsconfig/strictest": "npm:2.0.2"
     "@types/node": "npm:20.11.5"
@@ -532,7 +531,7 @@ __metadata:
     "@types/semver": "npm:7.5.6"
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
-    date-fns: "npm:3.2.0"
+    date-fns: "npm:3.3.0"
     eslint: "npm:8.56.0"
     prettier: "npm:3.2.4"
     prettier-plugin-packagejson: "npm:2.4.9"
@@ -549,9 +548,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/core@npm:^5.0.0, @octokit/core@npm:^5.0.1":
-  version: 5.0.2
-  resolution: "@octokit/core@npm:5.0.2"
+"@octokit/core@npm:^5.0.1":
+  version: 5.1.0
+  resolution: "@octokit/core@npm:5.1.0"
   dependencies:
     "@octokit/auth-token": "npm:^4.0.0"
     "@octokit/graphql": "npm:^7.0.0"
@@ -560,7 +559,7 @@ __metadata:
     "@octokit/types": "npm:^12.0.0"
     before-after-hook: "npm:^2.2.0"
     universal-user-agent: "npm:^6.0.0"
-  checksum: f3b3cb72f8f374e763e60922eacad56cb08fc05ee0be26f2a7b61937f89a377a8fd1b54f3d621a2b9627a9402c595d4b7e24900602e401b8a8edaffd995fa98f
+  checksum: a1d2882373b4a33cd9f6e56d76bcc82e5589a477829fc3491b1ef471a8a83fa437b339a2c76d97d9e8ea4ca12bf3ebf32e66119ba16977e542d98f1f5dd3c994
   languageName: node
   linkType: hard
 
@@ -603,15 +602,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-request-log@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@octokit/plugin-request-log@npm:4.0.0"
-  peerDependencies:
-    "@octokit/core": ">=5"
-  checksum: ca6db112f288326d2f11de5170e7d6429ba54f04a22dc1e5d06c8d626f72bd2effeb0218a8f73bc9e23657b5a89194cd297964ace54693d2dfdfba3828920b45
-  languageName: node
-  linkType: hard
-
 "@octokit/plugin-rest-endpoint-methods@npm:^10.0.0":
   version: 10.2.0
   resolution: "@octokit/plugin-rest-endpoint-methods@npm:10.2.0"
@@ -623,7 +613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request-error@npm:^5.0.0":
+"@octokit/request-error@npm:^5.0.0, @octokit/request-error@npm:^5.0.1":
   version: 5.0.1
   resolution: "@octokit/request-error@npm:5.0.1"
   dependencies:
@@ -643,18 +633,6 @@ __metadata:
     "@octokit/types": "npm:^12.0.0"
     universal-user-agent: "npm:^6.0.0"
   checksum: ef84418e0b1f28335c105bca2b1518b04797791761024d26f80f60a528cdcf468baf9897fd34f535c42af0643a598884f882bc832e68edbfe1ea530c2df563a4
-  languageName: node
-  linkType: hard
-
-"@octokit/rest@npm:^20.0.2":
-  version: 20.0.2
-  resolution: "@octokit/rest@npm:20.0.2"
-  dependencies:
-    "@octokit/core": "npm:^5.0.0"
-    "@octokit/plugin-paginate-rest": "npm:^9.0.0"
-    "@octokit/plugin-request-log": "npm:^4.0.0"
-    "@octokit/plugin-rest-endpoint-methods": "npm:^10.0.0"
-  checksum: e9bfc617d0e0bfb0ba9dea3d1e0a19167c5a255beac622dd34280e1754dfab7688323b3251f8e8c85494b39548ecc52385e8b84e21ce0627f58176562a6e2fae
   languageName: node
   linkType: hard
 
@@ -1232,9 +1210,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001565":
-  version: 1.0.30001578
-  resolution: "caniuse-lite@npm:1.0.30001578"
-  checksum: c3bd9c08a945cee4f0cc284a217ebe9c2613e04d5aef4b48f1871a779b1875c34286469eb8d7d94bd028b5a354613e676ad503b6bf8db20a2f154574bd5fde48
+  version: 1.0.30001579
+  resolution: "caniuse-lite@npm:1.0.30001579"
+  checksum: 4003970f8d01a5fa314e39f4a21751dc750a530f3d19aed225e18e8e02892b590b8b0debfa0961eae9bc0e49b77bfb17cf30d2469540e428a8305e3cc9164fb8
   languageName: node
   linkType: hard
 
@@ -1367,11 +1345,11 @@ __metadata:
   linkType: hard
 
 "core-js-compat@npm:^3.34.0":
-  version: 3.35.0
-  resolution: "core-js-compat@npm:3.35.0"
+  version: 3.35.1
+  resolution: "core-js-compat@npm:3.35.1"
   dependencies:
     browserslist: "npm:^4.22.2"
-  checksum: 8c4379240b8decb94b21e81d5ba6f768418721061923b28c9dfc97574680c35d778d39c010207402fc7c8308a68a4cf6d5e02bcbcb96e931c52e6e0dce29a68c
+  checksum: c3b872e1f9703aa9554cce816207d85730da4703f1776c540b4da11bbbef6d9a1e6041625b5c1f58d2ada3d05f4a2b92897b7de5315c5ecd5d33d50dec86cca7
   languageName: node
   linkType: hard
 
@@ -1406,10 +1384,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:3.2.0":
-  version: 3.2.0
-  resolution: "date-fns@npm:3.2.0"
-  checksum: f93e987f785d7f2b7349986d150b014ce21fa6425e2e1edea6f0e01731dceef68deabf0f723689c28604e857648ac708a52b924cb7584e4321835686aa665371
+"date-fns@npm:3.3.0":
+  version: 3.3.0
+  resolution: "date-fns@npm:3.3.0"
+  checksum: 71aa44146f1f4a626535d3c81c751f870a57a5bee141412accd18e02f9f215aeb51fce67204a9e13eb228e90ffadcada9974d542e474d2b1b6510eefb244bd7d
   languageName: node
   linkType: hard
 
@@ -1571,9 +1549,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.601":
-  version: 1.4.636
-  resolution: "electron-to-chromium@npm:1.4.636"
-  checksum: 9eac3575c80f0ce60c275c2e212101328d329af676e5498ed501eedca322db6faa966ed4185b6217cc8153231dbda55238eb1b0b82132510e25c037eac8ea815
+  version: 1.4.640
+  resolution: "electron-to-chromium@npm:1.4.640"
+  checksum: fe5e2eaf3bdd73c1628ed0a7856a1d6afad99bdcceec6cacf87e7bac31db8514a52084d040b95b956ceba4f95723a6f3cf40a91f21b0061e6490328c9099dc4a
   languageName: node
   linkType: hard
 

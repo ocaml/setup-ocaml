@@ -16,7 +16,7 @@
     "@actions/exec": "1.1.1",
     "@actions/github": "6.0.0",
     "@actions/glob": "0.4.0",
-    "@github/dependency-submission-toolkit": "2.0.1",
+    "@github/dependency-submission-toolkit": "2.0.3",
     "packageurl-js": "1.2.1",
     "strip-ansi": "7.1.0"
   },

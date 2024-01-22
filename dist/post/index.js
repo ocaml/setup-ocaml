@@ -41128,7 +41128,7 @@ var import_graphql = __nccwpck_require__(8559);
 var import_auth_token = __nccwpck_require__(6258);
 
 // pkg/dist-src/version.js
-var VERSION = "5.0.2";
+var VERSION = "5.1.0";
 
 // pkg/dist-src/index.js
 var noop = () => {
@@ -98195,14 +98195,12 @@ function startOfWeekYear(date, options) {
 
 function getWeek(date, options) {
   const _date = toDate(date);
-  const diff =
-    startOfWeek(_date, options).getTime() -
-    startOfWeekYear(_date, options).getTime();
+  const diff = +startOfWeek(_date, options) - +startOfWeekYear(_date, options);
 
   // Round the number of days to the nearest integer
   // because the number of milliseconds in a week is not constant
   // (e.g. it's different in the week of the daylight saving time clock shift)
-  return Math.round(diff / millisecondsInWeek) + 1;
+  return Math.trunc(diff / millisecondsInWeek) + 1;
 }
 
 // Fallback for modularized imports:
