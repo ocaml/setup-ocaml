@@ -57,7 +57,7 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         os:
-          - macos-13
+          - macos-14
           - ubuntu-22.04
         ocaml-compiler:
           - "5.1"
