@@ -15,9 +15,9 @@
     "eslint-plugin-import/tsconfig-paths": "4.2.0"
   },
   "devDependencies": {
-    "prettier": "3.2.4",
+    "prettier": "3.2.5",
     "prettier-plugin-packagejson": "2.4.10",
-    "turbo": "1.12.0"
+    "turbo": "1.12.3"
   },
   "packageManager": "yarn@4.1.0"
 }
