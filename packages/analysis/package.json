@@ -16,18 +16,18 @@
     "@actions/exec": "1.1.1",
     "@actions/github": "6.0.0",
     "@actions/glob": "0.4.0",
-    "@github/dependency-submission-toolkit": "2.0.3",
+    "@github/dependency-submission-toolkit": "2.0.4",
     "packageurl-js": "1.2.1",
     "strip-ansi": "7.1.0"
   },
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/strictest": "2.0.3",
-    "@types/node": "20.11.17",
+    "@types/node": "20.11.20",
     "@vercel/ncc": "0.38.1",
-    "eslint": "8.56.0",
+    "eslint": "8.57.0",
     "prettier": "3.2.5",
-    "prettier-plugin-packagejson": "2.4.10",
+    "prettier-plugin-packagejson": "2.4.12",
     "typescript": "5.3.3"
   }
 }
