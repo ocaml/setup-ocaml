@@ -5,11 +5,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "format": "turbo run format",
-    "format:check": "turbo run format:check",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck"
+    "build": "turbo run build --continue --parallel",
+    "format": "turbo run format --continue --parallel",
+    "format:check": "turbo run format:check --continue --parallel",
+    "lint": "turbo run lint --continue --parallel",
+    "typecheck": "turbo run typecheck --continue --parallel"
   },
   "resolutions": {
     "eslint-plugin-import/tsconfig-paths": "4.2.0"
