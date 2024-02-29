@@ -24,13 +24,13 @@
     "cheerio": "1.0.0-rc.12",
     "date-fns": "3.3.1",
     "semver": "7.6.0",
-    "yaml": "2.3.4"
+    "yaml": "2.4.0"
   },
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/node20": "20.1.2",
     "@tsconfig/strictest": "2.0.3",
-    "@types/node": "20.11.20",
+    "@types/node": "20.11.24",
     "@types/semver": "7.5.8",
     "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
