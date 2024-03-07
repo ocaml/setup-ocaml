@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.2.6]
+
+### Changed
+
+- Update runtime dependencies.
+
 ## [2.2.5]
 
 ### Changed
@@ -563,7 +569,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.5...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.6...HEAD
+[2.2.6]: https://github.com/ocaml/setup-ocaml/compare/v2.2.5...v2.2.6
 [2.2.5]: https://github.com/ocaml/setup-ocaml/compare/v2.2.4...v2.2.5
 [2.2.4]: https://github.com/ocaml/setup-ocaml/compare/v2.2.3...v2.2.4
 [2.2.3]: https://github.com/ocaml/setup-ocaml/compare/v2.2.2...v2.2.3
