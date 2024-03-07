@@ -23,11 +23,11 @@
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/strictest": "2.0.3",
-    "@types/node": "20.11.24",
+    "@types/node": "20.11.25",
     "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
     "prettier": "3.2.5",
     "prettier-plugin-packagejson": "2.4.12",
-    "typescript": "5.3.3"
+    "typescript": "5.4.2"
   }
 }
