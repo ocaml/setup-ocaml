@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "ncc build src/index.ts --license=LICENSE.txt --out ../../lint-opam/dist",
+    "build": "tsup",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "TIMING=1 eslint .",
@@ -19,10 +19,10 @@
     "@tsconfig/node20": "20.1.2",
     "@tsconfig/strictest": "2.0.3",
     "@types/node": "20.11.27",
-    "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
     "prettier": "3.2.5",
     "prettier-plugin-packagejson": "2.4.12",
+    "tsup": "8.0.2",
     "typescript": "5.4.2"
   }
 }
