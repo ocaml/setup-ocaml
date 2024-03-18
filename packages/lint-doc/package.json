@@ -18,7 +18,7 @@
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/node20": "20.1.2",
     "@tsconfig/strictest": "2.0.3",
-    "@types/node": "20.11.27",
+    "@types/node": "20.11.28",
     "eslint": "8.57.0",
     "prettier": "3.2.5",
     "prettier-plugin-packagejson": "2.4.12",

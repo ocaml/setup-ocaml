@@ -22,7 +22,7 @@
   "devDependencies": {
     "@ocaml/eslint-config-ocaml": "workspace:*",
     "@tsconfig/strictest": "2.0.3",
-    "@types/node": "20.11.27",
+    "@types/node": "20.11.28",
     "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
     "prettier": "3.2.5",
