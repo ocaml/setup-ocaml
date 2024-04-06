@@ -1,6 +1,6 @@
+import type { Package } from "@github/dependency-submission-toolkit";
 import {
   BuildTarget,
-  Package,
   PackageCache,
 } from "@github/dependency-submission-toolkit";
 import { PackageURL } from "packageurl-js";

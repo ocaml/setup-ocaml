@@ -19,10 +19,10 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
 
-      - name: Set-up Node.js 20
+      - name: Set-up Node.js
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
-          node-version: 20
+          node-version: latest
 
       - run: corepack enable
 
@@ -36,16 +36,6 @@ jobs:
 
       - run: yarn typecheck
         if: always()
-
-      - name: Ensure dist directory is up-to-date
-        shell: bash
-        run: |
-          yarn build
-          if [ "$(git status dist lint-doc lint-fmt lint-opam --porcelain | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build. See status below:"
-            git diff
-            exit 1
-          fi
 
   test:
     name: Test

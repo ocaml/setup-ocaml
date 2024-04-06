@@ -6,9 +6,9 @@ export default defineConfig({
   bundle: true,
   clean: true,
   format: "cjs",
-  minify: true,
+  minify: false,
   noExternal: [/.*/],
-  splitting: true,
+  splitting: false,
   target: "node20",
   treeshake: true,
 });

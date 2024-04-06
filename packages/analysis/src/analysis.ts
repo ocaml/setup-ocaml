@@ -9,7 +9,8 @@ import {
   submitSnapshot,
 } from "@github/dependency-submission-toolkit";
 
-import { createBuildTarget, type Output } from "./opam-detector";
+import type { Output } from "./opam-detector";
+import { createBuildTarget } from "./opam-detector";
 
 async function getOpamLocalPackages() {
   const globber = await glob.create("*.opam");
