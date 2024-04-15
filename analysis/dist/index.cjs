@@ -20335,9 +20335,9 @@ var require_balanced_match = __commonJS({
   }
 });
 
-// ../../node_modules/minimatch/node_modules/brace-expansion/index.js
+// ../../node_modules/brace-expansion/index.js
 var require_brace_expansion = __commonJS({
-  "../../node_modules/minimatch/node_modules/brace-expansion/index.js"(exports, module) {
+  "../../node_modules/brace-expansion/index.js"(exports, module) {
     var concatMap = require_concat_map();
     var balanced = require_balanced_match();
     module.exports = expandTop;
@@ -22774,7 +22774,7 @@ var init_dist_src = __esm({
 var VERSION2;
 var init_version3 = __esm({
   "../../node_modules/@octokit/request/dist-src/version.js"() {
-    VERSION2 = "8.3.1";
+    VERSION2 = "8.4.0";
   }
 });
 
@@ -22978,6 +22978,7 @@ function fetchWrapper(requestOptions) {
   return fetch(requestOptions.url, {
     method: requestOptions.method,
     body: requestOptions.body,
+    redirect: requestOptions.request?.redirect,
     headers: requestOptions.headers,
     signal: requestOptions.request?.signal,
     // duplex must be set if request.body is ReadableStream or Async Iterables.
