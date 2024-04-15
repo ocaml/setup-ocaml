@@ -35,6 +35,9 @@ import { updateUnixPackageIndexFiles } from "./system.js";
 import { resolveCompiler } from "./version.js";
 
 export async function installer() {
+  if (core.isDebug()) {
+    core.exportVariable("OPAMVERBOSE", 1);
+  }
   if (ALLOW_PRERELEASE_OPAM) {
     core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   } else {
