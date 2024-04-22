@@ -62,7 +62,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   // file that has been converted to a CommonJS file using a Babel-
   // compatible transform (i.e. "__esModule" has not been set), then set
   // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  __defProp(target, "default", { value: mod, enumerable: true }) ,
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
@@ -19951,10 +19951,10 @@ var require_exec = __commonJS({
 });
 
 // src/index.ts
-var core2 = __toESM(require_core(), 1);
+var core2 = __toESM(require_core());
 
 // src/lint.ts
-var import_exec = __toESM(require_exec(), 1);
+var import_exec = __toESM(require_exec());
 async function opamLint() {
   await (0, import_exec.exec)("opam", ["lint"]);
 }
@@ -19963,8 +19963,8 @@ async function opamDuneLint() {
 }
 
 // src/opam.ts
-var core = __toESM(require_core(), 1);
-var import_exec2 = __toESM(require_exec(), 1);
+var core = __toESM(require_core());
+var import_exec2 = __toESM(require_exec());
 async function installOpamPackages() {
   await core.group("Install opam packages", async () => {
     await (0, import_exec2.exec)("opam", [
