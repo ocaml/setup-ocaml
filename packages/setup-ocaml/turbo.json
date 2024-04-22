@@ -7,7 +7,6 @@
       "passThroughEnv": [
         "GITHUB_ACTIONS",
         "GITHUB_WORKSPACE",
-        "HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK",
         "PATH",
         "USERPROFILE",
         "XDG_CACHE_HOME"

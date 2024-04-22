@@ -79,18 +79,7 @@ export async function installer() {
     await restoreCygwinCache();
   }
   const opamCacheHit = await restoreOpamCache();
-  const HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK =
-    process.env["HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK"];
-  if (PLATFORM === "macos") {
-    core.exportVariable("HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK", 1);
-  }
   await setupOpam();
-  if (PLATFORM === "macos") {
-    core.exportVariable(
-      "HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK",
-      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK,
-    );
-  }
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
   const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);

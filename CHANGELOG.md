@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+- Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing OCaml.
+
 ## [2.2.8]
 
 - Update runtime dependencies.

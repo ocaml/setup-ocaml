@@ -1,5 +1,4 @@
 {
   "endOfLine": "auto",
-
   "plugins": ["prettier-plugin-packagejson"]
 }
