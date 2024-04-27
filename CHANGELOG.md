@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [2.2.9]
+
 - Do not explicitly call the depext subcommand unless required.
 - Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing OCaml.
 - Update runtime dependencies.
@@ -581,7 +583,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.8...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.9...HEAD
+[2.2.9]: https://github.com/ocaml/setup-ocaml/compare/v2.2.8...v2.2.9
 [2.2.8]: https://github.com/ocaml/setup-ocaml/compare/v2.2.7...v2.2.8
 [2.2.7]: https://github.com/ocaml/setup-ocaml/compare/v2.2.6...v2.2.7
 [2.2.6]: https://github.com/ocaml/setup-ocaml/compare/v2.2.5...v2.2.6
