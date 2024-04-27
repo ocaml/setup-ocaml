@@ -49205,7 +49205,7 @@ function proxyPolicy(proxySettings, options) {
   }
   return {
     create: (nextPolicy, requestPolicyOptions) => {
-      return new ProxyPolicy(nextPolicy, requestPolicyOptions, proxySettings, void 0 );
+      return new ProxyPolicy(nextPolicy, requestPolicyOptions, proxySettings, options === null || options === void 0 ? void 0 : options.customNoProxyList);
     }
   };
 }
@@ -50441,7 +50441,7 @@ function isSpanContextValid2(context5) {
   return trace.isSpanContextValid(context5);
 }
 function getTracer(name, version3) {
-  return trace.getTracer("azure/core-tracing", version3);
+  return trace.getTracer(name || "azure/core-tracing", version3);
 }
 var SpanKind, context2, SpanStatusCode;
 var init_interfaces = __esm({
@@ -87995,7 +87995,7 @@ function getDefaultOptions() {
 // ../../node_modules/date-fns/startOfWeek.mjs
 function startOfWeek(date, options) {
   const defaultOptions2 = getDefaultOptions();
-  const weekStartsOn = defaultOptions2.weekStartsOn ?? defaultOptions2.locale?.options?.weekStartsOn ?? 0;
+  const weekStartsOn = options?.weekStartsOn ?? options?.locale?.options?.weekStartsOn ?? defaultOptions2.weekStartsOn ?? defaultOptions2.locale?.options?.weekStartsOn ?? 0;
   const _date = toDate(date);
   const day = _date.getDay();
   const diff = (day < weekStartsOn ? 7 : 0) + day - weekStartsOn;
@@ -88009,15 +88009,15 @@ function getWeekYear(date, options) {
   const _date = toDate(date);
   const year = _date.getFullYear();
   const defaultOptions2 = getDefaultOptions();
-  const firstWeekContainsDate = defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
+  const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
   const firstWeekOfNextYear = constructFrom(date, 0);
   firstWeekOfNextYear.setFullYear(year + 1, 0, firstWeekContainsDate);
   firstWeekOfNextYear.setHours(0, 0, 0, 0);
-  const startOfNextYear = startOfWeek(firstWeekOfNextYear);
+  const startOfNextYear = startOfWeek(firstWeekOfNextYear, options);
   const firstWeekOfThisYear = constructFrom(date, 0);
   firstWeekOfThisYear.setFullYear(year, 0, firstWeekContainsDate);
   firstWeekOfThisYear.setHours(0, 0, 0, 0);
-  const startOfThisYear = startOfWeek(firstWeekOfThisYear);
+  const startOfThisYear = startOfWeek(firstWeekOfThisYear, options);
   if (_date.getTime() >= startOfNextYear.getTime()) {
     return year + 1;
   } else if (_date.getTime() >= startOfThisYear.getTime()) {
@@ -88030,19 +88030,19 @@ function getWeekYear(date, options) {
 // ../../node_modules/date-fns/startOfWeekYear.mjs
 function startOfWeekYear(date, options) {
   const defaultOptions2 = getDefaultOptions();
-  const firstWeekContainsDate = defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
-  const year = getWeekYear(date);
+  const firstWeekContainsDate = options?.firstWeekContainsDate ?? options?.locale?.options?.firstWeekContainsDate ?? defaultOptions2.firstWeekContainsDate ?? defaultOptions2.locale?.options?.firstWeekContainsDate ?? 1;
+  const year = getWeekYear(date, options);
   const firstWeek = constructFrom(date, 0);
   firstWeek.setFullYear(year, 0, firstWeekContainsDate);
   firstWeek.setHours(0, 0, 0, 0);
-  const _date = startOfWeek(firstWeek);
+  const _date = startOfWeek(firstWeek, options);
   return _date;
 }
 
 // ../../node_modules/date-fns/getWeek.mjs
 function getWeek(date, options) {
   const _date = toDate(date);
-  const diff = +startOfWeek(_date) - +startOfWeekYear(_date);
+  const diff = +startOfWeek(_date, options) - +startOfWeekYear(_date, options);
   return Math.round(diff / millisecondsInWeek) + 1;
 }
 
