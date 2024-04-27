@@ -19996,7 +19996,7 @@ var core = __toESM(require_core());
 var import_exec2 = __toESM(require_exec());
 async function installOcamlformat(version2) {
   await core.group("Install ocamlformat", async () => {
-    await (0, import_exec2.exec)("opam", ["depext", "--install", `ocamlformat=${version2}`]);
+    await (0, import_exec2.exec)("opam", ["install", `ocamlformat=${version2}`]);
   });
 }
 

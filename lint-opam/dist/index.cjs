@@ -19978,7 +19978,7 @@ async function installOpamPackages() {
 }
 async function installOpamDuneLint() {
   await core.group("Install opam-dune-lint", async () => {
-    await (0, import_exec2.exec)("opam", ["depext", "--install", "opam-dune-lint"]);
+    await (0, import_exec2.exec)("opam", ["install", "opam-dune-lint"]);
   });
 }
 
