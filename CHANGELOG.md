@@ -8,6 +8,7 @@ and this project adheres to
 
 ## [unreleased]
 
+- Do not explicitly call the depext subcommand unless required.
 - Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing OCaml.
 - Update runtime dependencies.
 
