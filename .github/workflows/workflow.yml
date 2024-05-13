@@ -76,7 +76,7 @@ jobs:
 
       - name: Set-up Mold
         if: runner.os == 'Linux'
-        uses: rui314/setup-mold@c9803d2102b7e020ad0ccd687c55b2ad8baf3496 # v1
+        uses: rui314/setup-mold@8de9eea54963d01c1a6c200606257d65bd53bea1 # v1
 
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
