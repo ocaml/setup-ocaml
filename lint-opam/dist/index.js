@@ -27932,10 +27932,10 @@ async function installOpamPackages() {
     await core.group("Install opam packages", async () => {
         await (0,exec.exec)("opam", [
             "install",
-            ".",
             "--deps-only",
-            "--with-test",
             "--with-doc",
+            "--with-test",
+            ".",
         ]);
     });
 }

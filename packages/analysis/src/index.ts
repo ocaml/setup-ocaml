@@ -1,7 +1,5 @@
 import * as process from "node:process";
-
 import * as core from "@actions/core";
-
 import { analysis } from "./analysis";
 import { installOpamPackages } from "./opam";
 

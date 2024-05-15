@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Added
+
+- Add initial support for opam 2.2 on Windows.
+
 ## [2.2.10]
 
 ### Changed

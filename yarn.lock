@@ -429,7 +429,7 @@ __metadata:
     "@actions/glob": "npm:0.4.0"
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.2"
+    "@types/node": "npm:20.14.4"
     "@vercel/ncc": "npm:0.38.1"
     packageurl-js: "npm:1.2.1"
     strip-ansi: "npm:7.1.0"
@@ -445,7 +445,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.2"
+    "@types/node": "npm:20.14.4"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -459,7 +459,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.2"
+    "@types/node": "npm:20.14.4"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -473,7 +473,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.2"
+    "@types/node": "npm:20.14.4"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -493,11 +493,10 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.2"
+    "@types/node": "npm:20.14.4"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
-    date-fns: "npm:3.6.0"
     semver: "npm:7.6.2"
     typescript: "npm:5.4.5"
     yaml: "npm:2.4.5"
@@ -652,12 +651,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.14.2":
-  version: 20.14.2
-  resolution: "@types/node@npm:20.14.2"
+"@types/node@npm:20.14.4":
+  version: 20.14.4
+  resolution: "@types/node@npm:20.14.4"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/2d86e5f2227aaa42212e82ea0affe72799111b888ff900916376450b02b09b963ca888b20d9c332d8d2b833ed4781987867a38eaa2e4863fa8439071468b0a6f
+  checksum: 10c0/2244be2e66e19377a491bfc279b52bc3f598c2e31d683d2388f4a16dbf6e81ad0032fde01770c4babcc73a31609e23fa0e5864dffc5830e9f457db250bd08b33
   languageName: node
   linkType: hard
 
@@ -914,13 +913,6 @@ __metadata:
   version: 6.1.0
   resolution: "css-what@npm:6.1.0"
   checksum: 10c0/a09f5a6b14ba8dcf57ae9a59474722e80f20406c53a61e9aedb0eedc693b135113ffe2983f4efc4b5065ae639442e9ae88df24941ef159c218b231011d733746
-  languageName: node
-  linkType: hard
-
-"date-fns@npm:3.6.0":
-  version: 3.6.0
-  resolution: "date-fns@npm:3.6.0"
-  checksum: 10c0/0b5fb981590ef2f8e5a3ba6cd6d77faece0ea7f7158948f2eaae7bbb7c80a8f63ae30b01236c2923cf89bb3719c33aeb150c715ea4fe4e86e37dcf06bed42fb6
   languageName: node
   linkType: hard
 

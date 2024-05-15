@@ -91873,684 +91873,14 @@ var external_node_process_ = __nccwpck_require__(7742);
 var lib_core = __nccwpck_require__(7117);
 // EXTERNAL MODULE: external "node:os"
 var external_node_os_ = __nccwpck_require__(612);
-;// CONCATENATED MODULE: external "node:path"
-const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ../../node_modules/@actions/exec/lib/exec.js
 var lib_exec = __nccwpck_require__(6473);
+;// CONCATENATED MODULE: external "node:path"
+const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ../../node_modules/@actions/cache/lib/cache.js
 var cache = __nccwpck_require__(6930);
 // EXTERNAL MODULE: ../../node_modules/@actions/github/lib/github.js
 var lib_github = __nccwpck_require__(4005);
-;// CONCATENATED MODULE: ../../node_modules/date-fns/toDate.mjs
-/**
- * @name toDate
- * @category Common Helpers
- * @summary Convert the given argument to an instance of Date.
- *
- * @description
- * Convert the given argument to an instance of Date.
- *
- * If the argument is an instance of Date, the function returns its clone.
- *
- * If the argument is a number, it is treated as a timestamp.
- *
- * If the argument is none of the above, the function returns Invalid Date.
- *
- * **Note**: *all* Date arguments passed to any *date-fns* function is processed by `toDate`.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param argument - The value to convert
- *
- * @returns The parsed date in the local time zone
- *
- * @example
- * // Clone the date:
- * const result = toDate(new Date(2014, 1, 11, 11, 30, 30))
- * //=> Tue Feb 11 2014 11:30:30
- *
- * @example
- * // Convert the timestamp to date:
- * const result = toDate(1392098430000)
- * //=> Tue Feb 11 2014 11:30:30
- */
-function toDate(argument) {
-  const argStr = Object.prototype.toString.call(argument);
-
-  // Clone the date
-  if (
-    argument instanceof Date ||
-    (typeof argument === "object" && argStr === "[object Date]")
-  ) {
-    // Prevent the date to lose the milliseconds when passed to new Date() in IE10
-    return new argument.constructor(+argument);
-  } else if (
-    typeof argument === "number" ||
-    argStr === "[object Number]" ||
-    typeof argument === "string" ||
-    argStr === "[object String]"
-  ) {
-    // TODO: Can we get rid of as?
-    return new Date(argument);
-  } else {
-    // TODO: Can we get rid of as?
-    return new Date(NaN);
-  }
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_toDate = ((/* unused pure expression or super */ null && (toDate)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getYear.mjs
-
-
-/**
- * @name getYear
- * @category Year Helpers
- * @summary Get the year of the given date.
- *
- * @description
- * Get the year of the given date.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- *
- * @returns The year
- *
- * @example
- * // Which year is 2 July 2014?
- * const result = getYear(new Date(2014, 6, 2))
- * //=> 2014
- */
-function getYear(date) {
-  return toDate(date).getFullYear();
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getYear = ((/* unused pure expression or super */ null && (getYear)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getMonth.mjs
-
-
-/**
- * @name getMonth
- * @category Month Helpers
- * @summary Get the month of the given date.
- *
- * @description
- * Get the month of the given date.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- *
- * @returns The month index (0-11)
- *
- * @example
- * // Which month is 29 February 2012?
- * const result = getMonth(new Date(2012, 1, 29))
- * //=> 1
- */
-function getMonth(date) {
-  const _date = toDate(date);
-  const month = _date.getMonth();
-  return month;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getMonth = ((/* unused pure expression or super */ null && (getMonth)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getDate.mjs
-
-
-/**
- * @name getDate
- * @category Day Helpers
- * @summary Get the day of the month of the given date.
- *
- * @description
- * Get the day of the month of the given date.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- *
- * @returns The day of month
- *
- * @example
- * // Which day of the month is 29 February 2012?
- * const result = getDate(new Date(2012, 1, 29))
- * //=> 29
- */
-function getDate(date) {
-  const _date = toDate(date);
-  const dayOfMonth = _date.getDate();
-  return dayOfMonth;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getDate = ((/* unused pure expression or super */ null && (getDate)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/constants.mjs
-/**
- * @module constants
- * @summary Useful constants
- * @description
- * Collection of useful date constants.
- *
- * The constants could be imported from `date-fns/constants`:
- *
- * ```ts
- * import { maxTime, minTime } from "./constants/date-fns/constants";
- *
- * function isAllowedTime(time) {
- *   return time <= maxTime && time >= minTime;
- * }
- * ```
- */
-
-/**
- * @constant
- * @name daysInWeek
- * @summary Days in 1 week.
- */
-const daysInWeek = 7;
-
-/**
- * @constant
- * @name daysInYear
- * @summary Days in 1 year.
- *
- * @description
- * How many days in a year.
- *
- * One years equals 365.2425 days according to the formula:
- *
- * > Leap year occures every 4 years, except for years that are divisable by 100 and not divisable by 400.
- * > 1 mean year = (365+1/4-1/100+1/400) days = 365.2425 days
- */
-const daysInYear = 365.2425;
-
-/**
- * @constant
- * @name maxTime
- * @summary Maximum allowed time.
- *
- * @example
- * import { maxTime } from "./constants/date-fns/constants";
- *
- * const isValid = 8640000000000001 <= maxTime;
- * //=> false
- *
- * new Date(8640000000000001);
- * //=> Invalid Date
- */
-const maxTime = Math.pow(10, 8) * 24 * 60 * 60 * 1000;
-
-/**
- * @constant
- * @name minTime
- * @summary Minimum allowed time.
- *
- * @example
- * import { minTime } from "./constants/date-fns/constants";
- *
- * const isValid = -8640000000000001 >= minTime;
- * //=> false
- *
- * new Date(-8640000000000001)
- * //=> Invalid Date
- */
-const minTime = -maxTime;
-
-/**
- * @constant
- * @name millisecondsInWeek
- * @summary Milliseconds in 1 week.
- */
-const millisecondsInWeek = 604800000;
-
-/**
- * @constant
- * @name millisecondsInDay
- * @summary Milliseconds in 1 day.
- */
-const millisecondsInDay = 86400000;
-
-/**
- * @constant
- * @name millisecondsInMinute
- * @summary Milliseconds in 1 minute
- */
-const millisecondsInMinute = 60000;
-
-/**
- * @constant
- * @name millisecondsInHour
- * @summary Milliseconds in 1 hour
- */
-const millisecondsInHour = 3600000;
-
-/**
- * @constant
- * @name millisecondsInSecond
- * @summary Milliseconds in 1 second
- */
-const millisecondsInSecond = 1000;
-
-/**
- * @constant
- * @name minutesInYear
- * @summary Minutes in 1 year.
- */
-const minutesInYear = 525600;
-
-/**
- * @constant
- * @name minutesInMonth
- * @summary Minutes in 1 month.
- */
-const minutesInMonth = 43200;
-
-/**
- * @constant
- * @name minutesInDay
- * @summary Minutes in 1 day.
- */
-const minutesInDay = 1440;
-
-/**
- * @constant
- * @name minutesInHour
- * @summary Minutes in 1 hour.
- */
-const minutesInHour = 60;
-
-/**
- * @constant
- * @name monthsInQuarter
- * @summary Months in 1 quarter.
- */
-const monthsInQuarter = 3;
-
-/**
- * @constant
- * @name monthsInYear
- * @summary Months in 1 year.
- */
-const monthsInYear = 12;
-
-/**
- * @constant
- * @name quartersInYear
- * @summary Quarters in 1 year
- */
-const quartersInYear = 4;
-
-/**
- * @constant
- * @name secondsInHour
- * @summary Seconds in 1 hour.
- */
-const secondsInHour = 3600;
-
-/**
- * @constant
- * @name secondsInMinute
- * @summary Seconds in 1 minute.
- */
-const secondsInMinute = 60;
-
-/**
- * @constant
- * @name secondsInDay
- * @summary Seconds in 1 day.
- */
-const secondsInDay = secondsInHour * 24;
-
-/**
- * @constant
- * @name secondsInWeek
- * @summary Seconds in 1 week.
- */
-const secondsInWeek = secondsInDay * 7;
-
-/**
- * @constant
- * @name secondsInYear
- * @summary Seconds in 1 year.
- */
-const secondsInYear = secondsInDay * daysInYear;
-
-/**
- * @constant
- * @name secondsInMonth
- * @summary Seconds in 1 month
- */
-const secondsInMonth = secondsInYear / 12;
-
-/**
- * @constant
- * @name secondsInQuarter
- * @summary Seconds in 1 quarter.
- */
-const secondsInQuarter = secondsInMonth * 3;
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/_lib/defaultOptions.mjs
-let defaultOptions = {};
-
-function getDefaultOptions() {
-  return defaultOptions;
-}
-
-function setDefaultOptions(newOptions) {
-  defaultOptions = newOptions;
-}
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/startOfWeek.mjs
-
-
-
-/**
- * The {@link startOfWeek} function options.
- */
-
-/**
- * @name startOfWeek
- * @category Week Helpers
- * @summary Return the start of a week for the given date.
- *
- * @description
- * Return the start of a week for the given date.
- * The result will be in the local timezone.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The original date
- * @param options - An object with options
- *
- * @returns The start of a week
- *
- * @example
- * // The start of a week for 2 September 2014 11:55:00:
- * const result = startOfWeek(new Date(2014, 8, 2, 11, 55, 0))
- * //=> Sun Aug 31 2014 00:00:00
- *
- * @example
- * // If the week starts on Monday, the start of the week for 2 September 2014 11:55:00:
- * const result = startOfWeek(new Date(2014, 8, 2, 11, 55, 0), { weekStartsOn: 1 })
- * //=> Mon Sep 01 2014 00:00:00
- */
-function startOfWeek(date, options) {
-  const defaultOptions = getDefaultOptions();
-  const weekStartsOn =
-    options?.weekStartsOn ??
-    options?.locale?.options?.weekStartsOn ??
-    defaultOptions.weekStartsOn ??
-    defaultOptions.locale?.options?.weekStartsOn ??
-    0;
-
-  const _date = toDate(date);
-  const day = _date.getDay();
-  const diff = (day < weekStartsOn ? 7 : 0) + day - weekStartsOn;
-
-  _date.setDate(_date.getDate() - diff);
-  _date.setHours(0, 0, 0, 0);
-  return _date;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_startOfWeek = ((/* unused pure expression or super */ null && (startOfWeek)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/constructFrom.mjs
-/**
- * @name constructFrom
- * @category Generic Helpers
- * @summary Constructs a date using the reference date and the value
- *
- * @description
- * The function constructs a new date using the constructor from the reference
- * date and the given value. It helps to build generic functions that accept
- * date extensions.
- *
- * It defaults to `Date` if the passed reference date is a number or a string.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The reference date to take constructor from
- * @param value - The value to create the date
- *
- * @returns Date initialized using the given date and value
- *
- * @example
- * import { constructFrom } from 'date-fns'
- *
- * // A function that clones a date preserving the original type
- * function cloneDate<DateType extends Date(date: DateType): DateType {
- *   return constructFrom(
- *     date, // Use contrustor from the given date
- *     date.getTime() // Use the date value to create a new date
- *   )
- * }
- */
-function constructFrom(date, value) {
-  if (date instanceof Date) {
-    return new date.constructor(value);
-  } else {
-    return new Date(value);
-  }
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_constructFrom = ((/* unused pure expression or super */ null && (constructFrom)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getWeekYear.mjs
-
-
-
-
-
-/**
- * The {@link getWeekYear} function options.
- */
-
-/**
- * @name getWeekYear
- * @category Week-Numbering Year Helpers
- * @summary Get the local week-numbering year of the given date.
- *
- * @description
- * Get the local week-numbering year of the given date.
- * The exact calculation depends on the values of
- * `options.weekStartsOn` (which is the index of the first day of the week)
- * and `options.firstWeekContainsDate` (which is the day of January, which is always in
- * the first week of the week-numbering year)
- *
- * Week numbering: https://en.wikipedia.org/wiki/Week#The_ISO_week_date_system
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- * @param options - An object with options.
- *
- * @returns The local week-numbering year
- *
- * @example
- * // Which week numbering year is 26 December 2004 with the default settings?
- * const result = getWeekYear(new Date(2004, 11, 26))
- * //=> 2005
- *
- * @example
- * // Which week numbering year is 26 December 2004 if week starts on Saturday?
- * const result = getWeekYear(new Date(2004, 11, 26), { weekStartsOn: 6 })
- * //=> 2004
- *
- * @example
- * // Which week numbering year is 26 December 2004 if the first week contains 4 January?
- * const result = getWeekYear(new Date(2004, 11, 26), { firstWeekContainsDate: 4 })
- * //=> 2004
- */
-function getWeekYear(date, options) {
-  const _date = toDate(date);
-  const year = _date.getFullYear();
-
-  const defaultOptions = getDefaultOptions();
-  const firstWeekContainsDate =
-    options?.firstWeekContainsDate ??
-    options?.locale?.options?.firstWeekContainsDate ??
-    defaultOptions.firstWeekContainsDate ??
-    defaultOptions.locale?.options?.firstWeekContainsDate ??
-    1;
-
-  const firstWeekOfNextYear = constructFrom(date, 0);
-  firstWeekOfNextYear.setFullYear(year + 1, 0, firstWeekContainsDate);
-  firstWeekOfNextYear.setHours(0, 0, 0, 0);
-  const startOfNextYear = startOfWeek(firstWeekOfNextYear, options);
-
-  const firstWeekOfThisYear = constructFrom(date, 0);
-  firstWeekOfThisYear.setFullYear(year, 0, firstWeekContainsDate);
-  firstWeekOfThisYear.setHours(0, 0, 0, 0);
-  const startOfThisYear = startOfWeek(firstWeekOfThisYear, options);
-
-  if (_date.getTime() >= startOfNextYear.getTime()) {
-    return year + 1;
-  } else if (_date.getTime() >= startOfThisYear.getTime()) {
-    return year;
-  } else {
-    return year - 1;
-  }
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getWeekYear = ((/* unused pure expression or super */ null && (getWeekYear)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/startOfWeekYear.mjs
-
-
-
-
-
-/**
- * The {@link startOfWeekYear} function options.
- */
-
-/**
- * @name startOfWeekYear
- * @category Week-Numbering Year Helpers
- * @summary Return the start of a local week-numbering year for the given date.
- *
- * @description
- * Return the start of a local week-numbering year.
- * The exact calculation depends on the values of
- * `options.weekStartsOn` (which is the index of the first day of the week)
- * and `options.firstWeekContainsDate` (which is the day of January, which is always in
- * the first week of the week-numbering year)
- *
- * Week numbering: https://en.wikipedia.org/wiki/Week#The_ISO_week_date_system
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The original date
- * @param options - An object with options
- *
- * @returns The start of a week-numbering year
- *
- * @example
- * // The start of an a week-numbering year for 2 July 2005 with default settings:
- * const result = startOfWeekYear(new Date(2005, 6, 2))
- * //=> Sun Dec 26 2004 00:00:00
- *
- * @example
- * // The start of a week-numbering year for 2 July 2005
- * // if Monday is the first day of week
- * // and 4 January is always in the first week of the year:
- * const result = startOfWeekYear(new Date(2005, 6, 2), {
- *   weekStartsOn: 1,
- *   firstWeekContainsDate: 4
- * })
- * //=> Mon Jan 03 2005 00:00:00
- */
-function startOfWeekYear(date, options) {
-  const defaultOptions = getDefaultOptions();
-  const firstWeekContainsDate =
-    options?.firstWeekContainsDate ??
-    options?.locale?.options?.firstWeekContainsDate ??
-    defaultOptions.firstWeekContainsDate ??
-    defaultOptions.locale?.options?.firstWeekContainsDate ??
-    1;
-
-  const year = getWeekYear(date, options);
-  const firstWeek = constructFrom(date, 0);
-  firstWeek.setFullYear(year, 0, firstWeekContainsDate);
-  firstWeek.setHours(0, 0, 0, 0);
-  const _date = startOfWeek(firstWeek, options);
-  return _date;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_startOfWeekYear = ((/* unused pure expression or super */ null && (startOfWeekYear)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getWeek.mjs
-
-
-
-
-
-/**
- * The {@link getWeek} function options.
- */
-
-/**
- * @name getWeek
- * @category Week Helpers
- * @summary Get the local week index of the given date.
- *
- * @description
- * Get the local week index of the given date.
- * The exact calculation depends on the values of
- * `options.weekStartsOn` (which is the index of the first day of the week)
- * and `options.firstWeekContainsDate` (which is the day of January, which is always in
- * the first week of the week-numbering year)
- *
- * Week numbering: https://en.wikipedia.org/wiki/Week#The_ISO_week_date_system
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- * @param options - An object with options
- *
- * @returns The week
- *
- * @example
- * // Which week of the local week numbering year is 2 January 2005 with default options?
- * const result = getWeek(new Date(2005, 0, 2))
- * //=> 2
- *
- * @example
- * // Which week of the local week numbering year is 2 January 2005,
- * // if Monday is the first day of the week,
- * // and the first week of the year always contains 4 January?
- * const result = getWeek(new Date(2005, 0, 2), {
- *   weekStartsOn: 1,
- *   firstWeekContainsDate: 4
- * })
- * //=> 53
- */
-
-function getWeek(date, options) {
-  const _date = toDate(date);
-  const diff = +startOfWeek(_date, options) - +startOfWeekYear(_date, options);
-
-  // Round the number of weeks to the nearest integer because the number of
-  // milliseconds in a week is not constant (e.g. it's different in the week of
-  // the daylight saving time clock shift).
-  return Math.round(diff / millisecondsInWeek) + 1;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getWeek = ((/* unused pure expression or super */ null && (getWeek)));
-
 // EXTERNAL MODULE: ../../node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(8447);
 ;// CONCATENATED MODULE: ./src/constants.ts
@@ -92558,13 +91888,20 @@ var dist = __nccwpck_require__(8447);
 
 
 
+
 const ARCHITECTURE = (() => {
-    switch (external_node_os_.arch()) {
-        case "x64": {
-            return "x86_64";
+    switch (external_node_process_.arch) {
+        case "arm": {
+            return "armhf";
         }
         case "arm64": {
             return "arm64";
+        }
+        case "s390x": {
+            return "s390x";
+        }
+        case "x64": {
+            return "x86_64";
         }
         default: {
             throw new Error("The architecture is not supported.");
@@ -92572,30 +91909,52 @@ const ARCHITECTURE = (() => {
     }
 })();
 const PLATFORM = (() => {
-    switch (external_node_os_.platform()) {
-        case "linux": {
-            return "linux";
-        }
+    switch (external_node_process_.platform) {
         case "darwin": {
             return "macos";
         }
+        case "freebsd": {
+            return "freebsd";
+        }
+        case "linux": {
+            return "linux";
+        }
+        case "openbsd": {
+            return "openbsd";
+        }
         case "win32": {
-            return "win32";
+            return "windows";
         }
         default: {
             throw new Error("The platform is not supported.");
         }
     }
 })();
+const CYGWIN_MIRROR = "https://cygwin.mirror.constant.com/";
+// [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 const CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(CYGWIN_ROOT, "bin");
-const CYGWIN_ROOT_WRAPPERBIN = external_node_path_namespaceObject.join(CYGWIN_ROOT, "wrapperbin");
-// [todo] remove the branch for Windows once opam 2.2 is released as stable.
-const ALLOW_PRERELEASE_OPAM = PLATFORM !== "win32" &&
-    lib_core.getBooleanInput("allow-prerelease-opam", {
-        required: false,
-        trimWhitespace: true,
-    });
+const DUNE_CACHE_ROOT = (() => {
+    const homeDir = external_node_os_.homedir();
+    if (PLATFORM === "windows") {
+        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        const duneCacheDir = external_node_path_namespaceObject.join("D:", "dune");
+        return duneCacheDir;
+    }
+    const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
+    const duneCacheDir = xdgCacheHome
+        ? external_node_path_namespaceObject.join(xdgCacheHome, "dune")
+        : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
+    return duneCacheDir;
+})();
+const OPAM_ROOT = PLATFORM === "windows"
+    ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        external_node_path_namespaceObject.join("D:", ".opam")
+    : external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
+const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam", {
+    required: false,
+    trimWhitespace: true,
+});
 const CACHE_PREFIX = lib_core.getInput("cache-prefix", {
     required: false,
     trimWhitespace: true,
@@ -92612,17 +91971,14 @@ const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", {
     required: true,
     trimWhitespace: true,
 });
-// [todo] remove this once opam 2.2 is released as stable.
-const OPAM_DEPEXT = !ALLOW_PRERELEASE_OPAM &&
-    lib_core.getBooleanInput("opam-depext", {
+const OPAM_DISABLE_SANDBOXING = 
+// [TODO] unlock this once sandboxing is supported on Windows
+PLATFORM === "windows"
+    ? true
+    : lib_core.getBooleanInput("opam-disable-sandboxing", {
         required: false,
         trimWhitespace: true,
     });
-const OPAM_DEPEXT_FLAGS = lib_core.getInput("opam-depext-flags", { required: false, trimWhitespace: true })
-    .split(",")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0);
-const OPAM_DISABLE_SANDBOXING = lib_core.getBooleanInput("opam-disable-sandboxing", { required: false, trimWhitespace: true });
 const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages", {
     required: false,
     trimWhitespace: true,
@@ -92631,60 +91987,50 @@ const OPAM_PIN = lib_core.getBooleanInput("opam-pin", {
     required: false,
     trimWhitespace: true,
 });
-const repositories_yaml = dist/* parse */.Qc(lib_core.getInput("opam-repositories", { required: false, trimWhitespace: true }));
-const defaultRepository = PLATFORM === "win32"
-    ? "https://github.com/ocaml-opam/opam-repository-mingw.git#sunset"
-    : "https://github.com/ocaml/opam-repository.git";
-const OPAM_REPOSITORIES = repositories_yaml
-    ? Object.entries(repositories_yaml).reverse()
-    : [["default", defaultRepository]];
+const OPAM_REPOSITORIES = (() => {
+    const repositories_yaml = dist/* parse */.Qc(lib_core.getInput("opam-repositories", {
+        required: false,
+        trimWhitespace: true,
+    }));
+    return repositories_yaml
+        ? Object.entries(repositories_yaml).reverse()
+        : [["default", "https://github.com/ocaml/opam-repository.git"]];
+})();
 
 ;// CONCATENATED MODULE: external "node:fs"
 const external_node_fs_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
-// EXTERNAL MODULE: ../../node_modules/@actions/io/lib/io.js
-var io = __nccwpck_require__(47);
 // EXTERNAL MODULE: ../../node_modules/@actions/tool-cache/lib/tool-cache.js
 var tool_cache = __nccwpck_require__(834);
 // EXTERNAL MODULE: ../../node_modules/semver/index.js
 var semver = __nccwpck_require__(7546);
-;// CONCATENATED MODULE: ./src/system.ts
+;// CONCATENATED MODULE: ./src/unix.ts
 
 
 
-
-async function getSystemIdentificationInfo() {
-    if (PLATFORM === "linux") {
-        const osRelease = await external_node_fs_namespaceObject.promises.readFile("/etc/os-release", "utf8");
-        const lines = osRelease.split(external_node_os_.EOL);
-        let id = "";
-        let version = "";
-        for (const line of lines) {
-            const [key, value] = line.split("=").map((kv) => kv.trim());
-            if (key === "ID" && value !== undefined) {
-                id = value.toLowerCase();
-            }
-            else if (key === "VERSION_ID" && value !== undefined) {
-                version = value.toLowerCase().replaceAll('"', "");
-            }
+async function installUnixSystemPackages() {
+    const isGitHubRunner = external_node_process_.env.GITHUB_ACTIONS === "true";
+    if (isGitHubRunner) {
+        if (PLATFORM === "linux") {
+            await (0,lib_exec.exec)("sudo", [
+                "apt-get",
+                "--yes",
+                "install",
+                "bubblewrap",
+                "darcs",
+                "g++-multilib",
+                "gcc-multilib",
+                "mercurial",
+                "musl-tools",
+                "rsync",
+            ]);
         }
-        return { id, version };
-    }
-    if (PLATFORM === "macos") {
-        const swVers = await (0,lib_exec.getExecOutput)("sw_vers");
-        const lines = swVers.stdout.split(external_node_os_.EOL);
-        let version = "";
-        for (const line of lines) {
-            const [key, value] = line.split(":").map((kv) => kv.trim());
-            if (key === "ProductVersion" && value !== undefined) {
-                version = value;
-            }
+        else if (PLATFORM === "macos") {
+            await (0,lib_exec.exec)("brew", ["install", "darcs", "gpatch", "mercurial"]);
         }
-        return { id: "macos", version };
     }
-    throw new Error("The system is not supported.");
 }
 async function updateUnixPackageIndexFiles() {
-    const isGitHubRunner = process.env["GITHUB_ACTIONS"] === "true";
+    const isGitHubRunner = external_node_process_.env.GITHUB_ACTIONS === "true";
     if (isGitHubRunner) {
         if (PLATFORM === "linux") {
             await (0,lib_exec.exec)("sudo", ["apt-get", "update"]);
@@ -92695,8 +92041,212 @@ async function updateUnixPackageIndexFiles() {
     }
 }
 
+;// CONCATENATED MODULE: ./src/opam.ts
+
+
+
+
+
+
+
+
+
+async function getLatestOpamRelease() {
+    const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.3.0";
+    const octokit = lib_github.getOctokit(constants_GITHUB_TOKEN);
+    const { data: releases } = await octokit.rest.repos.listReleases({
+        owner: "ocaml",
+        repo: "opam",
+    });
+    const matchedReleases = releases
+        .filter((release) => semver.satisfies(release.tag_name, semverRange, {
+        includePrerelease: ALLOW_PRERELEASE_OPAM,
+        loose: true,
+    }))
+        .sort(({ tag_name: v1 }, { tag_name: v2 }) => semver.rcompare(v1, v2, { loose: true }));
+    const latestRelease = matchedReleases.at(0);
+    if (!latestRelease) {
+        throw new Error("Could not retrieve the opam release matching the version constraint");
+    }
+    const matchedAssets = latestRelease.assets.find((asset) => asset.browser_download_url.includes(`${ARCHITECTURE}-${PLATFORM}`));
+    if (!matchedAssets) {
+        throw new Error("Could not find any assets matching the current platform or architecture");
+    }
+    return {
+        version: latestRelease.tag_name,
+        browserDownloadUrl: matchedAssets.browser_download_url,
+    };
+}
+async function acquireOpam() {
+    await lib_core.group("Install opam", async () => {
+        const { version, browserDownloadUrl } = await getLatestOpamRelease();
+        const cachedPath = tool_cache.find("opam", version, ARCHITECTURE);
+        const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
+        if (cachedPath === "") {
+            const downloadedPath = await tool_cache.downloadTool(browserDownloadUrl);
+            lib_core.info(`Acquired ${version} from ${browserDownloadUrl}`);
+            const cachedPath = await tool_cache.cacheFile(downloadedPath, opam, "opam", version, ARCHITECTURE);
+            lib_core.info(`Successfully cached opam to ${cachedPath}`);
+            await external_node_fs_namespaceObject.promises.chmod(external_node_path_namespaceObject.join(cachedPath, opam), 0o755);
+            lib_core.addPath(cachedPath);
+            lib_core.info("Added opam to the path");
+        }
+        else {
+            lib_core.addPath(cachedPath);
+            lib_core.info("Added cached opam to the path");
+        }
+    });
+}
+async function initializeOpam() {
+    await lib_core.group("Initialise opam state", async () => {
+        if (PLATFORM !== "windows") {
+            try {
+                await installUnixSystemPackages();
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    lib_core.notice(`An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`);
+                }
+                await updateUnixPackageIndexFiles();
+                await installUnixSystemPackages();
+            }
+        }
+        const extraOptions = [];
+        if (PLATFORM === "windows") {
+            extraOptions.push("--cygwin-local-install");
+            extraOptions.push(`--cygwin-location=${CYGWIN_ROOT}`);
+        }
+        if (OPAM_DISABLE_SANDBOXING) {
+            extraOptions.push("--disable-sandboxing");
+        }
+        await (0,lib_exec.exec)("opam", [
+            "init",
+            "--auto-setup",
+            "--bare",
+            ...extraOptions,
+            "--enable-shell-hook",
+        ]);
+    });
+}
+async function setupOpam() {
+    await acquireOpam();
+    await initializeOpam();
+}
+async function installOcaml(ocamlCompiler) {
+    await lib_core.group("Install OCaml", async () => {
+        await (0,lib_exec.exec)("opam", [
+            "switch",
+            "--no-install",
+            `--packages=${ocamlCompiler}`,
+            "create",
+            ".",
+        ]);
+    });
+}
+async function pin(fpaths) {
+    await lib_core.group("Pin local packages", async () => {
+        for (const fpath of fpaths) {
+            const fname = external_node_path_namespaceObject.basename(fpath, ".opam");
+            const dname = external_node_path_namespaceObject.dirname(fpath);
+            await (0,lib_exec.exec)("opam", ["pin", "--no-action", "add", `${fname}.dev`, "."], {
+                cwd: dname,
+            });
+        }
+    });
+}
+async function repositoryAdd(name, address) {
+    await (0,lib_exec.exec)("opam", [
+        "repository",
+        "--all-switches",
+        "--set-default",
+        "add",
+        name,
+        address,
+    ]);
+}
+async function repositoryAddAll(repositories) {
+    await lib_core.group("Initialise the opam repositories", async () => {
+        for (const [name, address] of repositories) {
+            await repositoryAdd(name, address);
+        }
+    });
+}
+async function repositoryRemove(name) {
+    await (0,lib_exec.exec)("opam", ["repository", "--all-switches", "remove", name]);
+}
+async function repositoryList() {
+    const repositoryList = await (0,lib_exec.getExecOutput)("opam", ["repository", "--all-switches", "--short", "list"], { ignoreReturnCode: true, silent: true });
+    if (repositoryList.exitCode === 0) {
+        return repositoryList.stdout
+            .split("\n")
+            .map((repository) => repository.trim())
+            .filter((repository) => repository.length > 0);
+    }
+    return [];
+}
+async function repositoryRemoveAll() {
+    await lib_core.group("Remove the opam repositories", async () => {
+        const repositories = await repositoryList();
+        for (const repository of repositories) {
+            await repositoryRemove(repository);
+        }
+    });
+}
+
+;// CONCATENATED MODULE: ./src/version.ts
+
+
+
+
+function isSemverValidRange(semverVersion) {
+    return semver.validRange(semverVersion, { loose: true }) !== null;
+}
+async function getAllCompilerVersions() {
+    const octokit = lib_github.getOctokit(constants_GITHUB_TOKEN);
+    const { data: packages } = await octokit.rest.repos.getContent({
+        owner: "ocaml",
+        repo: "opam-repository",
+        path: "packages/ocaml-base-compiler",
+    });
+    const versions = new Set();
+    if (Array.isArray(packages)) {
+        for (const { path: p } of packages) {
+            const basename = external_node_path_namespaceObject.basename(p);
+            const version = basename.replace("ocaml-base-compiler.", "");
+            const parsed = semver.parse(version, { loose: true });
+            if (parsed !== null) {
+                const { major, minor: _minor, patch } = parsed;
+                const minor = _minor < 10
+                    ? // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
+                        `0${_minor}`
+                    : // ocaml-base-compiler.4.10.0, ocaml-base-compiler.4.14.0
+                        _minor;
+                const version = `${major}.${minor}.${patch}`;
+                versions.add(version);
+            }
+        }
+    }
+    return [...versions];
+}
+async function resolveVersion(semverVersion) {
+    const compilerVersions = await getAllCompilerVersions();
+    const matchedFullCompilerVersion = semver.maxSatisfying(compilerVersions, semverVersion, { loose: true });
+    if (matchedFullCompilerVersion === null) {
+        throw new Error(`No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`);
+    }
+    return matchedFullCompilerVersion;
+}
+async function resolveCompiler(compiler) {
+    const resolvedCompiler = isSemverValidRange(compiler)
+        ? `ocaml-base-compiler.${await resolveVersion(compiler)}`
+        : compiler;
+    return resolvedCompiler;
+}
+
 // EXTERNAL MODULE: ../../node_modules/@actions/http-client/lib/index.js
 var lib = __nccwpck_require__(7301);
+// EXTERNAL MODULE: ../../node_modules/@actions/io/lib/io.js
+var io = __nccwpck_require__(47);
 ;// CONCATENATED MODULE: ../../node_modules/cheerio/lib/esm/options.js
 const defaultOpts = {
     xml: false,
@@ -97509,7 +97059,7 @@ function reduceRules(a, b) {
 
 
 const defaultEquals = (a, b) => a === b;
-const esm_defaultOptions = {
+const defaultOptions = {
     adapter: domutils_lib_esm_namespaceObject,
     equals: defaultEquals,
 };
@@ -97519,7 +97069,7 @@ function convertOptionFormats(options) {
      * We force one format of options to the other one.
      */
     // @ts-expect-error Default options may have incompatible `Node` / `ElementNode`.
-    const opts = options !== null && options !== void 0 ? options : esm_defaultOptions;
+    const opts = options !== null && options !== void 0 ? options : defaultOptions;
     // @ts-expect-error Same as above.
     (_a = opts.adapter) !== null && _a !== void 0 ? _a : (opts.adapter = domutils_lib_esm_namespaceObject);
     // @ts-expect-error `equals` does not exist on `Options`
@@ -109975,7 +109525,12 @@ const { parseHTML: esm_parseHTML } = static_namespaceObject;
  */
 const { root: esm_root } = static_namespaceObject;
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./src/win32.ts
+;// CONCATENATED MODULE: ./src/windows.ts
+
+
+
+
+
 
 
 
@@ -109996,398 +109551,42 @@ async function getCygwinVersion() {
     });
     return version;
 }
-
-;// CONCATENATED MODULE: ./src/opam.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-async function getLatestOpamRelease() {
-    const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.2.0";
-    const octokit = lib_github.getOctokit(constants_GITHUB_TOKEN);
-    const { data: releases } = await octokit.rest.repos.listReleases({
-        owner: "ocaml",
-        repo: "opam",
-    });
-    const matchedReleases = releases
-        .filter((release) => semver.satisfies(release.tag_name, semverRange, {
-        includePrerelease: ALLOW_PRERELEASE_OPAM,
-        loose: true,
-    }))
-        .sort(({ tag_name: v1 }, { tag_name: v2 }) => semver.rcompare(v1, v2, { loose: true }));
-    const latestRelease = matchedReleases.at(0);
-    if (!latestRelease) {
-        throw new Error("Could not retrieve the opam release matching the version constraint");
-    }
-    const matchedAssets = latestRelease.assets.find((asset) => asset.browser_download_url.includes(`${ARCHITECTURE}-${PLATFORM}`));
-    if (!matchedAssets) {
-        throw new Error("Could not find any assets matching the current platform or architecture");
-    }
-    return {
-        version: latestRelease.tag_name,
-        browserDownloadUrl: matchedAssets.browser_download_url,
-    };
-}
-async function findOpam() {
-    if (PLATFORM === "win32") {
-        const opamPath = external_node_path_namespaceObject.join(CYGWIN_ROOT, "bin", "opam.exe");
-        return opamPath;
-    }
-    const opamPath = await io.which("opam");
-    return opamPath;
-}
-async function acquireOpamUnix() {
-    const { version, browserDownloadUrl } = await getLatestOpamRelease();
-    const cachedPath = tool_cache.find("opam", version, ARCHITECTURE);
-    if (cachedPath === "") {
-        const downloadedPath = await tool_cache.downloadTool(browserDownloadUrl);
-        lib_core.info(`Acquired ${version} from ${browserDownloadUrl}`);
-        const cachedPath = await tool_cache.cacheFile(downloadedPath, "opam", "opam", version, ARCHITECTURE);
-        lib_core.info(`Successfully cached opam to ${cachedPath}`);
-        await external_node_fs_namespaceObject.promises.chmod(`${cachedPath}/opam`, 0o755);
-        lib_core.addPath(cachedPath);
-        lib_core.info("Added opam to the path");
-    }
-    else {
-        lib_core.addPath(cachedPath);
-        lib_core.info("Added cached opam to the path");
-    }
-}
-async function installUnixSystemPackages() {
-    const isGitHubRunner = external_node_process_.env.GITHUB_ACTIONS === "true";
-    if (isGitHubRunner) {
-        if (PLATFORM === "linux") {
-            const { version: systemVersion } = await getSystemIdentificationInfo();
-            if (systemVersion === "18.04") {
-                // [info]: musl-tools bug in ubuntu 18.04;
-                // <https://github.com/ocaml/ocaml/issues/9131#issuecomment-599765888>
-                await (0,lib_exec.exec)("sudo", ["add-apt-repository", "ppa:avsm/musl"]);
-            }
-            await (0,lib_exec.exec)("sudo", [
-                "apt-get",
-                "--yes",
-                "install",
-                "bubblewrap",
-                "darcs",
-                "g++-multilib",
-                "gcc-multilib",
-                "mercurial",
-                "musl-tools",
-                "rsync",
-            ]);
-        }
-        else if (PLATFORM === "macos") {
-            await (0,lib_exec.exec)("brew", ["install", "darcs", "gpatch", "mercurial"]);
-        }
-    }
-}
-async function initializeOpamUnix() {
-    try {
-        await installUnixSystemPackages();
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            lib_core.notice(`An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`);
-        }
-        await updateUnixPackageIndexFiles();
-        await installUnixSystemPackages();
-    }
-    const disableSandboxing = [];
-    if (OPAM_DISABLE_SANDBOXING) {
-        disableSandboxing.push("--disable-sandboxing");
-    }
-    await (0,lib_exec.exec)("opam", [
-        "init",
-        "--auto-setup",
-        "--bare",
-        ...disableSandboxing,
-        "--enable-shell-hook",
-    ]);
-}
-async function setupOpamUnix() {
-    await lib_core.group("Install opam", async () => {
-        await acquireOpamUnix();
-    });
-    await lib_core.group("Initialise the opam state", async () => {
-        await initializeOpamUnix();
-    });
-}
 async function setupCygwin() {
-    const version = await getCygwinVersion();
-    const cachedPath = tool_cache.find("cygwin", version, "x86_64");
-    if (cachedPath === "") {
-        const downloadedPath = await tool_cache.downloadTool("https://cygwin.com/setup-x86_64.exe");
-        const cachedPath = await tool_cache.cacheFile(downloadedPath, "setup-x86_64.exe", "cygwin", version, "x86_64");
-        lib_core.addPath(cachedPath);
-    }
-    else {
-        lib_core.addPath(cachedPath);
-    }
-    const site = "https://mirrors.kernel.org/sourceware/cygwin";
-    const packages = [
-        "curl",
-        "diffutils",
-        "m4",
-        "make",
-        "mingw64-i686-gcc-core",
-        "mingw64-i686-gcc-g++",
-        "mingw64-x86_64-gcc-core",
-        "mingw64-x86_64-gcc-g++",
-        "patch",
-        "perl",
-        "rsync",
-        "unzip",
-    ].join(",");
-    await (0,lib_exec.exec)("setup-x86_64.exe", [
-        "--quiet-mode",
-        "--root",
-        CYGWIN_ROOT,
-        "--site",
-        site,
-        "--packages",
-        packages,
-        "--symlink-type=sys",
-    ]);
-    const setupExePath = await io.which("setup-x86_64.exe");
-    await io.cp(setupExePath, CYGWIN_ROOT);
-}
-async function acquireOpamWindows() {
-    const opamVersion = "0.0.0.2";
-    const cachedPath = tool_cache.find("opam", opamVersion);
-    if (cachedPath === "") {
-        const downloadedPath = await tool_cache.downloadTool(`https://github.com/fdopen/opam-repository-mingw/releases/download/${opamVersion}/opam64.zip`);
-        const extractedPath = await tool_cache.extractZip(downloadedPath);
-        const cachedPath = await tool_cache.cacheDir(extractedPath, "opam", opamVersion);
-        const installSh = external_node_path_namespaceObject.join(cachedPath, "opam64", "install.sh");
-        await external_node_fs_namespaceObject.promises.chmod(installSh, 0o755);
-        await (0,lib_exec.exec)("bash", [installSh, "--prefix", "/usr"]);
-    }
-    else {
-        const installSh = external_node_path_namespaceObject.join(cachedPath, "opam64", "install.sh");
-        await external_node_fs_namespaceObject.promises.chmod(installSh, 0o755);
-        await (0,lib_exec.exec)("bash", [installSh, "--prefix", "/usr"]);
-    }
-}
-async function initializeOpamWindows() {
-    await (0,lib_exec.exec)("git", ["config", "--global", "--add", "safe.directory", "'*'"]);
-    await (0,lib_exec.exec)("opam", [
-        "init",
-        "--auto-setup",
-        "--bare",
-        "--disable-sandboxing",
-        "--enable-shell-hook",
-    ]);
-    await io.mkdirP(CYGWIN_ROOT_WRAPPERBIN);
-    const opamCmd = external_node_path_namespaceObject.join(CYGWIN_ROOT_WRAPPERBIN, "opam.cmd");
-    const data = [
-        "@setlocal",
-        "@echo off",
-        "set PATH=%CYGWIN_ROOT_BIN%;%PATH%",
-        "ocaml-env exec -- opam.exe %*",
-    ].join(external_node_os_.EOL);
-    await external_node_fs_namespaceObject.promises.writeFile(opamCmd, data, { mode: 0o755 });
-}
-async function setupOpamWindows() {
     await lib_core.group("Prepare the Cygwin environment", async () => {
-        lib_core.exportVariable("CYGWIN", "winsymlinks:native");
-        lib_core.exportVariable("CYGWIN_ROOT", CYGWIN_ROOT);
-        lib_core.exportVariable("CYGWIN_ROOT_BIN", CYGWIN_ROOT_BIN);
-        lib_core.exportVariable("CYGWIN_ROOT_WRAPPERBIN", CYGWIN_ROOT_WRAPPERBIN);
-        lib_core.addPath(CYGWIN_ROOT_WRAPPERBIN);
-        await setupCygwin();
-    });
-    await saveCygwinCache();
-    const originalPath = external_node_process_.env.PATH?.split(external_node_path_namespaceObject.delimiter) ?? [];
-    const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
-    external_node_process_.env.PATH = patchedPath.join(external_node_path_namespaceObject.delimiter);
-    await lib_core.group("Install opam", async () => {
-        await acquireOpamWindows();
-    });
-    await lib_core.group("Initialise the opam state", async () => {
-        await initializeOpamWindows();
-    });
-    external_node_process_.env.PATH = originalPath.join(external_node_path_namespaceObject.delimiter);
-}
-async function setupOpam() {
-    if (PLATFORM === "win32") {
-        await setupOpamWindows();
-    }
-    else {
-        await setupOpamUnix();
-    }
-}
-async function installOcaml(ocamlCompiler) {
-    await lib_core.group("Install OCaml", async () => {
-        if (PLATFORM === "win32") {
-            const originalPath = external_node_process_.env.PATH?.split(external_node_path_namespaceObject.delimiter) ?? [];
-            const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
-            external_node_process_.env.PATH = patchedPath.join(external_node_path_namespaceObject.delimiter);
-            await (0,lib_exec.exec)("opam", [
-                "switch",
-                "create",
-                ".",
-                "--no-install",
-                "--packages",
-                ocamlCompiler,
-            ]);
-            external_node_process_.env.PATH = originalPath.join(external_node_path_namespaceObject.delimiter);
+        const version = await getCygwinVersion();
+        const cachedPath = tool_cache.find("cygwin", version, "x86_64");
+        if (cachedPath === "") {
+            const downloadedPath = await tool_cache.downloadTool("https://cygwin.com/setup-x86_64.exe");
+            const cachedPath = await tool_cache.cacheFile(downloadedPath, "setup-x86_64.exe", "cygwin", version, "x86_64");
+            lib_core.addPath(cachedPath);
         }
         else {
-            await (0,lib_exec.exec)("opam", [
-                "switch",
-                "create",
-                ".",
-                "--no-install",
-                "--packages",
-                ocamlCompiler,
-            ]);
+            lib_core.addPath(cachedPath);
         }
+        const packages = [
+            "curl",
+            "diffutils",
+            "m4",
+            "make",
+            "mingw64-i686-gcc-core",
+            "mingw64-i686-gcc-g++",
+            "mingw64-x86_64-gcc-core",
+            "mingw64-x86_64-gcc-g++",
+            "patch",
+            "perl",
+            "rsync",
+            "unzip",
+        ].join(",");
+        await (0,lib_exec.exec)("setup-x86_64", [
+            `--packages=${packages}`,
+            "--quiet-mode",
+            `--root=${CYGWIN_ROOT}`,
+            `--site=${CYGWIN_MIRROR}`,
+            "--symlink-type=sys",
+        ]);
+        const setup = await io.which("setup-x86_64");
+        await io.cp(setup, CYGWIN_ROOT);
     });
-}
-async function pin(fpaths) {
-    await lib_core.group("Pin local packages", async () => {
-        const opam = await findOpam();
-        for (const fpath of fpaths) {
-            const fname = external_node_path_namespaceObject.basename(fpath, ".opam");
-            const dname = external_node_path_namespaceObject.dirname(fpath);
-            await (0,lib_exec.exec)(opam, ["pin", "add", `${fname}.dev`, ".", "--no-action"], {
-                cwd: dname,
-            });
-        }
-    });
-}
-async function repositoryAdd(name, address) {
-    const opam = await findOpam();
-    await (0,lib_exec.exec)(opam, [
-        "repository",
-        "add",
-        name,
-        address,
-        "--all-switches",
-        "--set-default",
-    ]);
-}
-async function repositoryAddAll(repositories) {
-    await lib_core.group("Initialise the opam repositories", async () => {
-        let restore_autocrlf = undefined;
-        // Works around the lack of https://github.com/ocaml/opam/pull/3882 when
-        // adding ocaml/opam-repository on Windows. Can be removed when the action
-        // switches to opam 2.2
-        if (PLATFORM === "win32") {
-            const autocrlf = await (0,lib_exec.getExecOutput)("git", ["config", "--global", "core.autocrlf"], { ignoreReturnCode: true });
-            if (autocrlf.stdout.trim() !== "input") {
-                if (autocrlf.exitCode === 0) {
-                    restore_autocrlf = autocrlf.stdout.trim();
-                }
-                else {
-                    restore_autocrlf = null; // Unset the value at the end
-                }
-            }
-            await (0,lib_exec.exec)("git", ["config", "--global", "core.autocrlf", "input"]);
-        }
-        for (const [name, address] of repositories) {
-            await repositoryAdd(name, address);
-        }
-        if (restore_autocrlf === null) {
-            await (0,lib_exec.exec)("git", ["config", "--global", "--unset", "core.autocrlf"]);
-        }
-        else if (restore_autocrlf !== undefined) {
-            await (0,lib_exec.exec)("git", [
-                "config",
-                "--global",
-                "core.autocrlf",
-                restore_autocrlf,
-            ]);
-        }
-    });
-}
-async function repositoryRemove(name) {
-    const opam = await findOpam();
-    await (0,lib_exec.exec)(opam, ["repository", "remove", name, "--all-switches"]);
-}
-async function repositoryList() {
-    const opam = await findOpam();
-    const repositoryList = await (0,lib_exec.getExecOutput)(opam, ["repository", "list", "--all-switches", "--short"], { ignoreReturnCode: true });
-    if (repositoryList.exitCode === 0) {
-        return repositoryList.stdout
-            .split("\n")
-            .map((repository) => repository.trim())
-            .filter((repository) => repository.length > 0);
-    }
-    return [];
-}
-async function repositoryRemoveAll() {
-    await lib_core.group("Remove the opam repositories", async () => {
-        const repositories = await repositoryList();
-        for (const repository of repositories) {
-            await repositoryRemove(repository);
-        }
-    });
-}
-
-;// CONCATENATED MODULE: ./src/version.ts
-
-
-
-
-function isSemverValidRange(semverVersion) {
-    const isValidSemver = semver.validRange(semverVersion, { loose: true }) !== null;
-    // [NOTE] explicitly deny compilers like "4.14.0+mingw64c" as invalid semver
-    // syntax even though it's valid...
-    const plus = !semverVersion.includes("+");
-    return isValidSemver && plus;
-}
-async function getAllCompilerVersions() {
-    const octokit = lib_github.getOctokit(constants_GITHUB_TOKEN);
-    const owner = PLATFORM === "win32" ? "ocaml-opam" : "ocaml";
-    const repo = PLATFORM === "win32" ? "opam-repository-mingw" : "opam-repository";
-    const prefix = PLATFORM === "win32" ? "ocaml-variants" : "ocaml-base-compiler";
-    const { data: packages } = await octokit.rest.repos.getContent({
-        owner,
-        repo,
-        path: `packages/${prefix}`,
-    });
-    const versions = new Set();
-    if (Array.isArray(packages)) {
-        for (const { path: p } of packages) {
-            const basename = external_node_path_namespaceObject.basename(p);
-            const version = basename.replace(`${prefix}.`, "");
-            const parsed = semver.parse(version, { loose: true });
-            if (parsed !== null) {
-                const { major, minor: _minor, patch } = parsed;
-                const minor = _minor.toString().length > 1 ? _minor : `0${_minor}`;
-                const version = `${major}.${minor}.${patch}`;
-                versions.add(version);
-            }
-        }
-    }
-    return [...versions];
-}
-async function resolveVersion(semverVersion) {
-    const compilerVersions = await getAllCompilerVersions();
-    const matchedFullCompilerVersion = semver.maxSatisfying(compilerVersions, semverVersion, { loose: true });
-    if (matchedFullCompilerVersion === null) {
-        throw new Error(`No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`);
-    }
-    return matchedFullCompilerVersion;
-}
-async function resolveCompiler(compiler) {
-    const resolvedCompiler = isSemverValidRange(compiler)
-        ? PLATFORM === "win32"
-            ? `ocaml-variants.${await resolveVersion(compiler)}+mingw64c`
-            : `ocaml-base-compiler.${await resolveVersion(compiler)}`
-        : compiler;
-    return resolvedCompiler;
 }
 
 ;// CONCATENATED MODULE: ./src/cache.ts
@@ -110401,156 +109600,90 @@ async function resolveCompiler(compiler) {
 
 
 
-
-
-
-function composeDate() {
-    const d = new Date();
-    const year = getYear(d);
-    const month = getMonth(d);
-    const date = getDate(d);
-    const week = getWeek(d);
-    return { year, month, date, week };
-}
 async function composeCygwinCacheKeys() {
     const cygwinVersion = await getCygwinVersion();
-    // Bump cygwinEpoch when a new release requires the existing Cygwin caches to
-    // be invalidated.
-    const cygwinEpoch = "1";
-    const { year, week } = composeDate();
-    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinEpoch}-${cygwinVersion}-${year}-${week}`;
-    const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinEpoch}-${cygwinVersion}-${year}-${week}`,
-        `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinEpoch}-${cygwinVersion}-${year}-`,
-    ];
+    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
+    const restoreKeys = [key];
     return { key, restoreKeys };
 }
 function composeDuneCacheKeys() {
     const platform = PLATFORM.replaceAll(/\W/g, "_");
     const architecture = ARCHITECTURE.replaceAll(/\W/g, "_");
-    const { workflow: _workflow, job: _job, runId, runNumber } = lib_github.context;
+    const { workflow: _workflow, job: _job, runId } = lib_github.context;
     const workflow = _workflow.toLowerCase().replaceAll(/\W/g, "_");
     const job = _job.replaceAll(/\W/g, "_");
     const ocamlVersion = OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
-    const key = `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`;
+    const key = `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`;
     const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`,
-        `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-`,
+        `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`,
         `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-`,
     ];
     return { key, restoreKeys };
 }
 async function composeOpamCacheKeys() {
-    const fullPlatform = PLATFORM === "win32"
-        ? PLATFORM
-        : `${PLATFORM}-${(await getSystemIdentificationInfo()).version}`;
-    const opamVersion = PLATFORM === "win32" ? "0.0.0.2" : (await getLatestOpamRelease()).version;
+    const { version: opamVersion } = await getLatestOpamRelease();
     const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
     const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
     const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-    const { year, week } = composeDate();
-    const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-${week}`;
-    const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-${week}`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-`,
-    ];
-    return { key, restoreKeys };
-}
-function composeOpamDownloadCacheKeys() {
-    const repositories = OPAM_REPOSITORIES.map(([, u]) => {
-        try {
-            const url = new URL(u);
-            const urn = external_node_path_namespaceObject.join(url.hostname, url.pathname);
-            return urn;
-        }
-        catch {
-            return external_node_path_namespaceObject.resolve(u);
-        }
-    }).join("_");
-    const ocamlVersion = OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
-    const { year, month, date } = composeDate();
-    const { runId, runNumber } = lib_github.context;
-    const key = `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`;
-    const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-`,
-    ];
+    const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${PLATFORM}-${ARCHITECTURE}-${ocamlVersion}`;
+    const restoreKeys = [key];
     return { key, restoreKeys };
 }
 function composeCygwinCachePaths() {
     const paths = [];
     const githubWorkspace = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
-    const cygwinRoot = external_node_path_namespaceObject.join("D:", "cygwin");
-    paths.push(cygwinRoot);
+    paths.push(CYGWIN_ROOT);
     const cygwinRootSymlinkPath = external_node_path_namespaceObject.posix.join("/cygdrive", "d", "cygwin");
     paths.push(cygwinRootSymlinkPath);
-    const cygwinEncodedUri = encodeURIComponent("https://mirrors.kernel.org/sourceware/cygwin/").toLowerCase();
+    const cygwinEncodedUri = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
     const cygwinPackageRoot = external_node_path_namespaceObject.join(githubWorkspace, cygwinEncodedUri);
     paths.push(cygwinPackageRoot);
     return paths;
 }
 function composeDuneCachePaths() {
-    const paths = [];
-    const homeDir = external_node_os_.homedir();
-    if (PLATFORM === "win32") {
-        const duneCacheDir = external_node_path_namespaceObject.join(homeDir, "Local Settings", "Cache", "dune");
-        paths.push(duneCacheDir);
-    }
-    else {
-        const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
-        const duneCacheDir = xdgCacheHome
-            ? external_node_path_namespaceObject.join(xdgCacheHome, "dune")
-            : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
-        paths.push(duneCacheDir);
-    }
+    const paths = [DUNE_CACHE_ROOT];
     return paths;
 }
 function composeOpamCachePaths() {
-    const paths = [];
-    if (PLATFORM === "win32") {
-        const opamRootCachePath = external_node_path_namespaceObject.join("D:", ".opam");
-        paths.push(opamRootCachePath);
+    const paths = [OPAM_ROOT];
+    if (PLATFORM === "windows") {
         const { repo: { repo }, } = lib_github.context;
         const opamCygwinLocalCachePath = external_node_path_namespaceObject.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
         paths.push(opamCygwinLocalCachePath);
-    }
-    else {
-        const homeDir = external_node_os_.homedir();
-        const opamRootCachePath = external_node_path_namespaceObject.join(homeDir, ".opam");
-        paths.push(opamRootCachePath);
     }
     const githubWorkspace = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
     const opamLocalCachePath = external_node_path_namespaceObject.join(githubWorkspace, "_opam");
     paths.push(opamLocalCachePath);
     return paths;
 }
-function composeOpamDownloadCachePaths() {
-    const paths = [];
-    if (PLATFORM === "win32") {
-        const opamDownloadCachePath = external_node_path_namespaceObject.join("D:", ".opam", "download-cache");
-        paths.push(opamDownloadCachePath);
-    }
-    else {
-        const homeDir = external_node_os_.homedir();
-        const opamDownloadCachePath = external_node_path_namespaceObject.join(homeDir, ".opam", "download-cache");
-        paths.push(opamDownloadCachePath);
-    }
-    return paths;
-}
 async function restoreCache(key, restoreKeys, paths) {
-    const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
-    if (cacheKey) {
-        lib_core.info(`Cache restored from key: ${cacheKey}`);
+    if (!cache.isFeatureAvailable()) {
+        lib_core.info("Actions cache service feature is unavailable");
+        return;
     }
-    else {
-        lib_core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+    try {
+        const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
+        if (cacheKey) {
+            lib_core.info(`Cache restored from key: ${cacheKey}`);
+        }
+        else {
+            lib_core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+        }
+        return cacheKey;
     }
-    return cacheKey;
+    catch (error) {
+        if (error instanceof Error) {
+            lib_core.info(error.message);
+        }
+        lib_core.warning("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
+        return;
+    }
 }
 async function saveCache(key, paths) {
+    if (!cache.isFeatureAvailable()) {
+        lib_core.info("Actions cache service feature is unavailable");
+        return;
+    }
     try {
         await cache.saveCache(paths, key);
     }
@@ -110558,13 +109691,35 @@ async function saveCache(key, paths) {
         if (error instanceof Error) {
             lib_core.info(error.message);
         }
+        lib_core.warning("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
     }
 }
+async function restoreDuneCache() {
+    return await lib_core.group("Retrieve the dune cache", async () => {
+        const { key, restoreKeys } = composeDuneCacheKeys();
+        const paths = composeDuneCachePaths();
+        const cacheKey = await restoreCache(key, restoreKeys, paths);
+        return cacheKey;
+    });
+}
 async function restoreCygwinCache() {
-    await lib_core.group("Retrieve the Cygwin cache", async () => {
-        const { key, restoreKeys } = await composeCygwinCacheKeys();
-        const paths = composeCygwinCachePaths();
-        await restoreCache(key, restoreKeys, paths);
+    const { key, restoreKeys } = await composeCygwinCacheKeys();
+    const paths = composeCygwinCachePaths();
+    const cacheKey = await restoreCache(key, restoreKeys, paths);
+    return cacheKey;
+}
+async function restoreOpamCache() {
+    const { key, restoreKeys } = await composeOpamCacheKeys();
+    const paths = composeOpamCachePaths();
+    const cacheKey = await restoreCache(key, restoreKeys, paths);
+    return cacheKey;
+}
+async function restoreOpamCaches() {
+    return await lib_core.group("Retrieve the opam cache", async () => {
+        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows"
+            ? [restoreOpamCache(), restoreCygwinCache()]
+            : [restoreOpamCache()]);
+        return { opamCacheHit, cygwinCacheHit };
     });
 }
 async function saveCygwinCache() {
@@ -110574,26 +109729,11 @@ async function saveCygwinCache() {
         await saveCache(key, paths);
     });
 }
-async function restoreDuneCache() {
-    await lib_core.group("Retrieve the dune cache", async () => {
-        const { key, restoreKeys } = composeDuneCacheKeys();
-        const paths = composeDuneCachePaths();
-        await restoreCache(key, restoreKeys, paths);
-    });
-}
 async function saveDuneCache() {
     await core.group("Save the dune cache", async () => {
         const { key } = composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         await saveCache(key, paths);
-    });
-}
-async function restoreOpamCache() {
-    return await lib_core.group("Retrieve the opam cache", async () => {
-        const { key, restoreKeys } = await composeOpamCacheKeys();
-        const paths = composeOpamCachePaths();
-        const cacheKey = await restoreCache(key, restoreKeys, paths);
-        return cacheKey;
     });
 }
 async function saveOpamCache() {
@@ -110611,49 +109751,6 @@ async function saveOpamCache() {
         await saveCache(key, paths);
     });
 }
-async function restoreOpamDownloadCache() {
-    return await lib_core.group("Retrieve the opam download cache", async () => {
-        const { key, restoreKeys } = composeOpamDownloadCacheKeys();
-        const paths = composeOpamDownloadCachePaths();
-        const cacheKey = await restoreCache(key, restoreKeys, paths);
-        return cacheKey;
-    });
-}
-async function saveOpamDownloadCache() {
-    await core.group("Save the opam download cache", async () => {
-        const { key } = composeOpamDownloadCacheKeys();
-        const paths = composeOpamDownloadCachePaths();
-        await saveCache(key, paths);
-    });
-}
-
-;// CONCATENATED MODULE: ./src/depext.ts
-
-
-
-
-async function installDepext(ocamlVersion) {
-    await lib_core.group("Install depext", async () => {
-        const depextCygwinports = PLATFORM === "win32" ? ["depext-cygwinports"] : [];
-        await (0,lib_exec.exec)("opam", ["install", "opam-depext", ...depextCygwinports]);
-        if (PLATFORM === "win32") {
-            let base = "";
-            if (ocamlVersion.includes("mingw64")) {
-                base = "x86_64-w64-mingw32";
-            }
-            else if (ocamlVersion.includes("mingw32")) {
-                base = "i686-w64-mingw32";
-            }
-            lib_core.addPath(external_node_path_namespaceObject.posix.join("/", "usr", base, "sys-root", "mingw", "bin"));
-        }
-    });
-}
-async function installDepextPackages(fpaths) {
-    await lib_core.group("Install system packages required by opam packages", async () => {
-        const fnames = fpaths.map((fpath) => external_node_path_namespaceObject.basename(fpath, ".opam"));
-        await (0,lib_exec.exec)("opam", ["depext", ...fnames, ...OPAM_DEPEXT_FLAGS]);
-    });
-}
 
 ;// CONCATENATED MODULE: ./src/dune.ts
 
@@ -110663,12 +109760,7 @@ async function installDepextPackages(fpaths) {
 const { repo: { owner, repo }, runId: run_id, } = lib_github.context;
 async function installDune() {
     await lib_core.group("Install dune", async () => {
-        if (OPAM_DEPEXT) {
-            await (0,lib_exec.exec)("opam", ["depext", "--install", "dune"]);
-        }
-        else {
-            await (0,lib_exec.exec)("opam", ["install", "dune"]);
-        }
+        await (0,lib_exec.exec)("opam", ["install", "dune"]);
     });
 }
 async function trimDuneCache() {
@@ -110686,8 +109778,7 @@ async function trimDuneCache() {
             "dune",
             "cache",
             "trim",
-            "--size",
-            `${cacheSize}MB`,
+            `--size=${cacheSize}MB`,
         ]);
     });
 }
@@ -110715,36 +109806,24 @@ async function getOpamLocalPackages() {
 
 
 
-
-
 async function installer() {
     if (lib_core.isDebug()) {
         lib_core.exportVariable("OPAMVERBOSE", 1);
     }
-    if (ALLOW_PRERELEASE_OPAM) {
-        lib_core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
-    }
-    else {
-        // [todo] remove this once opam 2.2 is released as stable.
-        // https://github.com/ocaml/setup-ocaml/issues/299
-        lib_core.exportVariable("OPAMCLI", "2.0");
-    }
     lib_core.exportVariable("OPAMCOLOR", "always");
+    lib_core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
+    lib_core.exportVariable("OPAMDOWNLOADJOBS", external_node_os_.availableParallelism());
     lib_core.exportVariable("OPAMERRLOGLEN", 0);
-    lib_core.exportVariable("OPAMJOBS", external_node_os_.cpus().length);
     lib_core.exportVariable("OPAMPRECISETRACKING", 1);
-    // [todo] remove this once opam 2.2 is released as stable.
-    // https://github.com/ocaml/opam/issues/3447
-    lib_core.exportVariable("OPAMSOLVERTIMEOUT", 1000);
+    lib_core.exportVariable("OPAMROOT", OPAM_ROOT);
     lib_core.exportVariable("OPAMYES", 1);
-    if (PLATFORM === "win32") {
-        const opamRoot = external_node_path_namespaceObject.join("D:", ".opam");
-        lib_core.exportVariable("OPAMROOT", opamRoot);
-    }
-    if (PLATFORM === "win32") {
-        await lib_core.group("Change the file system behavior parameters", async () => {
+    if (PLATFORM === "windows") {
+        lib_core.exportVariable("CYGWIN", "winsymlinks:native");
+        lib_core.exportVariable("HOME", external_node_process_.env.USERPROFILE);
+        lib_core.exportVariable("MSYS", "winsymlinks:native");
+        await lib_core.group("Change the file system behaviour parameters", async () => {
             await (0,lib_exec.exec)("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-            // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
+            // [INFO] https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
             await (0,lib_exec.exec)("fsutil", [
                 "behavior",
                 "set",
@@ -110755,14 +109834,14 @@ async function installer() {
             await (0,lib_exec.exec)("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
         });
     }
-    if (PLATFORM === "win32") {
-        lib_core.exportVariable("HOME", external_node_process_.env.USERPROFILE);
-        lib_core.exportVariable("MSYS", "winsymlinks:native");
+    const { opamCacheHit, cygwinCacheHit } = await restoreOpamCaches();
+    if (PLATFORM === "windows") {
+        if (!cygwinCacheHit) {
+            await setupCygwin();
+            await saveCygwinCache();
+        }
+        lib_core.addPath(CYGWIN_ROOT_BIN);
     }
-    if (PLATFORM === "win32") {
-        await restoreCygwinCache();
-    }
-    const opamCacheHit = await restoreOpamCache();
     await setupOpam();
     await repositoryRemoveAll();
     await repositoryAddAll(OPAM_REPOSITORIES);
@@ -110771,16 +109850,13 @@ async function installer() {
         await installOcaml(ocamlCompiler);
         await saveOpamCache();
     }
-    await restoreOpamDownloadCache();
-    if (OPAM_DEPEXT) {
-        await installDepext(ocamlCompiler);
-    }
     if (DUNE_CACHE) {
         await restoreDuneCache();
         await installDune();
         lib_core.exportVariable("DUNE_CACHE", "enabled");
+        lib_core.exportVariable("DUNE_CACHE_ROOT", DUNE_CACHE_ROOT);
+        lib_core.exportVariable("DUNE_CACHE_STORAGE_MODE", "hardlink");
         lib_core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
-        lib_core.exportVariable("DUNE_CACHE_STORAGE_MODE", "copy");
     }
     lib_core.exportVariable("CLICOLOR_FORCE", "1");
     const fnames = await getOpamLocalPackages();
@@ -110788,23 +109864,8 @@ async function installer() {
         if (OPAM_PIN) {
             await pin(fnames);
         }
-        if (OPAM_DEPEXT) {
-            try {
-                await installDepextPackages(fnames);
-            }
-            catch (error) {
-                if (error instanceof Error) {
-                    lib_core.notice(`An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`);
-                }
-                await updateUnixPackageIndexFiles();
-                await installDepextPackages(fnames);
-            }
-        }
     }
     await (0,lib_exec.exec)("opam", ["--version"]);
-    if (OPAM_DEPEXT) {
-        await (0,lib_exec.exec)("opam", ["depext", "--version"]);
-    }
     await (0,lib_exec.exec)("opam", ["exec", "--", "ocaml", "-version"]);
 }
 

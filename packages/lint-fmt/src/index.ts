@@ -1,7 +1,5 @@
 import * as process from "node:process";
-
 import * as core from "@actions/core";
-
 import { checkFmt } from "./lint.js";
 import { getOcamlformatVersion } from "./ocamlformat.js";
 import { installOcamlformat } from "./opam.js";

@@ -27918,15 +27918,15 @@ var core = __nccwpck_require__(7117);
 var exec = __nccwpck_require__(6473);
 ;// CONCATENATED MODULE: ./src/odoc.ts
 
+
 async function lintOdoc() {
-    const options = {
+    const exitCode = await (0,exec.exec)("opam", ["exec", "--", "dune", "build", "@doc"], {
         env: {
-            ...process.env,
-            PATH: process.env["PATH"] ?? "",
+            ...external_node_process_namespaceObject.env,
+            PATH: external_node_process_namespaceObject.env.PATH ?? "",
             ODOC_WARN_ERROR: "true",
         },
-    };
-    const exitCode = await (0,exec.exec)("opam", ["exec", "--", "dune", "build", "@doc"], options);
+    });
     if (exitCode !== 0) {
         throw new Error("dune build @doc failed");
     }
@@ -27937,18 +27937,12 @@ async function lintOdoc() {
 
 async function installOpamPackages() {
     await core.group("Install opam packages", async () => {
-        await (0,exec.exec)("opam", ["install", ".", "--deps-only", "--with-doc"]);
+        await (0,exec.exec)("opam", ["install", "--deps-only", "--with-doc", "."]);
     });
 }
 async function installOdoc() {
     await core.group("Install odoc", async () => {
-        await (0,exec.exec)("opam", [
-            "depext",
-            "--install",
-            "conf-m4",
-            "dune",
-            "odoc>=1.5.0",
-        ]);
+        await (0,exec.exec)("opam", ["install", "dune", "odoc>=1.5.0"]);
     });
 }
 

@@ -34939,6 +34939,7 @@ function createBuildTarget(output, filePath) {
 
 
 
+
 async function getOpamLocalPackages() {
     const globber = await glob.create("*.opam");
     const fpaths = await globber.glob();
@@ -34957,21 +34958,21 @@ async function analysis() {
         const { name } = external_node_path_namespaceObject.parse(fpath);
         await (0,exec.exec)("opam", [
             "tree",
-            name,
+            `--json=${tempJson}`,
             "--with-dev-setup",
             // [NOTE] https://github.com/ocaml/opam/issues/4541
             // "--with-doc",
             "--with-test",
-            `--json=${tempJson}`,
+            name,
         ], {
             env: {
-                ...process.env,
-                PATH: process.env["PATH"] ?? "",
+                ...external_node_process_namespaceObject.env,
+                PATH: external_node_process_namespaceObject.env.PATH ?? "",
             },
             silent: true,
         });
         const output = JSON.parse(await promises_namespaceObject.readFile(tempJson, "utf8"));
-        const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
+        const githubWorkspace = external_node_process_namespaceObject.env.GITHUB_WORKSPACE ?? external_node_process_namespaceObject.cwd();
         const opamPackagePath = external_node_path_namespaceObject.normalize(external_node_path_namespaceObject.relative(githubWorkspace, fpath));
         const buildTarget = createBuildTarget(output, opamPackagePath);
         snapshot.addManifest(buildTarget);
@@ -34986,12 +34987,12 @@ async function installOpamPackages() {
     await core.group("Install opam packages", async () => {
         await (0,exec.exec)("opam", [
             "install",
-            ".",
             "--deps-only",
             "--with-dev-setup",
             // [NOTE] https://github.com/ocaml/opam/issues/4541
             // "--with-doc",
             "--with-test",
+            ".",
         ]);
     });
 }

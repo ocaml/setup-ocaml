@@ -1,41 +1,33 @@
 import * as path from "node:path";
-
 import * as github from "@actions/github";
 import * as semver from "semver";
-
-import { GITHUB_TOKEN, PLATFORM } from "./constants.js";
+import { GITHUB_TOKEN } from "./constants.js";
 
 function isSemverValidRange(semverVersion: string) {
-  const isValidSemver =
-    semver.validRange(semverVersion, { loose: true }) !== null;
-  // [NOTE] explicitly deny compilers like "4.14.0+mingw64c" as invalid semver
-  // syntax even though it's valid...
-  const plus = !semverVersion.includes("+");
-  return isValidSemver && plus;
+  return semver.validRange(semverVersion, { loose: true }) !== null;
 }
 
 async function getAllCompilerVersions() {
   const octokit = github.getOctokit(GITHUB_TOKEN);
-
-  const owner = PLATFORM === "win32" ? "ocaml-opam" : "ocaml";
-  const repo =
-    PLATFORM === "win32" ? "opam-repository-mingw" : "opam-repository";
-  const prefix =
-    PLATFORM === "win32" ? "ocaml-variants" : "ocaml-base-compiler";
   const { data: packages } = await octokit.rest.repos.getContent({
-    owner,
-    repo,
-    path: `packages/${prefix}`,
+    owner: "ocaml",
+    repo: "opam-repository",
+    path: "packages/ocaml-base-compiler",
   });
   const versions = new Set<string>();
   if (Array.isArray(packages)) {
     for (const { path: p } of packages) {
       const basename = path.basename(p);
-      const version = basename.replace(`${prefix}.`, "");
+      const version = basename.replace("ocaml-base-compiler.", "");
       const parsed = semver.parse(version, { loose: true });
       if (parsed !== null) {
         const { major, minor: _minor, patch } = parsed;
-        const minor = _minor.toString().length > 1 ? _minor : `0${_minor}`;
+        const minor =
+          _minor < 10
+            ? // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
+              `0${_minor}`
+            : // ocaml-base-compiler.4.10.0, ocaml-base-compiler.4.14.0
+              _minor;
         const version = `${major}.${minor}.${patch}`;
         versions.add(version);
       }
@@ -61,9 +53,7 @@ async function resolveVersion(semverVersion: string) {
 
 export async function resolveCompiler(compiler: string) {
   const resolvedCompiler = isSemverValidRange(compiler)
-    ? PLATFORM === "win32"
-      ? `ocaml-variants.${await resolveVersion(compiler)}+mingw64c`
-      : `ocaml-base-compiler.${await resolveVersion(compiler)}`
+    ? `ocaml-base-compiler.${await resolveVersion(compiler)}`
     : compiler;
   return resolvedCompiler;
 }

@@ -61995,7 +61995,7 @@ module.exports = {
 
 
 const { Transform } = __nccwpck_require__(2781)
-const { Console } = __nccwpck_require__(6206)
+const { Console } = __nccwpck_require__(1807)
 
 /**
  * Gets the output of `console.table(…)` as a string.
@@ -65542,7 +65542,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("child_proces
 
 /***/ }),
 
-/***/ 6206:
+/***/ 1807:
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("console");
@@ -66326,7 +66326,7 @@ exports.decodeStringToString = decodeStringToString;
 
 /***/ }),
 
-/***/ 4609:
+/***/ 7692:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
@@ -66606,7 +66606,7 @@ Object.defineProperty(exports, "createClientPipeline", ({ enumerable: true, get:
 var interfaces_js_1 = __nccwpck_require__(7154);
 Object.defineProperty(exports, "XML_ATTRKEY", ({ enumerable: true, get: function () { return interfaces_js_1.XML_ATTRKEY; } }));
 Object.defineProperty(exports, "XML_CHARKEY", ({ enumerable: true, get: function () { return interfaces_js_1.XML_CHARKEY; } }));
-var deserializationPolicy_js_1 = __nccwpck_require__(4609);
+var deserializationPolicy_js_1 = __nccwpck_require__(7692);
 Object.defineProperty(exports, "deserializationPolicy", ({ enumerable: true, get: function () { return deserializationPolicy_js_1.deserializationPolicy; } }));
 Object.defineProperty(exports, "deserializationPolicyName", ({ enumerable: true, get: function () { return deserializationPolicy_js_1.deserializationPolicyName; } }));
 var serializationPolicy_js_1 = __nccwpck_require__(8912);
@@ -66817,7 +66817,7 @@ exports.getOperationRequestInfo = getOperationRequestInfo;
 // Licensed under the MIT license.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createClientPipeline = void 0;
-const deserializationPolicy_js_1 = __nccwpck_require__(4609);
+const deserializationPolicy_js_1 = __nccwpck_require__(7692);
 const core_rest_pipeline_1 = __nccwpck_require__(1547);
 const serializationPolicy_js_1 = __nccwpck_require__(8912);
 /**
@@ -84675,8 +84675,6 @@ var __webpack_exports__ = {};
 var external_node_process_ = __nccwpck_require__(7742);
 // EXTERNAL MODULE: ../../node_modules/@actions/core/lib/core.js
 var lib_core = __nccwpck_require__(7117);
-// EXTERNAL MODULE: external "node:os"
-var external_node_os_ = __nccwpck_require__(612);
 ;// CONCATENATED MODULE: external "node:path"
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ../../node_modules/@actions/cache/lib/cache.js
@@ -84685,676 +84683,8 @@ var lib_cache = __nccwpck_require__(6930);
 var lib_exec = __nccwpck_require__(6473);
 // EXTERNAL MODULE: ../../node_modules/@actions/github/lib/github.js
 var lib_github = __nccwpck_require__(4005);
-;// CONCATENATED MODULE: ../../node_modules/date-fns/toDate.mjs
-/**
- * @name toDate
- * @category Common Helpers
- * @summary Convert the given argument to an instance of Date.
- *
- * @description
- * Convert the given argument to an instance of Date.
- *
- * If the argument is an instance of Date, the function returns its clone.
- *
- * If the argument is a number, it is treated as a timestamp.
- *
- * If the argument is none of the above, the function returns Invalid Date.
- *
- * **Note**: *all* Date arguments passed to any *date-fns* function is processed by `toDate`.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param argument - The value to convert
- *
- * @returns The parsed date in the local time zone
- *
- * @example
- * // Clone the date:
- * const result = toDate(new Date(2014, 1, 11, 11, 30, 30))
- * //=> Tue Feb 11 2014 11:30:30
- *
- * @example
- * // Convert the timestamp to date:
- * const result = toDate(1392098430000)
- * //=> Tue Feb 11 2014 11:30:30
- */
-function toDate(argument) {
-  const argStr = Object.prototype.toString.call(argument);
-
-  // Clone the date
-  if (
-    argument instanceof Date ||
-    (typeof argument === "object" && argStr === "[object Date]")
-  ) {
-    // Prevent the date to lose the milliseconds when passed to new Date() in IE10
-    return new argument.constructor(+argument);
-  } else if (
-    typeof argument === "number" ||
-    argStr === "[object Number]" ||
-    typeof argument === "string" ||
-    argStr === "[object String]"
-  ) {
-    // TODO: Can we get rid of as?
-    return new Date(argument);
-  } else {
-    // TODO: Can we get rid of as?
-    return new Date(NaN);
-  }
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_toDate = ((/* unused pure expression or super */ null && (toDate)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getYear.mjs
-
-
-/**
- * @name getYear
- * @category Year Helpers
- * @summary Get the year of the given date.
- *
- * @description
- * Get the year of the given date.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- *
- * @returns The year
- *
- * @example
- * // Which year is 2 July 2014?
- * const result = getYear(new Date(2014, 6, 2))
- * //=> 2014
- */
-function getYear(date) {
-  return toDate(date).getFullYear();
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getYear = ((/* unused pure expression or super */ null && (getYear)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getMonth.mjs
-
-
-/**
- * @name getMonth
- * @category Month Helpers
- * @summary Get the month of the given date.
- *
- * @description
- * Get the month of the given date.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- *
- * @returns The month index (0-11)
- *
- * @example
- * // Which month is 29 February 2012?
- * const result = getMonth(new Date(2012, 1, 29))
- * //=> 1
- */
-function getMonth(date) {
-  const _date = toDate(date);
-  const month = _date.getMonth();
-  return month;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getMonth = ((/* unused pure expression or super */ null && (getMonth)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getDate.mjs
-
-
-/**
- * @name getDate
- * @category Day Helpers
- * @summary Get the day of the month of the given date.
- *
- * @description
- * Get the day of the month of the given date.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- *
- * @returns The day of month
- *
- * @example
- * // Which day of the month is 29 February 2012?
- * const result = getDate(new Date(2012, 1, 29))
- * //=> 29
- */
-function getDate(date) {
-  const _date = toDate(date);
-  const dayOfMonth = _date.getDate();
-  return dayOfMonth;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getDate = ((/* unused pure expression or super */ null && (getDate)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/constants.mjs
-/**
- * @module constants
- * @summary Useful constants
- * @description
- * Collection of useful date constants.
- *
- * The constants could be imported from `date-fns/constants`:
- *
- * ```ts
- * import { maxTime, minTime } from "./constants/date-fns/constants";
- *
- * function isAllowedTime(time) {
- *   return time <= maxTime && time >= minTime;
- * }
- * ```
- */
-
-/**
- * @constant
- * @name daysInWeek
- * @summary Days in 1 week.
- */
-const daysInWeek = 7;
-
-/**
- * @constant
- * @name daysInYear
- * @summary Days in 1 year.
- *
- * @description
- * How many days in a year.
- *
- * One years equals 365.2425 days according to the formula:
- *
- * > Leap year occures every 4 years, except for years that are divisable by 100 and not divisable by 400.
- * > 1 mean year = (365+1/4-1/100+1/400) days = 365.2425 days
- */
-const daysInYear = 365.2425;
-
-/**
- * @constant
- * @name maxTime
- * @summary Maximum allowed time.
- *
- * @example
- * import { maxTime } from "./constants/date-fns/constants";
- *
- * const isValid = 8640000000000001 <= maxTime;
- * //=> false
- *
- * new Date(8640000000000001);
- * //=> Invalid Date
- */
-const maxTime = Math.pow(10, 8) * 24 * 60 * 60 * 1000;
-
-/**
- * @constant
- * @name minTime
- * @summary Minimum allowed time.
- *
- * @example
- * import { minTime } from "./constants/date-fns/constants";
- *
- * const isValid = -8640000000000001 >= minTime;
- * //=> false
- *
- * new Date(-8640000000000001)
- * //=> Invalid Date
- */
-const minTime = -maxTime;
-
-/**
- * @constant
- * @name millisecondsInWeek
- * @summary Milliseconds in 1 week.
- */
-const millisecondsInWeek = 604800000;
-
-/**
- * @constant
- * @name millisecondsInDay
- * @summary Milliseconds in 1 day.
- */
-const millisecondsInDay = 86400000;
-
-/**
- * @constant
- * @name millisecondsInMinute
- * @summary Milliseconds in 1 minute
- */
-const millisecondsInMinute = 60000;
-
-/**
- * @constant
- * @name millisecondsInHour
- * @summary Milliseconds in 1 hour
- */
-const millisecondsInHour = 3600000;
-
-/**
- * @constant
- * @name millisecondsInSecond
- * @summary Milliseconds in 1 second
- */
-const millisecondsInSecond = 1000;
-
-/**
- * @constant
- * @name minutesInYear
- * @summary Minutes in 1 year.
- */
-const minutesInYear = 525600;
-
-/**
- * @constant
- * @name minutesInMonth
- * @summary Minutes in 1 month.
- */
-const minutesInMonth = 43200;
-
-/**
- * @constant
- * @name minutesInDay
- * @summary Minutes in 1 day.
- */
-const minutesInDay = 1440;
-
-/**
- * @constant
- * @name minutesInHour
- * @summary Minutes in 1 hour.
- */
-const minutesInHour = 60;
-
-/**
- * @constant
- * @name monthsInQuarter
- * @summary Months in 1 quarter.
- */
-const monthsInQuarter = 3;
-
-/**
- * @constant
- * @name monthsInYear
- * @summary Months in 1 year.
- */
-const monthsInYear = 12;
-
-/**
- * @constant
- * @name quartersInYear
- * @summary Quarters in 1 year
- */
-const quartersInYear = 4;
-
-/**
- * @constant
- * @name secondsInHour
- * @summary Seconds in 1 hour.
- */
-const secondsInHour = 3600;
-
-/**
- * @constant
- * @name secondsInMinute
- * @summary Seconds in 1 minute.
- */
-const secondsInMinute = 60;
-
-/**
- * @constant
- * @name secondsInDay
- * @summary Seconds in 1 day.
- */
-const secondsInDay = secondsInHour * 24;
-
-/**
- * @constant
- * @name secondsInWeek
- * @summary Seconds in 1 week.
- */
-const secondsInWeek = secondsInDay * 7;
-
-/**
- * @constant
- * @name secondsInYear
- * @summary Seconds in 1 year.
- */
-const secondsInYear = secondsInDay * daysInYear;
-
-/**
- * @constant
- * @name secondsInMonth
- * @summary Seconds in 1 month
- */
-const secondsInMonth = secondsInYear / 12;
-
-/**
- * @constant
- * @name secondsInQuarter
- * @summary Seconds in 1 quarter.
- */
-const secondsInQuarter = secondsInMonth * 3;
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/_lib/defaultOptions.mjs
-let defaultOptions = {};
-
-function getDefaultOptions() {
-  return defaultOptions;
-}
-
-function setDefaultOptions(newOptions) {
-  defaultOptions = newOptions;
-}
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/startOfWeek.mjs
-
-
-
-/**
- * The {@link startOfWeek} function options.
- */
-
-/**
- * @name startOfWeek
- * @category Week Helpers
- * @summary Return the start of a week for the given date.
- *
- * @description
- * Return the start of a week for the given date.
- * The result will be in the local timezone.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The original date
- * @param options - An object with options
- *
- * @returns The start of a week
- *
- * @example
- * // The start of a week for 2 September 2014 11:55:00:
- * const result = startOfWeek(new Date(2014, 8, 2, 11, 55, 0))
- * //=> Sun Aug 31 2014 00:00:00
- *
- * @example
- * // If the week starts on Monday, the start of the week for 2 September 2014 11:55:00:
- * const result = startOfWeek(new Date(2014, 8, 2, 11, 55, 0), { weekStartsOn: 1 })
- * //=> Mon Sep 01 2014 00:00:00
- */
-function startOfWeek(date, options) {
-  const defaultOptions = getDefaultOptions();
-  const weekStartsOn =
-    options?.weekStartsOn ??
-    options?.locale?.options?.weekStartsOn ??
-    defaultOptions.weekStartsOn ??
-    defaultOptions.locale?.options?.weekStartsOn ??
-    0;
-
-  const _date = toDate(date);
-  const day = _date.getDay();
-  const diff = (day < weekStartsOn ? 7 : 0) + day - weekStartsOn;
-
-  _date.setDate(_date.getDate() - diff);
-  _date.setHours(0, 0, 0, 0);
-  return _date;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_startOfWeek = ((/* unused pure expression or super */ null && (startOfWeek)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/constructFrom.mjs
-/**
- * @name constructFrom
- * @category Generic Helpers
- * @summary Constructs a date using the reference date and the value
- *
- * @description
- * The function constructs a new date using the constructor from the reference
- * date and the given value. It helps to build generic functions that accept
- * date extensions.
- *
- * It defaults to `Date` if the passed reference date is a number or a string.
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The reference date to take constructor from
- * @param value - The value to create the date
- *
- * @returns Date initialized using the given date and value
- *
- * @example
- * import { constructFrom } from 'date-fns'
- *
- * // A function that clones a date preserving the original type
- * function cloneDate<DateType extends Date(date: DateType): DateType {
- *   return constructFrom(
- *     date, // Use contrustor from the given date
- *     date.getTime() // Use the date value to create a new date
- *   )
- * }
- */
-function constructFrom(date, value) {
-  if (date instanceof Date) {
-    return new date.constructor(value);
-  } else {
-    return new Date(value);
-  }
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_constructFrom = ((/* unused pure expression or super */ null && (constructFrom)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getWeekYear.mjs
-
-
-
-
-
-/**
- * The {@link getWeekYear} function options.
- */
-
-/**
- * @name getWeekYear
- * @category Week-Numbering Year Helpers
- * @summary Get the local week-numbering year of the given date.
- *
- * @description
- * Get the local week-numbering year of the given date.
- * The exact calculation depends on the values of
- * `options.weekStartsOn` (which is the index of the first day of the week)
- * and `options.firstWeekContainsDate` (which is the day of January, which is always in
- * the first week of the week-numbering year)
- *
- * Week numbering: https://en.wikipedia.org/wiki/Week#The_ISO_week_date_system
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- * @param options - An object with options.
- *
- * @returns The local week-numbering year
- *
- * @example
- * // Which week numbering year is 26 December 2004 with the default settings?
- * const result = getWeekYear(new Date(2004, 11, 26))
- * //=> 2005
- *
- * @example
- * // Which week numbering year is 26 December 2004 if week starts on Saturday?
- * const result = getWeekYear(new Date(2004, 11, 26), { weekStartsOn: 6 })
- * //=> 2004
- *
- * @example
- * // Which week numbering year is 26 December 2004 if the first week contains 4 January?
- * const result = getWeekYear(new Date(2004, 11, 26), { firstWeekContainsDate: 4 })
- * //=> 2004
- */
-function getWeekYear(date, options) {
-  const _date = toDate(date);
-  const year = _date.getFullYear();
-
-  const defaultOptions = getDefaultOptions();
-  const firstWeekContainsDate =
-    options?.firstWeekContainsDate ??
-    options?.locale?.options?.firstWeekContainsDate ??
-    defaultOptions.firstWeekContainsDate ??
-    defaultOptions.locale?.options?.firstWeekContainsDate ??
-    1;
-
-  const firstWeekOfNextYear = constructFrom(date, 0);
-  firstWeekOfNextYear.setFullYear(year + 1, 0, firstWeekContainsDate);
-  firstWeekOfNextYear.setHours(0, 0, 0, 0);
-  const startOfNextYear = startOfWeek(firstWeekOfNextYear, options);
-
-  const firstWeekOfThisYear = constructFrom(date, 0);
-  firstWeekOfThisYear.setFullYear(year, 0, firstWeekContainsDate);
-  firstWeekOfThisYear.setHours(0, 0, 0, 0);
-  const startOfThisYear = startOfWeek(firstWeekOfThisYear, options);
-
-  if (_date.getTime() >= startOfNextYear.getTime()) {
-    return year + 1;
-  } else if (_date.getTime() >= startOfThisYear.getTime()) {
-    return year;
-  } else {
-    return year - 1;
-  }
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getWeekYear = ((/* unused pure expression or super */ null && (getWeekYear)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/startOfWeekYear.mjs
-
-
-
-
-
-/**
- * The {@link startOfWeekYear} function options.
- */
-
-/**
- * @name startOfWeekYear
- * @category Week-Numbering Year Helpers
- * @summary Return the start of a local week-numbering year for the given date.
- *
- * @description
- * Return the start of a local week-numbering year.
- * The exact calculation depends on the values of
- * `options.weekStartsOn` (which is the index of the first day of the week)
- * and `options.firstWeekContainsDate` (which is the day of January, which is always in
- * the first week of the week-numbering year)
- *
- * Week numbering: https://en.wikipedia.org/wiki/Week#The_ISO_week_date_system
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The original date
- * @param options - An object with options
- *
- * @returns The start of a week-numbering year
- *
- * @example
- * // The start of an a week-numbering year for 2 July 2005 with default settings:
- * const result = startOfWeekYear(new Date(2005, 6, 2))
- * //=> Sun Dec 26 2004 00:00:00
- *
- * @example
- * // The start of a week-numbering year for 2 July 2005
- * // if Monday is the first day of week
- * // and 4 January is always in the first week of the year:
- * const result = startOfWeekYear(new Date(2005, 6, 2), {
- *   weekStartsOn: 1,
- *   firstWeekContainsDate: 4
- * })
- * //=> Mon Jan 03 2005 00:00:00
- */
-function startOfWeekYear(date, options) {
-  const defaultOptions = getDefaultOptions();
-  const firstWeekContainsDate =
-    options?.firstWeekContainsDate ??
-    options?.locale?.options?.firstWeekContainsDate ??
-    defaultOptions.firstWeekContainsDate ??
-    defaultOptions.locale?.options?.firstWeekContainsDate ??
-    1;
-
-  const year = getWeekYear(date, options);
-  const firstWeek = constructFrom(date, 0);
-  firstWeek.setFullYear(year, 0, firstWeekContainsDate);
-  firstWeek.setHours(0, 0, 0, 0);
-  const _date = startOfWeek(firstWeek, options);
-  return _date;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_startOfWeekYear = ((/* unused pure expression or super */ null && (startOfWeekYear)));
-
-;// CONCATENATED MODULE: ../../node_modules/date-fns/getWeek.mjs
-
-
-
-
-
-/**
- * The {@link getWeek} function options.
- */
-
-/**
- * @name getWeek
- * @category Week Helpers
- * @summary Get the local week index of the given date.
- *
- * @description
- * Get the local week index of the given date.
- * The exact calculation depends on the values of
- * `options.weekStartsOn` (which is the index of the first day of the week)
- * and `options.firstWeekContainsDate` (which is the day of January, which is always in
- * the first week of the week-numbering year)
- *
- * Week numbering: https://en.wikipedia.org/wiki/Week#The_ISO_week_date_system
- *
- * @typeParam DateType - The `Date` type, the function operates on. Gets inferred from passed arguments. Allows to use extensions like [`UTCDate`](https://github.com/date-fns/utc).
- *
- * @param date - The given date
- * @param options - An object with options
- *
- * @returns The week
- *
- * @example
- * // Which week of the local week numbering year is 2 January 2005 with default options?
- * const result = getWeek(new Date(2005, 0, 2))
- * //=> 2
- *
- * @example
- * // Which week of the local week numbering year is 2 January 2005,
- * // if Monday is the first day of the week,
- * // and the first week of the year always contains 4 January?
- * const result = getWeek(new Date(2005, 0, 2), {
- *   weekStartsOn: 1,
- *   firstWeekContainsDate: 4
- * })
- * //=> 53
- */
-
-function getWeek(date, options) {
-  const _date = toDate(date);
-  const diff = +startOfWeek(_date, options) - +startOfWeekYear(_date, options);
-
-  // Round the number of weeks to the nearest integer because the number of
-  // milliseconds in a week is not constant (e.g. it's different in the week of
-  // the daylight saving time clock shift).
-  return Math.round(diff / millisecondsInWeek) + 1;
-}
-
-// Fallback for modularized imports:
-/* harmony default export */ const date_fns_getWeek = ((/* unused pure expression or super */ null && (getWeek)));
-
+// EXTERNAL MODULE: external "node:os"
+var external_node_os_ = __nccwpck_require__(612);
 // EXTERNAL MODULE: ../../node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(8447);
 ;// CONCATENATED MODULE: ./src/constants.ts
@@ -85362,13 +84692,20 @@ var dist = __nccwpck_require__(8447);
 
 
 
+
 const constants_ARCHITECTURE = (() => {
-    switch (external_node_os_.arch()) {
-        case "x64": {
-            return "x86_64";
+    switch (external_node_process_.arch) {
+        case "arm": {
+            return "armhf";
         }
         case "arm64": {
             return "arm64";
+        }
+        case "s390x": {
+            return "s390x";
+        }
+        case "x64": {
+            return "x86_64";
         }
         default: {
             throw new Error("The architecture is not supported.");
@@ -85376,30 +84713,52 @@ const constants_ARCHITECTURE = (() => {
     }
 })();
 const constants_PLATFORM = (() => {
-    switch (external_node_os_.platform()) {
-        case "linux": {
-            return "linux";
-        }
+    switch (external_node_process_.platform) {
         case "darwin": {
             return "macos";
         }
+        case "freebsd": {
+            return "freebsd";
+        }
+        case "linux": {
+            return "linux";
+        }
+        case "openbsd": {
+            return "openbsd";
+        }
         case "win32": {
-            return "win32";
+            return "windows";
         }
         default: {
             throw new Error("The platform is not supported.");
         }
     }
 })();
-const CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
-const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(CYGWIN_ROOT, "bin");
-const CYGWIN_ROOT_WRAPPERBIN = external_node_path_namespaceObject.join(CYGWIN_ROOT, "wrapperbin");
-// [todo] remove the branch for Windows once opam 2.2 is released as stable.
-const ALLOW_PRERELEASE_OPAM = constants_PLATFORM !== "win32" &&
-    lib_core.getBooleanInput("allow-prerelease-opam", {
-        required: false,
-        trimWhitespace: true,
-    });
+const constants_CYGWIN_MIRROR = "https://cygwin.mirror.constant.com/";
+// [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
+const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
+const DUNE_CACHE_ROOT = (() => {
+    const homeDir = external_node_os_.homedir();
+    if (constants_PLATFORM === "windows") {
+        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        const duneCacheDir = external_node_path_namespaceObject.join("D:", "dune");
+        return duneCacheDir;
+    }
+    const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
+    const duneCacheDir = xdgCacheHome
+        ? external_node_path_namespaceObject.join(xdgCacheHome, "dune")
+        : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
+    return duneCacheDir;
+})();
+const constants_OPAM_ROOT = constants_PLATFORM === "windows"
+    ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        external_node_path_namespaceObject.join("D:", ".opam")
+    : external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
+const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam", {
+    required: false,
+    trimWhitespace: true,
+});
 const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix", {
     required: false,
     trimWhitespace: true,
@@ -85416,17 +84775,14 @@ const constants_OCAML_COMPILER = lib_core.getInput("ocaml-compiler", {
     required: true,
     trimWhitespace: true,
 });
-// [todo] remove this once opam 2.2 is released as stable.
-const constants_OPAM_DEPEXT = !ALLOW_PRERELEASE_OPAM &&
-    lib_core.getBooleanInput("opam-depext", {
+const constants_OPAM_DISABLE_SANDBOXING = 
+// [TODO] unlock this once sandboxing is supported on Windows
+constants_PLATFORM === "windows"
+    ? true
+    : lib_core.getBooleanInput("opam-disable-sandboxing", {
         required: false,
         trimWhitespace: true,
     });
-const OPAM_DEPEXT_FLAGS = lib_core.getInput("opam-depext-flags", { required: false, trimWhitespace: true })
-    .split(",")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0);
-const constants_OPAM_DISABLE_SANDBOXING = lib_core.getBooleanInput("opam-disable-sandboxing", { required: false, trimWhitespace: true });
 const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages", {
     required: false,
     trimWhitespace: true,
@@ -85435,13 +84791,15 @@ const OPAM_PIN = lib_core.getBooleanInput("opam-pin", {
     required: false,
     trimWhitespace: true,
 });
-const repositories_yaml = dist/* parse */.Qc(lib_core.getInput("opam-repositories", { required: false, trimWhitespace: true }));
-const defaultRepository = constants_PLATFORM === "win32"
-    ? "https://github.com/ocaml-opam/opam-repository-mingw.git#sunset"
-    : "https://github.com/ocaml/opam-repository.git";
-const OPAM_REPOSITORIES = repositories_yaml
-    ? Object.entries(repositories_yaml).reverse()
-    : [["default", defaultRepository]];
+const OPAM_REPOSITORIES = (() => {
+    const repositories_yaml = dist/* parse */.Qc(lib_core.getInput("opam-repositories", {
+        required: false,
+        trimWhitespace: true,
+    }));
+    return repositories_yaml
+        ? Object.entries(repositories_yaml).reverse()
+        : [["default", "https://github.com/ocaml/opam-repository.git"]];
+})();
 
 ;// CONCATENATED MODULE: ./src/cache.ts
 
@@ -85454,156 +84812,90 @@ const OPAM_REPOSITORIES = repositories_yaml
 
 
 
-
-
-
-function composeDate() {
-    const d = new Date();
-    const year = getYear(d);
-    const month = getMonth(d);
-    const date = getDate(d);
-    const week = getWeek(d);
-    return { year, month, date, week };
-}
 async function composeCygwinCacheKeys() {
     const cygwinVersion = await getCygwinVersion();
-    // Bump cygwinEpoch when a new release requires the existing Cygwin caches to
-    // be invalidated.
-    const cygwinEpoch = "1";
-    const { year, week } = composeDate();
-    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinEpoch}-${cygwinVersion}-${year}-${week}`;
-    const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinEpoch}-${cygwinVersion}-${year}-${week}`,
-        `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinEpoch}-${cygwinVersion}-${year}-`,
-    ];
+    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
+    const restoreKeys = [key];
     return { key, restoreKeys };
 }
 function composeDuneCacheKeys() {
     const platform = constants_PLATFORM.replaceAll(/\W/g, "_");
     const architecture = constants_ARCHITECTURE.replaceAll(/\W/g, "_");
-    const { workflow: _workflow, job: _job, runId, runNumber } = lib_github.context;
+    const { workflow: _workflow, job: _job, runId } = lib_github.context;
     const workflow = _workflow.toLowerCase().replaceAll(/\W/g, "_");
     const job = _job.replaceAll(/\W/g, "_");
     const ocamlVersion = constants_OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
-    const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`;
+    const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`;
     const restoreKeys = [
-        `${constants_CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-${runNumber}`,
-        `${constants_CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}-`,
+        `${constants_CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`,
         `${constants_CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-`,
     ];
     return { key, restoreKeys };
 }
 async function composeOpamCacheKeys() {
-    const fullPlatform = PLATFORM === "win32"
-        ? PLATFORM
-        : `${PLATFORM}-${(await getSystemIdentificationInfo()).version}`;
-    const opamVersion = PLATFORM === "win32" ? "0.0.0.2" : (await getLatestOpamRelease()).version;
+    const { version: opamVersion } = await getLatestOpamRelease();
     const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
     const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
     const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-    const { year, week } = composeDate();
-    const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-${week}`;
-    const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-${week}`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-${year}-`,
-        `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${fullPlatform}-${ARCHITECTURE}-${ocamlVersion}-`,
-    ];
-    return { key, restoreKeys };
-}
-function composeOpamDownloadCacheKeys() {
-    const repositories = OPAM_REPOSITORIES.map(([, u]) => {
-        try {
-            const url = new URL(u);
-            const urn = external_node_path_namespaceObject.join(url.hostname, url.pathname);
-            return urn;
-        }
-        catch {
-            return external_node_path_namespaceObject.resolve(u);
-        }
-    }).join("_");
-    const ocamlVersion = constants_OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
-    const { year, month, date } = composeDate();
-    const { runId, runNumber } = lib_github.context;
-    const key = `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`;
-    const restoreKeys = [
-        `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-${runNumber}`,
-        `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-${runId}-`,
-        `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-${date}-`,
-        `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${repositories}-${ocamlVersion}-${year}-${month}-`,
-    ];
+    const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${PLATFORM}-${ARCHITECTURE}-${ocamlVersion}`;
+    const restoreKeys = [key];
     return { key, restoreKeys };
 }
 function composeCygwinCachePaths() {
     const paths = [];
-    const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
-    const cygwinRoot = path.join("D:", "cygwin");
-    paths.push(cygwinRoot);
+    const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
+    paths.push(CYGWIN_ROOT);
     const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
     paths.push(cygwinRootSymlinkPath);
-    const cygwinEncodedUri = encodeURIComponent("https://mirrors.kernel.org/sourceware/cygwin/").toLowerCase();
+    const cygwinEncodedUri = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
     const cygwinPackageRoot = path.join(githubWorkspace, cygwinEncodedUri);
     paths.push(cygwinPackageRoot);
     return paths;
 }
 function composeDuneCachePaths() {
-    const paths = [];
-    const homeDir = external_node_os_.homedir();
-    if (constants_PLATFORM === "win32") {
-        const duneCacheDir = external_node_path_namespaceObject.join(homeDir, "Local Settings", "Cache", "dune");
-        paths.push(duneCacheDir);
-    }
-    else {
-        const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
-        const duneCacheDir = xdgCacheHome
-            ? external_node_path_namespaceObject.join(xdgCacheHome, "dune")
-            : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
-        paths.push(duneCacheDir);
-    }
+    const paths = [DUNE_CACHE_ROOT];
     return paths;
 }
 function composeOpamCachePaths() {
-    const paths = [];
-    if (PLATFORM === "win32") {
-        const opamRootCachePath = path.join("D:", ".opam");
-        paths.push(opamRootCachePath);
+    const paths = [OPAM_ROOT];
+    if (PLATFORM === "windows") {
         const { repo: { repo }, } = github.context;
         const opamCygwinLocalCachePath = path.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
         paths.push(opamCygwinLocalCachePath);
     }
-    else {
-        const homeDir = os.homedir();
-        const opamRootCachePath = path.join(homeDir, ".opam");
-        paths.push(opamRootCachePath);
-    }
-    const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
+    const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
     const opamLocalCachePath = path.join(githubWorkspace, "_opam");
     paths.push(opamLocalCachePath);
     return paths;
 }
-function composeOpamDownloadCachePaths() {
-    const paths = [];
-    if (constants_PLATFORM === "win32") {
-        const opamDownloadCachePath = external_node_path_namespaceObject.join("D:", ".opam", "download-cache");
-        paths.push(opamDownloadCachePath);
-    }
-    else {
-        const homeDir = external_node_os_.homedir();
-        const opamDownloadCachePath = external_node_path_namespaceObject.join(homeDir, ".opam", "download-cache");
-        paths.push(opamDownloadCachePath);
-    }
-    return paths;
-}
 async function restoreCache(key, restoreKeys, paths) {
-    const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
-    if (cacheKey) {
-        core.info(`Cache restored from key: ${cacheKey}`);
+    if (!cache.isFeatureAvailable()) {
+        core.info("Actions cache service feature is unavailable");
+        return;
     }
-    else {
-        core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+    try {
+        const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
+        if (cacheKey) {
+            core.info(`Cache restored from key: ${cacheKey}`);
+        }
+        else {
+            core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+        }
+        return cacheKey;
     }
-    return cacheKey;
+    catch (error) {
+        if (error instanceof Error) {
+            core.info(error.message);
+        }
+        core.warning("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
+        return;
+    }
 }
 async function saveCache(key, paths) {
+    if (!lib_cache.isFeatureAvailable()) {
+        lib_core.info("Actions cache service feature is unavailable");
+        return;
+    }
     try {
         await lib_cache.saveCache(paths, key);
     }
@@ -85611,13 +84903,35 @@ async function saveCache(key, paths) {
         if (error instanceof Error) {
             lib_core.info(error.message);
         }
+        lib_core.warning("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
     }
 }
+async function restoreDuneCache() {
+    return await core.group("Retrieve the dune cache", async () => {
+        const { key, restoreKeys } = composeDuneCacheKeys();
+        const paths = composeDuneCachePaths();
+        const cacheKey = await restoreCache(key, restoreKeys, paths);
+        return cacheKey;
+    });
+}
 async function restoreCygwinCache() {
-    await core.group("Retrieve the Cygwin cache", async () => {
-        const { key, restoreKeys } = await composeCygwinCacheKeys();
-        const paths = composeCygwinCachePaths();
-        await restoreCache(key, restoreKeys, paths);
+    const { key, restoreKeys } = await composeCygwinCacheKeys();
+    const paths = composeCygwinCachePaths();
+    const cacheKey = await restoreCache(key, restoreKeys, paths);
+    return cacheKey;
+}
+async function restoreOpamCache() {
+    const { key, restoreKeys } = await composeOpamCacheKeys();
+    const paths = composeOpamCachePaths();
+    const cacheKey = await restoreCache(key, restoreKeys, paths);
+    return cacheKey;
+}
+async function restoreOpamCaches() {
+    return await core.group("Retrieve the opam cache", async () => {
+        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows"
+            ? [restoreOpamCache(), restoreCygwinCache()]
+            : [restoreOpamCache()]);
+        return { opamCacheHit, cygwinCacheHit };
     });
 }
 async function saveCygwinCache() {
@@ -85627,26 +84941,11 @@ async function saveCygwinCache() {
         await saveCache(key, paths);
     });
 }
-async function restoreDuneCache() {
-    await core.group("Retrieve the dune cache", async () => {
-        const { key, restoreKeys } = composeDuneCacheKeys();
-        const paths = composeDuneCachePaths();
-        await restoreCache(key, restoreKeys, paths);
-    });
-}
 async function saveDuneCache() {
     await lib_core.group("Save the dune cache", async () => {
         const { key } = composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         await saveCache(key, paths);
-    });
-}
-async function restoreOpamCache() {
-    return await core.group("Retrieve the opam cache", async () => {
-        const { key, restoreKeys } = await composeOpamCacheKeys();
-        const paths = composeOpamCachePaths();
-        const cacheKey = await restoreCache(key, restoreKeys, paths);
-        return cacheKey;
     });
 }
 async function saveOpamCache() {
@@ -85664,21 +84963,6 @@ async function saveOpamCache() {
         await saveCache(key, paths);
     });
 }
-async function restoreOpamDownloadCache() {
-    return await core.group("Retrieve the opam download cache", async () => {
-        const { key, restoreKeys } = composeOpamDownloadCacheKeys();
-        const paths = composeOpamDownloadCachePaths();
-        const cacheKey = await restoreCache(key, restoreKeys, paths);
-        return cacheKey;
-    });
-}
-async function saveOpamDownloadCache() {
-    await lib_core.group("Save the opam download cache", async () => {
-        const { key } = composeOpamDownloadCacheKeys();
-        const paths = composeOpamDownloadCachePaths();
-        await saveCache(key, paths);
-    });
-}
 
 ;// CONCATENATED MODULE: ./src/dune.ts
 
@@ -85688,12 +84972,7 @@ async function saveOpamDownloadCache() {
 const { repo: { owner, repo }, runId: run_id, } = lib_github.context;
 async function installDune() {
     await core.group("Install dune", async () => {
-        if (OPAM_DEPEXT) {
-            await exec("opam", ["depext", "--install", "dune"]);
-        }
-        else {
-            await exec("opam", ["install", "dune"]);
-        }
+        await exec("opam", ["install", "dune"]);
     });
 }
 async function trimDuneCache() {
@@ -85711,8 +84990,7 @@ async function trimDuneCache() {
             "dune",
             "cache",
             "trim",
-            "--size",
-            `${cacheSize}MB`,
+            `--size=${cacheSize}MB`,
         ]);
     });
 }
@@ -85729,7 +85007,6 @@ async function run() {
             await trimDuneCache();
             await saveDuneCache();
         }
-        await saveOpamDownloadCache();
         external_node_process_.exit(0);
     }
     catch (error) {
