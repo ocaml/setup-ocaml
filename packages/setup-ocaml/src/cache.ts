@@ -200,13 +200,7 @@ async function saveCache(key: string, paths: string[]) {
     await cache.saveCache(paths, key);
   } catch (error) {
     if (error instanceof Error) {
-      if (error.name === cache.ValidationError.name) {
-        throw error;
-      } else if (error.name === cache.ReserveCacheError.name) {
-        core.info(error.message);
-      } else {
-        core.warning(error.message);
-      }
+      core.info(error.message);
     }
   }
 }

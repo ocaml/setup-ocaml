@@ -18869,10 +18869,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
     exports.error = error2;
-    function warning2(message, properties = {}) {
+    function warning(message, properties = {}) {
       command_1.issueCommand("warning", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.warning = warning2;
+    exports.warning = warning;
     function notice(message, properties = {}) {
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -48044,11 +48044,11 @@ var require_xml2js = __commonJS({
       exports.defaults = defaults.defaults;
       exports.processors = processors;
       exports.ValidationError = function(superClass) {
-        extend2(ValidationError2, superClass);
-        function ValidationError2(message) {
+        extend2(ValidationError, superClass);
+        function ValidationError(message) {
           this.message = message;
         }
-        return ValidationError2;
+        return ValidationError;
       }(Error);
       exports.Builder = builder.Builder;
       exports.Parser = parser.Parser;
@@ -76666,34 +76666,34 @@ var require_cache2 = __commonJS({
     var utils = __importStar(require_cacheUtils());
     var cacheHttpClient = __importStar(require_cacheHttpClient());
     var tar_1 = require_tar();
-    var ValidationError2 = class _ValidationError extends Error {
+    var ValidationError = class _ValidationError extends Error {
       constructor(message) {
         super(message);
         this.name = "ValidationError";
         Object.setPrototypeOf(this, _ValidationError.prototype);
       }
     };
-    exports.ValidationError = ValidationError2;
-    var ReserveCacheError2 = class _ReserveCacheError extends Error {
+    exports.ValidationError = ValidationError;
+    var ReserveCacheError = class _ReserveCacheError extends Error {
       constructor(message) {
         super(message);
         this.name = "ReserveCacheError";
         Object.setPrototypeOf(this, _ReserveCacheError.prototype);
       }
     };
-    exports.ReserveCacheError = ReserveCacheError2;
+    exports.ReserveCacheError = ReserveCacheError;
     function checkPaths(paths) {
       if (!paths || paths.length === 0) {
-        throw new ValidationError2(`Path Validation Error: At least one directory or file path is required`);
+        throw new ValidationError(`Path Validation Error: At least one directory or file path is required`);
       }
     }
     function checkKey(key) {
       if (key.length > 512) {
-        throw new ValidationError2(`Key Validation Error: ${key} cannot be larger than 512 characters.`);
+        throw new ValidationError(`Key Validation Error: ${key} cannot be larger than 512 characters.`);
       }
       const regex = /^[^,]*$/;
       if (!regex.test(key)) {
-        throw new ValidationError2(`Key Validation Error: ${key} cannot contain commas.`);
+        throw new ValidationError(`Key Validation Error: ${key} cannot contain commas.`);
       }
     }
     function isFeatureAvailable() {
@@ -76708,7 +76708,7 @@ var require_cache2 = __commonJS({
         core5.debug("Resolved Keys:");
         core5.debug(JSON.stringify(keys));
         if (keys.length > 10) {
-          throw new ValidationError2(`Key Validation Error: Keys are limited to a maximum of 10.`);
+          throw new ValidationError(`Key Validation Error: Keys are limited to a maximum of 10.`);
         }
         for (const key of keys) {
           checkKey(key);
@@ -76740,7 +76740,7 @@ var require_cache2 = __commonJS({
           return cacheEntry.cacheKey;
         } catch (error2) {
           const typedError = error2;
-          if (typedError.name === ValidationError2.name) {
+          if (typedError.name === ValidationError.name) {
             throw error2;
           } else {
             core5.warning(`Failed to restore: ${error2.message}`);
@@ -76794,15 +76794,15 @@ var require_cache2 = __commonJS({
           } else if ((reserveCacheResponse === null || reserveCacheResponse === void 0 ? void 0 : reserveCacheResponse.statusCode) === 400) {
             throw new Error((_d2 = (_c2 = reserveCacheResponse === null || reserveCacheResponse === void 0 ? void 0 : reserveCacheResponse.error) === null || _c2 === void 0 ? void 0 : _c2.message) !== null && _d2 !== void 0 ? _d2 : `Cache size of ~${Math.round(archiveFileSize / (1024 * 1024))} MB (${archiveFileSize} B) is over the data cap limit, not saving cache.`);
           } else {
-            throw new ReserveCacheError2(`Unable to reserve cache with key ${key}, another job may be creating this cache. More details: ${(_e = reserveCacheResponse === null || reserveCacheResponse === void 0 ? void 0 : reserveCacheResponse.error) === null || _e === void 0 ? void 0 : _e.message}`);
+            throw new ReserveCacheError(`Unable to reserve cache with key ${key}, another job may be creating this cache. More details: ${(_e = reserveCacheResponse === null || reserveCacheResponse === void 0 ? void 0 : reserveCacheResponse.error) === null || _e === void 0 ? void 0 : _e.message}`);
           }
           core5.debug(`Saving Cache (ID: ${cacheId})`);
           yield cacheHttpClient.saveCache(cacheId, archivePath, options);
         } catch (error2) {
           const typedError = error2;
-          if (typedError.name === ValidationError2.name) {
+          if (typedError.name === ValidationError.name) {
             throw error2;
-          } else if (typedError.name === ReserveCacheError2.name) {
+          } else if (typedError.name === ReserveCacheError.name) {
             core5.info(`Failed to save: ${typedError.message}`);
           } else {
             core5.warning(`Failed to save: ${typedError.message}`);
@@ -82495,12 +82495,12 @@ var require_log = __commonJS({
       if (logLevel === "debug")
         console.log(...messages);
     }
-    function warn(logLevel, warning2) {
+    function warn(logLevel, warning) {
       if (logLevel === "debug" || logLevel === "warn") {
         if (typeof process !== "undefined" && process.emitWarning)
-          process.emitWarning(warning2);
+          process.emitWarning(warning);
         else
-          console.warn(warning2);
+          console.warn(warning);
       }
     }
     exports.debug = debug;
@@ -85809,9 +85809,9 @@ var require_composer = __commonJS({
         this.prelude = [];
         this.errors = [];
         this.warnings = [];
-        this.onError = (source, code, message, warning2) => {
+        this.onError = (source, code, message, warning) => {
           const pos = getErrorPos(source);
-          if (warning2)
+          if (warning)
             this.warnings.push(new errors.YAMLWarning(pos, code, message));
           else
             this.errors.push(new errors.YAMLParseError(pos, code, message));
@@ -85882,10 +85882,10 @@ ${cb}` : comment;
           console.dir(token, { depth: null });
         switch (token.type) {
           case "directive":
-            this.directives.add(token.source, (offset, message, warning2) => {
+            this.directives.add(token.source, (offset, message, warning) => {
               const pos = getErrorPos(token);
               pos[0] += offset;
-              this.onError(pos, "BAD_DIRECTIVE", message, warning2);
+              this.onError(pos, "BAD_DIRECTIVE", message, warning);
             });
             this.prelude.push(token.source);
             this.atDirectives = true;
@@ -87868,7 +87868,7 @@ var require_public_api2 = __commonJS({
       const doc = parseDocument(src, options);
       if (!doc)
         return null;
-      doc.warnings.forEach((warning2) => log2.warn(doc.options.logLevel, warning2));
+      doc.warnings.forEach((warning) => log2.warn(doc.options.logLevel, warning));
       if (doc.errors.length > 0) {
         if (doc.options.logLevel !== "silent")
           throw doc.errors[0];
@@ -88219,13 +88219,7 @@ async function saveCache2(key, paths) {
     await cache.saveCache(paths, key);
   } catch (error2) {
     if (error2 instanceof Error) {
-      if (error2.name === cache.ValidationError.name) {
-        throw error2;
-      } else if (error2.name === cache.ReserveCacheError.name) {
-        core2.info(error2.message);
-      } else {
-        core2.warning(error2.message);
-      }
+      core2.info(error2.message);
     }
   }
 }
