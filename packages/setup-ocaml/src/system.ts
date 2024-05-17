@@ -20,7 +20,8 @@ export async function getSystemIdentificationInfo() {
       }
     }
     return { id, version };
-  } else if (PLATFORM === "macos") {
+  }
+  if (PLATFORM === "macos") {
     const swVers = await getExecOutput("sw_vers");
     const lines = swVers.stdout.split(os.EOL);
     let version = "";
@@ -31,9 +32,8 @@ export async function getSystemIdentificationInfo() {
       }
     }
     return { id: "macos", version };
-  } else {
-    throw new Error("The system is not supported.");
   }
+  throw new Error("The system is not supported.");
 }
 
 export async function updateUnixPackageIndexFiles() {

@@ -55,9 +55,8 @@ async function resolveVersion(semverVersion: string) {
     throw new Error(
       `No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`,
     );
-  } else {
-    return matchedFullCompilerVersion;
   }
+  return matchedFullCompilerVersion;
 }
 
 export async function resolveCompiler(compiler: string) {

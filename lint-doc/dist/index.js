@@ -27953,7 +27953,6 @@ async function installOdoc() {
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
-/* eslint-disable unicorn/no-process-exit */
 
 
 
