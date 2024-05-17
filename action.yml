@@ -50,6 +50,6 @@ inputs:
     default: ${{ github.token }}
 runs:
   using: node20
-  main: dist/index.cjs
-  post: dist/post.cjs
+  main: dist/index.js
+  post: dist/post/index.js
   post-if: success()
