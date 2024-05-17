@@ -27946,7 +27946,6 @@ async function installOpamDuneLint() {
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
-/* eslint-disable unicorn/no-process-exit */
 
 
 

@@ -68,10 +68,9 @@ async function findOpam() {
   if (PLATFORM === "win32") {
     const opamPath = path.join(CYGWIN_ROOT, "bin", "opam.exe");
     return opamPath;
-  } else {
-    const opamPath = await io.which("opam");
-    return opamPath;
   }
+  const opamPath = await io.which("opam");
+  return opamPath;
 }
 
 async function acquireOpamUnix() {
@@ -259,8 +258,7 @@ async function setupOpamWindows() {
     await setupCygwin();
   });
   await saveCygwinCache();
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const originalPath = process.env["PATH"]!.split(path.delimiter);
+  const originalPath = process.env["PATH"]?.split(path.delimiter) ?? [];
   const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
   process.env["PATH"] = patchedPath.join(path.delimiter);
   await core.group("Install opam", async () => {
@@ -283,8 +281,7 @@ export async function setupOpam() {
 export async function installOcaml(ocamlCompiler: string) {
   await core.group("Install OCaml", async () => {
     if (PLATFORM === "win32") {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const originalPath = process.env["PATH"]!.split(path.delimiter);
+      const originalPath = process.env["PATH"]?.split(path.delimiter) ?? [];
       const patchedPath = [CYGWIN_ROOT_BIN, ...originalPath];
       process.env["PATH"] = patchedPath.join(path.delimiter);
       await exec("opam", [
@@ -336,7 +333,7 @@ async function repositoryAdd(name: string, address: string) {
 
 export async function repositoryAddAll(repositories: [string, string][]) {
   await core.group("Initialise the opam repositories", async () => {
-    let restore_autocrlf;
+    let restore_autocrlf: string | null | undefined = undefined;
     // Works around the lack of https://github.com/ocaml/opam/pull/3882 when
     // adding ocaml/opam-repository on Windows. Can be removed when the action
     // switches to opam 2.2
@@ -350,7 +347,6 @@ export async function repositoryAddAll(repositories: [string, string][]) {
         if (autocrlf.exitCode === 0) {
           restore_autocrlf = autocrlf.stdout.trim();
         } else {
-          // eslint-disable-next-line unicorn/no-null
           restore_autocrlf = null; // Unset the value at the end
         }
       }
@@ -389,9 +385,8 @@ async function repositoryList() {
       .split("\n")
       .map((repository) => repository.trim())
       .filter((repository) => repository.length > 0);
-  } else {
-    return [];
   }
+  return [];
 }
 
 export async function repositoryRemoveAll() {

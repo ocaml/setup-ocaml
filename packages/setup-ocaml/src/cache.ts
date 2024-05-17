@@ -64,13 +64,9 @@ async function composeOpamCacheKeys() {
   const fullPlatform =
     PLATFORM === "win32"
       ? PLATFORM
-      : // eslint-disable-next-line unicorn/no-await-expression-member
-        `${PLATFORM}-${(await getSystemIdentificationInfo()).version}`;
+      : `${PLATFORM}-${(await getSystemIdentificationInfo()).version}`;
   const opamVersion =
-    PLATFORM === "win32"
-      ? "0.0.0.2"
-      : // eslint-disable-next-line unicorn/no-await-expression-member
-        (await getLatestOpamRelease()).version;
+    PLATFORM === "win32" ? "0.0.0.2" : (await getLatestOpamRelease()).version;
   const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
   const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
   const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";

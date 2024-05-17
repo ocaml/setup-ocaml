@@ -23,9 +23,8 @@ export async function getOcamlformatVersion() {
     .at(1);
   if (version) {
     return version;
-  } else {
-    throw new Error(
-      "Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice",
-    );
   }
+  throw new Error(
+    "Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice",
+  );
 }
