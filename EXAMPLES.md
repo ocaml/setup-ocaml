@@ -38,7 +38,7 @@ jobs:
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: "5.1"
+          ocaml-compiler: "5.2"
 
       - name: Install dependencies
         run: opam install . --deps-only --with-doc
@@ -47,41 +47,16 @@ jobs:
         run: opam exec -- dune build @doc
 
       - name: Set-up Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: _build/default/_doc/_html
 
       - name: Deploy odoc to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3
-```
-
-## Using the strategy matrix
-
-```yml
-strategy:
-  fail-fast: false
-  matrix:
-    os:
-      - macos-latest
-      - ubuntu-latest
-      - windows-latest
-    ocaml-compiler:
-      - "5.1"
-
-runs-on: ${{ matrix.os }}
-
-steps:
-  - name: Checkout tree
-    uses: actions/checkout@v4
-
-  - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
-    uses: ocaml/setup-ocaml@v2
-    with:
-      ocaml-compiler: ${{ matrix.ocaml-compiler }}
+        uses: actions/deploy-pages@v4
 ```
 
 ## Using several conditional setup steps
@@ -96,7 +71,8 @@ steps:
     if: runner.os == 'Windows'
     with:
       opam-repositories: |
-        default: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
+        sunset: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
+        default: https://github.com/ocaml/opam-repository.git
 
   - name: Set-up OCaml on Unix
     uses: ocaml/setup-ocaml@v2
@@ -143,7 +119,7 @@ steps:
   - name: Checkout tree
     uses: actions/checkout@v4
 
-  - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
+  - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v2
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -161,8 +137,6 @@ strategy:
     container:
       - debian:latest
       - ubuntu:latest
-    ocaml-compiler:
-      - "5.1"
 
 container: ${{ matrix.container }}
 
@@ -178,10 +152,10 @@ steps:
   - name: Install system packages
     run: apt-get --yes install bubblewrap curl darcs gcc git m4 make mercurial patch rsync sudo unzip
 
-  - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
+  - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v2
     with:
-      ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      ocaml-compiler: "5.2"
       cache-prefix: v1-${{ matrix.container }}
       opam-disable-sandboxing: true
 ```

@@ -13,7 +13,8 @@ and this project adheres to
 ### Changed
 
 - Do not explicitly call the depext subcommand unless required.
-- Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing OCaml.
+- Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing
+  OCaml.
 - Update runtime dependencies.
 
 ## [2.2.8]
@@ -50,7 +51,8 @@ and this project adheres to
 
 ### Changed
 
-- Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis` again.
+- Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis`
+  again.
 
 ## [2.2.2]
 
@@ -70,11 +72,13 @@ and this project adheres to
 ### Added
 
 - Add opam support for the Dependency submission API.
-- Set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` on the runner while installing OCaml.
+- Set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` on the runner while
+  installing OCaml.
 
 ### Removed
 
-- Since decent official support is now available to deploy natively to GitHub Pages, `deploy-doc` has been deprecated and removed.
+- Since decent official support is now available to deploy natively to GitHub
+  Pages, `deploy-doc` has been deprecated and removed.
 
 ## [2.1.8]
 

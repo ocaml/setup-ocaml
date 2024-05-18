@@ -1,7 +1,7 @@
 # lint-fmt
 
-> [!IMPORTANT]
-> Make sure you have an `.ocamlformat` file at the root of your project.
+> [!IMPORTANT] Make sure you have an `.ocamlformat` file at the root of your
+> project.
 
 ## Usage
 
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@v4
 
-      - name: Set-up OCaml 5.1
+      - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: "5.1"
+          ocaml-compiler: "5.2"
           dune-cache: true
 
       - name: Lint fmt
