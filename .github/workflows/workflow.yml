@@ -28,14 +28,14 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: yarn ci
-        if: always()
+      - if: always()
+        run: yarn ci
 
-      - run: yarn typecheck
-        if: always()
+      - if: always()
+        run: yarn typecheck
 
       - name: Ensure dist directory is up-to-date
-        shell: bash
+        if: always()
         run: yarn build && git diff --exit-code --ignore-cr-at-eol
 
   test:
@@ -46,28 +46,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         os:
-          - macos-14
-          - ubuntu-22.04
+          - macos-latest
+          - ubuntu-latest
         ocaml-compiler:
-          - "5.1"
+          - "5.2"
         allow-prerelease-opam:
           - false
         include:
-          - os: windows-2022
-            ocaml-compiler: "4.14"
-            allow-prerelease-opam: false
-          - os: ubuntu-22.04
-            ocaml-compiler: ocaml-variants.5.1.0+options,ocaml-option-flambda
-            allow-prerelease-opam: true
-          - os: windows-2022
-            ocaml-compiler: ocaml-variants.5.1.0+options,ocaml-option-mingw
+          - os: windows-latest
+            ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-mingw
             allow-prerelease-opam: false
             opam-repositories: |
               windows-5.0: https://github.com/dra27/opam-repository.git#windows-5.0
               sunset: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
               default: https://github.com/ocaml/opam-repository.git
+          - os: ubuntu-latest
+            ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-flambda
+            allow-prerelease-opam: true
 
     runs-on: ${{ matrix.os }}
 
@@ -75,18 +71,12 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
-      - name: Set-up Mold
-        if: runner.os == 'Linux'
-        uses: rui314/setup-mold@8de9eea54963d01c1a6c200606257d65bd53bea1 # v1
-
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
-          dune-cache: ${{ matrix.os != 'windows-2022' }}
+          dune-cache: ${{ runner.os != 'Windows' }}
           opam-repositories: ${{ matrix.opam-repositories }}
 
       - run: opam depext --install uri
-
-      - run: opam install ocamlbuild
