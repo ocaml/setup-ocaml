@@ -1,16 +1,10 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": [
-        "../../lint-fmt/dist/**"
-      ],
-      "passThroughEnv": [
-        "GITHUB_WORKSPACE"
-      ]
+      "outputs": ["../../lint-fmt/dist/**"],
+      "passThroughEnv": ["GITHUB_WORKSPACE"]
     }
   }
 }

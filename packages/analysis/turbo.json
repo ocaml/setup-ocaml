@@ -1,17 +1,10 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": [
-        "../../analysis/dist/**"
-      ],
-      "passThroughEnv": [
-        "GITHUB_WORKSPACE",
-        "PATH"
-      ]
+      "outputs": ["../../analysis/dist/**"],
+      "passThroughEnv": ["GITHUB_WORKSPACE", "PATH"]
     }
   }
 }
