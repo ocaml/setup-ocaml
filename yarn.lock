@@ -429,7 +429,7 @@ __metadata:
     "@actions/glob": "npm:0.4.0"
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.1"
+    "@types/node": "npm:20.14.2"
     "@vercel/ncc": "npm:0.38.1"
     packageurl-js: "npm:1.2.1"
     strip-ansi: "npm:7.1.0"
@@ -445,7 +445,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.1"
+    "@types/node": "npm:20.14.2"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -459,7 +459,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.1"
+    "@types/node": "npm:20.14.2"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -473,7 +473,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.1"
+    "@types/node": "npm:20.14.2"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -493,7 +493,7 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.1"
+    "@types/node": "npm:20.14.2"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
@@ -652,12 +652,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.14.1":
-  version: 20.14.1
-  resolution: "@types/node@npm:20.14.1"
+"@types/node@npm:20.14.2":
+  version: 20.14.2
+  resolution: "@types/node@npm:20.14.2"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/12b7879047f50cc217bbea3add7c45e542070f6e9fb2092be97542152b7022512bcb2bf848d04f77e295c4c8699acd484e79a4a4dbe9bcfa4e89dd543d530611
+  checksum: 10c0/2d86e5f2227aaa42212e82ea0affe72799111b888ff900916376450b02b09b963ca888b20d9c332d8d2b833ed4781987867a38eaa2e4863fa8439071468b0a6f
   languageName: node
   linkType: hard
 
@@ -1233,15 +1233,15 @@ __metadata:
   linkType: hard
 
 "jackspeak@npm:^3.1.2":
-  version: 3.2.5
-  resolution: "jackspeak@npm:3.2.5"
+  version: 3.4.0
+  resolution: "jackspeak@npm:3.4.0"
   dependencies:
     "@isaacs/cliui": "npm:^8.0.2"
     "@pkgjs/parseargs": "npm:^0.11.0"
   dependenciesMeta:
     "@pkgjs/parseargs":
       optional: true
-  checksum: 10c0/45a4fa9912ad22f58d06001c09fba10c6a6f66184ba54bf2b8dc6138bcd5b7bdd28688e43398682290cc6ed1f7587a8e53edabe3b00bf6ada39fb2e918f79dfe
+  checksum: 10c0/7e42d1ea411b4d57d43ea8a6afbca9224382804359cb72626d0fc45bb8db1de5ad0248283c3db45fe73e77210750d4fcc7c2b4fe5d24fda94aaa24d658295c5f
   languageName: node
   linkType: hard
 
@@ -1603,7 +1603,7 @@ __metadata:
   resolution: "setup-ocaml@workspace:."
   dependencies:
     "@biomejs/biome": "npm:1.8.0"
-    turbo: "npm:2.0.1"
+    turbo: "npm:2.0.3"
   languageName: unknown
   linkType: soft
 
@@ -1750,9 +1750,9 @@ __metadata:
   linkType: hard
 
 "tslib@npm:^2.2.0, tslib@npm:^2.6.2":
-  version: 2.6.2
-  resolution: "tslib@npm:2.6.2"
-  checksum: 10c0/e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb
+  version: 2.6.3
+  resolution: "tslib@npm:2.6.3"
+  checksum: 10c0/2598aef53d9dbe711af75522464b2104724d6467b26a60f2bdac8297d2b5f1f6b86a71f61717384aa8fd897240467aaa7bcc36a0700a0faf751293d1331db39a
   languageName: node
   linkType: hard
 
@@ -1763,58 +1763,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo-darwin-64@npm:2.0.1"
+"turbo-darwin-64@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo-darwin-64@npm:2.0.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo-darwin-arm64@npm:2.0.1"
+"turbo-darwin-arm64@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo-darwin-arm64@npm:2.0.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo-linux-64@npm:2.0.1"
+"turbo-linux-64@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo-linux-64@npm:2.0.3"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo-linux-arm64@npm:2.0.1"
+"turbo-linux-arm64@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo-linux-arm64@npm:2.0.3"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo-windows-64@npm:2.0.1"
+"turbo-windows-64@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo-windows-64@npm:2.0.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo-windows-arm64@npm:2.0.1"
+"turbo-windows-arm64@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo-windows-arm64@npm:2.0.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:2.0.1":
-  version: 2.0.1
-  resolution: "turbo@npm:2.0.1"
+"turbo@npm:2.0.3":
+  version: 2.0.3
+  resolution: "turbo@npm:2.0.3"
   dependencies:
-    turbo-darwin-64: "npm:2.0.1"
-    turbo-darwin-arm64: "npm:2.0.1"
-    turbo-linux-64: "npm:2.0.1"
-    turbo-linux-arm64: "npm:2.0.1"
-    turbo-windows-64: "npm:2.0.1"
-    turbo-windows-arm64: "npm:2.0.1"
+    turbo-darwin-64: "npm:2.0.3"
+    turbo-darwin-arm64: "npm:2.0.3"
+    turbo-linux-64: "npm:2.0.3"
+    turbo-linux-arm64: "npm:2.0.3"
+    turbo-windows-64: "npm:2.0.3"
+    turbo-windows-arm64: "npm:2.0.3"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -1830,7 +1830,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/9a90a4b0e85a8b340f8e55852666f20284ac7aac3063264a72cfef89668c71a937178e66546a1a6141fcea23d54cfa8b21bc1d47535be8888af172feb4f62d9d
+  checksum: 10c0/154f2fab8ce2faa66444a32950171e3cb520576d07f20c58f13052442997a80bf31146e5826ce4e05abddfe99d71c68f309b7efab84cad05ee984352ef1f2621
   languageName: node
   linkType: hard
 
