@@ -6,8 +6,9 @@
   ],
   "scripts": {
     "build": "turbo run build --continue --parallel",
-    "ci": "biome ci .",
-    "format": "biome format --write .",
+    "check": "biome check",
+    "ci": "biome ci",
+    "fix": "biome check --fix",
     "typecheck": "turbo run typecheck --continue --parallel"
   },
   "devDependencies": {
