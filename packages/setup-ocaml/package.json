@@ -21,7 +21,7 @@
     "cheerio": "1.0.0-rc.12",
     "date-fns": "3.6.0",
     "semver": "7.6.2",
-    "yaml": "2.4.3"
+    "yaml": "2.4.5"
   },
   "devDependencies": {
     "@tsconfig/node20": "20.1.4",
