@@ -9,7 +9,7 @@
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
     "noEmit": true,
-    "resolveJsonModule": true
-  },
-  "exclude": ["node_modules"]
+    "noPropertyAccessFromIndexSignature": false,
+    "verbatimModuleSyntax": true
+  }
 }

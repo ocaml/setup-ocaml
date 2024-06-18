@@ -5,10 +5,10 @@ export async function installOpamPackages() {
   await core.group("Install opam packages", async () => {
     await exec("opam", [
       "install",
-      ".",
       "--deps-only",
-      "--with-test",
       "--with-doc",
+      "--with-test",
+      ".",
     ]);
   });
 }

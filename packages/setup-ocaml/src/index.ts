@@ -1,7 +1,5 @@
 import * as process from "node:process";
-
 import * as core from "@actions/core";
-
 import { installer } from "./installer.js";
 
 async function run() {

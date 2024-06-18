@@ -1,5 +1,4 @@
 import * as glob from "@actions/glob";
-
 import { OPAM_LOCAL_PACKAGES } from "./constants.js";
 
 export async function getOpamLocalPackages() {

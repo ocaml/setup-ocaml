@@ -3,18 +3,12 @@ import { exec } from "@actions/exec";
 
 export async function installOpamPackages() {
   await core.group("Install opam packages", async () => {
-    await exec("opam", ["install", ".", "--deps-only", "--with-doc"]);
+    await exec("opam", ["install", "--deps-only", "--with-doc", "."]);
   });
 }
 
 export async function installOdoc() {
   await core.group("Install odoc", async () => {
-    await exec("opam", [
-      "depext",
-      "--install",
-      "conf-m4",
-      "dune",
-      "odoc>=1.5.0",
-    ]);
+    await exec("opam", ["install", "dune", "odoc>=1.5.0"]);
   });
 }

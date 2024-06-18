@@ -97,18 +97,16 @@ steps:
 
 ## Inputs
 
-| Name                      | Required | Description                                                                                                                                                                                           | Type   | Default  |
-| ------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. Consult the [supported version syntax](#supported-version-syntax) section.                                                                                 | string |          |
-| `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                                   | string |          |
-| `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                                           | bool   | `true`   |
-| `opam-depext`             | No       | Enable the automation feature for opam depext.                                                                                                                                                        | bool   | `true`   |
-| `opam-depext-flags`       | No       | The flags for the opam depext command. The flags must be separated by the comma.                                                                                                                      | string |          |
-| `opam-local-packages`     | No       | The local packages to be used by `opam-pin` or `opam-depext`. Consult the [`@actions/glob` documentation](https://github.com/actions/toolkit/tree/main/packages/glob) package for supported patterns. | string | `*.opam` |
-| `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                                                  | bool   | `false`  |
-| `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                                                | bool   | `false`  |
-| `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                                                         | string | `v1`     |
-| `allow-prerelease-opam`   | No       | Allow to use a pre-release version of opam.                                                                                                                                                           | bool   | `false`  |
+| Name                      | Required | Description                                                                                                                                                                          | Type   | Default  |
+| ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- |
+| `ocaml-compiler`          | Yes      | The OCaml compiler packages to initialise. Consult the [supported version syntax](#supported-version-syntax) section.                                                                | string |          |
+| `opam-repositories`       | No       | The name and URL pair of the repository to fetch the packages from.                                                                                                                  | string |          |
+| `opam-pin`                | No       | Enable the automation feature for opam pin.                                                                                                                                          | bool   | `true`   |
+| `opam-local-packages`     | No       | The local packages to be used by `opam-pin`. Consult the [`@actions/glob` documentation](https://github.com/actions/toolkit/tree/main/packages/glob) package for supported patterns. | string | `*.opam` |
+| `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature.                                                                                                                                                 | bool   | `false`  |
+| `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                               | bool   | `false`  |
+| `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                                        | string | `v1`     |
+| `allow-prerelease-opam`   | No       | Allow to use a pre-release version of opam.                                                                                                                                          | bool   | `false`  |
 
 ### Supported version syntax
 
@@ -122,12 +120,11 @@ more detailed examples please refer to the
 
 Examples:
 
-- Exact package name: `ocaml-base-compiler.5.2.0`,
-  `ocaml-variants.4.14.2+mingw64c`
+- Exact package name: `ocaml-base-compiler.5.2.0`
 - Combine multiple packages:
   `ocaml-variants.5.2.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
 - Minor versions: `4.08`, `4.14`, `5.2`, `5.2.x`
-- More specific versions: `~4.02.2`, `5.1.0`,
+- More specific versions: `~4.02.2`, `5.1.0`
 
 ## Advanced Configurations
 

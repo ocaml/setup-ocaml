@@ -49,21 +49,12 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
+          - windows-latest
         ocaml-compiler:
           - "5.2"
-        allow-prerelease-opam:
-          - false
         include:
-          - os: windows-latest
-            ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-mingw
-            allow-prerelease-opam: false
-            opam-repositories: |
-              windows-5.0: https://github.com/dra27/opam-repository.git#windows-5.0
-              sunset: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
-              default: https://github.com/ocaml/opam-repository.git
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-flambda
-            allow-prerelease-opam: true
 
     runs-on: ${{ matrix.os }}
 
@@ -75,8 +66,6 @@ jobs:
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
-          dune-cache: ${{ runner.os != 'Windows' }}
-          opam-repositories: ${{ matrix.opam-repositories }}
+          allow-prerelease-opam: true
 
-      - run: opam depext --install uri
+      - run: opam install uri

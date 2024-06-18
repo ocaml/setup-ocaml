@@ -1,10 +1,10 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
-
+import * as process from "node:process";
 import { convertToUnix } from "./compat.js";
 
 async function parse() {
-  const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
+  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
   const fpath = path.join(githubWorkspace, ".ocamlformat");
   const buf = await fs.readFile(fpath);
   const str = buf.toString();

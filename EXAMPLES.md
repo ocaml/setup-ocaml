@@ -59,55 +59,6 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-## Using several conditional setup steps
-
-```yml
-steps:
-  - name: Checkout tree
-    uses: actions/checkout@v4
-
-  - name: Set-up OCaml on Windows
-    uses: ocaml/setup-ocaml@v2
-    if: runner.os == 'Windows'
-    with:
-      opam-repositories: |
-        sunset: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
-        default: https://github.com/ocaml/opam-repository.git
-
-  - name: Set-up OCaml on Unix
-    uses: ocaml/setup-ocaml@v2
-    if: runner.os != 'Windows'
-    with:
-      opam-repositories: |
-        default: https://github.com/ocaml/opam-repository.git
-```
-
-## Using a custom step to choose between the values
-
-```yml
-steps:
-  - name: Checkout tree
-    uses: actions/checkout@v4
-
-  - name: Set opam repository url
-    id: repository
-    shell: bash
-    run: |
-      if [ "$RUNNER_OS" == "Windows" ]; then
-        echo "::set-output name=url::https://github.com/ocaml-opam/opam-repository-mingw.git#sunset"
-      elif [ "$RUNNER_OS" == "macOS" ]; then
-        echo "::set-output name=url::https://github.com/custom/opam-repository.git#macOS"
-      else
-        echo "::set-output name=url::https://github.com/ocaml/opam-repository.git"
-      fi
-
-  - name: Set-up OCaml with repository ${{ steps.repository.outputs.url }}
-    uses: ocaml/setup-ocaml@v2
-    with:
-      opam-repositories: |
-        default: ${{ steps.repository.outputs.url }}
-```
-
 ## Using glob patterns to filter local packages
 
 Consult the

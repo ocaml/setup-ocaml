@@ -27937,8 +27937,9 @@ function convertToUnix(str) {
 
 
 
+
 async function parse() {
-    const githubWorkspace = process.env["GITHUB_WORKSPACE"] ?? process.cwd();
+    const githubWorkspace = external_node_process_namespaceObject.env.GITHUB_WORKSPACE ?? external_node_process_namespaceObject.cwd();
     const fpath = external_node_path_namespaceObject.join(githubWorkspace, ".ocamlformat");
     const buf = await external_node_fs_namespaceObject.promises.readFile(fpath);
     const str = buf.toString();
