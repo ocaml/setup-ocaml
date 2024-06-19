@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.0-alpha]
+
 ### Added
 
 - Add initial support for opam 2.2 on Windows.
@@ -603,7 +605,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v2.2.10...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-alpha...HEAD
+[3.0.0-alpha]: https://github.com/ocaml/setup-ocaml/compare/v2.2.10...v3.0.0-alpha
 [2.2.10]: https://github.com/ocaml/setup-ocaml/compare/v2.2.9...v2.2.10
 [2.2.9]: https://github.com/ocaml/setup-ocaml/compare/v2.2.8...v2.2.9
 [2.2.8]: https://github.com/ocaml/setup-ocaml/compare/v2.2.7...v2.2.8
