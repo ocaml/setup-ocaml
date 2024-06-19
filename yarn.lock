@@ -429,7 +429,7 @@ __metadata:
     "@actions/glob": "npm:0.4.0"
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.4"
+    "@types/node": "npm:20.14.5"
     "@vercel/ncc": "npm:0.38.1"
     packageurl-js: "npm:1.2.1"
     strip-ansi: "npm:7.1.0"
@@ -445,7 +445,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.4"
+    "@types/node": "npm:20.14.5"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -459,7 +459,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.4"
+    "@types/node": "npm:20.14.5"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -473,7 +473,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.4"
+    "@types/node": "npm:20.14.5"
     "@vercel/ncc": "npm:0.38.1"
     typescript: "npm:5.4.5"
   languageName: unknown
@@ -493,7 +493,7 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:20.14.4"
+    "@types/node": "npm:20.14.5"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
@@ -651,12 +651,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.14.4":
-  version: 20.14.4
-  resolution: "@types/node@npm:20.14.4"
+"@types/node@npm:20.14.5":
+  version: 20.14.5
+  resolution: "@types/node@npm:20.14.5"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/2244be2e66e19377a491bfc279b52bc3f598c2e31d683d2388f4a16dbf6e81ad0032fde01770c4babcc73a31609e23fa0e5864dffc5830e9f457db250bd08b33
+  checksum: 10c0/06a8c304b5f7f190d4497807dc67ad09ee7b14ea2996bfdc823553c624698d8cab1ef9d16f8b764f20cb9eb11caa0e832787741e9ef70e1c89d620797ab28436
   languageName: node
   linkType: hard
 
@@ -1103,17 +1103,18 @@ __metadata:
   linkType: hard
 
 "glob@npm:^10.2.2, glob@npm:^10.3.10":
-  version: 10.4.1
-  resolution: "glob@npm:10.4.1"
+  version: 10.4.2
+  resolution: "glob@npm:10.4.2"
   dependencies:
     foreground-child: "npm:^3.1.0"
     jackspeak: "npm:^3.1.2"
     minimatch: "npm:^9.0.4"
     minipass: "npm:^7.1.2"
+    package-json-from-dist: "npm:^1.0.0"
     path-scurry: "npm:^1.11.1"
   bin:
     glob: dist/esm/bin.mjs
-  checksum: 10c0/77f2900ed98b9cc2a0e1901ee5e476d664dae3cd0f1b662b8bfd4ccf00d0edc31a11595807706a274ca10e1e251411bbf2e8e976c82bed0d879a9b89343ed379
+  checksum: 10c0/2c7296695fa75a935f3ad17dc62e4e170a8bb8752cf64d328be8992dd6ad40777939003754e10e9741ff8fbe43aa52fba32d6930d0ffa0e3b74bc3fb5eebaa2f
   languageName: node
   linkType: hard
 
@@ -1481,6 +1482,13 @@ __metadata:
   dependencies:
     aggregate-error: "npm:^3.0.0"
   checksum: 10c0/592c05bd6262c466ce269ff172bb8de7c6975afca9b50c975135b974e9bdaafbfe80e61aaaf5be6d1200ba08b30ead04b88cfa7e25ff1e3b93ab28c9f62a2c75
+  languageName: node
+  linkType: hard
+
+"package-json-from-dist@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "package-json-from-dist@npm:1.0.0"
+  checksum: 10c0/e3ffaf6ac1040ab6082a658230c041ad14e72fabe99076a2081bb1d5d41210f11872403fc09082daf4387fc0baa6577f96c9c0e94c90c394fd57794b66aa4033
   languageName: node
   linkType: hard
 
