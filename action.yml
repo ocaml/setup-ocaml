@@ -15,7 +15,8 @@ inputs:
   opam-repositories:
     description: The name and URL pair of the repository to fetch the packages from.
     required: false
-    default: ""
+    default: |
+      default: git+https://github.com/ocaml/opam-repository.git
   opam-pin:
     description: Enable the automation feature for opam pin.
     required: false

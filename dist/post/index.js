@@ -84796,9 +84796,7 @@ const OPAM_REPOSITORIES = (() => {
         required: false,
         trimWhitespace: true,
     }));
-    return repositories_yaml
-        ? Object.entries(repositories_yaml).reverse()
-        : [["default", "https://github.com/ocaml/opam-repository.git"]];
+    return Object.entries(repositories_yaml).reverse();
 })();
 
 ;// CONCATENATED MODULE: ./src/cache.ts

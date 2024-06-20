@@ -127,9 +127,6 @@ export const OPAM_REPOSITORIES: [string, string][] = (() => {
       required: false,
       trimWhitespace: true,
     }),
-  ) as Record<string, string> | null;
-
-  return repositories_yaml
-    ? Object.entries(repositories_yaml).reverse()
-    : [["default", "https://github.com/ocaml/opam-repository.git"]];
+  ) as Record<string, string>;
+  return Object.entries(repositories_yaml).reverse();
 })();
