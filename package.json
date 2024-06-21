@@ -12,7 +12,7 @@
     "typecheck": "turbo run typecheck --continue --parallel"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.1",
+    "@biomejs/biome": "1.8.2",
     "turbo": "2.0.4"
   },
   "packageManager": "yarn@4.3.0"
