@@ -18,7 +18,7 @@ import {
 } from "./constants.js";
 import { getLatestOpamRelease } from "./opam.js";
 import { resolveCompiler } from "./version.js";
-import { getCygwinVersion } from "./windows.js";
+import { addCygwinReg, getCygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
   const cygwinVersion = await getCygwinVersion();
@@ -151,6 +151,9 @@ async function restoreCygwinCache() {
   const { key, restoreKeys } = await composeCygwinCacheKeys();
   const paths = composeCygwinCachePaths();
   const cacheKey = await restoreCache(key, restoreKeys, paths);
+  if (cacheKey) {
+    await addCygwinReg();
+  }
   return cacheKey;
 }
 

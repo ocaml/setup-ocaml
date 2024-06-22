@@ -109532,6 +109532,7 @@ const { root: esm_root } = static_namespaceObject;
 
 
 
+
 function createHttpClient() {
     return new lib.HttpClient("OCamlBot (+https://github.com/ocaml/setup-ocaml)", [], { allowRetries: true, maxRetries: 5 });
 }
@@ -109585,6 +109586,23 @@ async function setupCygwin() {
         const setup = await io.which("setup-x86_64");
         await io.cp(setup, CYGWIN_ROOT);
     });
+}
+async function addCygwinReg() {
+    const keyname = external_node_path_namespaceObject.join("HKLM", "SOFTWARE", "Cygwin", "setup");
+    const valuename = "rootdir";
+    const datatype = "REG_SZ";
+    const data = CYGWIN_ROOT;
+    await (0,lib_exec.exec)("reg", [
+        "add",
+        keyname,
+        "/v",
+        valuename,
+        "/t",
+        datatype,
+        "/d",
+        data,
+        "/f",
+    ]);
 }
 
 ;// CONCATENATED MODULE: ./src/cache.ts
@@ -109704,6 +109722,9 @@ async function restoreCygwinCache() {
     const { key, restoreKeys } = await composeCygwinCacheKeys();
     const paths = composeCygwinCachePaths();
     const cacheKey = await restoreCache(key, restoreKeys, paths);
+    if (cacheKey) {
+        await addCygwinReg();
+    }
     return cacheKey;
 }
 async function restoreOpamCache() {

@@ -84916,6 +84916,9 @@ async function restoreCygwinCache() {
     const { key, restoreKeys } = await composeCygwinCacheKeys();
     const paths = composeCygwinCachePaths();
     const cacheKey = await restoreCache(key, restoreKeys, paths);
+    if (cacheKey) {
+        await addCygwinReg();
+    }
     return cacheKey;
 }
 async function restoreOpamCache() {

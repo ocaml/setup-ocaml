@@ -1,3 +1,4 @@
+import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import { HttpClient } from "@actions/http-client";
@@ -73,4 +74,22 @@ export async function setupCygwin() {
     const setup = await io.which("setup-x86_64");
     await io.cp(setup, CYGWIN_ROOT);
   });
+}
+
+export async function addCygwinReg() {
+  const keyname = path.join("HKLM", "SOFTWARE", "Cygwin", "setup");
+  const valuename = "rootdir";
+  const datatype = "REG_SZ";
+  const data = CYGWIN_ROOT;
+  await exec("reg", [
+    "add",
+    keyname,
+    "/v",
+    valuename,
+    "/t",
+    datatype,
+    "/d",
+    data,
+    "/f",
+  ]);
 }

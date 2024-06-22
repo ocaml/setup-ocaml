@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Add an entry to the registry once the Cygwin cache is restored.
+
 ## [3.0.0-alpha]
 
 ### Added
