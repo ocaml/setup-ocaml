@@ -109834,8 +109834,8 @@ async function installer() {
     }
     const { opamCacheHit, cygwinCacheHit } = await restoreOpamCaches();
     if (PLATFORM === "windows") {
+        await setupCygwin();
         if (!cygwinCacheHit) {
-            await setupCygwin();
             await saveCygwinCache();
         }
         lib_core.addPath(CYGWIN_ROOT_BIN);

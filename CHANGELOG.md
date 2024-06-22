@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Always set-up Cygwin whether or not the cache is hit.
+
 ## [3.0.0-alpha]
 
 ### Added
