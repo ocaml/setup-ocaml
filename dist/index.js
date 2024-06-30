@@ -44991,7 +44991,7 @@ class HttpsProxyAgent extends agent_base_1.Agent {
             const servername = this.connectOpts.servername || this.connectOpts.host;
             socket = tls.connect({
                 ...this.connectOpts,
-                servername: servername && net.isIP(servername) ? undefined : servername,
+                servername,
             });
         }
         else {
@@ -45032,7 +45032,7 @@ class HttpsProxyAgent extends agent_base_1.Agent {
                 return tls.connect({
                     ...omit(opts, 'host', 'path', 'port'),
                     socket,
-                    servername: net.isIP(servername) ? undefined : servername,
+                    servername,
                 });
             }
             return socket;
@@ -77414,7 +77414,7 @@ exports.buildCreatePoller = buildCreatePoller;
 // Licensed under the MIT license.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEFAULT_RETRY_POLICY_COUNT = exports.SDK_VERSION = void 0;
-exports.SDK_VERSION = "1.16.0";
+exports.SDK_VERSION = "1.16.1";
 exports.DEFAULT_RETRY_POLICY_COUNT = 3;
 //# sourceMappingURL=constants.js.map
 
@@ -77463,7 +77463,9 @@ function createPipelineFromOptions(options) {
     // properties (e.g., making the boundary constant in recorded tests).
     pipeline.addPolicy((0, multipartPolicy_js_1.multipartPolicy)(), { afterPhase: "Deserialize" });
     pipeline.addPolicy((0, defaultRetryPolicy_js_1.defaultRetryPolicy)(options.retryOptions), { phase: "Retry" });
-    pipeline.addPolicy((0, tracingPolicy_js_1.tracingPolicy)(options.userAgentOptions), { afterPhase: "Retry" });
+    pipeline.addPolicy((0, tracingPolicy_js_1.tracingPolicy)(Object.assign(Object.assign({}, options.userAgentOptions), options.loggingOptions)), {
+        afterPhase: "Retry",
+    });
     if (core_util_1.isNodeLike) {
         // Both XHR and Fetch expect to handle redirects automatically,
         // so only include this policy when we're in Node.
@@ -79488,6 +79490,7 @@ const userAgent_js_1 = __nccwpck_require__(9844);
 const log_js_1 = __nccwpck_require__(4170);
 const core_util_1 = __nccwpck_require__(7409);
 const restError_js_1 = __nccwpck_require__(6993);
+const sanitizer_js_1 = __nccwpck_require__(9174);
 /**
  * The programmatic identifier of the tracingPolicy.
  */
@@ -79499,7 +79502,10 @@ exports.tracingPolicyName = "tracingPolicy";
  * @param options - Options to configure the telemetry logged by the tracing policy.
  */
 function tracingPolicy(options = {}) {
-    const userAgent = (0, userAgent_js_1.getUserAgentValue)(options.userAgentPrefix);
+    const userAgentPromise = (0, userAgent_js_1.getUserAgentValue)(options.userAgentPrefix);
+    const sanitizer = new sanitizer_js_1.Sanitizer({
+        additionalAllowedQueryParameters: options.additionalAllowedQueryParameters,
+    });
     const tracingClient = tryCreateTracingClient();
     return {
         name: exports.tracingPolicyName,
@@ -79508,7 +79514,17 @@ function tracingPolicy(options = {}) {
             if (!tracingClient || !((_a = request.tracingOptions) === null || _a === void 0 ? void 0 : _a.tracingContext)) {
                 return next(request);
             }
-            const { span, tracingContext } = (_b = tryCreateSpan(tracingClient, request, userAgent)) !== null && _b !== void 0 ? _b : {};
+            const userAgent = await userAgentPromise;
+            const spanAttributes = {
+                "http.url": sanitizer.sanitizeUrl(request.url),
+                "http.method": request.method,
+                "http.user_agent": userAgent,
+                requestId: request.requestId,
+            };
+            if (userAgent) {
+                spanAttributes["http.user_agent"] = userAgent;
+            }
+            const { span, tracingContext } = (_b = tryCreateSpan(tracingClient, request, spanAttributes)) !== null && _b !== void 0 ? _b : {};
             if (!span || !tracingContext) {
                 return next(request);
             }
@@ -79538,24 +79554,17 @@ function tryCreateTracingClient() {
         return undefined;
     }
 }
-function tryCreateSpan(tracingClient, request, userAgent) {
+function tryCreateSpan(tracingClient, request, spanAttributes) {
     try {
         // As per spec, we do not need to differentiate between HTTP and HTTPS in span name.
         const { span, updatedOptions } = tracingClient.startSpan(`HTTP ${request.method}`, { tracingOptions: request.tracingOptions }, {
             spanKind: "client",
-            spanAttributes: {
-                "http.method": request.method,
-                "http.url": request.url,
-                requestId: request.requestId,
-            },
+            spanAttributes,
         });
         // If the span is not recording, don't do any more work.
         if (!span.isRecording()) {
             span.end();
             return undefined;
-        }
-        if (userAgent) {
-            span.setAttribute("http.user_agent", userAgent);
         }
         // set headers
         const headers = tracingClient.createRequestHeaders(updatedOptions.tracingOptions.tracingContext);
@@ -79629,7 +79638,7 @@ function userAgentPolicy(options = {}) {
         name: exports.userAgentPolicyName,
         async sendRequest(request, next) {
             if (!request.headers.has(UserAgentHeaderName)) {
-                request.headers.set(UserAgentHeaderName, userAgentValue);
+                request.headers.set(UserAgentHeaderName, await userAgentValue);
             }
             return next(request);
         },
@@ -80256,6 +80265,21 @@ class Sanitizer {
             return value;
         }, 2);
     }
+    sanitizeUrl(value) {
+        if (typeof value !== "string" || value === null) {
+            return value;
+        }
+        const url = new URL(value);
+        if (!url.search) {
+            return value;
+        }
+        for (const [key] of url.searchParams) {
+            if (!this.allowedQueryParameters.has(key.toLowerCase())) {
+                url.searchParams.set(key, RedactedString);
+            }
+        }
+        return url.toString();
+    }
     sanitizeHeaders(obj) {
         const sanitized = {};
         for (const key of Object.keys(obj)) {
@@ -80282,21 +80306,6 @@ class Sanitizer {
             }
         }
         return sanitized;
-    }
-    sanitizeUrl(value) {
-        if (typeof value !== "string" || value === null) {
-            return value;
-        }
-        const url = new URL(value);
-        if (!url.search) {
-            return value;
-        }
-        for (const [key] of url.searchParams) {
-            if (!this.allowedQueryParameters.has(key.toLowerCase())) {
-                url.searchParams.set(key, RedactedString);
-            }
-        }
-        return url.toString();
     }
 }
 exports.Sanitizer = Sanitizer;
@@ -80446,12 +80455,20 @@ function createTokenCycler(credential, tokenCyclerOptions) {
         // - Return the token, since it's fine if we didn't return in
         //   step 1.
         //
+        const hasClaimChallenge = Boolean(tokenOptions.claims);
+        const tenantIdChanged = tenantId !== tokenOptions.tenantId;
+        if (hasClaimChallenge) {
+            // If we've received a claim, we know the existing token isn't valid
+            // We want to clear it so that that refresh worker won't use the old expiration time as a timeout
+            token = null;
+        }
         // If the tenantId passed in token options is different to the one we have
         // Or if we are in claim challenge and the token was rejected and a new access token need to be issued, we need to
         // refresh the token with the new tenantId or token.
-        const mustRefresh = tenantId !== tokenOptions.tenantId || Boolean(tokenOptions.claims) || cycler.mustRefresh;
-        if (mustRefresh)
+        const mustRefresh = tenantIdChanged || hasClaimChallenge || cycler.mustRefresh;
+        if (mustRefresh) {
             return refresh(scopes, tokenOptions);
+        }
         if (cycler.shouldRefresh) {
             refresh(scopes, tokenOptions);
         }
@@ -80521,10 +80538,10 @@ exports.getUserAgentHeaderName = getUserAgentHeaderName;
 /**
  * @internal
  */
-function getUserAgentValue(prefix) {
+async function getUserAgentValue(prefix) {
     const runtimeInfo = new Map();
     runtimeInfo.set("core-rest-pipeline", constants_js_1.SDK_VERSION);
-    (0, userAgentPlatform_js_1.setPlatformSpecificData)(runtimeInfo);
+    await (0, userAgentPlatform_js_1.setPlatformSpecificData)(runtimeInfo);
     const defaultAgent = getUserAgentString(runtimeInfo);
     const userAgentValue = prefix ? `${prefix} ${defaultAgent}` : defaultAgent;
     return userAgentValue;
@@ -80555,16 +80572,18 @@ exports.getHeaderName = getHeaderName;
 /**
  * @internal
  */
-function setPlatformSpecificData(map) {
-    const versions = process.versions;
-    if (versions.bun) {
-        map.set("Bun", versions.bun);
-    }
-    else if (versions.deno) {
-        map.set("Deno", versions.deno);
-    }
-    else if (versions.node) {
-        map.set("Node", versions.node);
+async function setPlatformSpecificData(map) {
+    if (process && process.versions) {
+        const versions = process.versions;
+        if (versions.bun) {
+            map.set("Bun", versions.bun);
+        }
+        else if (versions.deno) {
+            map.set("Deno", versions.deno);
+        }
+        else if (versions.node) {
+            map.set("Node", versions.node);
+        }
     }
     map.set("OS", `(${os.arch()}-${os.type()}-${os.release()})`);
 }
