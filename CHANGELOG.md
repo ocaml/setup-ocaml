@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.0-beta1]
+
 ### Fixed
 
 - Fix asset selector to select the correct opam release asset.
@@ -615,7 +617,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta1...HEAD
+[3.0.0-beta1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta...v3.0.0-beta1
 [3.0.0-beta]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-alpha...v3.0.0-beta
 [3.0.0-alpha]: https://github.com/ocaml/setup-ocaml/compare/v2.2.10...v3.0.0-alpha
 [2.2.10]: https://github.com/ocaml/setup-ocaml/compare/v2.2.9...v2.2.10

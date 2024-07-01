@@ -1,6 +1,7 @@
 {
   "name": "setup-ocaml",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
