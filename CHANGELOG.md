@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Fix asset selector to select the correct opam release asset.
+
 ## [3.0.0-beta]
 
 ### Changed

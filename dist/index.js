@@ -92085,7 +92085,12 @@ async function getLatestOpamRelease() {
     if (!latestRelease) {
         throw new Error("Could not retrieve the opam release matching the version constraint");
     }
-    const matchedAssets = latestRelease.assets.find((asset) => asset.browser_download_url.includes(`${ARCHITECTURE}-${PLATFORM}`));
+    const matchedAssets = latestRelease.assets.find((asset) => {
+        if (PLATFORM === "windows") {
+            return asset.browser_download_url.endsWith(`${ARCHITECTURE}-${PLATFORM}.exe`);
+        }
+        return asset.browser_download_url.endsWith(`${ARCHITECTURE}-${PLATFORM}`);
+    });
     if (!matchedAssets) {
         throw new Error("Could not find any assets matching the current platform or architecture");
     }
