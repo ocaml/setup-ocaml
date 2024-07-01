@@ -66,6 +66,5 @@ jobs:
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          allow-prerelease-opam: true
 
       - run: opam install uri
