@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.0]
+
+- This was a version bump only, there were no code changes.
+
 ## [3.0.0-beta1]
 
 ### Fixed
@@ -617,7 +621,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta1...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta1...v3.0.0
 [3.0.0-beta1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta...v3.0.0-beta1
 [3.0.0-beta]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-alpha...v3.0.0-beta
 [3.0.0-alpha]: https://github.com/ocaml/setup-ocaml/compare/v2.2.10...v3.0.0-alpha
