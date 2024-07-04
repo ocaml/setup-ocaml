@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set-up OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "5.2"
 
@@ -71,7 +71,7 @@ steps:
     uses: actions/checkout@v4
 
   - name: Set-up OCaml
-    uses: ocaml/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v3
     with:
       ocaml-compiler: ${{ matrix.ocaml-compiler }}
       opam-local-packages: |
@@ -104,7 +104,7 @@ steps:
     run: apt-get --yes install bubblewrap curl darcs gcc git m4 make mercurial patch rsync sudo unzip
 
   - name: Set-up OCaml
-    uses: ocaml/setup-ocaml@v2
+    uses: ocaml/setup-ocaml@v3
     with:
       ocaml-compiler: "5.2"
       cache-prefix: v1-${{ matrix.container }}

@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set-up OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "5.2"
 
@@ -63,13 +63,13 @@ The actions are downloaded and run from the GitHub graph of repositories. The
 workflow references an action using a ref.
 
 > [!NOTE] Binding to a major version is the latest of that major version (e.g.
-> `v2` = `2.*`) Major versions should guarantee compatibility. A major version
+> `v3` = `3.*`) Major versions should guarantee compatibility. A major version
 > can add net new capabilities but should not break existing input compatibility
 > or break existing workflows.
 
 ```yml
 - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
-  uses: ocaml/setup-ocaml@v2
+  uses: ocaml/setup-ocaml@v3
   #                      ^^^
   with:
     ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -86,11 +86,11 @@ creating a tag.
 ```yml
 steps:
   # Reference the major version of a release (most recommended)
-  - uses: ocaml/setup-ocaml@v2
+  - uses: ocaml/setup-ocaml@v3
   # Reference a specific commit (most strict)
   - uses: ocaml/setup-ocaml@<SHA>
   # Reference a semver version of a release (not recommended)
-  - uses: ocaml/setup-ocaml@v2.0.0
+  - uses: ocaml/setup-ocaml@v3.0.0
   # Reference a branch (most dangerous - do not do this)
   - uses: ocaml/setup-ocaml@master
 ```

@@ -13,13 +13,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set-up OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "5.2"
-          dune-cache: true
 
       - name: Lint opam
-        uses: ocaml/setup-ocaml/lint-opam@v2
+        uses: ocaml/setup-ocaml/lint-opam@v3
 ```
 
 ## Inputs

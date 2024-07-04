@@ -9,6 +9,7 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
+| v3      | :white_check_mark: |
 | v2      | :white_check_mark: |
 | v1      | :white_check_mark: |
 
