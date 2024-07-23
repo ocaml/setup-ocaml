@@ -8223,8 +8223,8 @@ class BaseRequestPolicy {
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-const SDK_VERSION = "12.23.0";
-const SERVICE_VERSION = "2024-05-04";
+const SDK_VERSION = "12.24.0";
+const SERVICE_VERSION = "2024-08-04";
 const BLOCK_BLOB_MAX_UPLOAD_BLOB_BYTES = 256 * 1024 * 1024; // 256MB
 const BLOCK_BLOB_MAX_STAGE_BLOCK_BYTES = 4000 * 1024 * 1024; // 4000MB
 const BLOCK_BLOB_MAX_BLOCKS = 50000;
@@ -8276,6 +8276,7 @@ const HeaderConstants = {
     X_MS_DATE: "x-ms-date",
     X_MS_ERROR_CODE: "x-ms-error-code",
     X_MS_VERSION: "x-ms-version",
+    X_MS_CopySourceErrorCode: "x-ms-copy-source-error-code",
 };
 const ETagNone = "";
 const ETagAny = "*";
@@ -8379,6 +8380,8 @@ const StorageBlobLoggingAllowedHeaderNames = [
     "x-ms-source-if-unmodified-since",
     "x-ms-tag-count",
     "x-ms-encryption-key-sha256",
+    "x-ms-copy-source-error-code",
+    "x-ms-copy-source-status-code",
     "x-ms-if-tags",
     "x-ms-source-if-tags",
 ];
@@ -9321,6 +9324,21 @@ class StorageRetryPolicy extends BaseRequestPolicy {
                 return true;
             }
         }
+        // [Copy source error code] Feature is pending on service side, skip retry on copy source error for now.
+        // if (response) {
+        //   // Retry select Copy Source Error Codes.
+        //   if (response?.status >= 400) {
+        //     const copySourceError = response.headers.get(HeaderConstants.X_MS_CopySourceErrorCode);
+        //     if (copySourceError !== undefined) {
+        //       switch (copySourceError) {
+        //         case "InternalError":
+        //         case "OperationTimedOut":
+        //         case "ServerBusy":
+        //           return true;
+        //       }
+        //     }
+        //   }
+        // }
         if ((err === null || err === void 0 ? void 0 : err.code) === "PARSE_ERROR" && (err === null || err === void 0 ? void 0 : err.message.startsWith(`Error "Error: Unclosed root tag`))) {
             logger.info("RetryPolicy: Incomplete XML response likely due to service timeout, will retry.");
             return true;
@@ -9404,6 +9422,79 @@ class CredentialPolicy extends BaseRequestPolicy {
         // will be executed in sendRequest().
         return request;
     }
+}
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+/*
+ * We need to imitate .Net culture-aware sorting, which is used in storage service.
+ * Below tables contain sort-keys for en-US culture.
+ */
+const table_lv0 = new Uint32Array([
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x71c, 0x0, 0x71f, 0x721,
+    0x723, 0x725, 0x0, 0x0, 0x0, 0x72d, 0x803, 0x0, 0x0, 0x733, 0x0, 0xd03, 0xd1a, 0xd1c, 0xd1e,
+    0xd20, 0xd22, 0xd24, 0xd26, 0xd28, 0xd2a, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xe02, 0xe09, 0xe0a,
+    0xe1a, 0xe21, 0xe23, 0xe25, 0xe2c, 0xe32, 0xe35, 0xe36, 0xe48, 0xe51, 0xe70, 0xe7c, 0xe7e, 0xe89,
+    0xe8a, 0xe91, 0xe99, 0xe9f, 0xea2, 0xea4, 0xea6, 0xea7, 0xea9, 0x0, 0x0, 0x0, 0x743, 0x744, 0x748,
+    0xe02, 0xe09, 0xe0a, 0xe1a, 0xe21, 0xe23, 0xe25, 0xe2c, 0xe32, 0xe35, 0xe36, 0xe48, 0xe51, 0xe70,
+    0xe7c, 0xe7e, 0xe89, 0xe8a, 0xe91, 0xe99, 0xe9f, 0xea2, 0xea4, 0xea6, 0xea7, 0xea9, 0x0, 0x74c,
+    0x0, 0x750, 0x0,
+]);
+const table_lv2 = new Uint32Array([
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
+    0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
+    0x12, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+]);
+const table_lv4 = new Uint32Array([
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x8012, 0x0, 0x0, 0x0, 0x0, 0x0, 0x8212, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+]);
+function compareHeader(lhs, rhs) {
+    if (isLessThan(lhs, rhs))
+        return -1;
+    return 1;
+}
+function isLessThan(lhs, rhs) {
+    const tables = [table_lv0, table_lv2, table_lv4];
+    let curr_level = 0;
+    let i = 0;
+    let j = 0;
+    while (curr_level < tables.length) {
+        if (curr_level === tables.length - 1 && i !== j) {
+            return i > j;
+        }
+        const weight1 = i < lhs.length ? tables[curr_level][lhs[i].charCodeAt(0)] : 0x1;
+        const weight2 = j < rhs.length ? tables[curr_level][rhs[j].charCodeAt(0)] : 0x1;
+        if (weight1 === 0x1 && weight2 === 0x1) {
+            i = 0;
+            j = 0;
+            ++curr_level;
+        }
+        else if (weight1 === weight2) {
+            ++i;
+            ++j;
+        }
+        else if (weight1 === 0) {
+            ++i;
+        }
+        else if (weight2 === 0) {
+            ++j;
+        }
+        else {
+            return weight1 < weight2;
+        }
+    }
+    return false;
 }
 
 // Copyright (c) Microsoft Corporation.
@@ -9497,7 +9588,7 @@ class StorageSharedKeyCredentialPolicy extends CredentialPolicy {
             return value.name.toLowerCase().startsWith(HeaderConstants.PREFIX_FOR_STORAGE);
         });
         headersArray.sort((a, b) => {
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            return compareHeader(a.name.toLowerCase(), b.name.toLowerCase());
         });
         // Remove duplicate headers
         headersArray = headersArray.filter((value, index, array) => {
@@ -9763,6 +9854,21 @@ function storageRetryPolicy(options = {}) {
                 return true;
             }
         }
+        // [Copy source error code] Feature is pending on service side, skip retry on copy source error for now.
+        // if (response) {
+        //   // Retry select Copy Source Error Codes.
+        //   if (response?.status >= 400) {
+        //     const copySourceError = response.headers.get(HeaderConstants.X_MS_CopySourceErrorCode);
+        //     if (copySourceError !== undefined) {
+        //       switch (copySourceError) {
+        //         case "InternalError":
+        //         case "OperationTimedOut":
+        //         case "ServerBusy":
+        //           return true;
+        //       }
+        //     }
+        //   }
+        // }
         return false;
     }
     function calculateDelay(isPrimaryRetry, attempt) {
@@ -9914,7 +10020,7 @@ function storageSharedKeyCredentialPolicy(options) {
             }
         }
         headersArray.sort((a, b) => {
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            return compareHeader(a.name.toLowerCase(), b.name.toLowerCase());
         });
         // Remove duplicate headers
         headersArray = headersArray.filter((value, index, array) => {
@@ -10020,6 +10126,32 @@ class StorageBrowserPolicyFactory {
     create(nextPolicy, options) {
         return new StorageBrowserPolicy(nextPolicy, options);
     }
+}
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+/**
+ * The programmatic identifier of the storageCorrectContentLengthPolicy.
+ */
+const storageCorrectContentLengthPolicyName = "StorageCorrectContentLengthPolicy";
+/**
+ * storageCorrectContentLengthPolicy to correctly set Content-Length header with request body length.
+ */
+function storageCorrectContentLengthPolicy() {
+    function correctContentLength(request) {
+        if (request.body &&
+            (typeof request.body === "string" || Buffer.isBuffer(request.body)) &&
+            request.body.length > 0) {
+            request.headers.set(HeaderConstants.CONTENT_LENGTH, Buffer.byteLength(request.body));
+        }
+    }
+    return {
+        name: storageCorrectContentLengthPolicyName,
+        async sendRequest(request, next) {
+            correctContentLength(request);
+            return next(request);
+        },
+    };
 }
 
 // Copyright (c) Microsoft Corporation.
@@ -10151,6 +10283,7 @@ function getCoreClientOptions(pipeline) {
             } }));
         corePipeline.removePolicy({ phase: "Retry" });
         corePipeline.removePolicy({ name: coreRestPipeline.decompressResponsePolicyName });
+        corePipeline.addPolicy(storageCorrectContentLengthPolicy());
         corePipeline.addPolicy(storageRetryPolicy(restOptions.retryOptions), { phase: "Retry" });
         corePipeline.addPolicy(storageBrowserPolicy());
         const downlevelResults = processDownlevelPipeline(pipeline);
@@ -10562,6 +10695,13 @@ const StorageError = {
             code: {
                 serializedName: "Code",
                 xmlName: "Code",
+                type: {
+                    name: "String",
+                },
+            },
+            authenticationErrorDetail: {
+                serializedName: "AuthenticationErrorDetail",
+                xmlName: "AuthenticationErrorDetail",
                 type: {
                     name: "String",
                 },
@@ -14010,6 +14150,13 @@ const ContainerGetAccountInfoHeaders = {
                     ],
                 },
             },
+            isHierarchicalNamespaceEnabled: {
+                serializedName: "x-ms-is-hns-enabled",
+                xmlName: "x-ms-is-hns-enabled",
+                type: {
+                    name: "Boolean",
+                },
+            },
         },
     },
 };
@@ -16172,6 +16319,13 @@ const BlobGetAccountInfoHeaders = {
                         "FileStorage",
                         "BlockBlobStorage",
                     ],
+                },
+            },
+            isHierarchicalNamespaceEnabled: {
+                serializedName: "x-ms-is-hns-enabled",
+                xmlName: "x-ms-is-hns-enabled",
+                type: {
+                    name: "Boolean",
                 },
             },
         },
@@ -18732,7 +18886,7 @@ const timeoutInSeconds = {
 const version = {
     parameterPath: "version",
     mapper: {
-        defaultValue: "2024-05-04",
+        defaultValue: "2024-08-04",
         isConstant: true,
         serializedName: "x-ms-version",
         type: {
@@ -20503,9 +20657,17 @@ const getAccountInfoOperationSpec$2 = {
             headersMapper: ServiceGetAccountInfoExceptionHeaders,
         },
     },
-    queryParameters: [comp, restype1],
+    queryParameters: [
+        comp,
+        timeoutInSeconds,
+        restype1,
+    ],
     urlParameters: [url],
-    headerParameters: [version, accept1],
+    headerParameters: [
+        version,
+        requestId,
+        accept1,
+    ],
     isXML: true,
     serializer: xmlSerializer$5,
 };
@@ -21265,9 +21427,17 @@ const getAccountInfoOperationSpec$1 = {
             headersMapper: ContainerGetAccountInfoExceptionHeaders,
         },
     },
-    queryParameters: [comp, restype1],
+    queryParameters: [
+        comp,
+        timeoutInSeconds,
+        restype1,
+    ],
     urlParameters: [url],
-    headerParameters: [version, accept1],
+    headerParameters: [
+        version,
+        requestId,
+        accept1,
+    ],
     isXML: true,
     serializer: xmlSerializer$4,
 };
@@ -22145,9 +22315,17 @@ const getAccountInfoOperationSpec = {
             headersMapper: BlobGetAccountInfoExceptionHeaders,
         },
     },
-    queryParameters: [comp, restype1],
+    queryParameters: [
+        comp,
+        timeoutInSeconds,
+        restype1,
+    ],
     urlParameters: [url],
-    headerParameters: [version, accept1],
+    headerParameters: [
+        version,
+        requestId,
+        accept1,
+    ],
     isXML: true,
     serializer: xmlSerializer$3,
 };
@@ -23325,7 +23503,7 @@ let StorageClient$1 = class StorageClient extends coreHttpCompat__namespace.Exte
         const defaults = {
             requestContentType: "application/json; charset=utf-8",
         };
-        const packageDetails = `azsdk-js-azure-storage-blob/12.23.0`;
+        const packageDetails = `azsdk-js-azure-storage-blob/12.24.0`;
         const userAgentPrefix = options.userAgentOptions && options.userAgentOptions.userAgentPrefix
             ? `${options.userAgentOptions.userAgentPrefix} ${packageDetails}`
             : `${packageDetails}`;
@@ -23336,7 +23514,7 @@ let StorageClient$1 = class StorageClient extends coreHttpCompat__namespace.Exte
         // Parameter assignments
         this.url = url;
         // Assigning values to Constant parameters
-        this.version = options.version || "2023-11-03";
+        this.version = options.version || "2024-08-04";
         this.service = new ServiceImpl(this);
         this.container = new ContainerImpl(this);
         this.blob = new BlobImpl(this);
@@ -28276,6 +28454,24 @@ class BlobClient extends StorageClient {
             }));
         });
     }
+    /**
+     * The Get Account Information operation returns the sku name and account kind
+     * for the specified account.
+     * The Get Account Information operation is available on service versions beginning
+     * with version 2018-03-28.
+     * @see https://docs.microsoft.com/en-us/rest/api/storageservices/get-account-information
+     *
+     * @param options - Options to the Service Get Account Info operation.
+     * @returns Response data for the Service Get Account Info operation.
+     */
+    async getAccountInfo(options = {}) {
+        return tracingClient.withSpan("BlobClient-getAccountInfo", options, async (updatedOptions) => {
+            return assertResponse(await this.blobContext.getAccountInfo({
+                abortSignal: options.abortSignal,
+                tracingOptions: updatedOptions.tracingOptions,
+            }));
+        });
+    }
 }
 /**
  * AppendBlobClient defines a set of operations applicable to append blobs.
@@ -31489,6 +31685,24 @@ class ContainerClient extends StorageClient {
                 return this.findBlobsByTagsSegments(tagFilterSqlExpression, settings.continuationToken, Object.assign({ maxPageSize: settings.maxPageSize }, listSegmentOptions));
             },
         };
+    }
+    /**
+     * The Get Account Information operation returns the sku name and account kind
+     * for the specified account.
+     * The Get Account Information operation is available on service versions beginning
+     * with version 2018-03-28.
+     * @see https://docs.microsoft.com/en-us/rest/api/storageservices/get-account-information
+     *
+     * @param options - Options to the Service Get Account Info operation.
+     * @returns Response data for the Service Get Account Info operation.
+     */
+    async getAccountInfo(options = {}) {
+        return tracingClient.withSpan("ContainerClient-getAccountInfo", options, async (updatedOptions) => {
+            return assertResponse(await this.containerContext.getAccountInfo({
+                abortSignal: options.abortSignal,
+                tracingOptions: updatedOptions.tracingOptions,
+            }));
+        });
     }
     getContainerNameFromUrl() {
         let containerName;
