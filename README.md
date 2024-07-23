@@ -21,11 +21,8 @@ methods to do this.
 name: Builds, tests & co
 
 on:
-  pull_request:
-  push:
-  schedule:
-    # Prime the caches every Monday
-    - cron: 0 1 * * MON
+  - push
+  - pull_request
 
 permissions: read-all
 
@@ -35,8 +32,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
           - ubuntu-latest
+          - macos-latest
           - windows-latest
 
     runs-on: ${{ matrix.os }}
@@ -48,7 +45,7 @@ jobs:
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: "5.2"
+          ocaml-compiler: 5
 
       - run: opam install . --deps-only --with-test
 
@@ -123,6 +120,7 @@ Examples:
 - Exact package name: `ocaml-base-compiler.5.2.0`
 - Combine multiple packages:
   `ocaml-variants.5.2.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
+- Major versions: `4`, `5`
 - Minor versions: `4.08`, `4.14`, `5.2`, `5.2.x`
 - More specific versions: `~4.02.2`, `5.1.0`
 

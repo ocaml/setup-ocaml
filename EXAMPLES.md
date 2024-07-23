@@ -38,7 +38,7 @@ jobs:
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: "5.2"
+          ocaml-compiler: 5
 
       - name: Install dependencies
         run: opam install . --deps-only --with-doc
@@ -106,7 +106,7 @@ steps:
   - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v3
     with:
-      ocaml-compiler: "5.2"
+      ocaml-compiler: 5
       cache-prefix: v1-${{ matrix.container }}
       opam-disable-sandboxing: true
 ```

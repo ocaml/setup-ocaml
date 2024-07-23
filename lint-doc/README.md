@@ -11,14 +11,11 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@v4
-
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: "5.2"
-
-      - name: Lint doc
-        uses: ocaml/setup-ocaml/lint-doc@v3
+          ocaml-compiler: 5
+      - uses: ocaml/setup-ocaml/lint-doc@v3
 ```
 
 ## Inputs

@@ -5,20 +5,32 @@
 ### Example workflow
 
 ```yml
+name: Opam Dependency Submission
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: opam-dependency-submission
+  cancel-in-progress: true
+
+permissions: read-all
+
 jobs:
   opam-dependency-submission:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tree
         uses: actions/checkout@v4
-
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: "5.2"
-
-      - name: Opam Dependency Submission
-        uses: ocaml/setup-ocaml/analysis@v3
+          ocaml-compiler: 5
+      - uses: ocaml/setup-ocaml/analysis@v3
 ```
 
 ## Inputs
