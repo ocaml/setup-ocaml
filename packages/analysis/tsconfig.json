@@ -4,12 +4,10 @@
     "@tsconfig/node20/tsconfig.json"
   ],
   "compilerOptions": {
-    "lib": ["ESNext"],
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleDetection": "force",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "verbatimModuleSyntax": true
+    "noPropertyAccessFromIndexSignature": false
   }
 }
