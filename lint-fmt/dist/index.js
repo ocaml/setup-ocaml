@@ -27938,6 +27938,7 @@ function convertToUnix(str) {
 
 
 
+
 async function parse() {
     const githubWorkspace = external_node_process_namespaceObject.env.GITHUB_WORKSPACE ?? external_node_process_namespaceObject.cwd();
     const fpath = external_node_path_namespaceObject.join(githubWorkspace, ".ocamlformat");
@@ -27955,10 +27956,11 @@ async function getOcamlformatVersion() {
         .filter((line) => line.at(0) === "version")
         .flat()
         .at(1);
-    if (version) {
-        return version;
+    if (!version) {
+        core.warning("Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice");
+        return;
     }
-    throw new Error("Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice");
+    return version;
 }
 
 ;// CONCATENATED MODULE: ./src/opam.ts
@@ -27979,7 +27981,9 @@ async function installOcamlformat(version) {
 async function run() {
     try {
         const version = await getOcamlformatVersion();
-        await installOcamlformat(version);
+        if (version) {
+            await installOcamlformat(version);
+        }
         await checkFmt();
         external_node_process_namespaceObject.exit(0);
     }

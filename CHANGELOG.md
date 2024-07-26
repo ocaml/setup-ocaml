@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- If the ocamlformat config does not exist, continue lint-fmt without
+  installing it.
+
 ## [3.0.0]
 
 - This was a version bump only, there were no code changes.

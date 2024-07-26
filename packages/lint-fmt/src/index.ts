@@ -7,7 +7,9 @@ import { installOcamlformat } from "./opam.js";
 async function run() {
   try {
     const version = await getOcamlformatVersion();
-    await installOcamlformat(version);
+    if (version) {
+      await installOcamlformat(version);
+    }
     await checkFmt();
     process.exit(0);
   } catch (error) {

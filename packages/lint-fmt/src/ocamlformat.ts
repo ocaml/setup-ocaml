@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import * as process from "node:process";
+import * as core from "@actions/core";
 import { convertToUnix } from "./compat.js";
 
 async function parse() {
@@ -21,10 +22,11 @@ export async function getOcamlformatVersion() {
     .filter((line) => line.at(0) === "version")
     .flat()
     .at(1);
-  if (version) {
-    return version;
+  if (!version) {
+    core.warning(
+      "Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice",
+    );
+    return;
   }
-  throw new Error(
-    "Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice",
-  );
+  return version;
 }
