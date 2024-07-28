@@ -42237,6 +42237,8 @@ function useColors() {
 		return false;
 	}
 
+	let m;
+
 	// Is webkit? http://stackoverflow.com/a/16459606/376773
 	// document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
 	return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
@@ -42244,7 +42246,7 @@ function useColors() {
 		(typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
 		// Is firefox >= v31?
 		// https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-		(typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
+		(typeof navigator !== 'undefined' && navigator.userAgent && (m = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(m[1], 10) >= 31) ||
 		// Double check webkit in userAgent just in case we are in a worker
 		(typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
 }
@@ -43626,6 +43628,7 @@ Builder.prototype.j2x = function(jObj, level) {
       //repeated nodes
       const arrLen = jObj[key].length;
       let listTagVal = "";
+      let listTagAttr = "";
       for (let j = 0; j < arrLen; j++) {
         const item = jObj[key][j];
         if (typeof item === 'undefined') {
@@ -43635,17 +43638,27 @@ Builder.prototype.j2x = function(jObj, level) {
           else val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
           // val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
         } else if (typeof item === 'object') {
-          if(this.options.oneListGroup ){
-            listTagVal += this.j2x(item, level + 1).val;
+          if(this.options.oneListGroup){
+            const result = this.j2x(item, level + 1);
+            listTagVal += result.val;
+            if (this.options.attributesGroupName && item.hasOwnProperty(this.options.attributesGroupName)) {
+              listTagAttr += result.attrStr
+            }
           }else{
             listTagVal += this.processTextOrObjNode(item, key, level)
           }
         } else {
-          listTagVal += this.buildTextValNode(item, key, '', level);
+          if (this.options.oneListGroup) {
+            let textValue = this.options.tagValueProcessor(key, item);
+            textValue = this.replaceEntitiesValue(textValue);
+            listTagVal += textValue;
+          } else {
+            listTagVal += this.buildTextValNode(item, key, '', level);
+          }
         }
       }
       if(this.options.oneListGroup){
-        listTagVal = this.buildObjectNode(listTagVal, key, '', level);
+        listTagVal = this.buildObjectNode(listTagVal, key, listTagAttr, level);
       }
       val += listTagVal;
     } else {
@@ -92105,6 +92118,8 @@ var lib_core = __nccwpck_require__(7117);
 var external_node_os_ = __nccwpck_require__(612);
 // EXTERNAL MODULE: ../../node_modules/@actions/exec/lib/exec.js
 var lib_exec = __nccwpck_require__(6473);
+;// CONCATENATED MODULE: external "node:crypto"
+const external_node_crypto_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
 ;// CONCATENATED MODULE: external "node:path"
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ../../node_modules/@actions/cache/lib/cache.js
@@ -109833,32 +109848,43 @@ async function setupCygwin() {
 
 
 
+
 async function composeCygwinCacheKeys() {
     const cygwinVersion = await getCygwinVersion();
     const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
 }
-function composeDuneCacheKeys() {
+async function composeDuneCacheKeys() {
     const platform = PLATFORM.replaceAll(/\W/g, "_");
     const architecture = ARCHITECTURE.replaceAll(/\W/g, "_");
-    const { workflow: _workflow, job: _job, runId } = lib_github.context;
-    const workflow = _workflow.toLowerCase().replaceAll(/\W/g, "_");
-    const job = _job.replaceAll(/\W/g, "_");
-    const ocamlVersion = OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
-    const key = `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`;
-    const restoreKeys = [
-        `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`,
-        `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-`,
-    ];
+    const { workflow, job } = lib_github.context;
+    const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
+    const sha256 = external_node_crypto_namespaceObject.createHash("sha256");
+    const hash = sha256
+        .update([architecture, job, ocamlCompiler, platform, workflow].join(""))
+        .digest("hex");
+    const key = `${CACHE_PREFIX}-setup-ocaml-dune-${hash}`;
+    const restoreKeys = [key];
     return { key, restoreKeys };
 }
 async function composeOpamCacheKeys() {
     const { version: opamVersion } = await getLatestOpamRelease();
+    const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
     const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
-    const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
-    const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-    const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${PLATFORM}-${ARCHITECTURE}-${ocamlVersion}`;
+    const repositories = OPAM_REPOSITORIES.map(([_, value]) => value).join("");
+    const sha256 = external_node_crypto_namespaceObject.createHash("sha256");
+    const hash = sha256
+        .update([
+        ARCHITECTURE,
+        ocamlCompiler,
+        opamVersion,
+        PLATFORM,
+        repositories,
+        sandbox,
+    ].join(""))
+        .digest("hex");
+    const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
 }
@@ -109929,7 +109955,7 @@ async function saveCache(key, paths) {
 }
 async function restoreDuneCache() {
     return await lib_core.group("Retrieve the dune cache", async () => {
-        const { key, restoreKeys } = composeDuneCacheKeys();
+        const { key, restoreKeys } = await composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         const cacheKey = await restoreCache(key, restoreKeys, paths);
         return cacheKey;
@@ -109964,7 +109990,7 @@ async function saveCygwinCache() {
 }
 async function saveDuneCache() {
     await core.group("Save the dune cache", async () => {
-        const { key } = composeDuneCacheKeys();
+        const { key } = await composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         await saveCache(key, paths);
     });

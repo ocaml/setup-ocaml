@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Fixed
 
+- Add the repositories hash to the opam cache key for stronger reproducibility.
 - If the ocamlformat config does not exist, continue lint-fmt without
   installing it.
 
