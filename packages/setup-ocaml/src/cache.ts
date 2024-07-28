@@ -1,10 +1,10 @@
+import * as crypto from "node:crypto";
 import * as path from "node:path";
 import * as process from "node:process";
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
-
 import {
   ARCHITECTURE,
   CACHE_PREFIX,
@@ -13,6 +13,7 @@ import {
   DUNE_CACHE_ROOT,
   OCAML_COMPILER,
   OPAM_DISABLE_SANDBOXING,
+  OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
 } from "./constants.js";
@@ -27,27 +28,39 @@ async function composeCygwinCacheKeys() {
   return { key, restoreKeys };
 }
 
-function composeDuneCacheKeys() {
+async function composeDuneCacheKeys() {
   const platform = PLATFORM.replaceAll(/\W/g, "_");
   const architecture = ARCHITECTURE.replaceAll(/\W/g, "_");
-  const { workflow: _workflow, job: _job, runId } = github.context;
-  const workflow = _workflow.toLowerCase().replaceAll(/\W/g, "_");
-  const job = _job.replaceAll(/\W/g, "_");
-  const ocamlVersion = OCAML_COMPILER.toLowerCase().replaceAll(/\W/g, "_");
-  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`;
-  const restoreKeys = [
-    `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-${runId}`,
-    `${CACHE_PREFIX}-setup-ocaml-dune-${platform}-${architecture}-${ocamlVersion}-${workflow}-${job}-`,
-  ];
+  const { workflow, job } = github.context;
+  const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
+  const sha256 = crypto.createHash("sha256");
+  const hash = sha256
+    .update([architecture, job, ocamlCompiler, platform, workflow].join(""))
+    .digest("hex");
+  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${hash}`;
+  const restoreKeys = [key];
   return { key, restoreKeys };
 }
 
 async function composeOpamCacheKeys() {
   const { version: opamVersion } = await getLatestOpamRelease();
+  const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
-  const ocamlVersion = ocamlCompiler.toLowerCase().replaceAll(/\W/g, "_");
-  const sandboxed = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${opamVersion}-${sandboxed}-${PLATFORM}-${ARCHITECTURE}-${ocamlVersion}`;
+  const repositories = OPAM_REPOSITORIES.map(([_, value]) => value).join("");
+  const sha256 = crypto.createHash("sha256");
+  const hash = sha256
+    .update(
+      [
+        ARCHITECTURE,
+        ocamlCompiler,
+        opamVersion,
+        PLATFORM,
+        repositories,
+        sandbox,
+      ].join(""),
+    )
+    .digest("hex");
+  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
 }
@@ -140,7 +153,7 @@ async function saveCache(key: string, paths: string[]) {
 
 export async function restoreDuneCache() {
   return await core.group("Retrieve the dune cache", async () => {
-    const { key, restoreKeys } = composeDuneCacheKeys();
+    const { key, restoreKeys } = await composeDuneCacheKeys();
     const paths = composeDuneCachePaths();
     const cacheKey = await restoreCache(key, restoreKeys, paths);
     return cacheKey;
@@ -182,7 +195,7 @@ export async function saveCygwinCache() {
 
 export async function saveDuneCache() {
   await core.group("Save the dune cache", async () => {
-    const { key } = composeDuneCacheKeys();
+    const { key } = await composeDuneCacheKeys();
     const paths = composeDuneCachePaths();
     await saveCache(key, paths);
   });

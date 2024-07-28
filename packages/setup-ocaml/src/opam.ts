@@ -5,7 +5,6 @@ import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import * as toolCache from "@actions/tool-cache";
 import * as semver from "semver";
-
 import {
   ALLOW_PRERELEASE_OPAM,
   ARCHITECTURE,
