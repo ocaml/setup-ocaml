@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "yarn build:main & yarn build:post",
+    "build": "pnpm build:main && pnpm build:post",
     "build:main": "ncc build src/index.ts --license LICENSE.txt --out ../../dist",
     "build:post": "ncc build src/post.ts --license LICENSE.txt --out ../../dist/post",
     "typecheck": "tsc"
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "20.14.12",
+    "@types/node": "22.0.2",
     "@types/semver": "7.5.8",
     "@vercel/ncc": "0.38.1",
     "typescript": "5.5.4"
