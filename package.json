@@ -2,19 +2,16 @@
   "name": "setup-ocaml",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "build": "turbo run build --continue --parallel",
     "check": "biome check",
-    "ci": "biome ci",
     "fix": "biome check --fix",
+    "lint": "biome check",
     "typecheck": "turbo run typecheck --continue --parallel"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
-    "turbo": "2.0.9"
+    "turbo": "2.0.11"
   },
-  "packageManager": "yarn@4.3.1"
+  "packageManager": "pnpm@9.6.0"
 }

@@ -10,6 +10,6 @@ To regenerated the compiled JavaScript files in `dist/`, call:
 
 ```
 corepack enable
-yarn install --immutable
-yarn build
+pnpm install --frozen-lockfile
+pnpm build
 ```
