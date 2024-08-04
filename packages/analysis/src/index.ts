@@ -1,11 +1,12 @@
 import * as process from "node:process";
 import * as core from "@actions/core";
 import { analysis } from "./analysis.js";
-import { installOpamPackages } from "./opam.js";
+import { installDune, installOpamPackages } from "./opam.js";
 
 async function run() {
   try {
     await installOpamPackages();
+    await installDune();
     await analysis();
     process.exit(0);
   } catch (error) {

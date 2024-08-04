@@ -2,7 +2,7 @@ import * as process from "node:process";
 import * as core from "@actions/core";
 import { checkFmt } from "./lint.js";
 import { getOcamlformatVersion } from "./ocamlformat.js";
-import { installOcamlformat } from "./opam.js";
+import { installDune, installOcamlformat } from "./opam.js";
 
 async function run() {
   try {
@@ -10,6 +10,7 @@ async function run() {
     if (version) {
       await installOcamlformat(version);
     }
+    await installDune();
     await checkFmt();
     process.exit(0);
   } catch (error) {

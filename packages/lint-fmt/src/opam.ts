@@ -6,3 +6,9 @@ export async function installOcamlformat(version: string) {
     await exec("opam", ["install", `ocamlformat=${version}`]);
   });
 }
+
+export async function installDune() {
+  await core.group("Install dune", async () => {
+    await exec("opam", ["install", "dune"]);
+  });
+}
