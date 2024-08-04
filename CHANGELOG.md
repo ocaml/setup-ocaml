@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Do not throw an error even if the .ocamlformat file is not found.
+
 ## [3.0.1]
 
 ### Fixed
@@ -342,7 +346,7 @@ and this project adheres to
 
 ### Fixed
 
-- Print a proper error if the version not found in the `.ocamlformat` file.
+- Print a proper error if the version is not found in the `.ocamlformat` file.
 
 ## [2.0.0-beta12]
 

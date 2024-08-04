@@ -7,26 +7,32 @@ import { convertToUnix } from "./compat.js";
 async function parse() {
   const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
   const fpath = path.join(githubWorkspace, ".ocamlformat");
-  const buf = await fs.readFile(fpath);
-  const str = buf.toString();
-  const normalisedStr = convertToUnix(str);
-  const config = normalisedStr
-    .split("\n")
-    .map((line) => line.split("=").map((str) => str.trim()));
-  return config;
+  try {
+    await fs.access(fpath, fs.constants.R_OK);
+    const buf = await fs.readFile(fpath);
+    const str = buf.toString();
+    const normalisedStr = convertToUnix(str);
+    const kv = normalisedStr
+      .split("\n")
+      .map((line) => line.split("=").map((str) => str.trim()));
+    const config: Record<string, string> = Object.fromEntries(kv);
+    return config;
+  } catch {
+    return;
+  }
 }
 
 export async function getOcamlformatVersion() {
   const config = await parse();
-  const version = config
-    .filter((line) => line.at(0) === "version")
-    .flat()
-    .at(1);
-  if (!version) {
-    core.warning(
-      "Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice",
-    );
+  if (config === undefined) {
+    core.warning(".ocamlformat file is not found");
     return;
   }
-  return version;
+  if (config.version) {
+    return config.version;
+  }
+  core.warning(
+    "ocamlformat version is not found in .ocamlformat: setting up your project to use the default profile and the ocamlformat version you installed in .ocamlformat file is considered good practice",
+  );
+  return;
 }

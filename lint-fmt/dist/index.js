@@ -27942,25 +27942,32 @@ function convertToUnix(str) {
 async function parse() {
     const githubWorkspace = external_node_process_namespaceObject.env.GITHUB_WORKSPACE ?? external_node_process_namespaceObject.cwd();
     const fpath = external_node_path_namespaceObject.join(githubWorkspace, ".ocamlformat");
-    const buf = await external_node_fs_namespaceObject.promises.readFile(fpath);
-    const str = buf.toString();
-    const normalisedStr = convertToUnix(str);
-    const config = normalisedStr
-        .split("\n")
-        .map((line) => line.split("=").map((str) => str.trim()));
-    return config;
+    try {
+        await external_node_fs_namespaceObject.promises.access(fpath, external_node_fs_namespaceObject.promises.constants.R_OK);
+        const buf = await external_node_fs_namespaceObject.promises.readFile(fpath);
+        const str = buf.toString();
+        const normalisedStr = convertToUnix(str);
+        const kv = normalisedStr
+            .split("\n")
+            .map((line) => line.split("=").map((str) => str.trim()));
+        const config = Object.fromEntries(kv);
+        return config;
+    }
+    catch {
+        return;
+    }
 }
 async function getOcamlformatVersion() {
     const config = await parse();
-    const version = config
-        .filter((line) => line.at(0) === "version")
-        .flat()
-        .at(1);
-    if (!version) {
-        core.warning("Field version not found in .ocamlformat file: setting up your project to use the default profile and the OCamlFormat version you installed in .ocamlformat file is considered good practice");
+    if (config === undefined) {
+        core.warning(".ocamlformat file is not found");
         return;
     }
-    return version;
+    if (config.version) {
+        return config.version;
+    }
+    core.warning("ocamlformat version is not found in .ocamlformat: setting up your project to use the default profile and the ocamlformat version you installed in .ocamlformat file is considered good practice");
+    return;
 }
 
 ;// CONCATENATED MODULE: ./src/opam.ts
