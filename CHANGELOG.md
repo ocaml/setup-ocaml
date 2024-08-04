@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.2]
+
 ### Fixed
 
 - Do not throw an error even if the .ocamlformat file is not found.
@@ -633,7 +635,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.1...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.2...HEAD
+[3.0.2]: https://github.com/ocaml/setup-ocaml/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta1...v3.0.0
 [3.0.0-beta1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta...v3.0.0-beta1
