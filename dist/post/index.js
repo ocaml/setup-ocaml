@@ -87479,7 +87479,7 @@ async function restoreCache(key, restoreKeys, paths) {
             core.info(`Cache restored from key: ${cacheKey}`);
         }
         else {
-            core.info(`Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+            core.info(`Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
         }
         return cacheKey;
     }

@@ -119,7 +119,7 @@ async function restoreCache(
       core.info(`Cache restored from key: ${cacheKey}`);
     } else {
       core.info(
-        `Cache not found for input keys: ${[key, ...restoreKeys].join(", ")}`,
+        `Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`,
       );
     }
     return cacheKey;
