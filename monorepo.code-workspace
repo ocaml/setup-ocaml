@@ -16,7 +16,7 @@
       "**/.turbo": true,
       "**/dist": true,
       "**/node_modules": true,
-      "pnpm-lock.yaml": true
+      "yarn.lock": true
     }
   }
 }

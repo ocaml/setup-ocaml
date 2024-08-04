@@ -26,17 +26,17 @@ jobs:
 
       - run: corepack enable
 
-      - run: pnpm install --frozen-lockfile
+      - run: yarn install --immutable
 
       - if: always()
-        run: pnpm lint
+        run: yarn lint
 
       - if: always()
-        run: pnpm typecheck
+        run: yarn typecheck
 
       - name: Ensure dist directory is up-to-date
         if: always()
-        run: pnpm build && git diff --exit-code --ignore-cr-at-eol
+        run: yarn build && git diff --exit-code --ignore-cr-at-eol
 
   test:
     name: Test

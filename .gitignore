@@ -1,2 +1,4 @@
+/.yarn/*
+!/.yarn/releases/
 /.turbo/
 /node_modules/
