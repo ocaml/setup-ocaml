@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.1]
+
 ### Fixed
 
 - Add the repositories hash to the opam cache key for stronger reproducibility.
@@ -627,7 +629,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta1...v3.0.0
 [3.0.0-beta1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-beta...v3.0.0-beta1
 [3.0.0-beta]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0-alpha...v3.0.0-beta
