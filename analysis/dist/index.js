@@ -34996,6 +34996,11 @@ async function installOpamPackages() {
         ]);
     });
 }
+async function installDune() {
+    await core.group("Install dune", async () => {
+        await (0,exec.exec)("opam", ["install", "dune"]);
+    });
+}
 
 ;// CONCATENATED MODULE: ./src/index.ts
 
@@ -35005,6 +35010,7 @@ async function installOpamPackages() {
 async function run() {
     try {
         await installOpamPackages();
+        await installDune();
         await analysis();
         external_node_process_namespaceObject.exit(0);
     }

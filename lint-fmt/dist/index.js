@@ -27978,6 +27978,11 @@ async function installOcamlformat(version) {
         await (0,exec.exec)("opam", ["install", `ocamlformat=${version}`]);
     });
 }
+async function installDune() {
+    await core.group("Install dune", async () => {
+        await (0,exec.exec)("opam", ["install", "dune"]);
+    });
+}
 
 ;// CONCATENATED MODULE: ./src/index.ts
 
@@ -27991,6 +27996,7 @@ async function run() {
         if (version) {
             await installOcamlformat(version);
         }
+        await installDune();
         await checkFmt();
         external_node_process_namespaceObject.exit(0);
     }

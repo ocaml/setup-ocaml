@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Always install dune within every extends.
+
 ## [3.0.2]
 
 ### Fixed

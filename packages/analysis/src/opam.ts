@@ -14,3 +14,9 @@ export async function installOpamPackages() {
     ]);
   });
 }
+
+export async function installDune() {
+  await core.group("Install dune", async () => {
+    await exec("opam", ["install", "dune"]);
+  });
+}
