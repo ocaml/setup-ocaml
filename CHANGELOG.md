@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Minimise GitHub API calls.
+
 ## [3.0.3]
 
 ### Fixed

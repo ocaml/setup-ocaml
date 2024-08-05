@@ -1,9 +1,9 @@
 import * as os from "node:os";
 import * as path from "node:path";
 import * as process from "node:process";
-
 import * as core from "@actions/core";
 import * as yaml from "yaml";
+import { resolveCompiler } from "./version.js";
 
 export const ARCHITECTURE = (() => {
   switch (process.arch) {
@@ -98,7 +98,7 @@ export const DUNE_CACHE = core.getBooleanInput("dune-cache", {
   trimWhitespace: true,
 });
 
-export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
+const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   required: true,
   trimWhitespace: true,
 });
@@ -130,4 +130,9 @@ export const OPAM_REPOSITORIES: [string, string][] = (() => {
     }),
   ) as Record<string, string>;
   return Object.entries(repositories_yaml).reverse();
+})();
+
+export const RESOLVED_COMPILER = (async () => {
+  const resolvedCompiler = await resolveCompiler(OCAML_COMPILER);
+  return resolvedCompiler;
 })();

@@ -11,14 +11,13 @@ import {
   CYGWIN_MIRROR,
   CYGWIN_ROOT,
   DUNE_CACHE_ROOT,
-  OCAML_COMPILER,
   OPAM_DISABLE_SANDBOXING,
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
+  RESOLVED_COMPILER,
 } from "./constants.js";
 import { getLatestOpamRelease } from "./opam.js";
-import { resolveCompiler } from "./version.js";
 import { getCygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
@@ -32,7 +31,7 @@ async function composeDuneCacheKeys() {
   const platform = PLATFORM.replaceAll(/\W/g, "_");
   const architecture = ARCHITECTURE.replaceAll(/\W/g, "_");
   const { workflow, job } = github.context;
-  const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
+  const ocamlCompiler = await RESOLVED_COMPILER;
   const sha256 = crypto.createHash("sha256");
   const hash = sha256
     .update([architecture, job, ocamlCompiler, platform, workflow].join(""))
@@ -45,7 +44,7 @@ async function composeDuneCacheKeys() {
 async function composeOpamCacheKeys() {
   const { version: opamVersion } = await getLatestOpamRelease();
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-  const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
+  const ocamlCompiler = await RESOLVED_COMPILER;
   const repositories = OPAM_REPOSITORIES.map(([_, value]) => value).join("");
   const sha256 = crypto.createHash("sha256");
   const hash = sha256
