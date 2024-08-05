@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Changed
+
+- Set Git to ignore Cygwin local package directory.
+
 ## [3.0.4]
 
 ### Changed

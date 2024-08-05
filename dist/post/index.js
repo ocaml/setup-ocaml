@@ -103538,7 +103538,12 @@ const constants_PLATFORM = (() => {
         }
     }
 })();
-const constants_CYGWIN_MIRROR = "https://cygwin.mirror.constant.com/";
+const CYGWIN_MIRROR = "https://cygwin.mirror.constant.com/";
+const constants_GITHUB_WORKSPACE = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
+const constants_CYGWIN_LOCAL_PACKAGE_DIRECTORY = (() => {
+    const cygwinMirrorEncodedUri = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
+    return external_node_path_namespaceObject.join(constants_GITHUB_WORKSPACE, cygwinMirrorEncodedUri);
+})();
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
@@ -103618,7 +103623,6 @@ const constants_RESOLVED_COMPILER = (async () => {
 
 
 
-
 async function composeCygwinCacheKeys() {
     const cygwinVersion = await getCygwinVersion();
     const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
@@ -103657,14 +103661,12 @@ async function composeOpamCacheKeys() {
     return { key, restoreKeys };
 }
 function composeCygwinCachePaths() {
-    const paths = [];
-    const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
-    paths.push(CYGWIN_ROOT);
     const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
-    paths.push(cygwinRootSymlinkPath);
-    const cygwinEncodedUri = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
-    const cygwinPackageRoot = path.join(githubWorkspace, cygwinEncodedUri);
-    paths.push(cygwinPackageRoot);
+    const paths = [
+        CYGWIN_LOCAL_PACKAGE_DIRECTORY,
+        CYGWIN_ROOT,
+        cygwinRootSymlinkPath,
+    ];
     return paths;
 }
 function composeDuneCachePaths() {
@@ -103672,15 +103674,13 @@ function composeDuneCachePaths() {
     return paths;
 }
 function composeOpamCachePaths() {
-    const paths = [OPAM_ROOT];
+    const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
+    const paths = [OPAM_ROOT, opamLocalCachePath];
     if (PLATFORM === "windows") {
         const { repo: { repo }, } = github.context;
         const opamCygwinLocalCachePath = path.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
         paths.push(opamCygwinLocalCachePath);
     }
-    const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
-    const opamLocalCachePath = path.join(githubWorkspace, "_opam");
-    paths.push(opamLocalCachePath);
     return paths;
 }
 async function restoreCache(key, restoreKeys, paths) {

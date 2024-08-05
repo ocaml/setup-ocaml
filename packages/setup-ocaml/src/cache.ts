@@ -1,6 +1,5 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
-import * as process from "node:process";
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
@@ -9,9 +8,10 @@ import * as system from "systeminformation";
 import {
   ARCHITECTURE,
   CACHE_PREFIX,
-  CYGWIN_MIRROR,
+  CYGWIN_LOCAL_PACKAGE_DIRECTORY,
   CYGWIN_ROOT,
   DUNE_CACHE_ROOT,
+  GITHUB_WORKSPACE,
   OPAM_DISABLE_SANDBOXING,
   OPAM_REPOSITORIES,
   OPAM_ROOT,
@@ -64,14 +64,12 @@ async function composeOpamCacheKeys() {
 }
 
 function composeCygwinCachePaths() {
-  const paths = [];
-  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  paths.push(CYGWIN_ROOT);
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
-  paths.push(cygwinRootSymlinkPath);
-  const cygwinEncodedUri = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
-  const cygwinPackageRoot = path.join(githubWorkspace, cygwinEncodedUri);
-  paths.push(cygwinPackageRoot);
+  const paths = [
+    CYGWIN_LOCAL_PACKAGE_DIRECTORY,
+    CYGWIN_ROOT,
+    cygwinRootSymlinkPath,
+  ];
   return paths;
 }
 
@@ -81,7 +79,8 @@ function composeDuneCachePaths() {
 }
 
 function composeOpamCachePaths() {
-  const paths = [OPAM_ROOT];
+  const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
+  const paths = [OPAM_ROOT, opamLocalCachePath];
   if (PLATFORM === "windows") {
     const {
       repo: { repo },
@@ -96,9 +95,6 @@ function composeOpamCachePaths() {
     );
     paths.push(opamCygwinLocalCachePath);
   }
-  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  const opamLocalCachePath = path.join(githubWorkspace, "_opam");
-  paths.push(opamLocalCachePath);
   return paths;
 }
 
