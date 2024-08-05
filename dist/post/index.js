@@ -103540,10 +103540,7 @@ const constants_PLATFORM = (() => {
 })();
 const CYGWIN_MIRROR = "https://cygwin.mirror.constant.com/";
 const constants_GITHUB_WORKSPACE = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
-const constants_CYGWIN_LOCAL_PACKAGE_DIRECTORY = (() => {
-    const cygwinMirrorEncodedUri = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
-    return external_node_path_namespaceObject.join(constants_GITHUB_WORKSPACE, cygwinMirrorEncodedUri);
-})();
+const constants_CYGWIN_MIRROR_ENCODED_URI = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
@@ -103662,9 +103659,10 @@ async function composeOpamCacheKeys() {
 }
 function composeCygwinCachePaths() {
     const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
+    const cygwinLocalPackageDirectory = path.join(GITHUB_WORKSPACE, CYGWIN_MIRROR_ENCODED_URI);
     const paths = [
-        CYGWIN_LOCAL_PACKAGE_DIRECTORY,
         CYGWIN_ROOT,
+        cygwinLocalPackageDirectory,
         cygwinRootSymlinkPath,
     ];
     return paths;

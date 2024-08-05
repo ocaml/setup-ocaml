@@ -9,8 +9,8 @@ import * as toolCache from "@actions/tool-cache";
 import * as cheerio from "cheerio";
 import * as semver from "semver";
 import {
-  CYGWIN_LOCAL_PACKAGE_DIRECTORY,
   CYGWIN_MIRROR,
+  CYGWIN_MIRROR_ENCODED_URI,
   CYGWIN_ROOT,
 } from "./constants.js";
 
@@ -45,14 +45,27 @@ async function setGitToIgnoreCygwinLocalPackageDirectory() {
     : path.join(homeDir, ".config", "git");
   await fs.mkdir(globalGitConfigDir, { recursive: true });
   const globalGitIgnorePath = path.join(globalGitConfigDir, "ignore");
-  await fs.appendFile(globalGitIgnorePath, CYGWIN_LOCAL_PACKAGE_DIRECTORY, {
-    encoding: "utf8",
-  });
-  await exec(
-    "git",
-    ["config", "--add", "--global", "core.excludesfile", globalGitIgnorePath],
-    { windowsVerbatimArguments: true },
-  );
+  try {
+    await fs.access(globalGitIgnorePath, fs.constants.R_OK);
+    const contents = await fs.readFile(globalGitIgnorePath, {
+      encoding: "utf8",
+    });
+    if (!contents.includes(CYGWIN_MIRROR_ENCODED_URI)) {
+      await fs.appendFile(globalGitIgnorePath, CYGWIN_MIRROR_ENCODED_URI, {
+        encoding: "utf8",
+      });
+    }
+  } catch {
+    await fs.writeFile(globalGitIgnorePath, CYGWIN_MIRROR_ENCODED_URI, {
+      encoding: "utf8",
+    });
+  } finally {
+    await exec(
+      "git",
+      ["config", "--add", "--local", "core.excludesfile", globalGitIgnorePath],
+      { windowsVerbatimArguments: true },
+    );
+  }
 }
 
 export async function setupCygwin() {

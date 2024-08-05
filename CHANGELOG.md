@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Fix global Git ignore for self-hosted runner.
+
 ## [3.0.5]
 
 ### Changed
