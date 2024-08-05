@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.6]
+
 ### Fixed
 
 - Fix global Git ignore for self-hosted runner.
@@ -661,7 +663,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.5...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.6...HEAD
+[3.0.6]: https://github.com/ocaml/setup-ocaml/compare/v3.0.5...v3.0.6
 [3.0.5]: https://github.com/ocaml/setup-ocaml/compare/v3.0.4...v3.0.5
 [3.0.4]: https://github.com/ocaml/setup-ocaml/compare/v3.0.3...v3.0.4
 [3.0.3]: https://github.com/ocaml/setup-ocaml/compare/v3.0.2...v3.0.3
