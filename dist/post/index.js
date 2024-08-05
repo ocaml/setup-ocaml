@@ -43572,7 +43572,7 @@ module.exports = sort
 
 /***/ }),
 
-/***/ 3529:
+/***/ 3863:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const parse = __nccwpck_require__(8257)
@@ -43594,7 +43594,7 @@ const constants = __nccwpck_require__(9073)
 const SemVer = __nccwpck_require__(1490)
 const identifiers = __nccwpck_require__(8587)
 const parse = __nccwpck_require__(8257)
-const valid = __nccwpck_require__(3529)
+const valid = __nccwpck_require__(3863)
 const clean = __nccwpck_require__(7876)
 const inc = __nccwpck_require__(5009)
 const diff = __nccwpck_require__(3272)
@@ -68930,7 +68930,7 @@ exports.authorizeRequestOnClaimChallenge = authorizeRequestOnClaimChallenge;
 
 /***/ }),
 
-/***/ 3863:
+/***/ 3230:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -69390,7 +69390,7 @@ Object.defineProperty(exports, "serializationPolicy", ({ enumerable: true, get: 
 Object.defineProperty(exports, "serializationPolicyName", ({ enumerable: true, get: function () { return serializationPolicy_js_1.serializationPolicyName; } }));
 var authorizeRequestOnClaimChallenge_js_1 = __nccwpck_require__(7037);
 Object.defineProperty(exports, "authorizeRequestOnClaimChallenge", ({ enumerable: true, get: function () { return authorizeRequestOnClaimChallenge_js_1.authorizeRequestOnClaimChallenge; } }));
-var authorizeRequestOnTenantChallenge_js_1 = __nccwpck_require__(3863);
+var authorizeRequestOnTenantChallenge_js_1 = __nccwpck_require__(3230);
 Object.defineProperty(exports, "authorizeRequestOnTenantChallenge", ({ enumerable: true, get: function () { return authorizeRequestOnTenantChallenge_js_1.authorizeRequestOnTenantChallenge; } }));
 //# sourceMappingURL=index.js.map
 
@@ -87472,7 +87472,60 @@ var lib_github = __nccwpck_require__(4005);
 var external_node_os_ = __nccwpck_require__(612);
 // EXTERNAL MODULE: ../../node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(8447);
+// EXTERNAL MODULE: ../../node_modules/semver/index.js
+var semver = __nccwpck_require__(7546);
+;// CONCATENATED MODULE: ./src/version.ts
+
+
+
+
+function isSemverValidRange(semverVersion) {
+    return semver.validRange(semverVersion, { loose: true }) !== null;
+}
+async function getAllCompilerVersions() {
+    const octokit = lib_github.getOctokit(GITHUB_TOKEN);
+    const { data: packages } = await octokit.rest.repos.getContent({
+        owner: "ocaml",
+        repo: "opam-repository",
+        path: "packages/ocaml-base-compiler",
+    });
+    const versions = new Set();
+    if (Array.isArray(packages)) {
+        for (const { path: p } of packages) {
+            const basename = external_node_path_namespaceObject.basename(p);
+            const version = basename.replace("ocaml-base-compiler.", "");
+            const parsed = semver.parse(version, { loose: true });
+            if (parsed !== null) {
+                const { major, minor: _minor, patch } = parsed;
+                const minor = major < 5 && _minor < 10
+                    ? // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
+                        `0${_minor}`
+                    : // ocaml-base-compiler.5.2.0, ocaml-base-compiler.4.14.0
+                        _minor;
+                const version = `${major}.${minor}.${patch}`;
+                versions.add(version);
+            }
+        }
+    }
+    return [...versions];
+}
+async function resolveVersion(semverVersion) {
+    const compilerVersions = await getAllCompilerVersions();
+    const matchedFullCompilerVersion = semver.maxSatisfying(compilerVersions, semverVersion, { loose: true });
+    if (matchedFullCompilerVersion === null) {
+        throw new Error(`No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`);
+    }
+    return matchedFullCompilerVersion;
+}
+async function resolveCompiler(compiler) {
+    const resolvedCompiler = isSemverValidRange(compiler)
+        ? `ocaml-base-compiler.${await resolveVersion(compiler)}`
+        : compiler;
+    return resolvedCompiler;
+}
+
 ;// CONCATENATED MODULE: ./src/constants.ts
+
 
 
 
@@ -87556,7 +87609,7 @@ const DUNE_CACHE = lib_core.getBooleanInput("dune-cache", {
     required: false,
     trimWhitespace: true,
 });
-const constants_OCAML_COMPILER = lib_core.getInput("ocaml-compiler", {
+const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", {
     required: true,
     trimWhitespace: true,
 });
@@ -87583,61 +87636,12 @@ const constants_OPAM_REPOSITORIES = (() => {
     }));
     return Object.entries(repositories_yaml).reverse();
 })();
-
-// EXTERNAL MODULE: ../../node_modules/semver/index.js
-var semver = __nccwpck_require__(7546);
-;// CONCATENATED MODULE: ./src/version.ts
-
-
-
-
-function isSemverValidRange(semverVersion) {
-    return semver.validRange(semverVersion, { loose: true }) !== null;
-}
-async function getAllCompilerVersions() {
-    const octokit = lib_github.getOctokit(GITHUB_TOKEN);
-    const { data: packages } = await octokit.rest.repos.getContent({
-        owner: "ocaml",
-        repo: "opam-repository",
-        path: "packages/ocaml-base-compiler",
-    });
-    const versions = new Set();
-    if (Array.isArray(packages)) {
-        for (const { path: p } of packages) {
-            const basename = external_node_path_namespaceObject.basename(p);
-            const version = basename.replace("ocaml-base-compiler.", "");
-            const parsed = semver.parse(version, { loose: true });
-            if (parsed !== null) {
-                const { major, minor: _minor, patch } = parsed;
-                const minor = major < 5 && _minor < 10
-                    ? // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
-                        `0${_minor}`
-                    : // ocaml-base-compiler.5.2.0, ocaml-base-compiler.4.14.0
-                        _minor;
-                const version = `${major}.${minor}.${patch}`;
-                versions.add(version);
-            }
-        }
-    }
-    return [...versions];
-}
-async function resolveVersion(semverVersion) {
-    const compilerVersions = await getAllCompilerVersions();
-    const matchedFullCompilerVersion = semver.maxSatisfying(compilerVersions, semverVersion, { loose: true });
-    if (matchedFullCompilerVersion === null) {
-        throw new Error(`No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`);
-    }
-    return matchedFullCompilerVersion;
-}
-async function version_resolveCompiler(compiler) {
-    const resolvedCompiler = isSemverValidRange(compiler)
-        ? `ocaml-base-compiler.${await resolveVersion(compiler)}`
-        : compiler;
+const constants_RESOLVED_COMPILER = (async () => {
+    const resolvedCompiler = await resolveCompiler(OCAML_COMPILER);
     return resolvedCompiler;
-}
+})();
 
 ;// CONCATENATED MODULE: ./src/cache.ts
-
 
 
 
@@ -87658,7 +87662,7 @@ async function composeDuneCacheKeys() {
     const platform = constants_PLATFORM.replaceAll(/\W/g, "_");
     const architecture = constants_ARCHITECTURE.replaceAll(/\W/g, "_");
     const { workflow, job } = lib_github.context;
-    const ocamlCompiler = await version_resolveCompiler(constants_OCAML_COMPILER);
+    const ocamlCompiler = await constants_RESOLVED_COMPILER;
     const sha256 = external_node_crypto_namespaceObject.createHash("sha256");
     const hash = sha256
         .update([architecture, job, ocamlCompiler, platform, workflow].join(""))
@@ -87670,7 +87674,7 @@ async function composeDuneCacheKeys() {
 async function composeOpamCacheKeys() {
     const { version: opamVersion } = await getLatestOpamRelease();
     const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-    const ocamlCompiler = await resolveCompiler(OCAML_COMPILER);
+    const ocamlCompiler = await RESOLVED_COMPILER;
     const repositories = OPAM_REPOSITORIES.map(([_, value]) => value).join("");
     const sha256 = crypto.createHash("sha256");
     const hash = sha256
