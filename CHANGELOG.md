@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [unreleased]
 
+## [3.0.4]
+
 ### Changed
 
 - Minimise GitHub API calls.
@@ -649,7 +651,8 @@ that require it.
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.3...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.4...HEAD
+[3.0.4]: https://github.com/ocaml/setup-ocaml/compare/v3.0.3...v3.0.4
 [3.0.3]: https://github.com/ocaml/setup-ocaml/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/ocaml/setup-ocaml/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/ocaml/setup-ocaml/compare/v3.0.0...v3.0.1
