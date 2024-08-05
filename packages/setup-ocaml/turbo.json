@@ -3,7 +3,20 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../dist/**"],
+      "dependsOn": ["build:main", "build:post"]
+    },
+    "build:main": {
+      "outputs": ["../../dist/*"],
+      "passThroughEnv": [
+        "GITHUB_ACTIONS",
+        "GITHUB_WORKSPACE",
+        "PATH",
+        "USERPROFILE",
+        "XDG_CACHE_HOME"
+      ]
+    },
+    "build:post": {
+      "outputs": ["../../dist/post/*"],
       "passThroughEnv": [
         "GITHUB_ACTIONS",
         "GITHUB_WORKSPACE",

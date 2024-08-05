@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../lint-opam/dist/**"]
+      "outputs": ["../../lint-opam/dist/*"]
     }
   }
 }

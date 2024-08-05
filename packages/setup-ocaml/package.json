@@ -4,7 +4,6 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "yarn build:main & yarn build:post",
     "build:main": "ncc build src/index.ts --license LICENSE.txt --out ../../dist",
     "build:post": "ncc build src/post.ts --license LICENSE.txt --out ../../dist/post",
     "typecheck": "tsc"

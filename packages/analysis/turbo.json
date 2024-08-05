@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../analysis/dist/**"],
+      "outputs": ["../../analysis/dist/*"],
       "passThroughEnv": ["GITHUB_WORKSPACE", "PATH"]
     }
   }

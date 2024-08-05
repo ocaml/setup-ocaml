@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../lint-doc/dist/**"],
+      "outputs": ["../../lint-doc/dist/*"],
       "passThroughEnv": ["PATH"]
     }
   }
