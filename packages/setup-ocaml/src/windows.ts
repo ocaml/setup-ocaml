@@ -1,3 +1,6 @@
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import { HttpClient } from "@actions/http-client";
@@ -5,7 +8,11 @@ import * as io from "@actions/io";
 import * as toolCache from "@actions/tool-cache";
 import * as cheerio from "cheerio";
 import * as semver from "semver";
-import { CYGWIN_MIRROR, CYGWIN_ROOT } from "./constants.js";
+import {
+  CYGWIN_LOCAL_PACKAGE_DIRECTORY,
+  CYGWIN_MIRROR,
+  CYGWIN_ROOT,
+} from "./constants.js";
 
 function createHttpClient() {
   return new HttpClient(
@@ -30,8 +37,27 @@ export async function getCygwinVersion() {
   return version;
 }
 
+async function setGitToIgnoreCygwinLocalPackageDirectory() {
+  const xdgConfigHome = process.env.XDG_CONFIG_HOME;
+  const homeDir = os.homedir();
+  const globalGitConfigDir = xdgConfigHome
+    ? path.join(xdgConfigHome, "git")
+    : path.join(homeDir, ".config", "git");
+  await fs.mkdir(globalGitConfigDir, { recursive: true });
+  const globalGitIgnorePath = path.join(globalGitConfigDir, "ignore");
+  await fs.appendFile(globalGitIgnorePath, CYGWIN_LOCAL_PACKAGE_DIRECTORY, {
+    encoding: "utf8",
+  });
+  await exec(
+    "git",
+    ["config", "--add", "--global", "core.excludesfile", globalGitIgnorePath],
+    { windowsVerbatimArguments: true },
+  );
+}
+
 export async function setupCygwin() {
   await core.group("Prepare the Cygwin environment", async () => {
+    await setGitToIgnoreCygwinLocalPackageDirectory();
     const version = await getCygwinVersion();
     const cachedPath = toolCache.find("cygwin", version, "x86_64");
     if (cachedPath === "") {
