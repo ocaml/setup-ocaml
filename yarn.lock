@@ -499,6 +499,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
     semver: "npm:7.6.3"
+    systeminformation: "npm:5.23.3"
     typescript: "npm:5.5.4"
     yaml: "npm:2.5.0"
   languageName: unknown
@@ -1712,6 +1713,16 @@ __metadata:
   version: 1.0.5
   resolution: "strnum@npm:1.0.5"
   checksum: 10c0/64fb8cc2effbd585a6821faa73ad97d4b553c8927e49086a162ffd2cc818787643390b89d567460a8e74300148d11ac052e21c921ef2049f2987f4b1b89a7ff1
+  languageName: node
+  linkType: hard
+
+"systeminformation@npm:5.23.3":
+  version: 5.23.3
+  resolution: "systeminformation@npm:5.23.3"
+  bin:
+    systeminformation: lib/cli.js
+  checksum: 10c0/9f0bce29fca815e30756fb93ed4e89afaea95ebdb571540390f5648058a1211792398ff19974466aae5407cf34d5534e4b783b745abb490a7fcdf561f647c1f0
+  conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
 

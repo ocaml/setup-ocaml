@@ -5,6 +5,7 @@ import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
+import * as system from "systeminformation";
 import {
   ARCHITECTURE,
   CACHE_PREFIX,
@@ -28,16 +29,15 @@ async function composeCygwinCacheKeys() {
 }
 
 async function composeDuneCacheKeys() {
-  const platform = PLATFORM.replaceAll(/\W/g, "_");
-  const architecture = ARCHITECTURE.replaceAll(/\W/g, "_");
   const { workflow, job } = github.context;
   const ocamlCompiler = await RESOLVED_COMPILER;
-  const sha256 = crypto.createHash("sha256");
-  const hash = sha256
-    .update([architecture, job, ocamlCompiler, platform, workflow].join(""))
-    .digest("hex");
+  const plainKey = [PLATFORM, ARCHITECTURE, ocamlCompiler, workflow, job].join(
+    ",",
+  );
+  const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-dune-${hash}`;
   const restoreKeys = [key];
+  core.debug(`dune cache key: ${plainKey}`);
   return { key, restoreKeys };
 }
 
@@ -45,22 +45,21 @@ async function composeOpamCacheKeys() {
   const { version: opamVersion } = await getLatestOpamRelease();
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const ocamlCompiler = await RESOLVED_COMPILER;
-  const repositories = OPAM_REPOSITORIES.map(([_, value]) => value).join("");
-  const sha256 = crypto.createHash("sha256");
-  const hash = sha256
-    .update(
-      [
-        ARCHITECTURE,
-        ocamlCompiler,
-        opamVersion,
-        PLATFORM,
-        repositories,
-        sandbox,
-      ].join(""),
-    )
-    .digest("hex");
+  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
+  const osInfo = await system.osInfo();
+  const plainKey = [
+    PLATFORM,
+    osInfo.release,
+    ARCHITECTURE,
+    opamVersion,
+    ocamlCompiler,
+    repositoryUrls,
+    sandbox,
+  ].join(",");
+  const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
+  core.debug(`opam cache key: ${plainKey}`);
   return { key, restoreKeys };
 }
 

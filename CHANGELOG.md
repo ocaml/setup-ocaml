@@ -12,6 +12,10 @@ and this project adheres to
 
 - Minimise GitHub API calls.
 
+### Fixed
+
+- Use stricter cache keys.
+
 ## [3.0.3]
 
 ### Fixed
