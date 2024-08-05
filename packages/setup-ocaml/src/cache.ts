@@ -8,7 +8,7 @@ import * as system from "systeminformation";
 import {
   ARCHITECTURE,
   CACHE_PREFIX,
-  CYGWIN_LOCAL_PACKAGE_DIRECTORY,
+  CYGWIN_MIRROR_ENCODED_URI,
   CYGWIN_ROOT,
   DUNE_CACHE_ROOT,
   GITHUB_WORKSPACE,
@@ -65,9 +65,13 @@ async function composeOpamCacheKeys() {
 
 function composeCygwinCachePaths() {
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
+  const cygwinLocalPackageDirectory = path.join(
+    GITHUB_WORKSPACE,
+    CYGWIN_MIRROR_ENCODED_URI,
+  );
   const paths = [
-    CYGWIN_LOCAL_PACKAGE_DIRECTORY,
     CYGWIN_ROOT,
+    cygwinLocalPackageDirectory,
     cygwinRootSymlinkPath,
   ];
   return paths;
