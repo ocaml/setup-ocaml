@@ -103627,12 +103627,16 @@ async function composeCygwinCacheKeys() {
     return { key, restoreKeys };
 }
 async function composeDuneCacheKeys() {
-    const { workflow, job } = lib_github.context;
+    const { workflow, job, runId } = lib_github.context;
     const ocamlCompiler = await constants_RESOLVED_COMPILER;
-    const plainKey = [constants_PLATFORM, constants_ARCHITECTURE, ocamlCompiler, workflow, job].join(",");
+    const plainKey = [ocamlCompiler, workflow, job].join(",");
     const hash = external_node_crypto_namespaceObject.createHash("sha256").update(plainKey).digest("hex");
-    const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${hash}`;
-    const restoreKeys = [key];
+    const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${constants_PLATFORM}-${constants_ARCHITECTURE}-${hash}-${runId}`;
+    const restoreKeys = [
+        key,
+        `${constants_CACHE_PREFIX}-setup-ocaml-dune-${constants_PLATFORM}-${constants_ARCHITECTURE}-${hash}-`,
+        `${constants_CACHE_PREFIX}-setup-ocaml-dune-${constants_PLATFORM}-${constants_ARCHITECTURE}-`,
+    ];
     lib_core.debug(`dune cache key: ${plainKey}`);
     return { key, restoreKeys };
 }

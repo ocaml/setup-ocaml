@@ -29,14 +29,16 @@ async function composeCygwinCacheKeys() {
 }
 
 async function composeDuneCacheKeys() {
-  const { workflow, job } = github.context;
+  const { workflow, job, runId } = github.context;
   const ocamlCompiler = await RESOLVED_COMPILER;
-  const plainKey = [PLATFORM, ARCHITECTURE, ocamlCompiler, workflow, job].join(
-    ",",
-  );
+  const plainKey = [ocamlCompiler, workflow, job].join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${hash}`;
-  const restoreKeys = [key];
+  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
+  const restoreKeys = [
+    key,
+    `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-`,
+    `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-`,
+  ];
   core.debug(`dune cache key: ${plainKey}`);
   return { key, restoreKeys };
 }
