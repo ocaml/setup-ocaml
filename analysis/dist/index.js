@@ -34958,11 +34958,10 @@ async function analysis() {
         const { name } = external_node_path_namespaceObject.parse(fpath);
         await (0,exec.exec)("opam", [
             "tree",
-            `--json=${tempJson}`,
             "--with-dev-setup",
-            // [NOTE] https://github.com/ocaml/opam/issues/4541
-            // "--with-doc",
+            "--with-doc",
             "--with-test",
+            `--json=${tempJson}`,
             name,
         ], {
             env: {
@@ -34989,8 +34988,7 @@ async function installOpamPackages() {
             "install",
             "--deps-only",
             "--with-dev-setup",
-            // [NOTE] https://github.com/ocaml/opam/issues/4541
-            // "--with-doc",
+            "--with-doc",
             "--with-test",
             ".",
         ]);

@@ -34,11 +34,10 @@ export async function analysis() {
       "opam",
       [
         "tree",
-        `--json=${tempJson}`,
         "--with-dev-setup",
-        // [NOTE] https://github.com/ocaml/opam/issues/4541
-        // "--with-doc",
+        "--with-doc",
         "--with-test",
+        `--json=${tempJson}`,
         name,
       ],
       {

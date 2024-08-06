@@ -7,8 +7,7 @@ export async function installOpamPackages() {
       "install",
       "--deps-only",
       "--with-dev-setup",
-      // [NOTE] https://github.com/ocaml/opam/issues/4541
-      // "--with-doc",
+      "--with-doc",
       "--with-test",
       ".",
     ]);

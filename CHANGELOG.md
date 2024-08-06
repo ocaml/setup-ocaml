@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ## [unreleased]
 
+### Changed
+
+- Unlock `--with-doc` in analysis.
+
 ### Fixed
 
 - Configure git config globally instead of locally.
