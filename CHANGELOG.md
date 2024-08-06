@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [unreleased]
 
+### Fixed
+
+- Configure git config globally instead of locally.
+
 ## [3.0.6]
 
 ### Fixed

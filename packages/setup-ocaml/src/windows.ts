@@ -62,7 +62,7 @@ async function setGitToIgnoreCygwinLocalPackageDirectory() {
   } finally {
     await exec(
       "git",
-      ["config", "--add", "--local", "core.excludesfile", globalGitIgnorePath],
+      ["config", "--add", "--global", "core.excludesfile", globalGitIgnorePath],
       { windowsVerbatimArguments: true },
     );
   }
