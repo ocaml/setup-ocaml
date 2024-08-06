@@ -2,9 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0),
-and this project adheres to
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
@@ -51,8 +49,7 @@ and this project adheres to
 ### Fixed
 
 - Add the repositories hash to the opam cache key for stronger reproducibility.
-- If the ocamlformat config does not exist, continue lint-fmt without
-  installing it.
+- If the ocamlformat config does not exist, continue lint-fmt without installing it.
 
 ## [3.0.0]
 
@@ -87,8 +84,7 @@ and this project adheres to
 ### Changed
 
 - Do not explicitly call the depext subcommand unless required.
-- Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing
-  OCaml.
+- Do not set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` while installing OCaml.
 - Update runtime dependencies.
 
 ## [2.2.8]
@@ -125,8 +121,7 @@ and this project adheres to
 
 ### Changed
 
-- Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis`
-  again.
+- Adopt native ESM for runtime environment for `ocaml/setup-ocaml/analysis` again.
 
 ## [2.2.2]
 
@@ -146,13 +141,11 @@ and this project adheres to
 ### Added
 
 - Add opam support for the Dependency submission API.
-- Set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` on the runner while
-  installing OCaml.
+- Set `HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK` to `1` on the runner while installing OCaml.
 
 ### Removed
 
-- Since decent official support is now available to deploy natively to GitHub
-  Pages, `deploy-doc` has been deprecated and removed.
+- Since decent official support is now available to deploy natively to GitHub Pages, `deploy-doc` has been deprecated and removed.
 
 ## [2.1.8]
 
@@ -318,8 +311,7 @@ and this project adheres to
 
 ### Fixed
 
-- Make the retry handling around unix system package installation more
-  stringent.
+- Make the retry handling around unix system package installation more stringent.
 
 ## [2.0.6]
 
@@ -347,8 +339,7 @@ and this project adheres to
 
 ### Added
 
-- Expose the `enable-jekyll` alias to the `enable_jekyll` input for deploy-doc
-  action.
+- Expose the `enable-jekyll` alias to the `enable_jekyll` input for deploy-doc action.
 
 ### Fixed
 
@@ -386,18 +377,14 @@ and this project adheres to
 
 ### Fixed
 
-- Fallback to the version in which the assets exist if no assets exist in the
-  latest opam release.
-- Instruct Cygwin setup to use "sys" symlinks during setup (partial workaround
-  for bug with native symlinks in Cygwin setup - some depexts may still be
-  affected)
+- Fallback to the version in which the assets exist if no assets exist in the latest opam release.
+- Instruct Cygwin setup to use "sys" symlinks during setup (partial workaround for bug with native symlinks in Cygwin setup - some depexts may still be affected)
 
 ## [2.0.0-beta11]
 
 ### Fixed
 
-- Add support for more styles for the ocamlformat configuration in lint-fmt
-  action.
+- Add support for more styles for the ocamlformat configuration in lint-fmt action.
 
 ## [2.0.0-beta10]
 
@@ -407,8 +394,7 @@ and this project adheres to
 
 ### Changed
 
-- Remove some hacks as `--no-depexts` is now used in CLI 2.0 mode from opam
-  2.1.2.
+- Remove some hacks as `--no-depexts` is now used in CLI 2.0 mode from opam 2.1.2.
 
 ## [2.0.0-beta9]
 
@@ -426,8 +412,7 @@ and this project adheres to
 
 ### Fixed
 
-- Return an empty array to avoid depext failure when depext flags are not
-  passed.
+- Return an empty array to avoid depext failure when depext flags are not passed.
 
 ## [2.0.0-beta6]
 
@@ -443,17 +428,14 @@ and this project adheres to
 
 ### Fixed
 
-- If no user-input version is found in the opam-repository, explicitly raise an
-  error instead of implicitly breaking the workflow.
-- Retrieve the base compiler version from opam-repository to use the live
-  released compiler version.
+- If no user-input version is found in the opam-repository, explicitly raise an error instead of implicitly breaking the workflow.
+- Retrieve the base compiler version from opam-repository to use the live released compiler version.
 
 ## [2.0.0-beta4]
 
 ### Changed
 
-- Set `OPAMSOLVERTIMEOUT` to `1000` to avoid a timeout even if the opam solver
-  is slow.
+- Set `OPAMSOLVERTIMEOUT` to `1000` to avoid a timeout even if the opam solver is slow.
 - Increase cache hit ratio by loosening restore keys of opam cache.
 
 ## [2.0.0-beta3]
@@ -465,8 +447,7 @@ and this project adheres to
 ### Fixed
 
 - Set repository priorities correctly for multiple repositories feature.
-- Lock the version of opam to be installed only to < 2.1 releases until opam 2.2
-  is released.
+- Lock the version of opam to be installed only to < 2.1 releases until opam 2.2 is released.
 
 ## [2.0.0-beta2]
 
@@ -486,8 +467,7 @@ and this project adheres to
 
 ### Removed
 
-- The `opam-repository` input has been removed in order to add the
-  `opam-repositories` input.
+- The `opam-repository` input has been removed in order to add the `opam-repositories` input.
 
 ## [2.0.0-alpha]
 
@@ -495,37 +475,19 @@ and this project adheres to
 
 - Added support for 32 bits compiler variants.
 - Added semver-style version matching support.
-- Cache opam root (`~/.opam` on Unix, `D:\.opam` on Windows), opam
-  download-cache (`~/.opam/download-cache` on Unix, `D:\.opam\download-cache` on
-  Windows), and opam local switch (`_opam`).
-- If `dune-cache` enabled, install dune, automatically configure the dune cache
-  for the most efficient use in CI (exports `DUNE_CACHE=enabled`,
-  `DUNE_CACHE_TRANSPORT=direct`. TRANSPORT must be `direct`, not `daemon`, to
-  speed up the opam install process and to support Windows:
-  <https://github.com/ocaml/dune/issues/4166>,
-  <https://github.com/ocaml/dune/issues/4167>), and share the dune cache
-  directory for each run.
-- If `opam-pin` is enabled, pin the local packages specified by
-  `opam-local-packages`.
-- If `opam-depext` is enabled, install the system dependencies specified by
-  `opam-local-packages` via depext
-- If `opam-disable-sandboxing` is enabled, sandboxing is disabled for all
-  platforms except Windows. (Sandboxing is always disabled on the Windows
-  runners due to limitations of opam.)
-- The profiling functionality allows us to check the duration of each group if
-  debug mode is enabled.
-  (<https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging>)
+- Cache opam root (`~/.opam` on Unix, `D:\.opam` on Windows), opam download-cache (`~/.opam/download-cache` on Unix, `D:\.opam\download-cache` on Windows), and opam local switch (`_opam`).
+- If `dune-cache` enabled, install dune, automatically configure the dune cache for the most efficient use in CI (exports `DUNE_CACHE=enabled`, `DUNE_CACHE_TRANSPORT=direct`. TRANSPORT must be `direct`, not `daemon`, to speed up the opam install process and to support Windows: <https://github.com/ocaml/dune/issues/4166>, <https://github.com/ocaml/dune/issues/4167>), and share the dune cache directory for each run.
+- If `opam-pin` is enabled, pin the local packages specified by `opam-local-packages`.
+- If `opam-depext` is enabled, install the system dependencies specified by `opam-local-packages` via depext
+- If `opam-disable-sandboxing` is enabled, sandboxing is disabled for all platforms except Windows. (Sandboxing is always disabled on the Windows runners due to limitations of opam.)
+- The profiling functionality allows us to check the duration of each group if debug mode is enabled. (<https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging>)
 
 ### Changed
 
-- The Windows runners install `mingw64-i686-gcc-core` and `mingw64-i686-gcc-g++`
-  for 32 bit compiler variant support.
+- The Windows runners install `mingw64-i686-gcc-core` and `mingw64-i686-gcc-g++` for 32 bit compiler variant support.
 - Clean the log output by grouping some operations.
-- The compiler will be initialised in all platforms with an opam local switch to
-  eliminate differences between platforms and prepare for full dependency
-  caching in the future.
-- The macOS and Ubuntu runners install and cache opam from the GitHub release
-  directly without the system package manager.
+- The compiler will be initialised in all platforms with an opam local switch to eliminate differences between platforms and prepare for full dependency caching in the future.
+- The macOS and Ubuntu runners install and cache opam from the GitHub release directly without the system package manager.
 - The macOS and Ubuntu runners install `darcs` and `mercurial`.
 - The Windows runners install `mercurial`.
 - Export `OPAMCOLOR=always`.
@@ -533,26 +495,21 @@ and this project adheres to
 - Export `OPAMPRECISETRACKING=1`.
 - Export `OPAMSOLVERTIMEOUT=500`.
 - Export `OPAMROOT=D:\.opam` on the Windows runners.
-- Export `OPAMVERBOSE=true` if the actions debug mode is enabled.
-  (<https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging>)
+- Export `OPAMVERBOSE=true` if the actions debug mode is enabled. (<https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging>)
 - Export `MSYS=winsymlinks:native` for `@actions/cache` on the Windows runners.
 - Export `HOME=%USERPROFILE%` for opam on the Windows runners.
 
 ### Removed
 
 - The `ocaml-version` input has been removed. Use the `ocaml-compiler` instead.
-- The simplified version specifying scheme (e.g. `4.12.0`) support has been
-  removed.
+- The simplified version specifying scheme (e.g. `4.12.0`) support has been removed.
 
 ### Fixed
 
-- Use the appropriate file system behavior parameters on the Windows runners.
-  (`R2L:1`, `R2R:1`)
+- Use the appropriate file system behavior parameters on the Windows runners. (`R2L:1`, `R2R:1`)
 - Add `ppa: avsm/musl` on 18.04 and older Ubuntu runners.
-- Pass `--enable-shell-hook` to `opam init` fixes a bug that must be run via
-  opam exec in subsequent steps.
-- The Ubuntu runners install `gcc-multilib`, `g++-multilib` for
-  `ocaml-option-32bit`.
+- Pass `--enable-shell-hook` to `opam init` fixes a bug that must be run via opam exec in subsequent steps.
+- The Ubuntu runners install `gcc-multilib`, `g++-multilib` for `ocaml-option-32bit`.
 
 ## [1.1.11]
 
@@ -564,8 +521,7 @@ and this project adheres to
 
 ### Changed
 
-- Run `brew update` before set up to avoid an issue with Bintray transition
-  period.
+- Run `brew update` before set up to avoid an issue with Bintray transition period.
 
 ## [1.1.9]
 
@@ -577,11 +533,8 @@ and this project adheres to
 
 ### Changed
 
-- The Windows opam wrapper is fractionally less-archaically named opam.cmd, with
-  no loss in arcaneness.
-- Export `CYGWIN_ROOT` on the Windows runners, allowing bash to be invoked as
-  `%CYGWIN_ROOT%\bin\bash`/`$env:CYGWIN_ROOT\bin\bash` (and similarly for Cygwin
-  `setup-x86_64.exe`).
+- The Windows opam wrapper is fractionally less-archaically named opam.cmd, with no loss in arcaneness.
+- Export `CYGWIN_ROOT` on the Windows runners, allowing bash to be invoked as `%CYGWIN_ROOT%\bin\bash`/`$env:CYGWIN_ROOT\bin\bash` (and similarly for Cygwin `setup-x86_64.exe`).
 - The Windows runner no longer prepends `%CYGWIN_ROOT%\bin` to `PATH`.
 
 ### Fixed
@@ -592,8 +545,7 @@ and this project adheres to
 
 ### Changed
 
-- Ubuntu and macOS runners no longer display "No switch is currently installed."
-  before building the compiler.
+- Ubuntu and macOS runners no longer display "No switch is currently installed." before building the compiler.
 - Ubuntu no longer installs the system ocaml packages.
 - macOS no longer builds two compilers on every run.
 - Upgrade opam to 2.0.8 for Linux VMs.
@@ -614,15 +566,13 @@ Reduce build time by exporting modified `OPAMJOBS` environment variable.
 
 ### Changed
 
-Windows installs `mingw64-x86_64-gcc-g++` so GitHub Action can build libraries
-that require it.
+Windows installs `mingw64-x86_64-gcc-g++` so GitHub Action can build libraries that require it.
 
 ## [1.1.3] - 2020-10-23 [YANKED]
 
 ### Security
 
-- Update the `@actions/core` package to address
-  [CVE-2020-15228](https://github.com/advisories/GHSA-mfwh-5m23-j46w).
+- Update the `@actions/core` package to address [CVE-2020-15228](https://github.com/advisories/GHSA-mfwh-5m23-j46w).
 
 ## [1.1.2] - 2020-09-10
 
@@ -656,12 +606,9 @@ that require it.
 
 - `node_modules` are not exported anymore which reduces the size of the action
 
-- The repository is initialised directly from the opam-repository git source, so
-  that there is no lag in packages being available for CI
+- The repository is initialised directly from the opam-repository git source, so that there is no lag in packages being available for CI
 
-- Ubuntu installs `musl-tools` so that the GitHub Action can generate statically
-  linked Linux binaries in conjunction with the
-  `ocaml-variants.4.x.y+musl+flambda` switch
+- Ubuntu installs `musl-tools` so that the GitHub Action can generate statically linked Linux binaries in conjunction with the `ocaml-variants.4.x.y+musl+flambda` switch
 
 ## [1.0] - 2019-11-21
 

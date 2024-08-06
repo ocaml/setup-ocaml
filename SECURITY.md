@@ -17,11 +17,6 @@
 
 The TLDR for reporting potential security vulnerabilities:
 
-1. Please report potential security vulnerabilities using the GitHub Security
-   Advisory
-   "[Report a Vulnerability](https://github.com/ocaml/setup-ocaml/security/advisories/new)"
-   tab.
-2. The advisory will be reviewed by the [maintainers](#maintainers) of this
-   repository.
-3. The advisory will be made public when patches to the
-   [supported versions](#supported-versions) have been released.
+1. Please report potential security vulnerabilities using the GitHub Security Advisory "[Report a Vulnerability](https://github.com/ocaml/setup-ocaml/security/advisories/new)" tab.
+2. The advisory will be reviewed by the [maintainers](#maintainers) of this repository.
+3. The advisory will be made public when patches to the [supported versions](#supported-versions) have been released.

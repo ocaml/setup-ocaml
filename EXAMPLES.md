@@ -61,9 +61,7 @@ jobs:
 
 ## Using glob patterns to filter local packages
 
-Consult the
-[`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob)
-package for supported patterns.
+Consult the [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packages/glob) package for supported patterns.
 
 ```yml
 steps:

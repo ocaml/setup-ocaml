@@ -1,7 +1,7 @@
 # lint-fmt
 
-> [!IMPORTANT] Make sure you have an `.ocamlformat` file at the root of your
-> project.
+> [!IMPORTANT]
+> Make sure you have an `.ocamlformat` file at the root of your project.
 
 ## Usage
 
