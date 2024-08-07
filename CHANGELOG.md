@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ## [unreleased]
 
+## [3.0.7]
+
 ### Changed
 
 - Unlock `--with-doc` in analysis.
@@ -619,7 +621,8 @@ Windows installs `mingw64-x86_64-gcc-g++` so GitHub Action can build libraries t
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.6...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.7...HEAD
+[3.0.7]: https://github.com/ocaml/setup-ocaml/compare/v3.0.6...v3.0.7
 [3.0.6]: https://github.com/ocaml/setup-ocaml/compare/v3.0.5...v3.0.6
 [3.0.5]: https://github.com/ocaml/setup-ocaml/compare/v3.0.4...v3.0.5
 [3.0.4]: https://github.com/ocaml/setup-ocaml/compare/v3.0.3...v3.0.4
