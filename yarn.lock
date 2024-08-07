@@ -499,7 +499,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.1"
     cheerio: "npm:1.0.0-rc.12"
     semver: "npm:7.6.3"
-    systeminformation: "npm:5.23.3"
+    systeminformation: "npm:5.23.4"
     typescript: "npm:5.5.4"
     yaml: "npm:2.5.0"
   languageName: unknown
@@ -1598,7 +1598,7 @@ __metadata:
   resolution: "setup-ocaml@workspace:."
   dependencies:
     "@biomejs/biome": "npm:1.8.3"
-    turbo: "npm:2.0.11"
+    turbo: "npm:2.0.12"
   languageName: unknown
   linkType: soft
 
@@ -1716,12 +1716,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.23.3":
-  version: 5.23.3
-  resolution: "systeminformation@npm:5.23.3"
+"systeminformation@npm:5.23.4":
+  version: 5.23.4
+  resolution: "systeminformation@npm:5.23.4"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/9f0bce29fca815e30756fb93ed4e89afaea95ebdb571540390f5648058a1211792398ff19974466aae5407cf34d5534e4b783b745abb490a7fcdf561f647c1f0
+  checksum: 10c0/ed779bb3682a61f6cd049d01d9999c4c03818513d297e202e5fa6b42787b05ff2cbbfa69ad2b30773b5071987e5aba62205799e9d648cf21318eba07853b7454
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
@@ -1768,58 +1768,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo-darwin-64@npm:2.0.11"
+"turbo-darwin-64@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo-darwin-64@npm:2.0.12"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo-darwin-arm64@npm:2.0.11"
+"turbo-darwin-arm64@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo-darwin-arm64@npm:2.0.12"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo-linux-64@npm:2.0.11"
+"turbo-linux-64@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo-linux-64@npm:2.0.12"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo-linux-arm64@npm:2.0.11"
+"turbo-linux-arm64@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo-linux-arm64@npm:2.0.12"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo-windows-64@npm:2.0.11"
+"turbo-windows-64@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo-windows-64@npm:2.0.12"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo-windows-arm64@npm:2.0.11"
+"turbo-windows-arm64@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo-windows-arm64@npm:2.0.12"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:2.0.11":
-  version: 2.0.11
-  resolution: "turbo@npm:2.0.11"
+"turbo@npm:2.0.12":
+  version: 2.0.12
+  resolution: "turbo@npm:2.0.12"
   dependencies:
-    turbo-darwin-64: "npm:2.0.11"
-    turbo-darwin-arm64: "npm:2.0.11"
-    turbo-linux-64: "npm:2.0.11"
-    turbo-linux-arm64: "npm:2.0.11"
-    turbo-windows-64: "npm:2.0.11"
-    turbo-windows-arm64: "npm:2.0.11"
+    turbo-darwin-64: "npm:2.0.12"
+    turbo-darwin-arm64: "npm:2.0.12"
+    turbo-linux-64: "npm:2.0.12"
+    turbo-linux-arm64: "npm:2.0.12"
+    turbo-windows-64: "npm:2.0.12"
+    turbo-windows-arm64: "npm:2.0.12"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -1835,7 +1835,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/f9f2ced5803b07074a19c14877fd08c1c12b823caebb590a58a3c08a82ba3b51a084abe313679f33929118d93644f517b0fef6823d2f1123899015480eee5f33
+  checksum: 10c0/2a6d90897cc2f49e745e389d044278d56a3579cfafaacb9a1ec41a5c4ed41d5f2560254d732a146c3e39ff18c3a79a46ae3153fab4ad85d9fbf59eb0fa0c0719
   languageName: node
   linkType: hard
 
