@@ -38530,6 +38530,32 @@ module.exports = {
 
 /***/ }),
 
+/***/ 914:
+/***/ ((module) => {
+
+function getIgnoreAttributesFn(ignoreAttributes) {
+    if (typeof ignoreAttributes === 'function') {
+        return ignoreAttributes
+    }
+    if (Array.isArray(ignoreAttributes)) {
+        return (attrName) => {
+            for (const pattern of ignoreAttributes) {
+                if (typeof pattern === 'string' && attrName === pattern) {
+                    return true
+                }
+                if (pattern instanceof RegExp && pattern.test(attrName)) {
+                    return true
+                }
+            }
+        }
+    }
+    return () => false
+}
+
+module.exports = getIgnoreAttributesFn
+
+/***/ }),
+
 /***/ 7341:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -39047,6 +39073,7 @@ function getPositionFromMatch(match) {
 
 //parse Empty Node as self closing node
 const buildFromOrderedJs = __nccwpck_require__(1622);
+const getIgnoreAttributesFn = __nccwpck_require__(914)
 
 const defaultOptions = {
   attributeNamePrefix: '@_',
@@ -39084,11 +39111,12 @@ const defaultOptions = {
 
 function Builder(options) {
   this.options = Object.assign({}, defaultOptions, options);
-  if (this.options.ignoreAttributes || this.options.attributesGroupName) {
+  if (this.options.ignoreAttributes === true || this.options.attributesGroupName) {
     this.isAttribute = function(/*a*/) {
       return false;
     };
   } else {
+    this.ignoreAttributesFn = getIgnoreAttributesFn(this.options.ignoreAttributes)
     this.attrPrefixLen = this.options.attributeNamePrefix.length;
     this.isAttribute = isAttribute;
   }
@@ -39117,13 +39145,14 @@ Builder.prototype.build = function(jObj) {
         [this.options.arrayNodeName] : jObj
       }
     }
-    return this.j2x(jObj, 0).val;
+    return this.j2x(jObj, 0, []).val;
   }
 };
 
-Builder.prototype.j2x = function(jObj, level) {
+Builder.prototype.j2x = function(jObj, level, ajPath) {
   let attrStr = '';
   let val = '';
+  const jPath = ajPath.join('.')
   for (let key in jObj) {
     if(!Object.prototype.hasOwnProperty.call(jObj, key)) continue;
     if (typeof jObj[key] === 'undefined') {
@@ -39146,9 +39175,9 @@ Builder.prototype.j2x = function(jObj, level) {
     } else if (typeof jObj[key] !== 'object') {
       //premitive type
       const attr = this.isAttribute(key);
-      if (attr) {
+      if (attr && !this.ignoreAttributesFn(attr, jPath)) {
         attrStr += this.buildAttrPairStr(attr, '' + jObj[key]);
-      }else {
+      } else if (!attr) {
         //tag value
         if (key === this.options.textNodeName) {
           let newval = this.options.tagValueProcessor(key, '' + jObj[key]);
@@ -39172,13 +39201,13 @@ Builder.prototype.j2x = function(jObj, level) {
           // val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
         } else if (typeof item === 'object') {
           if(this.options.oneListGroup){
-            const result = this.j2x(item, level + 1);
+            const result = this.j2x(item, level + 1, ajPath.concat(key));
             listTagVal += result.val;
             if (this.options.attributesGroupName && item.hasOwnProperty(this.options.attributesGroupName)) {
               listTagAttr += result.attrStr
             }
           }else{
-            listTagVal += this.processTextOrObjNode(item, key, level)
+            listTagVal += this.processTextOrObjNode(item, key, level, ajPath)
           }
         } else {
           if (this.options.oneListGroup) {
@@ -39203,7 +39232,7 @@ Builder.prototype.j2x = function(jObj, level) {
           attrStr += this.buildAttrPairStr(Ks[j], '' + jObj[key][Ks[j]]);
         }
       } else {
-        val += this.processTextOrObjNode(jObj[key], key, level)
+        val += this.processTextOrObjNode(jObj[key], key, level, ajPath)
       }
     }
   }
@@ -39218,8 +39247,8 @@ Builder.prototype.buildAttrPairStr = function(attrName, val){
   } else return ' ' + attrName + '="' + val + '"';
 }
 
-function processTextOrObjNode (object, key, level) {
-  const result = this.j2x(object, level + 1);
+function processTextOrObjNode (object, key, level, ajPath) {
+  const result = this.j2x(object, level + 1, ajPath.concat(key));
   if (object[this.options.textNodeName] !== undefined && Object.keys(object).length === 1) {
     return this.buildTextValNode(object[this.options.textNodeName], key, result.attrStr, level);
   } else {
@@ -39694,6 +39723,7 @@ const util = __nccwpck_require__(7341);
 const xmlNode = __nccwpck_require__(9620);
 const readDocType = __nccwpck_require__(3095);
 const toNumber = __nccwpck_require__(780);
+const getIgnoreAttributesFn = __nccwpck_require__(914)
 
 // const regx =
 //   '<((!\\[CDATA\\[([\\s\\S]*?)(]]>))|((NAME:)?(NAME))([^>]*)>|((\\/)(NAME)\\s*>))([^<]*)'
@@ -39742,6 +39772,7 @@ class OrderedObjParser{
     this.readStopNodeData = readStopNodeData;
     this.saveTextToParentTag = saveTextToParentTag;
     this.addChild = addChild;
+    this.ignoreAttributesFn = getIgnoreAttributesFn(this.options.ignoreAttributes)
   }
 
 }
@@ -39814,7 +39845,7 @@ function resolveNameSpace(tagname) {
 const attrsRegx = new RegExp('([^\\s=]+)\\s*(=\\s*([\'"])([\\s\\S]*?)\\3)?', 'gm');
 
 function buildAttributesMap(attrStr, jPath, tagName) {
-  if (!this.options.ignoreAttributes && typeof attrStr === 'string') {
+  if (this.options.ignoreAttributes !== true && typeof attrStr === 'string') {
     // attrStr = attrStr.replace(/\r?\n/g, ' ');
     //attrStr = attrStr || attrStr.trim();
 
@@ -39823,6 +39854,9 @@ function buildAttributesMap(attrStr, jPath, tagName) {
     const attrs = {};
     for (let i = 0; i < len; i++) {
       const attrName = this.resolveNameSpace(matches[i][1]);
+      if (this.ignoreAttributesFn(attrName, jPath)) {
+        continue
+      }
       let oldVal = matches[i][4];
       let aName = this.options.attributeNamePrefix + attrName;
       if (attrName.length) {
@@ -96144,6 +96178,8 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
                 const map = new YAMLMap.YAMLMap(ctx.schema);
                 map.flow = true;
                 map.items.push(pair);
+                const endRange = (valueNode ?? keyNode).range;
+                map.range = [keyNode.range[0], endRange[1], endRange[2]];
                 coll.items.push(map);
             }
             offset = valueNode ? valueNode.range[2] : valueProps.end;
@@ -96275,7 +96311,7 @@ function foldLines(source) {
         first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy');
         line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy');
     }
-    catch (_) {
+    catch {
         first = /(.*?)[ \t]*\r?\n/sy;
         line = /[ \t]*(.*?)[ \t]*\r?\n/sy;
     }
@@ -97147,6 +97183,7 @@ function applyReviver(reviver, obj, key, val) {
             for (let i = 0, len = val.length; i < len; ++i) {
                 const v0 = val[i];
                 const v1 = applyReviver(reviver, val, String(i), v0);
+                // eslint-disable-next-line @typescript-eslint/no-array-delete
                 if (v1 === undefined)
                     delete val[i];
                 else if (v1 !== v0)
@@ -97613,8 +97650,6 @@ function debug(logLevel, ...messages) {
 }
 function warn(logLevel, warning) {
     if (logLevel === 'debug' || logLevel === 'warn') {
-        // https://github.com/typescript-eslint/typescript-eslint/issues/7478
-        // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
         if (typeof process !== 'undefined' && process.emitWarning)
             process.emitWarning(warning);
         else
@@ -100429,7 +100464,9 @@ class Parser {
                             const sep = it.sep;
                             sep.push(this.sourceToken);
                             // @ts-expect-error type guard is wrong here
-                            delete it.key, delete it.sep;
+                            delete it.key;
+                            // @ts-expect-error type guard is wrong here
+                            delete it.sep;
                             this.stack.push({
                                 type: 'block-map',
                                 offset: this.offset,
