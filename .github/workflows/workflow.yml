@@ -53,6 +53,8 @@ jobs:
           - windows-latest
         ocaml-compiler:
           - "5.2"
+        windows-environment:
+          - ""
         allow-prerelease-opam:
           - false
         include:
@@ -62,6 +64,9 @@ jobs:
           - os: ubuntu-latest
             ocaml-compiler: "5.2"
             allow-prerelease-opam: true
+          - os: windows-latest
+            ocaml-compiler: "5.2"
+            windows-environment: msys2
 
     runs-on: ${{ matrix.os }}
 
@@ -74,5 +79,6 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
+          windows-environment: ${{ matrix.windows-environment }}
 
       - run: opam install ssl
