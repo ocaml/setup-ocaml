@@ -103618,7 +103618,7 @@ const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam", 
     required: false,
     trimWhitespace: true,
 });
-const WINDOWS_ENVIRONMENT = (() => {
+const constants_WINDOWS_ENVIRONMENT = (() => {
     const input = lib_core.getInput("windows-environment");
     if (!(constants_PLATFORM === "windows" || input === "")) {
         lib_core.error("windows-environment is only supported on windows");
@@ -103811,7 +103811,7 @@ async function restoreOpamCache() {
 }
 async function restoreOpamCaches() {
     return await core.group("Retrieve the opam cache", async () => {
-        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows"
+        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin"
             ? [restoreOpamCache(), restoreCygwinCache()]
             : [restoreOpamCache()]);
         return { opamCacheHit, cygwinCacheHit };

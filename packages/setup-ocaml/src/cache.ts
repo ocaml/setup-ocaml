@@ -17,6 +17,7 @@ import {
   OPAM_ROOT,
   PLATFORM,
   RESOLVED_COMPILER,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { getLatestOpamRelease } from "./opam.js";
 import { getCygwinVersion } from "./windows.js";
@@ -177,7 +178,7 @@ async function restoreOpamCache() {
 export async function restoreOpamCaches() {
   return await core.group("Retrieve the opam cache", async () => {
     const [opamCacheHit, cygwinCacheHit] = await Promise.all(
-      PLATFORM === "windows"
+      PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin"
         ? [restoreOpamCache(), restoreCygwinCache()]
         : [restoreOpamCache()],
     );
