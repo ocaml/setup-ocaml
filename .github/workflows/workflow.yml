@@ -52,9 +52,14 @@ jobs:
           - windows-latest
         ocaml-compiler:
           - "5.2"
+        windows-environment:
+          - ""
         include:
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-flambda
+          - os: windows-latest
+            ocaml-compiler: "5.2"
+            windows-environment: msys2
 
     runs-on: ${{ matrix.os }}
 
@@ -66,5 +71,6 @@ jobs:
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          windows-environment: ${{ matrix.windows-environment }}
 
       - run: opam install uri
