@@ -51,6 +51,7 @@ async function composeOpamCacheKeys() {
   const ocamlCompiler = await RESOLVED_COMPILER;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
   const osInfo = await system.osInfo();
+  const msys2 = WINDOWS_ENVIRONMENT === "msys2" ? "msys2" : undefined;
   const plainKey = [
     PLATFORM,
     osInfo.release,
@@ -59,7 +60,9 @@ async function composeOpamCacheKeys() {
     ocamlCompiler,
     repositoryUrls,
     sandbox,
-  ].join();
+  ]
+    .concat(msys2 ?? [])
+    .join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
