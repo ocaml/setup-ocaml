@@ -115,3 +115,58 @@ export async function setupCygwin() {
     await io.cp(setup, CYGWIN_ROOT);
   });
 }
+
+function getPacmanPath(msys2Root: string): string {
+  return path.join(msys2Root, "usr", "bin", "pacman");
+}
+
+async function testMsys2Installation(path: string): Promise<void> {
+  try {
+    await fs.access(path);
+  } catch {
+    throw new Error(`No msys2 installation found at: ${path}.`);
+  }
+}
+
+async function getMsys2Install(): Promise<[root: string, pacmanPath: string]> {
+  const msys2Root = process.env.MSYS2_ROOT;
+
+  // MSYS2_ROOT takes priority
+  if (msys2Root) {
+    await testMsys2Installation(msys2Root);
+    return [msys2Root, getPacmanPath(msys2Root)];
+  }
+  try {
+    // check for pacman from PATH
+    const pacmanPath = await io.which("pacman", true);
+    return [path.dirname(path.dirname(path.dirname(pacmanPath))), pacmanPath];
+  } catch {
+    // finally check the default msys directory
+    const defaultRoot = "C:\\msys64";
+    testMsys2Installation(defaultRoot);
+    return [defaultRoot, getPacmanPath(defaultRoot)];
+  }
+}
+
+export async function prepareMsys2(): Promise<string> {
+  return await core.group("Install needed Msys2 packages", async () => {
+    const [root, pacmanPath] = await getMsys2Install();
+    // core update
+    await exec(pacmanPath, ["-Syu", "--noconfirm"]);
+    // packages needed for opam
+    const packages = [
+      "curl",
+      "diffutils",
+      "m4",
+      "make",
+      "mingw-w64-i686-gcc",
+      "mingw-w64-x86_64-gcc",
+      "patch",
+      "perl",
+      "rsync",
+      "unzip",
+    ];
+    await exec(pacmanPath, ["-Syu", "--noconfirm", ...packages]);
+    return root;
+  });
+}

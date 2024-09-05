@@ -112200,6 +112200,19 @@ const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam", 
     required: false,
     trimWhitespace: true,
 });
+const WINDOWS_ENVIRONMENT = (() => {
+    const input = lib_core.getInput("windows-environment");
+    if (!(constants_PLATFORM === "windows" || input === "")) {
+        lib_core.error("windows-environment is only supported on windows");
+    }
+    if (input === "msys2" || input === "cygwin") {
+        return input;
+    }
+    if (input !== "") {
+        lib_core.error("unrecognized value for windows-environment");
+    }
+    return "cygwin";
+})();
 const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix", {
     required: false,
     trimWhitespace: true,
