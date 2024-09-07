@@ -60,6 +60,13 @@ export const CYGWIN_ROOT = path.join("D:", "cygwin");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
+export const CYGWIN_ROOT_MINGW_BIN = path.join(
+  CYGWIN_ROOT,
+  "usr",
+  "x86_64-w64-mingw32",
+  "bin",
+);
+
 export const DUNE_CACHE_ROOT = (() => {
   const homeDir = os.homedir();
   if (PLATFORM === "windows") {
