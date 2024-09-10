@@ -10,6 +10,7 @@ import {
 } from "./cache.js";
 import {
   CYGWIN_ROOT_BIN,
+  CYGWIN_ROOT_MINGW_BIN,
   DUNE_CACHE,
   DUNE_CACHE_ROOT,
   OPAM_PIN,
@@ -67,6 +68,7 @@ export async function installer() {
       await saveCygwinCache();
     }
     core.addPath(CYGWIN_ROOT_BIN);
+    core.addPath(CYGWIN_ROOT_MINGW_BIN);
   }
   await setupOpam();
   await repositoryRemoveAll();

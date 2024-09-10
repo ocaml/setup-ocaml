@@ -103597,6 +103597,7 @@ const constants_CYGWIN_MIRROR_ENCODED_URI = encodeURIComponent(CYGWIN_MIRROR).to
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
+const CYGWIN_ROOT_MINGW_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "usr", "x86_64-w64-mingw32", "bin");
 const DUNE_CACHE_ROOT = (() => {
     const homeDir = external_node_os_.homedir();
     if (constants_PLATFORM === "windows") {
