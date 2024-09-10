@@ -13,14 +13,14 @@
     "@actions/github": "6.0.0",
     "@actions/glob": "0.5.0",
     "@github/dependency-submission-toolkit": "2.0.4",
-    "packageurl-js": "2.0.0",
+    "packageurl-js": "2.0.1",
     "strip-ansi": "7.1.0"
   },
   "devDependencies": {
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "22.5.3",
+    "@types/node": "22.5.4",
     "@vercel/ncc": "0.38.1",
-    "typescript": "5.5.4"
+    "typescript": "5.6.2"
   }
 }

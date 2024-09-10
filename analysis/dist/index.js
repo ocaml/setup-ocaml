@@ -10043,8 +10043,40 @@ module.exports = {
 
 const LOOP_SENTINEL = 1_000_000
 
+const REUSED_SEARCH_PARAMS = new URLSearchParams()
+
+const REUSED_SEARCH_PARAMS_KEY = '_'
+
+const REUSED_SEARCH_PARAMS_OFFSET = 2 // '_='.length
+
 module.exports = {
-    LOOP_SENTINEL
+    LOOP_SENTINEL,
+    REUSED_SEARCH_PARAMS,
+    REUSED_SEARCH_PARAMS_KEY,
+    REUSED_SEARCH_PARAMS_OFFSET
+}
+
+
+/***/ }),
+
+/***/ 409:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+const { PurlError } = __nccwpck_require__(2144)
+
+const { decodeURIComponent } = globalThis
+
+function decodePurlComponent(comp, encodedURIComponent) {
+    try {
+        return decodeURIComponent(encodedURIComponent)
+    } catch {}
+    throw new PurlError(`unable to decode "${comp}" component`)
+}
+
+module.exports = {
+    decodePurlComponent
 }
 
 
@@ -10055,12 +10087,13 @@ module.exports = {
 
 
 
+const {
+    REUSED_SEARCH_PARAMS,
+    REUSED_SEARCH_PARAMS_KEY,
+    REUSED_SEARCH_PARAMS_OFFSET
+} = __nccwpck_require__(1098)
 const { isObject } = __nccwpck_require__(7002)
 const { isNonEmptyString } = __nccwpck_require__(8595)
-
-const reusedSearchParams = new URLSearchParams()
-const reusedSearchParamKey = '_'
-const reusedSearchParamOffset = 2 // '_='.length
 
 const { encodeURIComponent } = globalThis
 
@@ -10077,9 +10110,9 @@ function encodeQualifierParam(param) {
         // Param key and value are encoded with `percentEncodeSet` of
         // 'application/x-www-form-urlencoded' and `spaceAsPlus` of `true`.
         // https://url.spec.whatwg.org/#urlencoded-serializing
-        reusedSearchParams.set(reusedSearchParamKey, param)
+        REUSED_SEARCH_PARAMS.set(REUSED_SEARCH_PARAMS_KEY, param)
         return replacePlusSignWithPercentEncodedSpace(
-            reusedSearchParams.toString().slice(reusedSearchParamOffset)
+            REUSED_SEARCH_PARAMS.toString().slice(REUSED_SEARCH_PARAMS_OFFSET)
         )
     }
     return ''
@@ -10123,6 +10156,47 @@ module.exports = {
     encodeQualifierParam,
     encodeSubpath,
     encodeURIComponent
+}
+
+
+/***/ }),
+
+/***/ 2144:
+/***/ ((module) => {
+
+
+
+function formatPurlErrorMessage(message = '') {
+    const { length } = message
+    let formatted = ''
+    if (length) {
+        // Lower case start of message.
+        const code0 = message.charCodeAt(0)
+        formatted =
+            code0 >= 65 /*'A'*/ || code0 <= 90 /*'Z'*/
+                ? `${message[0].toLowerCase()}${message.slice(1)}`
+                : message
+        // Remove period from end of message.
+        if (
+            length > 1 &&
+            message.charCodeAt(length - 1) === 46 /*'.'*/ &&
+            message.charCodeAt(length - 2) !== 46
+        ) {
+            formatted = formatted.slice(0, -1)
+        }
+    }
+    return `Invalid purl: ${formatted}`
+}
+
+class PurlError extends Error {
+    constructor(message) {
+        super(formatPurlErrorMessage(message))
+    }
+}
+
+module.exports = {
+    formatPurlErrorMessage,
+    PurlError
 }
 
 
@@ -10195,17 +10269,13 @@ module.exports = {
 const { isObject } = __nccwpck_require__(7002)
 const { isBlank } = __nccwpck_require__(8595)
 
-const { decodeURIComponent } = globalThis
-
 function normalizeName(rawName) {
-    return typeof rawName === 'string'
-        ? decodeURIComponent(rawName).trim()
-        : undefined
+    return typeof rawName === 'string' ? rawName.trim() : undefined
 }
 
 function normalizeNamespace(rawNamespace) {
     return typeof rawNamespace === 'string'
-        ? normalizePath(decodeURIComponent(rawNamespace))
+        ? normalizePath(rawNamespace)
         : undefined
 }
 
@@ -10266,7 +10336,7 @@ function normalizeQualifiers(rawQualifiers) {
 
 function normalizeSubpath(rawSubpath) {
     return typeof rawSubpath === 'string'
-        ? normalizePath(decodeURIComponent(rawSubpath), subpathFilter)
+        ? normalizePath(rawSubpath, subpathFilter)
         : undefined
 }
 
@@ -10274,14 +10344,12 @@ function normalizeType(rawType) {
     // The type must NOT be percent-encoded.
     // The type is case insensitive. The canonical form is lowercase.
     return typeof rawType === 'string'
-        ? decodeURIComponent(rawType).trim().toLowerCase()
+        ? rawType.trim().toLowerCase()
         : undefined
 }
 
 function normalizeVersion(rawVersion) {
-    return typeof rawVersion === 'string'
-        ? decodeURIComponent(rawVersion).trim()
-        : undefined
+    return typeof rawVersion === 'string' ? rawVersion.trim() : undefined
 }
 
 function qualifiersToEntries(rawQualifiers) {
@@ -10417,12 +10485,14 @@ SOFTWARE.
 */
 
 
+const { decodePurlComponent } = __nccwpck_require__(409)
 const { isObject, recursiveFreeze } = __nccwpck_require__(7002)
 const { isBlank, isNonEmptyString, trimLeadingSlashes } = __nccwpck_require__(8595)
 
 const { PurlComponent } = __nccwpck_require__(354)
 const { PurlQualifierNames } = __nccwpck_require__(7541)
 const { PurlType } = __nccwpck_require__(3392)
+const { PurlError } = __nccwpck_require__(2144)
 
 class PackageURL {
     static Component = recursiveFreeze(PurlComponent)
@@ -10544,16 +10614,14 @@ class PackageURL {
                         ? url
                         : new URL(purlStr)
             } catch (e) {
-                throw new Error('Invalid purl: failed to parse as URL', {
+                throw new PurlError('failed to parse as URL', {
                     cause: e
                 })
             }
         }
         // The scheme is a constant with the value "pkg".
         if (url?.protocol !== 'pkg:') {
-            throw new Error(
-                'Invalid purl: missing required "pkg" scheme component'
-            )
+            throw new PurlError('missing required "pkg" scheme component')
         }
         // A purl must NOT contain a URL Authority i.e. there is no support for
         // username, password, host and port components.
@@ -10561,17 +10629,17 @@ class PackageURL {
             maybeUrlWithAuth.username !== '' ||
             maybeUrlWithAuth.password !== ''
         ) {
-            throw new Error(
-                'Invalid purl: cannot contain a "user:pass@host:port"'
-            )
+            throw new PurlError('cannot contain a "user:pass@host:port"')
         }
 
         const { pathname } = url
         const firstSlashIndex = pathname.indexOf('/')
-        const rawType =
+        const rawType = decodePurlComponent(
+            'type',
             firstSlashIndex === -1
                 ? pathname
                 : pathname.slice(0, firstSlashIndex)
+        )
         if (firstSlashIndex < 1) {
             return [
                 rawType,
@@ -10600,7 +10668,10 @@ class PackageURL {
         )
         if (atSignIndex !== -1) {
             // Split the remainder once from right on '@'.
-            rawVersion = pathname.slice(atSignIndex + 1)
+            rawVersion = decodePurlComponent(
+                'version',
+                pathname.slice(atSignIndex + 1)
+            )
         }
 
         let rawNamespace
@@ -10608,17 +10679,26 @@ class PackageURL {
         const lastSlashIndex = beforeVersion.lastIndexOf('/')
         if (lastSlashIndex === -1) {
             // Split the remainder once from right on '/'.
-            rawName = beforeVersion
+            rawName = decodePurlComponent('name', beforeVersion)
         } else {
             // Split the remainder once from right on '/'.
-            rawName = beforeVersion.slice(lastSlashIndex + 1)
+            rawName = decodePurlComponent(
+                'name',
+                beforeVersion.slice(lastSlashIndex + 1)
+            )
             // Split the remainder on '/'.
-            rawNamespace = beforeVersion.slice(0, lastSlashIndex)
+            rawNamespace = decodePurlComponent(
+                'namespace',
+                beforeVersion.slice(0, lastSlashIndex)
+            )
         }
 
         let rawQualifiers
         const { searchParams } = url
         if (searchParams.size !== 0) {
+            searchParams.forEach((value) =>
+                decodePurlComponent('qualifiers', value)
+            )
             // Split the remainder once from right on '?'.
             rawQualifiers = searchParams
         }
@@ -10627,7 +10707,7 @@ class PackageURL {
         const { hash } = url
         if (hash.length !== 0) {
             // Split the purl string once from right on '#'.
-            rawSubpath = hash.slice(1)
+            rawSubpath = decodePurlComponent('subpath', hash.slice(1))
         }
 
         return [
@@ -10808,6 +10888,7 @@ const {
 } = __nccwpck_require__(8595)
 
 const { validateEmptyByType, validateRequiredByType } = __nccwpck_require__(3803)
+const { PurlError } = __nccwpck_require__(2144)
 
 const PurlTypNormalizer = (purl) => purl
 
@@ -10943,16 +11024,16 @@ module.exports = {
                     if (isNullishOrEmptyString(purl.namespace)) {
                         if (purl.qualifiers?.channel) {
                             if (throws) {
-                                throw new Error(
-                                    'Invalid purl: conan requires a "namespace" field when a "channel" qualifier is present.'
+                                throw new PurlError(
+                                    'conan requires a "namespace" component when a "channel" qualifier is present'
                                 )
                             }
                             return false
                         }
                     } else if (isNullishOrEmptyString(purl.qualifiers)) {
                         if (throws) {
-                            throw new Error(
-                                'Invalid purl: conan requires a "qualifiers" field when a namespace is present.'
+                            throw new PurlError(
+                                'conan requires a "qualifiers" component when a namespace is present'
                             )
                         }
                         return false
@@ -10984,8 +11065,8 @@ module.exports = {
                         !isSemverString(version.slice(1))
                     ) {
                         if (throws) {
-                            throw new Error(
-                                'Invalid purl: golang "version" field starting with a "v" must be followed by a valid semver version'
+                            throw new PurlError(
+                                'golang "version" component starting with a "v" must be followed by a valid semver version'
                             )
                         }
                         return false
@@ -11035,8 +11116,8 @@ module.exports = {
                   )
               ) {
                   if (throws) {
-                      throw new Error(
-                          'Invalid purl: pub "name" field may only contain [a-z0-9_] characters'
+                      throw new PurlError(
+                          'pub "name" component may only contain [a-z0-9_] characters'
                       )
                   }
                   return false
@@ -11212,15 +11293,14 @@ module.exports = {
 
 
 
+const { PurlError } = __nccwpck_require__(2144)
 const { isNullishOrEmptyString } = __nccwpck_require__(2858)
 const { isNonEmptyString } = __nccwpck_require__(8595)
 
 function validateEmptyByType(type, name, value, throws) {
     if (!isNullishOrEmptyString(value)) {
         if (throws) {
-            throw new Error(
-                `Invalid purl: ${type} "${name}" field must be empty.`
-            )
+            throw new PurlError(`${type} "${name}" component must be empty`)
         }
         return false
     }
@@ -11244,9 +11324,7 @@ function validateQualifiers(qualifiers, throws) {
     }
     if (typeof qualifiers !== 'object') {
         if (throws) {
-            throw new Error(
-                'Invalid purl: "qualifiers" argument must be an object.'
-            )
+            throw new PurlError('"qualifiers" must be an object')
         }
         return false
     }
@@ -11286,8 +11364,8 @@ function validateQualifierKey(key, throws) {
             )
         ) {
             if (throws) {
-                throw new Error(
-                    `Invalid purl: qualifier "${key}" contains an illegal character.`
+                throw new PurlError(
+                    `qualifier "${key}" contains an illegal character`
                 )
             }
             return false
@@ -11299,7 +11377,7 @@ function validateQualifierKey(key, throws) {
 function validateRequired(name, value, throws) {
     if (isNullishOrEmptyString(value)) {
         if (throws) {
-            throw new Error(`Invalid purl: "${name}" is a required field.`)
+            throw new PurlError(`"${name}" is a required component`)
         }
         return false
     }
@@ -11309,7 +11387,7 @@ function validateRequired(name, value, throws) {
 function validateRequiredByType(type, name, value, throws) {
     if (isNullishOrEmptyString(value)) {
         if (throws) {
-            throw new Error(`Invalid purl: ${type} requires a "${name}" field.`)
+            throw new PurlError(`${type} requires a "${name}" component`)
         }
         return false
     }
@@ -11321,8 +11399,8 @@ function validateStartsWithoutNumber(name, value, throws) {
         const code = value.charCodeAt(0)
         if (code >= 48 /*'0'*/ && code <= 57 /*'9'*/) {
             if (throws) {
-                throw new Error(
-                    `Invalid purl: ${name} "${value}" cannot start with a number.`
+                throw new PurlError(
+                    `${name} "${value}" cannot start with a number`
                 )
             }
             return false
@@ -11336,7 +11414,7 @@ function validateStrings(name, value, throws) {
         return true
     }
     if (throws) {
-        throw new Error(`Invalid purl: "'${name}" argument must be a string.`)
+        throw new PurlError(`"'${name}" must be a string`)
     }
     return false
 }
@@ -11372,8 +11450,8 @@ function validateType(type, throws) {
             )
         ) {
             if (throws) {
-                throw new Error(
-                    `Invalid purl: type "${type}" contains an illegal character.`
+                throw new PurlError(
+                    `type "${type}" contains an illegal character`
                 )
             }
             return false
