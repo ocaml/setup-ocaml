@@ -49,6 +49,28 @@ jobs:
       - run: opam exec -- dune runtest
 ```
 
+### OCaml Compiler Support Matrix
+
+When using GitHub-hosted runners, specifying compiler version `4` or `5` should work across all platforms and architectures. However, there are exceptions, as shown below. If you need to test with specific versions, please choose the appropriate version for your runtime environment.
+
+#### x86 64 bits
+
+| Version           | Ubuntu             | macOS              | Windows            |
+| ----------------- | ------------------ | ------------------ | ------------------ |
+| >= 4.13           | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| >= 4.02 & <= 4.12 | :white_check_mark: | :white_check_mark: | :x:                |
+| <= 4.01           | :white_check_mark: | :white_check_mark: | :x:                |
+
+#### ARM 64 bits
+
+| Version           | Ubuntu             | macOS              | Windows |
+| ----------------- | ------------------ | ------------------ | ------- |
+| >= 4.12           | :white_check_mark: | :white_check_mark: | :x:     |
+| = 4.11            | :white_check_mark: | :x:                | :x:     |
+| = 4.10            | :white_check_mark: | :white_check_mark: | :x:     |
+| >= 4.02 & <= 4.09 | :white_check_mark: | :x:                | :x:     |
+| <= 4.01           | :x:                | :x:                | :x:     |
+
 ### Versioning
 
 The actions are downloaded and run from the GitHub graph of repositories. The workflow references an action using a ref.
