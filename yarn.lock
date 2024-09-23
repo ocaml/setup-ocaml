@@ -431,7 +431,7 @@ __metadata:
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:22.5.5"
-    "@vercel/ncc": "npm:0.38.1"
+    "@vercel/ncc": "npm:0.38.2"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
     typescript: "npm:5.6.2"
@@ -447,7 +447,7 @@ __metadata:
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:22.5.5"
-    "@vercel/ncc": "npm:0.38.1"
+    "@vercel/ncc": "npm:0.38.2"
     typescript: "npm:5.6.2"
   languageName: unknown
   linkType: soft
@@ -461,7 +461,7 @@ __metadata:
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:22.5.5"
-    "@vercel/ncc": "npm:0.38.1"
+    "@vercel/ncc": "npm:0.38.2"
     typescript: "npm:5.6.2"
   languageName: unknown
   linkType: soft
@@ -475,7 +475,7 @@ __metadata:
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:22.5.5"
-    "@vercel/ncc": "npm:0.38.1"
+    "@vercel/ncc": "npm:0.38.2"
     typescript: "npm:5.6.2"
   languageName: unknown
   linkType: soft
@@ -496,7 +496,7 @@ __metadata:
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:22.5.5"
     "@types/semver": "npm:7.5.8"
-    "@vercel/ncc": "npm:0.38.1"
+    "@vercel/ncc": "npm:0.38.2"
     cheerio: "npm:1.0.0"
     semver: "npm:7.6.3"
     systeminformation: "npm:5.23.5"
@@ -669,14 +669,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/ncc@npm:0.38.1":
-  version: 0.38.1
-  resolution: "@vercel/ncc@npm:0.38.1"
+"@vercel/ncc@npm:0.38.2":
+  version: 0.38.2
+  resolution: "@vercel/ncc@npm:0.38.2"
   dependencies:
     node-gyp: "npm:latest"
   bin:
     ncc: dist/ncc/cli.js
-  checksum: 10c0/3e6c08251ccc8c6c7ca6523f223e326c70950af787259252c8a19ef04a7f8cc4c42d4c1ddb94f227a9d0d1c5429f71e303daf6a356948b4f81bcd38d075c9b24
+  checksum: 10c0/430f506d7243155d85b8f99d46f46159b9dea58190ae4c28eadebe6b1b90e350e9861c7accc4f3b2dcb603f47fbe7cc947c56af396c96ba1059419f1b4f20928
   languageName: node
   linkType: hard
 
