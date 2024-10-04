@@ -8,7 +8,6 @@ import * as semver from "semver";
 import {
   ALLOW_PRERELEASE_OPAM,
   ARCHITECTURE,
-  CYGWIN_ROOT,
   GITHUB_TOKEN,
   OPAM_DISABLE_SANDBOXING,
   PLATFORM,
@@ -86,7 +85,7 @@ async function acquireOpam() {
   });
 }
 
-async function initializeOpam() {
+async function initializeOpam(prefix?: string) {
   await core.group("Initialise opam state", async () => {
     if (PLATFORM !== "windows") {
       try {
@@ -104,7 +103,7 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       extraOptions.push("--cygwin-local-install");
-      extraOptions.push(`--cygwin-location=${CYGWIN_ROOT}`);
+      extraOptions.push(`--cygwin-location=${prefix}`);
     }
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");
@@ -119,9 +118,9 @@ async function initializeOpam() {
   });
 }
 
-export async function setupOpam() {
+export async function setupOpam(prefix?: string) {
   await acquireOpam();
-  await initializeOpam();
+  await initializeOpam(prefix);
 }
 
 export async function installOcaml(ocamlCompiler: string) {
