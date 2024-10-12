@@ -17,6 +17,7 @@ import {
   OPAM_ROOT,
   PLATFORM,
   RESOLVED_COMPILER,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { getLatestOpamRelease } from "./opam.js";
 import { getCygwinVersion } from "./windows.js";
@@ -49,6 +50,7 @@ async function composeOpamCacheKeys() {
   const ocamlCompiler = await RESOLVED_COMPILER;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
   const osInfo = await system.osInfo();
+  const msys2 = WINDOWS_ENVIRONMENT === "msys2" ? "msys2" : undefined;
   const plainKey = [
     PLATFORM,
     osInfo.release,
@@ -57,7 +59,9 @@ async function composeOpamCacheKeys() {
     ocamlCompiler,
     repositoryUrls,
     sandbox,
-  ].join(",");
+  ]
+    .concat(msys2 ?? [])
+    .join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
@@ -177,7 +181,7 @@ async function restoreOpamCache() {
 export async function restoreOpamCaches() {
   return await core.group("Retrieve the opam cache", async () => {
     const [opamCacheHit, cygwinCacheHit] = await Promise.all(
-      PLATFORM === "windows"
+      PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin"
         ? [restoreOpamCache(), restoreCygwinCache()]
         : [restoreOpamCache()],
     );

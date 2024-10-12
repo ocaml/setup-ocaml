@@ -1,4 +1,5 @@
 import * as os from "node:os";
+// import * as path from "node:path";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
@@ -9,6 +10,7 @@ import {
   saveOpamCache,
 } from "./cache.js";
 import {
+  CYGWIN_ROOT,
   CYGWIN_ROOT_BIN,
   DUNE_CACHE,
   DUNE_CACHE_ROOT,
@@ -17,6 +19,7 @@ import {
   OPAM_ROOT,
   PLATFORM,
   RESOLVED_COMPILER,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { installDune } from "./dune.js";
 import {
@@ -27,7 +30,7 @@ import {
   setupOpam,
 } from "./opam.js";
 import { getOpamLocalPackages } from "./packages.js";
-import { setupCygwin } from "./windows.js";
+import { prepareMsys2, setupCygwin } from "./windows.js";
 
 export async function installer() {
   if (core.isDebug()) {
@@ -62,13 +65,24 @@ export async function installer() {
   }
   const { opamCacheHit, cygwinCacheHit } = await restoreOpamCaches();
   if (PLATFORM === "windows") {
-    await setupCygwin();
-    if (!cygwinCacheHit) {
-      await saveCygwinCache();
+    switch (WINDOWS_ENVIRONMENT) {
+      case "msys2": {
+        const msys2Root = await prepareMsys2();
+        await setupOpam(msys2Root);
+        break;
+      }
+      case "cygwin":
+        await setupCygwin();
+        if (!cygwinCacheHit) {
+          await saveCygwinCache();
+        }
+        core.addPath(CYGWIN_ROOT_BIN);
+        await setupOpam(CYGWIN_ROOT);
+        break;
     }
-    core.addPath(CYGWIN_ROOT_BIN);
+  } else {
+    await setupOpam();
   }
-  await setupOpam();
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
   const ocamlCompiler = await RESOLVED_COMPILER;
