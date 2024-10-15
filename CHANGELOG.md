@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ## [unreleased]
 
+### Fixed
+
+- Fix darcs installation failure on latest Ubuntu image.
+
 ## [3.0.9]
 
 ### Changed
