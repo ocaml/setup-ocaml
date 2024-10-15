@@ -501,7 +501,7 @@ __metadata:
     semver: "npm:7.6.3"
     systeminformation: "npm:5.23.5"
     typescript: "npm:5.6.3"
-    yaml: "npm:2.5.1"
+    yaml: "npm:2.6.0"
   languageName: unknown
   linkType: soft
 
@@ -1914,9 +1914,9 @@ __metadata:
   linkType: hard
 
 "undici@npm:^6.19.5":
-  version: 6.20.0
-  resolution: "undici@npm:6.20.0"
-  checksum: 10c0/b74a6e4dcdfc3a6e7f5eab77c24f598c5a8664091797dc4940f86e1ed27e5dc9bef390aa1ecf53f20c7ec0e8809bc3d1518a8c3c560fa5972a6a325d628765be
+  version: 6.20.1
+  resolution: "undici@npm:6.20.1"
+  checksum: 10c0/b2c8d5adcd226c53d02f9270e4cac277256a7147cf310af319369ec6f87651ca46b2960366cb1339a6dac84d937e01e8cdbec5cb468f1f1ce5e9490e438d7222
   languageName: node
   linkType: hard
 
@@ -2071,11 +2071,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:2.5.1":
-  version: 2.5.1
-  resolution: "yaml@npm:2.5.1"
+"yaml@npm:2.6.0":
+  version: 2.6.0
+  resolution: "yaml@npm:2.6.0"
   bin:
     yaml: bin.mjs
-  checksum: 10c0/40fba5682898dbeeb3319e358a968fe886509fab6f58725732a15f8dda3abac509f91e76817c708c9959a15f786f38ff863c1b88062d7c1162c5334a7d09cb4a
+  checksum: 10c0/9e74cdb91cc35512a1c41f5ce509b0e93cc1d00eff0901e4ba831ee75a71ddf0845702adcd6f4ee6c811319eb9b59653248462ab94fa021ab855543a75396ceb
   languageName: node
   linkType: hard
