@@ -22,7 +22,7 @@ async function parse() {
   }
 }
 
-export async function getOcamlformatVersion() {
+export async function retrieveOcamlformatVersion() {
   const config = await parse();
   if (config === undefined) {
     core.warning(".ocamlformat file is not found");

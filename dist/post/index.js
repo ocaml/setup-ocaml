@@ -102957,7 +102957,7 @@ var semver = __nccwpck_require__(84);
 function isSemverValidRange(semverVersion) {
     return semver.validRange(semverVersion, { loose: true }) !== null;
 }
-async function getAllCompilerVersions() {
+async function retrieveAllCompilerVersions() {
     const octokit = lib_github.getOctokit(GITHUB_TOKEN);
     const { data: packages } = await octokit.rest.repos.getContent({
         owner: "ocaml",
@@ -102985,7 +102985,7 @@ async function getAllCompilerVersions() {
     return [...versions];
 }
 async function resolveVersion(semverVersion) {
-    const compilerVersions = await getAllCompilerVersions();
+    const compilerVersions = await retrieveAllCompilerVersions();
     const matchedFullCompilerVersion = semver.maxSatisfying(compilerVersions, semverVersion, { loose: true });
     if (matchedFullCompilerVersion === null) {
         throw new Error(`No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`);
@@ -103130,7 +103130,7 @@ const constants_RESOLVED_COMPILER = (async () => {
 
 
 async function composeCygwinCacheKeys() {
-    const cygwinVersion = await getCygwinVersion();
+    const cygwinVersion = await retrieveCygwinVersion();
     const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
@@ -103150,7 +103150,7 @@ async function composeDuneCacheKeys() {
     return { key, restoreKeys };
 }
 async function composeOpamCacheKeys() {
-    const { version: opamVersion } = await getLatestOpamRelease();
+    const { version: opamVersion } = await retrieveLatestOpamRelease();
     const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
     const ocamlCompiler = await RESOLVED_COMPILER;
     const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");

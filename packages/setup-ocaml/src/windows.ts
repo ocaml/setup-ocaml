@@ -22,7 +22,7 @@ function createHttpClient() {
   );
 }
 
-export async function getCygwinVersion() {
+export async function retrieveCygwinVersion() {
   const httpClient = createHttpClient();
   const response = await httpClient.get("https://www.cygwin.com");
   const body = await response.readBody();
@@ -71,7 +71,7 @@ async function setGitToIgnoreCygwinLocalPackageDirectory() {
 export async function setupCygwin() {
   await core.group("Prepare the Cygwin environment", async () => {
     await setGitToIgnoreCygwinLocalPackageDirectory();
-    const version = await getCygwinVersion();
+    const version = await retrieveCygwinVersion();
     const cachedPath = toolCache.find("cygwin", version, "x86_64");
     if (cachedPath === "") {
       const downloadedPath = await toolCache.downloadTool(

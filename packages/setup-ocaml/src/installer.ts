@@ -26,7 +26,7 @@ import {
   repositoryRemoveAll,
   setupOpam,
 } from "./opam.js";
-import { getOpamLocalPackages } from "./packages.js";
+import { retrieveOpamLocalPackages } from "./packages.js";
 import { setupCygwin } from "./windows.js";
 
 export async function installer() {
@@ -85,7 +85,7 @@ export async function installer() {
     core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
   }
   core.exportVariable("CLICOLOR_FORCE", "1");
-  const fnames = await getOpamLocalPackages();
+  const fnames = await retrieveOpamLocalPackages();
   if (fnames.length > 0) {
     if (OPAM_PIN) {
       await pin(fnames);

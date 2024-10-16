@@ -27457,7 +27457,7 @@ async function parse() {
         return;
     }
 }
-async function getOcamlformatVersion() {
+async function retrieveOcamlformatVersion() {
     const config = await parse();
     if (config === undefined) {
         core.warning(".ocamlformat file is not found");
@@ -27492,7 +27492,7 @@ async function installDune() {
 
 async function run() {
     try {
-        const version = await getOcamlformatVersion();
+        const version = await retrieveOcamlformatVersion();
         if (version) {
             await installOcamlformat(version);
         }

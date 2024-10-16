@@ -35972,7 +35972,7 @@ function createBuildTarget(output, filePath) {
 
 
 
-async function getOpamLocalPackages() {
+async function retrieveOpamLocalPackages() {
     const globber = await glob.create("*.opam");
     const fpaths = await globber.glob();
     return fpaths;
@@ -35983,7 +35983,7 @@ async function analysis() {
         url: "https://github.com/ocaml/setup-ocaml/tree/master/analysis",
         version: "0.0.0",
     });
-    const fpaths = await getOpamLocalPackages();
+    const fpaths = await retrieveOpamLocalPackages();
     for (const fpath of fpaths) {
         const temp = await promises_namespaceObject.mkdtemp(external_node_path_namespaceObject.join(external_node_os_namespaceObject.tmpdir(), "setup-ocaml-opam-tree-"));
         const tempJson = external_node_path_namespaceObject.join(temp, "tmp.json");

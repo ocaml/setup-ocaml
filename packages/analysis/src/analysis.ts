@@ -11,7 +11,7 @@ import {
 import type { Output } from "./opam-detector.js";
 import { createBuildTarget } from "./opam-detector.js";
 
-async function getOpamLocalPackages() {
+async function retrieveOpamLocalPackages() {
   const globber = await glob.create("*.opam");
   const fpaths = await globber.glob();
   return fpaths;
@@ -23,7 +23,7 @@ export async function analysis() {
     url: "https://github.com/ocaml/setup-ocaml/tree/master/analysis",
     version: "0.0.0",
   });
-  const fpaths = await getOpamLocalPackages();
+  const fpaths = await retrieveOpamLocalPackages();
   for (const fpath of fpaths) {
     const temp = await fs.mkdtemp(
       path.join(os.tmpdir(), "setup-ocaml-opam-tree-"),
