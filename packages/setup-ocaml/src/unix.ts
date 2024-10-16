@@ -2,7 +2,7 @@ import * as process from "node:process";
 import { exec, getExecOutput } from "@actions/exec";
 import { PLATFORM } from "./constants.js";
 
-async function checkInstallability(packageName: string) {
+async function checkAptInstallability(packageName: string) {
   const output = await getExecOutput("sudo", [
     "apt-cache",
     "search",
@@ -12,17 +12,29 @@ async function checkInstallability(packageName: string) {
   return output.stdout.length !== 0;
 }
 
+async function retrieveInstallableOptionalDependencies(
+  optionalDependencies: string[],
+) {
+  switch (PLATFORM) {
+    case "linux": {
+      return optionalDependencies.filter(
+        async (dep) => await checkAptInstallability(dep),
+      );
+    }
+    default: {
+      return [];
+    }
+  }
+}
+
 export async function installUnixSystemPackages() {
   const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
+  const optionalDependencies = await retrieveInstallableOptionalDependencies([
+    "darcs",
+    "mercurial",
+  ]);
   if (isGitHubRunner) {
     if (PLATFORM === "linux") {
-      const darcs = await (async () => {
-        const installability = await checkInstallability("darcs");
-        if (installability) {
-          return ["darcs"];
-        }
-        return [];
-      })();
       await exec("sudo", [
         "apt-get",
         "--yes",
@@ -30,10 +42,9 @@ export async function installUnixSystemPackages() {
         "bubblewrap",
         "g++-multilib",
         "gcc-multilib",
-        "mercurial",
         "musl-tools",
         "rsync",
-        ...darcs,
+        ...optionalDependencies,
       ]);
     } else if (PLATFORM === "macos") {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);

@@ -18,11 +18,11 @@ import {
   PLATFORM,
   RESOLVED_COMPILER,
 } from "./constants.js";
-import { getLatestOpamRelease } from "./opam.js";
-import { getCygwinVersion } from "./windows.js";
+import { retrieveLatestOpamRelease } from "./opam.js";
+import { retrieveCygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
-  const cygwinVersion = await getCygwinVersion();
+  const cygwinVersion = await retrieveCygwinVersion();
   const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
@@ -44,7 +44,7 @@ async function composeDuneCacheKeys() {
 }
 
 async function composeOpamCacheKeys() {
-  const { version: opamVersion } = await getLatestOpamRelease();
+  const { version: opamVersion } = await retrieveLatestOpamRelease();
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const ocamlCompiler = await RESOLVED_COMPILER;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");

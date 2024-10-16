@@ -7,7 +7,7 @@ function isSemverValidRange(semverVersion: string) {
   return semver.validRange(semverVersion, { loose: true }) !== null;
 }
 
-async function getAllCompilerVersions() {
+async function retrieveAllCompilerVersions() {
   const octokit = github.getOctokit(GITHUB_TOKEN);
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
@@ -37,7 +37,7 @@ async function getAllCompilerVersions() {
 }
 
 async function resolveVersion(semverVersion: string) {
-  const compilerVersions = await getAllCompilerVersions();
+  const compilerVersions = await retrieveAllCompilerVersions();
   const matchedFullCompilerVersion = semver.maxSatisfying(
     compilerVersions,
     semverVersion,

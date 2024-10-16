@@ -1,12 +1,12 @@
 import * as process from "node:process";
 import * as core from "@actions/core";
 import { checkFmt } from "./lint.js";
-import { getOcamlformatVersion } from "./ocamlformat.js";
+import { retrieveOcamlformatVersion } from "./ocamlformat.js";
 import { installDune, installOcamlformat } from "./opam.js";
 
 async function run() {
   try {
-    const version = await getOcamlformatVersion();
+    const version = await retrieveOcamlformatVersion();
     if (version) {
       await installOcamlformat(version);
     }
