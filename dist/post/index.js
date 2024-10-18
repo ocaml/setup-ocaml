@@ -84138,8 +84138,6 @@ function isSASCredential(credential) {
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.isTokenCredential = exports.isSASCredential = exports.AzureSASCredential = exports.isNamedKeyCredential = exports.AzureNamedKeyCredential = exports.isKeyCredential = exports.AzureKeyCredential = void 0;
 var azureKeyCredential_js_1 = __nccwpck_require__(1746);
@@ -84186,7 +84184,25 @@ function isKeyCredential(credential) {
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isBearerToken = isBearerToken;
+exports.isPopToken = isPopToken;
 exports.isTokenCredential = isTokenCredential;
+/**
+ * @internal
+ * @param accessToken - Access token
+ * @returns Whether a token is bearer type or not
+ */
+function isBearerToken(accessToken) {
+    return !accessToken.tokenType || accessToken.tokenType === "Bearer";
+}
+/**
+ * @internal
+ * @param accessToken - Access token
+ * @returns Whether a token is Pop token or not
+ */
+function isPopToken(accessToken) {
+    return accessToken.tokenType === "pop";
+}
 /**
  * Tests an object to determine whether it implements TokenCredential.
  *
