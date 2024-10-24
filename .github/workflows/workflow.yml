@@ -53,9 +53,15 @@ jobs:
           - windows-latest
         ocaml-compiler:
           - "5.2"
+        allow-prerelease-opam:
+          - false
         include:
           - os: ubuntu-latest
             ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-flambda
+            allow-prerelease-opam: false
+          - os: ubuntu-latest
+            ocaml-compiler: "5.2"
+            allow-prerelease-opam: true
 
     runs-on: ${{ matrix.os }}
 
@@ -67,5 +73,6 @@ jobs:
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
 
       - run: opam install uri
