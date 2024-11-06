@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ## [unreleased]
 
+## [3.0.11]
+
+### Changed
+
+- Update runtime dependencies.
+
 ## [3.0.10]
 
 ### Changed
@@ -643,7 +649,8 @@ Windows installs `mingw64-x86_64-gcc-g++` so GitHub Action can build libraries t
 
 - Initial release.
 
-[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.10...HEAD
+[unreleased]: https://github.com/ocaml/setup-ocaml/compare/v3.0.11...HEAD
+[3.0.11]: https://github.com/ocaml/setup-ocaml/compare/v3.0.10...v3.0.11
 [3.0.10]: https://github.com/ocaml/setup-ocaml/compare/v3.0.9...v3.0.10
 [3.0.9]: https://github.com/ocaml/setup-ocaml/compare/v3.0.8...v3.0.9
 [3.0.8]: https://github.com/ocaml/setup-ocaml/compare/v3.0.7...v3.0.8
