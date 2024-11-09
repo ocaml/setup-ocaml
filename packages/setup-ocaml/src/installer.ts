@@ -88,11 +88,9 @@ export async function installer() {
     core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
   }
   core.exportVariable("CLICOLOR_FORCE", "1");
-  const fnames = await retrieveOpamLocalPackages();
-  if (fnames.length > 0) {
-    if (OPAM_PIN) {
-      await pin(fnames);
-    }
+  if (OPAM_PIN) {
+    const fnames = await retrieveOpamLocalPackages();
+    await pin(fnames);
   }
   await exec("opam", ["--version"]);
   await exec("opam", ["exec", "--", "ocaml", "-version"]);

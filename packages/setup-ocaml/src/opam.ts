@@ -137,6 +137,9 @@ export async function installOcaml(ocamlCompiler: string) {
 }
 
 export async function pin(fpaths: string[]) {
+  if (fpaths.length === 0) {
+    return;
+  }
   await core.group("Pin local packages", async () => {
     for (const fpath of fpaths) {
       const fname = path.basename(fpath, ".opam");
