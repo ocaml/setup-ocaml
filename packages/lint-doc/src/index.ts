@@ -11,7 +11,7 @@ async function run() {
     process.exit(0);
   } catch (error) {
     if (error instanceof Error) {
-      core.setFailed(error.message);
+      core.error(error.message);
     }
     process.exit(1);
   }

@@ -103023,7 +103023,7 @@ async function restoreCache(key, restoreKeys, paths) {
         if (error instanceof Error) {
             core.info(error.message);
         }
-        core.warning("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
+        core.notice("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
         return;
     }
 }
@@ -103039,7 +103039,7 @@ async function saveCache(key, paths) {
         if (error instanceof Error) {
             lib_core.info(error.message);
         }
-        lib_core.warning("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
+        lib_core.notice("An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.");
     }
 }
 async function restoreDuneCache() {
@@ -103150,7 +103150,8 @@ async function run() {
         if (error instanceof Error) {
             lib_core.error(error.message);
         }
-        external_node_process_.exit(1);
+        // The post step should not fail if there is an error...
+        external_node_process_.exit(0);
     }
 }
 void run();

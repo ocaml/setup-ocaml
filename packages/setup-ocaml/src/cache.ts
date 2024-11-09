@@ -127,7 +127,7 @@ async function restoreCache(
     if (error instanceof Error) {
       core.info(error.message);
     }
-    core.warning(
+    core.notice(
       "An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.",
     );
     return;
@@ -145,7 +145,7 @@ async function saveCache(key: string, paths: string[]) {
     if (error instanceof Error) {
       core.info(error.message);
     }
-    core.warning(
+    core.notice(
       "An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.",
     );
   }

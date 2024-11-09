@@ -15,7 +15,8 @@ async function run() {
     if (error instanceof Error) {
       core.error(error.message);
     }
-    process.exit(1);
+    // The post step should not fail if there is an error...
+    process.exit(0);
   }
 }
 

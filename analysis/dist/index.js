@@ -36046,7 +36046,7 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error) {
-            core.setFailed(error.message);
+            core.error(error.message);
         }
         external_node_process_namespaceObject.exit(1);
     }
