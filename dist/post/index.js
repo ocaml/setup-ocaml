@@ -103092,6 +103092,7 @@ async function saveOpamCache() {
             "--download-cache",
             "--logs",
             "--repo-cache",
+            "--untracked",
             "--unused-repositories",
         ]);
         const { key } = await composeOpamCacheKeys();
