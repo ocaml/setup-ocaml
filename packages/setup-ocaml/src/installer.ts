@@ -25,6 +25,7 @@ import {
   repositoryAddAll,
   repositoryRemoveAll,
   setupOpam,
+  update,
 } from "./opam.js";
 import { retrieveOpamLocalPackages } from "./packages.js";
 import { setupCygwin } from "./windows.js";
@@ -69,12 +70,14 @@ export async function installer() {
     core.addPath(CYGWIN_ROOT_BIN);
   }
   await setupOpam();
-  await repositoryRemoveAll();
-  await repositoryAddAll(OPAM_REPOSITORIES);
-  const ocamlCompiler = await RESOLVED_COMPILER;
   if (!opamCacheHit) {
+    await repositoryRemoveAll();
+    await repositoryAddAll(OPAM_REPOSITORIES);
+    const ocamlCompiler = await RESOLVED_COMPILER;
     await installOcaml(ocamlCompiler);
     await saveOpamCache();
+  } else {
+    await update();
   }
   if (DUNE_CACHE) {
     await restoreDuneCache();
