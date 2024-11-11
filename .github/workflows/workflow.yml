@@ -75,4 +75,4 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
 
-      - run: opam install uri
+      - run: opam install ssl
