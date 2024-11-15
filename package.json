@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "turbo": "2.2.3"
+    "turbo": "2.3.0"
   },
   "packageManager": "yarn@4.5.1"
 }
