@@ -8141,8 +8141,8 @@ class BaseRequestPolicy {
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-const SDK_VERSION = "12.25.0";
-const SERVICE_VERSION = "2024-11-04";
+const SDK_VERSION = "12.26.0";
+const SERVICE_VERSION = "2025-01-05";
 const BLOCK_BLOB_MAX_UPLOAD_BLOB_BYTES = 256 * 1024 * 1024; // 256MB
 const BLOCK_BLOB_MAX_STAGE_BLOCK_BYTES = 4000 * 1024 * 1024; // 4000MB
 const BLOCK_BLOB_MAX_BLOCKS = 50000;
@@ -18804,7 +18804,7 @@ const timeoutInSeconds = {
 const version = {
     parameterPath: "version",
     mapper: {
-        defaultValue: "2024-11-04",
+        defaultValue: "2025-01-05",
         isConstant: true,
         serializedName: "x-ms-version",
         type: {
@@ -21802,7 +21802,12 @@ const setImmutabilityPolicyOperationSpec = {
             headersMapper: BlobSetImmutabilityPolicyExceptionHeaders,
         },
     },
-    queryParameters: [timeoutInSeconds, comp12],
+    queryParameters: [
+        timeoutInSeconds,
+        snapshot,
+        versionId,
+        comp12,
+    ],
     urlParameters: [url],
     headerParameters: [
         version,
@@ -21827,7 +21832,12 @@ const deleteImmutabilityPolicyOperationSpec = {
             headersMapper: BlobDeleteImmutabilityPolicyExceptionHeaders,
         },
     },
-    queryParameters: [timeoutInSeconds, comp12],
+    queryParameters: [
+        timeoutInSeconds,
+        snapshot,
+        versionId,
+        comp12,
+    ],
     urlParameters: [url],
     headerParameters: [
         version,
@@ -21849,7 +21859,12 @@ const setLegalHoldOperationSpec = {
             headersMapper: BlobSetLegalHoldExceptionHeaders,
         },
     },
-    queryParameters: [timeoutInSeconds, comp13],
+    queryParameters: [
+        timeoutInSeconds,
+        snapshot,
+        versionId,
+        comp13,
+    ],
     urlParameters: [url],
     headerParameters: [
         version,
@@ -23421,7 +23436,7 @@ let StorageClient$1 = class StorageClient extends coreHttpCompat__namespace.Exte
         const defaults = {
             requestContentType: "application/json; charset=utf-8",
         };
-        const packageDetails = `azsdk-js-azure-storage-blob/12.25.0`;
+        const packageDetails = `azsdk-js-azure-storage-blob/12.26.0`;
         const userAgentPrefix = options.userAgentOptions && options.userAgentOptions.userAgentPrefix
             ? `${options.userAgentOptions.userAgentPrefix} ${packageDetails}`
             : `${packageDetails}`;
@@ -23432,7 +23447,7 @@ let StorageClient$1 = class StorageClient extends coreHttpCompat__namespace.Exte
         // Parameter assignments
         this.url = url;
         // Assigning values to Constant parameters
-        this.version = options.version || "2024-11-04";
+        this.version = options.version || "2025-01-05";
         this.service = new ServiceImpl(this);
         this.container = new ContainerImpl(this);
         this.blob = new BlobImpl(this);
@@ -25723,7 +25738,7 @@ class AvroType {
             return AvroType.fromStringSchema(type);
         }
         catch (_a) {
-            // eslint-disable-line no-empty
+            // no-op
         }
         switch (type) {
             case AvroComplex.RECORD:
@@ -25850,7 +25865,6 @@ class AvroRecordType extends AvroType {
 function arraysEqual(a, b) {
     if (a === b)
         return true;
-    // eslint-disable-next-line eqeqeq
     if (a == null || b == null)
         return false;
     if (a.length !== b.length)
@@ -28377,6 +28391,38 @@ class BlobClient extends StorageClient {
             throw new RangeError("Can only generate the SAS when the client is initialized with a shared key credential");
         }
         return generateBlobSASQueryParametersInternal(Object.assign({ containerName: this._containerName, blobName: this._name, snapshotTime: this._snapshot, versionId: this._versionId }, options), this.credential).stringToSign;
+    }
+    /**
+     *
+     * Generates a Blob Service Shared Access Signature (SAS) URI based on
+     * the client properties and parameters passed in. The SAS is signed by the input user delegation key.
+     *
+     * @see https://docs.microsoft.com/en-us/rest/api/storageservices/constructing-a-service-sas
+     *
+     * @param options - Optional parameters.
+     * @param userDelegationKey -  Return value of `blobServiceClient.getUserDelegationKey()`
+     * @returns The SAS URI consisting of the URI to the resource represented by this client, followed by the generated SAS token.
+     */
+    generateUserDelegationSasUrl(options, userDelegationKey) {
+        return new Promise((resolve) => {
+            const sas = generateBlobSASQueryParameters(Object.assign({ containerName: this._containerName, blobName: this._name, snapshotTime: this._snapshot, versionId: this._versionId }, options), userDelegationKey, this.accountName).toString();
+            resolve(appendToURLQuery(this.url, sas));
+        });
+    }
+    /**
+     * Only available for BlobClient constructed with a shared key credential.
+     *
+     * Generates string to sign for a Blob Service Shared Access Signature (SAS) URI based on
+     * the client properties and parameters passed in. The SAS is signed by the input user delegation key.
+     *
+     * @see https://docs.microsoft.com/en-us/rest/api/storageservices/constructing-a-service-sas
+     *
+     * @param options - Optional parameters.
+     * @param userDelegationKey -  Return value of `blobServiceClient.getUserDelegationKey()`
+     * @returns The SAS URI consisting of the URI to the resource represented by this client, followed by the generated SAS token.
+     */
+    generateUserDelegationSasStringToSign(options, userDelegationKey) {
+        return generateBlobSASQueryParametersInternal(Object.assign({ containerName: this._containerName, blobName: this._name, snapshotTime: this._snapshot, versionId: this._versionId }, options), userDelegationKey, this.accountName).stringToSign;
     }
     /**
      * Delete the immutablility policy on the blob.
@@ -31741,6 +31787,35 @@ class ContainerClient extends StorageClient {
             throw new RangeError("Can only generate the SAS when the client is initialized with a shared key credential");
         }
         return generateBlobSASQueryParametersInternal(Object.assign({ containerName: this._containerName }, options), this.credential).stringToSign;
+    }
+    /**
+     * Generates a Blob Container Service Shared Access Signature (SAS) URI based on the client properties
+     * and parameters passed in. The SAS is signed by the input user delegation key.
+     *
+     * @see https://docs.microsoft.com/en-us/rest/api/storageservices/constructing-a-service-sas
+     *
+     * @param options - Optional parameters.
+     * @param userDelegationKey -  Return value of `blobServiceClient.getUserDelegationKey()`
+     * @returns The SAS URI consisting of the URI to the resource represented by this client, followed by the generated SAS token.
+     */
+    generateUserDelegationSasUrl(options, userDelegationKey) {
+        return new Promise((resolve) => {
+            const sas = generateBlobSASQueryParameters(Object.assign({ containerName: this._containerName }, options), userDelegationKey, this.accountName).toString();
+            resolve(appendToURLQuery(this.url, sas));
+        });
+    }
+    /**
+     * Generates string to sign for a Blob Container Service Shared Access Signature (SAS) URI
+     * based on the client properties and parameters passed in. The SAS is signed by the input user delegation key.
+     *
+     * @see https://docs.microsoft.com/en-us/rest/api/storageservices/constructing-a-service-sas
+     *
+     * @param options - Optional parameters.
+     * @param userDelegationKey -  Return value of `blobServiceClient.getUserDelegationKey()`
+     * @returns The SAS URI consisting of the URI to the resource represented by this client, followed by the generated SAS token.
+     */
+    generateUserDelegationSasStringToSign(options, userDelegationKey) {
+        return generateBlobSASQueryParametersInternal(Object.assign({ containerName: this._containerName }, options), userDelegationKey, this.accountName).stringToSign;
     }
     /**
      * Creates a BlobBatchClient object to conduct batch operations.
@@ -100567,7 +100642,7 @@ const jsonScalars = [
         identify: value => typeof value === 'boolean',
         default: true,
         tag: 'tag:yaml.org,2002:bool',
-        test: /^true|false$/,
+        test: /^true$|^false$/,
         resolve: str => str === 'true',
         stringify: stringifyJSON
     },
@@ -101462,7 +101537,7 @@ const timestamp = {
         }
         return new Date(date);
     },
-    stringify: ({ value }) => value.toISOString().replace(/((T00:00)?:00)?\.000Z$/, '')
+    stringify: ({ value }) => value.toISOString().replace(/(T00:00:00)?\.000Z$/, '')
 };
 
 exports.floatTime = floatTime;
@@ -102464,23 +102539,32 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
         start = start.replace(/\n+/g, `$&${indent}`);
     }
     const indentSize = indent ? '2' : '1'; // root is at -1
-    let header = (literal ? '|' : '>') + (startWithSpace ? indentSize : '') + chomp;
+    // Leading | or > is added later
+    let header = (startWithSpace ? indentSize : '') + chomp;
     if (comment) {
         header += ' ' + commentString(comment.replace(/ ?[\r\n]+/g, ' '));
         if (onComment)
             onComment();
     }
-    if (literal) {
-        value = value.replace(/\n+/g, `$&${indent}`);
-        return `${header}\n${indent}${start}${value}${end}`;
+    if (!literal) {
+        const foldedValue = value
+            .replace(/\n+/g, '\n$&')
+            .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
+            //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
+            .replace(/\n+/g, `$&${indent}`);
+        let literalFallback = false;
+        const foldOptions = getFoldOptions(ctx, true);
+        if (blockQuote !== 'folded' && type !== Scalar.Scalar.BLOCK_FOLDED) {
+            foldOptions.onOverflow = () => {
+                literalFallback = true;
+            };
+        }
+        const body = foldFlowLines.foldFlowLines(`${start}${foldedValue}${end}`, indent, foldFlowLines.FOLD_BLOCK, foldOptions);
+        if (!literalFallback)
+            return `>${header}\n${indent}${body}`;
     }
-    value = value
-        .replace(/\n+/g, '\n$&')
-        .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
-        //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
-        .replace(/\n+/g, `$&${indent}`);
-    const body = foldFlowLines.foldFlowLines(`${start}${value}${end}`, indent, foldFlowLines.FOLD_BLOCK, getFoldOptions(ctx, true));
-    return `${header}\n${indent}${body}`;
+    value = value.replace(/\n+/g, `$&${indent}`);
+    return `|${header}\n${indent}${start}${value}${end}`;
 }
 function plainString(item, ctx, onComment, onChompKeep) {
     const { type, value } = item;

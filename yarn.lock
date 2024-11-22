@@ -251,8 +251,8 @@ __metadata:
   linkType: hard
 
 "@azure/storage-blob@npm:^12.13.0":
-  version: 12.25.0
-  resolution: "@azure/storage-blob@npm:12.25.0"
+  version: 12.26.0
+  resolution: "@azure/storage-blob@npm:12.26.0"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.4.0"
@@ -267,7 +267,7 @@ __metadata:
     "@azure/logger": "npm:^1.0.0"
     events: "npm:^3.0.0"
     tslib: "npm:^2.2.0"
-  checksum: 10c0/25ffb7dfbb2efca5f30780c1e877712b0285c815f8e049c77d47983341692968fe057c8bb97f4ca3f722b8927e06f7cae170db7efcd435488e7ac5b5d6e53f9f
+  checksum: 10c0/069b7a85dddb33ee793efd74fbc1a3377c6d14dbb11094c2ebae87e324f16d23292806d5dcdf04280456dafc4d960e847968f6f01e384039b47363d61faf1017
   languageName: node
   linkType: hard
 
@@ -429,11 +429,11 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.9.0"
+    "@types/node": "npm:22.9.1"
     "@vercel/ncc": "npm:0.38.3"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
-    typescript: "npm:5.6.3"
+    typescript: "npm:5.7.2"
   languageName: unknown
   linkType: soft
 
@@ -445,9 +445,9 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.9.0"
+    "@types/node": "npm:22.9.1"
     "@vercel/ncc": "npm:0.38.3"
-    typescript: "npm:5.6.3"
+    typescript: "npm:5.7.2"
   languageName: unknown
   linkType: soft
 
@@ -459,9 +459,9 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.9.0"
+    "@types/node": "npm:22.9.1"
     "@vercel/ncc": "npm:0.38.3"
-    typescript: "npm:5.6.3"
+    typescript: "npm:5.7.2"
   languageName: unknown
   linkType: soft
 
@@ -473,9 +473,9 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.9.0"
+    "@types/node": "npm:22.9.1"
     "@vercel/ncc": "npm:0.38.3"
-    typescript: "npm:5.6.3"
+    typescript: "npm:5.7.2"
   languageName: unknown
   linkType: soft
 
@@ -493,14 +493,14 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.9.0"
+    "@types/node": "npm:22.9.1"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
     semver: "npm:7.6.3"
     systeminformation: "npm:5.23.5"
-    typescript: "npm:5.6.3"
-    yaml: "npm:2.6.0"
+    typescript: "npm:5.7.2"
+    yaml: "npm:2.6.1"
   languageName: unknown
   linkType: soft
 
@@ -652,12 +652,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.9.0":
-  version: 22.9.0
-  resolution: "@types/node@npm:22.9.0"
+"@types/node@npm:22.9.1":
+  version: 22.9.1
+  resolution: "@types/node@npm:22.9.1"
   dependencies:
     undici-types: "npm:~6.19.8"
-  checksum: 10c0/3f46cbe0a49bab4ba30494025e4c8a6e699b98ac922857aa1f0209ce11a1313ee46e6808b8f13fe5b8b960a9d7796b77c8d542ad4e9810e85ef897d5593b5d51
+  checksum: 10c0/ea489ae603aa8874e4e88980aab6f2dad09c755da779c88dd142983bfe9609803c89415ca7781f723072934066f63daf2b3339ef084a8ad1a8079cf3958be243
   languageName: node
   linkType: hard
 
@@ -1635,7 +1635,7 @@ __metadata:
   resolution: "setup-ocaml@workspace:."
   dependencies:
     "@biomejs/biome": "npm:1.9.4"
-    turbo: "npm:2.3.0"
+    turbo: "npm:2.3.1"
   languageName: unknown
   linkType: soft
 
@@ -1805,58 +1805,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo-darwin-64@npm:2.3.0"
+"turbo-darwin-64@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo-darwin-64@npm:2.3.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo-darwin-arm64@npm:2.3.0"
+"turbo-darwin-arm64@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo-darwin-arm64@npm:2.3.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo-linux-64@npm:2.3.0"
+"turbo-linux-64@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo-linux-64@npm:2.3.1"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo-linux-arm64@npm:2.3.0"
+"turbo-linux-arm64@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo-linux-arm64@npm:2.3.1"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo-windows-64@npm:2.3.0"
+"turbo-windows-64@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo-windows-64@npm:2.3.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo-windows-arm64@npm:2.3.0"
+"turbo-windows-arm64@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo-windows-arm64@npm:2.3.1"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:2.3.0":
-  version: 2.3.0
-  resolution: "turbo@npm:2.3.0"
+"turbo@npm:2.3.1":
+  version: 2.3.1
+  resolution: "turbo@npm:2.3.1"
   dependencies:
-    turbo-darwin-64: "npm:2.3.0"
-    turbo-darwin-arm64: "npm:2.3.0"
-    turbo-linux-64: "npm:2.3.0"
-    turbo-linux-arm64: "npm:2.3.0"
-    turbo-windows-64: "npm:2.3.0"
-    turbo-windows-arm64: "npm:2.3.0"
+    turbo-darwin-64: "npm:2.3.1"
+    turbo-darwin-arm64: "npm:2.3.1"
+    turbo-linux-64: "npm:2.3.1"
+    turbo-linux-arm64: "npm:2.3.1"
+    turbo-windows-64: "npm:2.3.1"
+    turbo-windows-arm64: "npm:2.3.1"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -1872,27 +1872,27 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/cad6a7b16d2cdaa15fe75efe1938d335cb026c073dfe639aaf2dce4c4d10ecc6a63216689682c1d1f7238ceed56f6e4ba736aa1b738aec70afb66f770e7c3817
+  checksum: 10c0/0e6766540b0b92591f9b0232b8ccc41e7bf54f1bf3c2b7deb96d7f51f1384dcf1aa11351d613948a9d073d9a1a454254e5bdd25db757cce7f9888200138040f7
   languageName: node
   linkType: hard
 
-"typescript@npm:5.6.3":
-  version: 5.6.3
-  resolution: "typescript@npm:5.6.3"
+"typescript@npm:5.7.2":
+  version: 5.7.2
+  resolution: "typescript@npm:5.7.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/44f61d3fb15c35359bc60399cb8127c30bae554cd555b8e2b46d68fa79d680354b83320ad419ff1b81a0bdf324197b29affe6cc28988cd6a74d4ac60c94f9799
+  checksum: 10c0/a873118b5201b2ef332127ef5c63fb9d9c155e6fdbe211cbd9d8e65877283797cca76546bad742eea36ed7efbe3424a30376818f79c7318512064e8625d61622
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>":
-  version: 5.6.3
-  resolution: "typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"
+"typescript@patch:typescript@npm%3A5.7.2#optional!builtin<compat/typescript>":
+  version: 5.7.2
+  resolution: "typescript@patch:typescript@npm%3A5.7.2#optional!builtin<compat/typescript>::version=5.7.2&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/7c9d2e07c81226d60435939618c91ec2ff0b75fbfa106eec3430f0fcf93a584bc6c73176676f532d78c3594fe28a54b36eb40b3d75593071a7ec91301533ace7
+  checksum: 10c0/f3b8082c9d1d1629a215245c9087df56cb784f9fb6f27b5d55577a20e68afe2a889c040aacff6d27e35be165ecf9dca66e694c42eb9a50b3b2c451b36b5675cb
   languageName: node
   linkType: hard
 
@@ -2070,11 +2070,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:2.6.0":
-  version: 2.6.0
-  resolution: "yaml@npm:2.6.0"
+"yaml@npm:2.6.1":
+  version: 2.6.1
+  resolution: "yaml@npm:2.6.1"
   bin:
     yaml: bin.mjs
-  checksum: 10c0/9e74cdb91cc35512a1c41f5ce509b0e93cc1d00eff0901e4ba831ee75a71ddf0845702adcd6f4ee6c811319eb9b59653248462ab94fa021ab855543a75396ceb
+  checksum: 10c0/aebf07f61c72b38c74d2b60c3a3ccf89ee4da45bcd94b2bfb7899ba07a5257625a7c9f717c65a6fc511563d48001e01deb1d9e55f0133f3e2edf86039c8c1be7
   languageName: node
   linkType: hard
