@@ -181,8 +181,8 @@ __metadata:
   linkType: hard
 
 "@azure/core-rest-pipeline@npm:^1.10.1, @azure/core-rest-pipeline@npm:^1.3.0, @azure/core-rest-pipeline@npm:^1.9.1":
-  version: 1.18.0
-  resolution: "@azure/core-rest-pipeline@npm:1.18.0"
+  version: 1.18.1
+  resolution: "@azure/core-rest-pipeline@npm:1.18.1"
   dependencies:
     "@azure/abort-controller": "npm:^2.0.0"
     "@azure/core-auth": "npm:^1.8.0"
@@ -192,7 +192,7 @@ __metadata:
     http-proxy-agent: "npm:^7.0.0"
     https-proxy-agent: "npm:^7.0.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/2a23ba10a53d81c82a0b74594ce32f86fc5d15a7762c6f174cfcfd4702542277f48994f252a3a00b3e7ff397fb0c8b5c4fd7d3374bd5dab946df863b461c80b9
+  checksum: 10c0/e63d110f799a74ed20925e59ee70eced355f76130a2283393ce109b49365c97a436e8ddde29badee138c17cf0ecf33c26b9ce3cfbf64cf98b904ab50e6bdedff
   languageName: node
   linkType: hard
 
@@ -429,7 +429,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.0"
+    "@types/node": "npm:22.10.1"
     "@vercel/ncc": "npm:0.38.3"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -445,7 +445,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.0"
+    "@types/node": "npm:22.10.1"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -459,7 +459,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.0"
+    "@types/node": "npm:22.10.1"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -473,7 +473,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.0"
+    "@types/node": "npm:22.10.1"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -493,7 +493,7 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.0"
+    "@types/node": "npm:22.10.1"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
@@ -652,12 +652,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.10.0":
-  version: 22.10.0
-  resolution: "@types/node@npm:22.10.0"
+"@types/node@npm:22.10.1":
+  version: 22.10.1
+  resolution: "@types/node@npm:22.10.1"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/efb3783b6fe74b4300c5bdd4f245f1025887d9b1d0950edae584af58a30d95cc058c10b4b3428f8300e4318468b605240c2ede8fcfb6ead2e0f05bca31e54c1b
+  checksum: 10c0/0fbb6d29fa35d807f0223a4db709c598ac08d66820240a2cd6a8a69b8f0bc921d65b339d850a666b43b4e779f967e6ed6cf6f0fca3575e08241e6b900364c234
   languageName: node
   linkType: hard
 
@@ -1635,7 +1635,7 @@ __metadata:
   resolution: "setup-ocaml@workspace:."
   dependencies:
     "@biomejs/biome": "npm:1.9.4"
-    turbo: "npm:2.3.2"
+    turbo: "npm:2.3.3"
   languageName: unknown
   linkType: soft
 
@@ -1805,58 +1805,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo-darwin-64@npm:2.3.2"
+"turbo-darwin-64@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo-darwin-64@npm:2.3.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo-darwin-arm64@npm:2.3.2"
+"turbo-darwin-arm64@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo-darwin-arm64@npm:2.3.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo-linux-64@npm:2.3.2"
+"turbo-linux-64@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo-linux-64@npm:2.3.3"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo-linux-arm64@npm:2.3.2"
+"turbo-linux-arm64@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo-linux-arm64@npm:2.3.3"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo-windows-64@npm:2.3.2"
+"turbo-windows-64@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo-windows-64@npm:2.3.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo-windows-arm64@npm:2.3.2"
+"turbo-windows-arm64@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo-windows-arm64@npm:2.3.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:2.3.2":
-  version: 2.3.2
-  resolution: "turbo@npm:2.3.2"
+"turbo@npm:2.3.3":
+  version: 2.3.3
+  resolution: "turbo@npm:2.3.3"
   dependencies:
-    turbo-darwin-64: "npm:2.3.2"
-    turbo-darwin-arm64: "npm:2.3.2"
-    turbo-linux-64: "npm:2.3.2"
-    turbo-linux-arm64: "npm:2.3.2"
-    turbo-windows-64: "npm:2.3.2"
-    turbo-windows-arm64: "npm:2.3.2"
+    turbo-darwin-64: "npm:2.3.3"
+    turbo-darwin-arm64: "npm:2.3.3"
+    turbo-linux-64: "npm:2.3.3"
+    turbo-linux-arm64: "npm:2.3.3"
+    turbo-windows-64: "npm:2.3.3"
+    turbo-windows-arm64: "npm:2.3.3"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -1872,7 +1872,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/bfcafa2bcdc50f25c82fb1e6b0db2e821bcbb1f40ff5adb6f7f1f94d71392802f267fe51b1cab93c2bd280c3fd05d520bfe273a49c8e3bf6ed7bd3491bdcae2d
+  checksum: 10c0/9aab52fb868a2b6246f41fe2343dec56c70252a9cb7729a3ea183458cfa728c1445d1b98882dd43542f0ffd46524e8ba7776fe0925e31a86904b113222778fa5
   languageName: node
   linkType: hard
 
