@@ -48,8 +48,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
           - ubuntu-latest
+          - macos-latest
           - windows-latest
         ocaml-compiler:
           - "5.2"
@@ -57,7 +57,7 @@ jobs:
           - false
         include:
           - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.5.2.0+options,ocaml-option-flambda
+            ocaml-compiler: ocaml-variants.5.2.1+options,ocaml-option-flambda
             allow-prerelease-opam: false
           - os: ubuntu-latest
             ocaml-compiler: "5.2"
