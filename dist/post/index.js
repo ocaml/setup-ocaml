@@ -112164,15 +112164,13 @@ const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cyg
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
 const DUNE_CACHE_ROOT = (() => {
     const homeDir = external_node_os_.homedir();
-    if (constants_PLATFORM === "windows") {
-        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-        const duneCacheDir = external_node_path_namespaceObject.join("D:", "dune");
-        return duneCacheDir;
-    }
     const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
     const duneCacheDir = xdgCacheHome
         ? external_node_path_namespaceObject.join(xdgCacheHome, "dune")
-        : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
+        : constants_PLATFORM === "windows"
+            ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+                external_node_path_namespaceObject.join("D:", "dune")
+            : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
     return duneCacheDir;
 })();
 const constants_OPAM_ROOT = constants_PLATFORM === "windows"

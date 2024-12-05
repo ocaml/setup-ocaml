@@ -62,15 +62,13 @@ export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
 export const DUNE_CACHE_ROOT = (() => {
   const homeDir = os.homedir();
-  if (PLATFORM === "windows") {
-    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-    const duneCacheDir = path.join("D:", "dune");
-    return duneCacheDir;
-  }
   const xdgCacheHome = process.env.XDG_CACHE_HOME;
   const duneCacheDir = xdgCacheHome
     ? path.join(xdgCacheHome, "dune")
-    : path.join(homeDir, ".cache", "dune");
+    : PLATFORM === "windows"
+      ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        path.join("D:", "dune")
+      : path.join(homeDir, ".cache", "dune");
   return duneCacheDir;
 })();
 
