@@ -112042,6 +112042,8 @@ var external_node_process_ = __nccwpck_require__(1708);
 var lib_core = __nccwpck_require__(7184);
 ;// CONCATENATED MODULE: external "node:crypto"
 const external_node_crypto_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+// EXTERNAL MODULE: external "node:os"
+var external_node_os_ = __nccwpck_require__(48161);
 ;// CONCATENATED MODULE: external "node:path"
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ../../node_modules/@actions/cache/lib/cache.js
@@ -112052,8 +112054,6 @@ var lib_exec = __nccwpck_require__(19192);
 var lib_github = __nccwpck_require__(58064);
 // EXTERNAL MODULE: ../../node_modules/systeminformation/lib/index.js
 var lib = __nccwpck_require__(70657);
-// EXTERNAL MODULE: external "node:os"
-var external_node_os_ = __nccwpck_require__(48161);
 // EXTERNAL MODULE: ../../node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(33483);
 // EXTERNAL MODULE: ../../node_modules/semver/index.js
@@ -112238,6 +112238,7 @@ const constants_RESOLVED_COMPILER = (async () => {
 
 
 
+
 async function composeCygwinCacheKeys() {
     const cygwinVersion = await retrieveCygwinVersion();
     const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
@@ -112279,6 +112280,20 @@ async function composeOpamCacheKeys() {
     core.debug(`opam cache key: ${plainKey}`);
     return { key, restoreKeys };
 }
+async function composeOpamDownloadCacheKeys() {
+    const ocamlCompiler = await constants_RESOLVED_COMPILER;
+    const repositoryUrls = constants_OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
+    const plainKey = [ocamlCompiler, repositoryUrls].join(",");
+    const hash = external_node_crypto_namespaceObject.createHash("sha256").update(plainKey).digest("hex");
+    const { runId } = lib_github.context;
+    const key = `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-${runId}`;
+    const restoreKeys = [
+        key,
+        `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-`,
+        `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-`,
+    ];
+    return { key, restoreKeys };
+}
 function composeCygwinCachePaths() {
     const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
     const cygwinLocalPackageDirectory = path.join(GITHUB_WORKSPACE, CYGWIN_MIRROR_ENCODED_URI);
@@ -112302,6 +112317,15 @@ function composeOpamCachePaths() {
         paths.push(opamCygwinLocalCachePath);
     }
     return paths;
+}
+function composeOpamDownloadCachePaths() {
+    if (constants_PLATFORM === "windows") {
+        const opamDownloadCachePath = external_node_path_namespaceObject.join("D:", ".opam", "download-cache");
+        return [opamDownloadCachePath];
+    }
+    const homeDir = external_node_os_.homedir();
+    const opamDownloadCachePath = external_node_path_namespaceObject.join(homeDir, ".opam", "download-cache");
+    return [opamDownloadCachePath];
 }
 async function restoreCache(key, restoreKeys, paths) {
     if (!cache.isFeatureAvailable()) {
@@ -112369,6 +112393,14 @@ async function restoreOpamCaches() {
         return { opamCacheHit, cygwinCacheHit };
     });
 }
+async function restoreOpamDownloadCache() {
+    return await core.group("Retrieve the opam download cache", async () => {
+        const { key, restoreKeys } = await composeOpamDownloadCacheKeys();
+        const paths = composeOpamDownloadCachePaths();
+        const cacheKey = await restoreCache(key, restoreKeys, paths);
+        return cacheKey;
+    });
+}
 async function saveCygwinCache() {
     await core.group("Save the Cygwin cache", async () => {
         const { key } = await composeCygwinCacheKeys();
@@ -112396,6 +112428,13 @@ async function saveOpamCache() {
         ]);
         const { key } = await composeOpamCacheKeys();
         const paths = composeOpamCachePaths();
+        await saveCache(key, paths);
+    });
+}
+async function saveOpamDownloadCache() {
+    await lib_core.group("Save the opam download cache", async () => {
+        const { key } = await composeOpamDownloadCacheKeys();
+        const paths = composeOpamDownloadCachePaths();
         await saveCache(key, paths);
     });
 }
@@ -112443,6 +112482,7 @@ async function run() {
             await trimDuneCache();
             await saveDuneCache();
         }
+        await saveOpamDownloadCache();
         external_node_process_.exit(0);
     }
     catch (error) {
