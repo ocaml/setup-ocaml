@@ -32,7 +32,7 @@ async function composeCygwinCacheKeys() {
 async function composeDuneCacheKeys() {
   const { workflow, job, runId } = github.context;
   const ocamlCompiler = await RESOLVED_COMPILER;
-  const plainKey = [ocamlCompiler, workflow, job].join(",");
+  const plainKey = [ocamlCompiler, workflow, job].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
   const restoreKeys = [
@@ -48,7 +48,7 @@ async function composeOpamCacheKeys() {
   const { version: opamVersion } = await retrieveLatestOpamRelease();
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const ocamlCompiler = await RESOLVED_COMPILER;
-  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
+  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
   const osInfo = await system.osInfo();
   const plainKey = [
     PLATFORM,
@@ -58,7 +58,7 @@ async function composeOpamCacheKeys() {
     ocamlCompiler,
     repositoryUrls,
     sandbox,
-  ].join(",");
+  ].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
@@ -67,9 +67,10 @@ async function composeOpamCacheKeys() {
 }
 
 async function composeOpamDownloadCacheKeys() {
+  const isWin = PLATFORM === "windows";
   const ocamlCompiler = await RESOLVED_COMPILER;
-  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
-  const plainKey = [ocamlCompiler, repositoryUrls].join(",");
+  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
+  const plainKey = [isWin, ocamlCompiler, repositoryUrls].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const { runId } = github.context;
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-${runId}`;
@@ -121,12 +122,11 @@ function composeOpamCachePaths() {
 }
 
 function composeOpamDownloadCachePaths() {
-  if (PLATFORM === "windows") {
-    const opamDownloadCachePath = path.join("D:", ".opam", "download-cache");
-    return [opamDownloadCachePath];
-  }
   const homeDir = os.homedir();
-  const opamDownloadCachePath = path.join(homeDir, ".opam", "download-cache");
+  const opamDownloadCachePath =
+    PLATFORM === "windows"
+      ? path.join("D:", ".opam", "download-cache")
+      : path.join(homeDir, ".opam", "download-cache");
   return [opamDownloadCachePath];
 }
 

@@ -112248,7 +112248,7 @@ async function composeCygwinCacheKeys() {
 async function composeDuneCacheKeys() {
     const { workflow, job, runId } = lib_github.context;
     const ocamlCompiler = await constants_RESOLVED_COMPILER;
-    const plainKey = [ocamlCompiler, workflow, job].join(",");
+    const plainKey = [ocamlCompiler, workflow, job].join();
     const hash = external_node_crypto_namespaceObject.createHash("sha256").update(plainKey).digest("hex");
     const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${constants_PLATFORM}-${constants_ARCHITECTURE}-${hash}-${runId}`;
     const restoreKeys = [
@@ -112263,7 +112263,7 @@ async function composeOpamCacheKeys() {
     const { version: opamVersion } = await retrieveLatestOpamRelease();
     const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
     const ocamlCompiler = await RESOLVED_COMPILER;
-    const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
+    const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
     const osInfo = await system.osInfo();
     const plainKey = [
         PLATFORM,
@@ -112273,7 +112273,7 @@ async function composeOpamCacheKeys() {
         ocamlCompiler,
         repositoryUrls,
         sandbox,
-    ].join(",");
+    ].join();
     const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
     const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
     const restoreKeys = [key];
@@ -112281,9 +112281,10 @@ async function composeOpamCacheKeys() {
     return { key, restoreKeys };
 }
 async function composeOpamDownloadCacheKeys() {
+    const isWin = constants_PLATFORM === "windows";
     const ocamlCompiler = await constants_RESOLVED_COMPILER;
-    const repositoryUrls = constants_OPAM_REPOSITORIES.map(([_, value]) => value).join(",");
-    const plainKey = [ocamlCompiler, repositoryUrls].join(",");
+    const repositoryUrls = constants_OPAM_REPOSITORIES.map(([_, value]) => value).join();
+    const plainKey = [isWin, ocamlCompiler, repositoryUrls].join();
     const hash = external_node_crypto_namespaceObject.createHash("sha256").update(plainKey).digest("hex");
     const { runId } = lib_github.context;
     const key = `${constants_CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-${runId}`;
@@ -112319,12 +112320,10 @@ function composeOpamCachePaths() {
     return paths;
 }
 function composeOpamDownloadCachePaths() {
-    if (constants_PLATFORM === "windows") {
-        const opamDownloadCachePath = external_node_path_namespaceObject.join("D:", ".opam", "download-cache");
-        return [opamDownloadCachePath];
-    }
     const homeDir = external_node_os_.homedir();
-    const opamDownloadCachePath = external_node_path_namespaceObject.join(homeDir, ".opam", "download-cache");
+    const opamDownloadCachePath = constants_PLATFORM === "windows"
+        ? external_node_path_namespaceObject.join("D:", ".opam", "download-cache")
+        : external_node_path_namespaceObject.join(homeDir, ".opam", "download-cache");
     return [opamDownloadCachePath];
 }
 async function restoreCache(key, restoreKeys, paths) {
