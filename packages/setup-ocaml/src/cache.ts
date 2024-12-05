@@ -70,9 +70,9 @@ async function composeOpamDownloadCacheKeys() {
   const isWin = PLATFORM === "windows";
   const ocamlCompiler = await RESOLVED_COMPILER;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
-  const plainKey = [isWin, ocamlCompiler, repositoryUrls].join();
+  const { runId, workflow, job } = github.context;
+  const plainKey = [isWin, job, ocamlCompiler, repositoryUrls, workflow].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const { runId } = github.context;
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-${runId}`;
   const restoreKeys = [
     key,
