@@ -84,10 +84,7 @@ export async function installer() {
   if (DUNE_CACHE) {
     await restoreDuneCache();
     await installDune();
-    core.exportVariable("DUNE_CACHE", "enabled");
     core.exportVariable("DUNE_CACHE_ROOT", DUNE_CACHE_ROOT);
-    core.exportVariable("DUNE_CACHE_STORAGE_MODE", "hardlink");
-    core.exportVariable("DUNE_CACHE_TRANSPORT", "direct");
   }
   core.exportVariable("CLICOLOR_FORCE", "1");
   if (OPAM_PIN) {
