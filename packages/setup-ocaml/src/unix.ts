@@ -9,7 +9,7 @@ async function checkAptInstallability(packageName: string) {
     "--names-only",
     `'^${packageName}$'`,
   ]);
-  return output.stdout.length !== 0;
+  return output.stdout.length > 0;
 }
 
 async function retrieveInstallableOptionalDependencies(
@@ -17,9 +17,14 @@ async function retrieveInstallableOptionalDependencies(
 ) {
   switch (PLATFORM) {
     case "linux": {
-      return optionalDependencies.filter(
-        async (dep) => await checkAptInstallability(dep),
-      );
+      const installableOptionalDependencies: string[] = [];
+      for (const optionalDependency of optionalDependencies) {
+        const isInstallable = await checkAptInstallability(optionalDependency);
+        if (isInstallable) {
+          installableOptionalDependencies.push(optionalDependency);
+        }
+      }
+      return installableOptionalDependencies;
     }
     default: {
       return [];
