@@ -44300,8 +44300,13 @@ class Agent extends http.Agent {
             .then((socket) => {
             this.decrementSockets(name, fakeSocket);
             if (socket instanceof http.Agent) {
-                // @ts-expect-error `addRequest()` isn't defined in `@types/node`
-                return socket.addRequest(req, connectOpts);
+                try {
+                    // @ts-expect-error `addRequest()` isn't defined in `@types/node`
+                    return socket.addRequest(req, connectOpts);
+                }
+                catch (err) {
+                    return cb(err);
+                }
             }
             this[INTERNAL].currentSocket = socket;
             // @ts-expect-error `createSocket()` isn't defined in `@types/node`
@@ -48527,6 +48532,17 @@ const agent_base_1 = __nccwpck_require__(59514);
 const url_1 = __nccwpck_require__(87016);
 const parse_proxy_response_1 = __nccwpck_require__(85187);
 const debug = (0, debug_1.default)('https-proxy-agent');
+const setServernameFromNonIpHost = (options) => {
+    if (options.servername === undefined &&
+        options.host &&
+        !net.isIP(options.host)) {
+        return {
+            ...options,
+            servername: options.host,
+        };
+    }
+    return options;
+};
 /**
  * The `HttpsProxyAgent` implements an HTTP Agent subclass that connects to
  * the specified "HTTP(s) proxy server" in order to proxy HTTPS requests.
@@ -48574,11 +48590,7 @@ class HttpsProxyAgent extends agent_base_1.Agent {
         let socket;
         if (proxy.protocol === 'https:') {
             debug('Creating `tls.Socket`: %o', this.connectOpts);
-            const servername = this.connectOpts.servername || this.connectOpts.host;
-            socket = tls.connect({
-                ...this.connectOpts,
-                servername,
-            });
+            socket = tls.connect(setServernameFromNonIpHost(this.connectOpts));
         }
         else {
             debug('Creating `net.Socket`: %o', this.connectOpts);
@@ -48614,11 +48626,9 @@ class HttpsProxyAgent extends agent_base_1.Agent {
                 // The proxy is connecting to a TLS server, so upgrade
                 // this socket connection to a TLS connection.
                 debug('Upgrading socket connection to TLS');
-                const servername = opts.servername || opts.host;
                 return tls.connect({
-                    ...omit(opts, 'host', 'path', 'port'),
+                    ...omit(setServernameFromNonIpHost(opts), 'host', 'path', 'port'),
                     socket,
-                    servername,
                 });
             }
             return socket;
@@ -60691,7 +60701,7 @@ function getWindowsWirelessIfaceSSID(interfaceName) {
   try {
     const result = execSync(`netsh wlan show  interface name="${interfaceName}" | findstr "SSID"`, util.execOptsWin);
     const SSID = result.split('\r\n').shift();
-    const parseSSID = SSID.split(':').pop();
+    const parseSSID = SSID.split(':').pop().trim();
     return parseSSID;
   } catch (error) {
     return 'Unknown';
@@ -60743,8 +60753,18 @@ function getWindowsIEEE8021x(connectionType, iface, ifaces) {
     try {
       const SSID = getWindowsWirelessIfaceSSID(iface);
       if (SSID !== 'Unknown') {
-        i8021xState = execSync(`netsh wlan show profiles "${SSID}" | findstr "802.1X"`, util.execOptsWin);
-        i8021xProtocol = execSync(`netsh wlan show profiles "${SSID}" | findstr "EAP"`, util.execOptsWin);
+
+        let ifaceSanitized = '';
+        const s = util.isPrototypePolluted() ? '---' : util.sanitizeShellString(SSID);
+        const l = util.mathMin(s.length, 2000);
+
+        for (let i = 0; i <= l; i++) {
+          if (s[i] !== undefined) {
+            ifaceSanitized = ifaceSanitized + s[i];
+          }
+        }
+        i8021xState = execSync(`netsh wlan show profiles "${ifaceSanitized}" | findstr "802.1X"`, util.execOptsWin);
+        i8021xProtocol = execSync(`netsh wlan show profiles "${ifaceSanitized}" | findstr "EAP"`, util.execOptsWin);
       }
 
       if (i8021xState.includes(':') && i8021xProtocol.includes(':')) {
@@ -62167,11 +62187,25 @@ const _sunos = (_platform === 'sunos');
 
 function time() {
   let t = new Date().toString().split(' ');
-  return {
-    current: Date.now(),
-    uptime: os.uptime(),
-    timezone: (t.length >= 7) ? t[5] : '',
-    timezoneName: Intl ? Intl.DateTimeFormat().resolvedOptions().timeZone : (t.length >= 7) ? t.slice(6).join(' ').replace(/\(/g, '').replace(/\)/g, '') : ''
+  if (_darwin || _linux) {
+    const stdout = execSync('date +%Z && date +%z && ls -l /etc/localtime 2>/dev/null', util.execOptsLinux);
+    const lines = stdout.toString().split(os.EOL);
+    if (lines.length > 3 && !lines[0]) {
+      lines.shift();
+    }
+    return {
+      current: Date.now(),
+      uptime: os.uptime(),
+      timezone: lines[0] && lines[1] ? lines[0] + lines[1] : '',
+      timezoneName: lines[2] && lines[2].indexOf('/zoneinfo/') > 0 ? (lines[2].split('/zoneinfo/')[1] || '') : ''
+    };
+  } else {
+    return {
+      current: Date.now(),
+      uptime: os.uptime(),
+      timezone: (t.length >= 7) ? t[5] : '',
+      timezoneName: Intl ? Intl.DateTimeFormat().resolvedOptions().timeZone : (t.length >= 7) ? t.slice(6).join(' ').replace(/\(/g, '').replace(/\)/g, '') : ''
+    };
   };
 }
 
@@ -67262,7 +67296,11 @@ function decodePiCpuinfo(lines) {
     '13': '400',
     '14': 'CM4',
     '15': 'CM4S',
+    '16': 'Internal use only',
     '17': '5',
+    '18': 'CM5',
+    '19': '500',
+    '1a': 'CM5 Lite',
   };
 
   const revisionCode = getValue(lines, 'revision', ':', true);
@@ -112011,7 +112049,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.
 /***/ 15460:
 /***/ ((module) => {
 
-module.exports = {"rE":"5.23.5"};
+module.exports = {"rE":"5.23.10"};
 
 /***/ })
 
