@@ -1,5 +1,3 @@
-paths:
-  - packages
 paths-ignore:
   - deploy-doc
   - dist
