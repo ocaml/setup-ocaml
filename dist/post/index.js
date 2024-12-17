@@ -47321,6 +47321,7 @@ function readDocType(xmlData, i){
             if (xmlData[i] === '<' && !comment) { //Determine the tag type
                 if( hasBody && isEntity(xmlData, i)){
                     i += 7; 
+                    let entityName, val;
                     [entityName, val,i] = readEntityExp(xmlData,i+1);
                     if(val.indexOf("&") === -1) //Parameter entities are not supported
                         entities[ validateEntityName(entityName) ] = {
@@ -61887,9 +61888,8 @@ function networkConnections(callback) {
         });
       }
       if (_darwin) {
-        // let cmd = 'netstat -natv | grep "ESTABLISHED\\|SYN_SENT\\|SYN_RECV\\|FIN_WAIT1\\|FIN_WAIT2\\|TIME_WAIT\\|CLOSE\\|CLOSE_WAIT\\|LAST_ACK\\|LISTEN\\|CLOSING\\|UNKNOWN"';
         let cmd = 'netstat -natvln | grep "tcp4\\|tcp6\\|udp4\\|udp6"';
-        const states = 'ESTABLISHED|SYN_SENT|SYN_RECV|FIN_WAIT1|FIN_WAIT2|TIME_WAIT|CLOSE|CLOSE_WAIT|LAST_ACK|LISTEN|CLOSING|UNKNOWN';
+        const states = 'ESTABLISHED|SYN_SENT|SYN_RECV|FIN_WAIT1|FIN_WAIT_1|FIN_WAIT2|FIN_WAIT_2|TIME_WAIT|CLOSE|CLOSE_WAIT|LAST_ACK|LISTEN|CLOSING|UNKNOWN';
         exec(cmd, { maxBuffer: 1024 * 20000 }, function (error, stdout) {
           if (!error) {
             exec('ps -axo pid,command', { maxBuffer: 1024 * 20000 }, function (err2, stdout2) {
@@ -61897,8 +61897,10 @@ function networkConnections(callback) {
               processes = processes.map((line => { return line.trim().replace(/ +/g, ' '); }));
               let lines = stdout.toString().split('\n');
 
+
               lines.forEach(function (line) {
                 line = line.replace(/ +/g, ' ').split(' ');
+                const hasTransferred = line.length >= 19;
                 if (line.length >= 8) {
                   let localip = line[3];
                   let localport = '';
@@ -61918,7 +61920,7 @@ function networkConnections(callback) {
                   }
                   const hasState = states.indexOf(line[5]) >= 0;
                   let connstate = hasState ? line[5] : 'UNKNOWN';
-                  let pid = parseInt(line[8 + (hasState ? 0 : -1)], 10);
+                  let pid = parseInt(line[8 + (hasState ? 0 : -1) + (hasTransferred ? 2 : 0)], 10);
                   if (connstate) {
                     result.push({
                       protocol: line[0],
@@ -62187,26 +62189,34 @@ const _sunos = (_platform === 'sunos');
 
 function time() {
   let t = new Date().toString().split(' ');
-  if (_darwin || _linux) {
-    const stdout = execSync('date +%Z && date +%z && ls -l /etc/localtime 2>/dev/null', util.execOptsLinux);
-    const lines = stdout.toString().split(os.EOL);
-    if (lines.length > 3 && !lines[0]) {
-      lines.shift();
-    }
-    return {
-      current: Date.now(),
-      uptime: os.uptime(),
-      timezone: lines[0] && lines[1] ? lines[0] + lines[1] : '',
-      timezoneName: lines[2] && lines[2].indexOf('/zoneinfo/') > 0 ? (lines[2].split('/zoneinfo/')[1] || '') : ''
-    };
-  } else {
-    return {
-      current: Date.now(),
-      uptime: os.uptime(),
-      timezone: (t.length >= 7) ? t[5] : '',
-      timezoneName: Intl ? Intl.DateTimeFormat().resolvedOptions().timeZone : (t.length >= 7) ? t.slice(6).join(' ').replace(/\(/g, '').replace(/\)/g, '') : ''
-    };
+  const result = {
+    current: Date.now(),
+    uptime: os.uptime(),
+    timezone: (t.length >= 7) ? t[5] : '',
+    timezoneName: Intl ? Intl.DateTimeFormat().resolvedOptions().timeZone : (t.length >= 7) ? t.slice(6).join(' ').replace(/\(/g, '').replace(/\)/g, '') : ''
   };
+  if (_darwin || _linux) {
+    try {
+      const stdout = execSync('date +%Z && date +%z && ls -l /etc/localtime 2>/dev/null', util.execOptsLinux);
+      const lines = stdout.toString().split(os.EOL);
+      if (lines.length > 3 && !lines[0]) {
+        lines.shift();
+      }
+      let timezone = lines[0] || '';
+      if (timezone.startsWith('+') || timezone.startsWith('-')) {
+        timezone = 'GMT';
+      }
+      return {
+        current: Date.now(),
+        uptime: os.uptime(),
+        timezone: lines[1] ? timezone + lines[1] : timezone,
+        timezoneName: lines[2] && lines[2].indexOf('/zoneinfo/') > 0 ? (lines[2].split('/zoneinfo/')[1] || '') : ''
+      };
+    } catch (e) {
+      util.noop();
+    }
+  }
+  return result;
 }
 
 exports.time = time;
@@ -68476,7 +68486,7 @@ function wifiConnections(callback) {
               const model = lines[1].indexOf(':') >= 0 ? lines[1].split(':')[1].trim() : '';
               const id = lines[2].indexOf(':') >= 0 ? lines[2].split(':')[1].trim() : '';
               const ssid = util.getValue(lines, 'SSID', ':', true);
-              const bssid = util.getValue(lines, 'BSSID', ':', true);
+              const bssid = util.getValue(lines, 'BSSID', ':', true) || util.getValue(lines, 'AP BSSID', ':', true);;
               const quality = util.getValue(lines, 'Signal', ':', true);
               const signalLevel = wifiDBFromQuality(quality);
               const type = util.getValue(lines, 'Radio type', ':', true) || util.getValue(lines, 'Type de radio', ':', true) || util.getValue(lines, 'Funktyp', ':', true) || null;
@@ -112049,7 +112059,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.
 /***/ 15460:
 /***/ ((module) => {
 
-module.exports = {"rE":"5.23.10"};
+module.exports = {"rE":"5.23.13"};
 
 /***/ })
 
