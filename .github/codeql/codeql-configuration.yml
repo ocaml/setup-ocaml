@@ -1,4 +1,8 @@
+paths:
+  - .github
+  - packages
 paths-ignore:
+  - analysis
   - deploy-doc
   - dist
   - lint-doc

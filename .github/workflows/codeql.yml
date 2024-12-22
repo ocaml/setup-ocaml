@@ -14,10 +14,16 @@ jobs:
   codeql-build:
     name: CodeQL Build
 
-    runs-on: ubuntu-latest
-
     permissions:
       security-events: write
+
+    strategy:
+      matrix:
+        language:
+          - actions
+          - typescript
+
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout tree
@@ -27,9 +33,7 @@ jobs:
         uses: github/codeql-action/init@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # v3.28.0
         with:
           config-file: .github/codeql/codeql-configuration.yml
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # v3.28.0
+          languages: ${{ matrix.language }}
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # v3.28.0
