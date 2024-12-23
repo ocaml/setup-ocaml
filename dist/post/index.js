@@ -61771,9 +61771,10 @@ function getProcessName(processes, pid) {
     }
   });
   cmd = cmd.split(' -')[0];
-  // return cmd;
-  const cmdParts = cmd.split('/');
-  return cmdParts[cmdParts.length - 1];
+  cmd = cmd.split(' /')[0];
+  return cmd;
+  // const cmdParts = cmd.split('/');
+  // return cmdParts[cmdParts.length - 1];
 }
 
 function networkConnections(callback) {
@@ -61889,18 +61890,24 @@ function networkConnections(callback) {
       }
       if (_darwin) {
         let cmd = 'netstat -natvln | grep "tcp4\\|tcp6\\|udp4\\|udp6"';
-        const states = 'ESTABLISHED|SYN_SENT|SYN_RECV|FIN_WAIT1|FIN_WAIT_1|FIN_WAIT2|FIN_WAIT_2|TIME_WAIT|CLOSE|CLOSE_WAIT|LAST_ACK|LISTEN|CLOSING|UNKNOWN';
+        const states = 'ESTABLISHED|SYN_SENT|SYN_RECV|FIN_WAIT1|FIN_WAIT_1|FIN_WAIT2|FIN_WAIT_2|TIME_WAIT|CLOSE|CLOSE_WAIT|LAST_ACK|LISTEN|CLOSING|UNKNOWN'.split('|');
         exec(cmd, { maxBuffer: 1024 * 20000 }, function (error, stdout) {
           if (!error) {
             exec('ps -axo pid,command', { maxBuffer: 1024 * 20000 }, function (err2, stdout2) {
               let processes = stdout2.toString().split('\n');
               processes = processes.map((line => { return line.trim().replace(/ +/g, ' '); }));
               let lines = stdout.toString().split('\n');
-
-
+              let pidPos = 8;
+              if (lines[0] !== '') {
+                const lineParts = lines[0].replace(/ +/g, ' ').split(' ');
+                for (let i = 0; i < lineParts.length; i++) {
+                  if (states.indexOf(lineParts[i]) >= 0) {
+                    pidPos = i + 3;
+                  }
+                };
+              }
               lines.forEach(function (line) {
                 line = line.replace(/ +/g, ' ').split(' ');
-                const hasTransferred = line.length >= 19;
                 if (line.length >= 8) {
                   let localip = line[3];
                   let localport = '';
@@ -61920,7 +61927,7 @@ function networkConnections(callback) {
                   }
                   const hasState = states.indexOf(line[5]) >= 0;
                   let connstate = hasState ? line[5] : 'UNKNOWN';
-                  let pid = parseInt(line[8 + (hasState ? 0 : -1) + (hasTransferred ? 2 : 0)], 10);
+                  let pid = parseInt(line[pidPos + (hasState ? 0 : -1)], 10);
                   if (connstate) {
                     result.push({
                       protocol: line[0],
@@ -65571,13 +65578,13 @@ function chassis(callback) {
         exec('ioreg -c IOPlatformExpertDevice -d 2', function (error, stdout) {
           if (!error) {
             let lines = stdout.toString().replace(/[<>"]/g, '').split('\n');
-            const model = util.getValue(lines, 'model', '=', true);
-            const modelParts = util.splitByNumber(model);
-            const version = util.getValue(lines, 'version', '=', true);
+            const model = util.getAppleModel(util.getValue(lines, 'model', '=', true));
+            // const modelParts = util.splitByNumber(model);
+            // const version = util.getValue(lines, 'version', '=', true);
             result.manufacturer = util.getValue(lines, 'manufacturer', '=', true);
-            result.model = version ? util.getValue(lines, 'model', '=', true) : modelParts[0];
-            result.type = macOsChassisType(result.model);
-            result.version = version || model;
+            result.model = model.key;
+            result.type = macOsChassisType(model.model);
+            result.version = model.version;
             result.serial = util.getValue(lines, 'ioplatformserialnumber', '=', true);
             result.assetTag = util.getValue(lines, 'board-id', '=', true) || util.getValue(lines, 'target-type', '=', true);
             result.sku = util.getValue(lines, 'target-sub-type', '=', true);
@@ -66038,7 +66045,7 @@ function parseUsersDarwin(lines) {
         result_w.command = l.slice(5, 1000).join(' ');
         // find corresponding 'who' line
         who_line = result_who.filter(function (obj) {
-          return (obj.user === result_w.user && (obj.tty.substring(3, 1000) === result_w.tty || obj.tty === result_w.tty));
+          return (obj.user.substring(0, 10) === result_w.user.substring(0, 10) && (obj.tty.substring(3, 1000) === result_w.tty || obj.tty === result_w.tty));
         });
         if (who_line.length === 1) {
           result.push({
@@ -67611,6 +67618,1166 @@ function semverCompare(v1, v2) {
   return res;
 }
 
+function getAppleModel(key) {
+  const appleModelIds = [
+    {
+      key: 'Mac15,12',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: 'M3',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac14,15',
+      name: 'MacBook Air',
+      size: '15-inch',
+      processor: 'M2',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac14,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: 'M2',
+      year: '2022',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir10,1',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: 'M1',
+      year: '2020',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir9,1',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: '2020',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir8,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir8,1',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: '2018',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir7,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: '2017',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir7,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Early 2015',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir7,1',
+      name: 'MacBook Air',
+      size: '11-inch',
+      processor: '',
+      year: 'Early 2015',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir6,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Early 2014',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir6,1',
+      name: 'MacBook Air',
+      size: '11-inch',
+      processor: '',
+      year: 'Early 2014',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir6,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2013',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir6,1',
+      name: 'MacBook Air',
+      size: '11-inch',
+      processor: '',
+      year: 'Mid 2013',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir5,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2012',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir5,1',
+      name: 'MacBook Air',
+      size: '11-inch',
+      processor: '',
+      year: 'Mid 2012',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir4,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2011',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir4,1',
+      name: 'MacBook Air',
+      size: '11-inch',
+      processor: '',
+      year: 'Mid 2011',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir3,2',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Late 2010',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir3,1',
+      name: 'MacBook Air',
+      size: '11-inch',
+      processor: '',
+      year: 'Late 2010',
+      additional: ''
+    },
+    {
+      key: 'MacBookAir2,1',
+      name: 'MacBook Air',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2009',
+      additional: ''
+    },
+    {
+      key: 'Mac16,1',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M4',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac16,6',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M4 Pro',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac16,8',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M4 Max',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac16,5',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M4 Pro',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac16,6',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M4 Max',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac15,3',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M3',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac15,6',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M3 Pro',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac15,8',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M3 Pro',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac15,10',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M3 Max',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac15,7',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M3 Pro',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac15,9',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M3 Pro',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac15,11',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M3 Max',
+      year: 'Nov 2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,5',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M2 Max',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,9',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M2 Max',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,6',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M2 Max',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,10',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M2 Max',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,7',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: 'M2',
+      year: '2022',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro18,3',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M1 Pro',
+      year: '2021',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro18,4',
+      name: 'MacBook Pro',
+      size: '14-inch',
+      processor: 'M1 Max',
+      year: '2021',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro18,1',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M1 Pro',
+      year: '2021',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro18,2',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: 'M1 Max',
+      year: '2021',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro17,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: 'M1',
+      year: '2020',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro16,3',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2020',
+      additional: 'Two Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro16,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2020',
+      additional: 'Four Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro16,1',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro16,4',
+      name: 'MacBook Pro',
+      size: '16-inch',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro15,3',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro15,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro15,1',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro15,4',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2019',
+      additional: 'Two Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro15,1',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: '2018',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro15,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2018',
+      additional: 'Four Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro14,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2017',
+      additional: 'Two Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro14,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2017',
+      additional: 'Four Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro14,3',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: '2017',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro13,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2016',
+      additional: 'Two Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro13,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: '2016',
+      additional: 'Four Thunderbolt 3 ports'
+    },
+    {
+      key: 'MacBookPro13,3',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: '2016',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro11,4',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Mid 2015',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro11,5',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Mid 2015',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro12,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Early 2015',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro11,2',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Late 2013',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro11,3',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Late 2013',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro11,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Late 2013',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro10,1',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Mid 2012',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro10,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Late 2012',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro9,1',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Mid 2012',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro9,2',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2012',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro8,3',
+      name: 'MacBook Pro',
+      size: '17-inch',
+      processor: '',
+      year: 'Early 2011',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro8,2',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Early 2011',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro8,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Early 2011',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro6,1',
+      name: 'MacBook Pro',
+      size: '17-inch',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro6,2',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro7,1',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro5,2',
+      name: 'MacBook Pro',
+      size: '17-inch',
+      processor: '',
+      year: 'Early 2009',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro5,3',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Mid 2009',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro5,5',
+      name: 'MacBook Pro',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2009',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro5,1',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Late 2008',
+      additional: ''
+    },
+    {
+      key: 'MacBookPro4,1',
+      name: 'MacBook Pro',
+      size: '15-inch',
+      processor: '',
+      year: 'Early 2008',
+      additional: ''
+    },
+    {
+      key: 'MacBook10,1',
+      name: 'MacBook',
+      size: '12-inch',
+      processor: '',
+      year: '2017',
+      additional: ''
+    },
+    {
+      key: 'MacBook9,1',
+      name: 'MacBook',
+      size: '12-inch',
+      processor: '',
+      year: 'Early 2016',
+      additional: ''
+    },
+    {
+      key: 'MacBook8,1',
+      name: 'MacBook',
+      size: '12-inch',
+      processor: '',
+      year: 'Early 2015',
+      additional: ''
+    },
+    {
+      key: 'MacBook7,1',
+      name: 'MacBook',
+      size: '13-inch',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'MacBook6,1',
+      name: 'MacBook',
+      size: '13-inch',
+      processor: '',
+      year: 'Late 2009',
+      additional: ''
+    },
+    {
+      key: 'MacBook5,2',
+      name: 'MacBook',
+      size: '13-inch',
+      processor: '',
+      year: 'Early 2009',
+      additional: ''
+    },
+    {
+      key: 'Mac14,13',
+      name: 'Mac Studio',
+      size: '',
+      processor: '',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,14',
+      name: 'Mac Studio',
+      size: '',
+      processor: '',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac13,1',
+      name: 'Mac Studio',
+      size: '',
+      processor: '',
+      year: '2022',
+      additional: ''
+    },
+    {
+      key: 'Mac13,2',
+      name: 'Mac Studio',
+      size: '',
+      processor: '',
+      year: '2022',
+      additional: ''
+    },
+    {
+      key: 'Mac16,11',
+      name: 'Mac mini',
+      size: '',
+      processor: 'M4 Pro',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac16,10',
+      name: 'Mac mini',
+      size: '',
+      processor: 'M4',
+      year: '2024',
+      additional: ''
+    },
+    {
+      key: 'Mac14,3',
+      name: 'Mac mini',
+      size: '',
+      processor: 'M2',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,12',
+      name: 'Mac mini',
+      size: '',
+      processor: 'M2 Pro',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Macmini9,1',
+      name: 'Mac mini',
+      size: '',
+      processor: 'M1',
+      year: '2020',
+      additional: ''
+    },
+    {
+      key: 'Macmini8,1',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Late 2018',
+      additional: ''
+    },
+    {
+      key: 'Macmini7,1',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Late 2014',
+      additional: ''
+    },
+    {
+      key: 'Macmini6,1',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Late 2012',
+      additional: ''
+    },
+    {
+      key: 'Macmini6,2',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Late 2012',
+      additional: ''
+    },
+    {
+      key: 'Macmini5,1',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Mid 2011',
+      additional: ''
+    },
+    {
+      key: 'Macmini5,2',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Mid 2011',
+      additional: ''
+    },
+    {
+      key: 'Macmini4,1',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'Macmini3,1',
+      name: 'Mac mini',
+      size: '',
+      processor: '',
+      year: 'Early 2009',
+      additional: ''
+    },
+    {
+      key: 'Mac16,3',
+      name: 'iMac',
+      size: '24-inch',
+      processor: 'M4',
+      year: '2024',
+      additional: 'Four ports'
+    },
+    {
+      key: 'Mac16,2',
+      name: 'iMac',
+      size: '24-inch',
+      processor: 'M4',
+      year: '2024',
+      additional: 'Two ports'
+    },
+    {
+      key: 'Mac15,5',
+      name: 'iMac',
+      size: '24-inch',
+      processor: 'M3',
+      year: '2023',
+      additional: 'Four ports'
+    },
+    {
+      key: 'Mac15,4',
+      name: 'iMac',
+      size: '24-inch',
+      processor: 'M3',
+      year: '2023',
+      additional: 'Two ports'
+    },
+    {
+      key: 'iMac21,1',
+      name: 'iMac',
+      size: '24-inch',
+      processor: 'M1',
+      year: '2021',
+      additional: ''
+    },
+    {
+      key: 'iMac21,2',
+      name: 'iMac',
+      size: '24-inch',
+      processor: 'M1',
+      year: '2021',
+      additional: ''
+    },
+    {
+      key: 'iMac20,1',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: '2020',
+      additional: 'Retina 5K'
+    },
+    {
+      key: 'iMac20,2',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: '2020',
+      additional: 'Retina 5K'
+    },
+    {
+      key: 'iMac19,1',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: '2019',
+      additional: 'Retina 5K'
+    },
+    {
+      key: 'iMac19,2',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: '2019',
+      additional: 'Retina 4K'
+    },
+    {
+      key: 'iMacPro1,1',
+      name: 'iMac Pro',
+      size: '',
+      processor: '',
+      year: '2017',
+      additional: ''
+    },
+    {
+      key: 'iMac18,3',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: '2017',
+      additional: 'Retina 5K'
+    },
+    {
+      key: 'iMac18,2',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: '2017',
+      additional: 'Retina 4K'
+    },
+    {
+      key: 'iMac18,1',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: '2017',
+      additional: ''
+    },
+    {
+      key: 'iMac17,1',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: 'Late 2015',
+      additional: 'Retina 5K'
+    },
+    {
+      key: 'iMac16,2',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Late 2015',
+      additional: 'Retina 4K'
+    },
+    {
+      key: 'iMac16,1',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Late 2015',
+      additional: ''
+    },
+    {
+      key: 'iMac15,1',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: 'Late 2014',
+      additional: 'Retina 5K'
+    },
+    {
+      key: 'iMac14,4',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Mid 2014',
+      additional: ''
+    },
+    {
+      key: 'iMac14,2',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: 'Late 2013',
+      additional: ''
+    },
+    {
+      key: 'iMac14,1',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Late 2013',
+      additional: ''
+    },
+    {
+      key: 'iMac13,2',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: 'Late 2012',
+      additional: ''
+    },
+    {
+      key: 'iMac13,1',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Late 2012',
+      additional: ''
+    },
+    {
+      key: 'iMac12,2',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: 'Mid 2011',
+      additional: ''
+    },
+    {
+      key: 'iMac12,1',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Mid 2011',
+      additional: ''
+    },
+    {
+      key: 'iMac11,3',
+      name: 'iMac',
+      size: '27-inch',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'iMac11,2',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'iMac10,1',
+      name: 'iMac',
+      size: '21.5-inch',
+      processor: '',
+      year: 'Late 2009',
+      additional: ''
+    },
+    {
+      key: 'iMac9,1',
+      name: 'iMac',
+      size: '20-inch',
+      processor: '',
+      year: 'Early 2009',
+      additional: ''
+    },
+    {
+      key: 'Mac14,8',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: '2023',
+      additional: ''
+    },
+    {
+      key: 'Mac14,8',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: '2023',
+      additional: 'Rack'
+    },
+    {
+      key: 'MacPro7,1',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: '2019',
+      additional: ''
+    },
+    {
+      key: 'MacPro7,1',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: '2019',
+      additional: 'Rack'
+    },
+    {
+      key: 'MacPro6,1',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: 'Late 2013',
+      additional: ''
+    },
+    {
+      key: 'MacPro5,1',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: 'Mid 2012',
+      additional: ''
+    },
+    {
+      key: 'MacPro5,1',
+      name: 'Mac Pro Server',
+      size: '',
+      processor: '',
+      year: 'Mid 2012',
+      additional: 'Server'
+    },
+    {
+      key: 'MacPro5,1',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: 'Mid 2010',
+      additional: ''
+    },
+    {
+      key: 'MacPro5,1',
+      name: 'Mac Pro Server',
+      size: '',
+      processor: '',
+      year: 'Mid 2010',
+      additional: 'Server'
+    },
+    {
+      key: 'MacPro4,1',
+      name: 'Mac Pro',
+      size: '',
+      processor: '',
+      year: 'Early 2009',
+      additional: ''
+    }
+  ];
+
+  const list = appleModelIds.filter((model) => model.key === key);
+  if (list.length === 0) {
+    return {
+      key: key,
+      model: 'Apple',
+      version: 'Unknown'
+    };
+  }
+  const features = [];
+  if (list[0].size) { features.push(list[0].size); }
+  if (list[0].processor) { features.push(list[0].processor); }
+  if (list[0].year) { features.push(list[0].year); }
+  if (list[0].additional) { features.push(list[0].additional); }
+  return {
+    key: key,
+    model: list[0].name,
+    version: list[0].name + ' (' + features.join(', ') + ')'
+  };
+}
+
 function noop() { }
 
 exports.toInt = toInt;
@@ -67663,6 +68830,7 @@ exports.mathMin = mathMin;
 exports.WINDIR = WINDIR;
 exports.getFilesInPath = getFilesInPath;
 exports.semverCompare = semverCompare;
+exports.getAppleModel = getAppleModel;
 
 
 /***/ }),
@@ -68131,7 +69299,7 @@ function getWifiNetworkListIw(iface) {
   }
 }
 
-function parseWifiDarwin(wifiObj) {
+function parseWifiDarwinXX(wifiObj) {
   const result = [];
   if (wifiObj) {
     wifiObj.forEach(function (wifiItem) {
@@ -68182,6 +69350,48 @@ function parseWifiDarwin(wifiObj) {
   }
   return result;
 }
+
+function parseWifiDarwin(wifiStr) {
+  const result = [];
+  try {
+    let wifiObj = JSON.parse(wifiStr);
+    wifiObj = wifiObj.SPAirPortDataType[0].spairport_airport_interfaces[0].spairport_airport_other_local_wireless_networks;
+    wifiObj.forEach(function (wifiItem) {
+
+      let security = [];
+      const sm = wifiItem.spairport_security_mode;
+      if (sm === 'spairport_security_mode_wep') {
+        security.push('WEP');
+      } else if (sm === 'spairport_security_mode_wpa2_personal') {
+        security.push('WPA2');
+      } else if (sm.startsWith('spairport_security_mode_wpa2_enterprise')) {
+        security.push('WPA2 EAP');
+      } else if (sm.startsWith('pairport_security_mode_wpa3_transition')) {
+        security.push('WPA2/WPA3');
+      } else if (sm.startsWith('pairport_security_mode_wpa3')) {
+        security.push('WPA3');
+      }
+      const channel = parseInt(('' + wifiItem.spairport_network_channel).split(' ')[0]) || 0;
+      const signalLevel = wifiItem.spairport_signal_noise || null;
+
+      result.push({
+        ssid: wifiItem._name || '',
+        bssid: wifiItem.spairport_network_bssid || null,
+        mode: wifiItem.spairport_network_phymode,
+        channel,
+        frequency: wifiFrequencyFromChannel(channel),
+        signalLevel: signalLevel ? parseInt(signalLevel, 10) : null,
+        quality: wifiQualityFromDB(signalLevel),
+        security,
+        wpaFlags: [],
+        rsnFlags: []
+      });
+    });
+    return result;
+  } catch (e) {
+    return result;
+  }
+};
 function wifiNetworks(callback) {
   return new Promise((resolve) => {
     process.nextTick(() => {
@@ -68245,10 +69455,9 @@ function wifiNetworks(callback) {
           resolve(result);
         }
       } else if (_darwin) {
-        let cmd = '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -s -x';
+        let cmd = 'system_profiler SPAirPortDataType -json 2>/dev/null';
         exec(cmd, { maxBuffer: 1024 * 40000 }, function (error, stdout) {
-          const output = stdout.toString();
-          result = parseWifiDarwin(util.plistParser(output));
+          result = parseWifiDarwin(stdout.toString());
           if (callback) {
             callback(result);
           }
@@ -68486,7 +69695,7 @@ function wifiConnections(callback) {
               const model = lines[1].indexOf(':') >= 0 ? lines[1].split(':')[1].trim() : '';
               const id = lines[2].indexOf(':') >= 0 ? lines[2].split(':')[1].trim() : '';
               const ssid = util.getValue(lines, 'SSID', ':', true);
-              const bssid = util.getValue(lines, 'BSSID', ':', true) || util.getValue(lines, 'AP BSSID', ':', true);;
+              const bssid = util.getValue(lines, 'BSSID', ':', true) || util.getValue(lines, 'AP BSSID', ':', true);
               const quality = util.getValue(lines, 'Signal', ':', true);
               const signalLevel = wifiDBFromQuality(quality);
               const type = util.getValue(lines, 'Radio type', ':', true) || util.getValue(lines, 'Type de radio', ':', true) || util.getValue(lines, 'Funktyp', ':', true) || null;
@@ -112059,7 +113268,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.
 /***/ 15460:
 /***/ ((module) => {
 
-module.exports = {"rE":"5.23.13"};
+module.exports = {"rE":"5.23.16"};
 
 /***/ })
 

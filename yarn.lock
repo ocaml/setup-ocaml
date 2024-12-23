@@ -509,7 +509,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
     semver: "npm:7.6.3"
-    systeminformation: "npm:5.23.13"
+    systeminformation: "npm:5.23.16"
     typescript: "npm:5.7.2"
     yaml: "npm:2.6.1"
   languageName: unknown
@@ -1900,12 +1900,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.23.13":
-  version: 5.23.13
-  resolution: "systeminformation@npm:5.23.13"
+"systeminformation@npm:5.23.16":
+  version: 5.23.16
+  resolution: "systeminformation@npm:5.23.16"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/3776ebd6af081f1a0572225b92646e3b26e127b44095af44eb512969bb11981bbfb5cde392a17e056464afda4f422371f1234bf0d0debcd9676f5a0c988980b5
+  checksum: 10c0/ef35da22cc1a71626c2904e49f549ca68c063fb00d5024675e80c3f897c82c54b73d61f761f0300f89509495cfe5c9cce3811738572ab10382017375fce1d858
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
