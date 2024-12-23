@@ -113399,6 +113399,9 @@ const constants_ARCHITECTURE = (() => {
         case "arm64": {
             return "arm64";
         }
+        case "riscv64": {
+            return "riscv64";
+        }
         case "s390x": {
             return "s390x";
         }
