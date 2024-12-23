@@ -47,6 +47,7 @@ export async function installer() {
     core.exportVariable("CYGWIN", "winsymlinks:native");
     core.exportVariable("HOME", process.env.USERPROFILE);
     core.exportVariable("MSYS", "winsymlinks:native");
+    core.exportVariable("SHELLOPTS", "igncr");
     await core.group(
       "Change the file system behaviour parameters",
       async () => {
