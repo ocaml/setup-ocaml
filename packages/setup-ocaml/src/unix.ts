@@ -56,3 +56,14 @@ export async function installUnixSystemPackages() {
     }
   }
 }
+
+export async function updateUnixPackageIndexFiles() {
+  const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
+  if (isGitHubRunner) {
+    if (PLATFORM === "linux") {
+      await exec("sudo", ["apt-get", "update"]);
+    } else if (PLATFORM === "macos") {
+      await exec("brew", ["update"]);
+    }
+  }
+}
