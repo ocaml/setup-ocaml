@@ -13,10 +13,7 @@ import {
   OPAM_DISABLE_SANDBOXING,
   PLATFORM,
 } from "./constants.js";
-import {
-  installUnixSystemPackages,
-  updateUnixPackageIndexFiles,
-} from "./unix.js";
+import { installUnixSystemPackages } from "./unix.js";
 
 export async function retrieveLatestOpamRelease() {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.4.0";
@@ -88,18 +85,9 @@ async function acquireOpam() {
 
 async function initializeOpam() {
   await core.group("Initialise opam state", async () => {
+    await exec("opam", ["update", "--depexts"]);
     if (PLATFORM !== "windows") {
-      try {
-        await installUnixSystemPackages();
-      } catch (error) {
-        if (error instanceof Error) {
-          core.notice(
-            `An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`,
-          );
-        }
-        await updateUnixPackageIndexFiles();
-        await installUnixSystemPackages();
-      }
+      await installUnixSystemPackages();
     }
     const extraOptions = [];
     if (PLATFORM === "windows") {
