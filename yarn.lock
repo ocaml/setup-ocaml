@@ -509,7 +509,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
     semver: "npm:7.6.3"
-    systeminformation: "npm:5.23.17"
+    systeminformation: "npm:5.23.23"
     typescript: "npm:5.7.2"
     yaml: "npm:2.6.1"
   languageName: unknown
@@ -1035,13 +1035,13 @@ __metadata:
   linkType: hard
 
 "domutils@npm:^3.0.1, domutils@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "domutils@npm:3.1.0"
+  version: 3.2.1
+  resolution: "domutils@npm:3.2.1"
   dependencies:
     dom-serializer: "npm:^2.0.0"
     domelementtype: "npm:^2.3.0"
     domhandler: "npm:^5.0.3"
-  checksum: 10c0/342d64cf4d07b8a0573fb51e0a6312a88fb520c7fefd751870bf72fa5fc0f2e0cb9a3958a573610b1d608c6e2a69b8e9b4b40f0bfb8f87a71bce4f180cca1887
+  checksum: 10c0/af2a8e28fe51137307d2400c4b6483a3294ac8f784b14fc74b67f3aca3aa53a63144bd9e2bb96f23174c0c1aa680544bf2d77b4cc94e6f90f33314ed65c12a4f
   languageName: node
   linkType: hard
 
@@ -1900,12 +1900,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.23.17":
-  version: 5.23.17
-  resolution: "systeminformation@npm:5.23.17"
+"systeminformation@npm:5.23.23":
+  version: 5.23.23
+  resolution: "systeminformation@npm:5.23.23"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/def66c091be863c89fe9bdcf7880ba8d85a24ebafd68b6acadaac9bd1988831f6f6b5b91cc38767eb3b0ae1e298e5c4e0f9932999521d9df53d4c08f7e2d1a34
+  checksum: 10c0/52567cce0404c163bd3e4b7c3674bf062266950ac911f9b14a36732634f5881bd6f72f659f6ef2fc354d5e61942ae431b2bbe5625e6ee4cdc9e12df7e9ec4681
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
