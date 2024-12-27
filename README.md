@@ -47,6 +47,39 @@ jobs:
       - run: opam exec -- dune build
 
       - run: opam exec -- dune runtest
+
+  lint-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v4
+      - name: Set-up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
+      - uses: ocaml/setup-ocaml/lint-doc@v3
+
+  lint-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v4
+      - name: Set-up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
+      - uses: ocaml/setup-ocaml/lint-fmt@v3
+
+  lint-opam:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@v4
+      - name: Set-up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
+      - uses: ocaml/setup-ocaml/lint-opam@v3
 ```
 
 ### OCaml Compiler Support Matrix
@@ -135,12 +168,12 @@ Examples:
 
 Consult the [examples](EXAMPLES.md) page for more complex patterns.
 
-## Extends
+## Extensions
 
-**STATUS: EXPERIMENTAL**
+**STATUS: STABLE**
 
 > [!NOTE]
-> All extends are recommended to be used in separate jobs run on `ubuntu-latest`.
+> All extensions are recommended to be used in separate jobs run on `ubuntu-latest`.
 
 - [analysis](analysis)
 - [lint-doc](lint-doc)
