@@ -56887,9 +56887,13 @@ function dockerContainerStats(containerIDs, callback) {
           return resolve([]);
         }
         let containerIDsSanitized = '';
-        containerIDsSanitized.__proto__.toLowerCase = util.stringToLower;
-        containerIDsSanitized.__proto__.replace = util.stringReplace;
-        containerIDsSanitized.__proto__.trim = util.stringTrim;
+        try {
+          containerIDsSanitized.__proto__.toLowerCase = util.stringToLower;
+          containerIDsSanitized.__proto__.replace = util.stringReplace;
+          containerIDsSanitized.__proto__.trim = util.stringTrim;
+        } catch (e) {
+          Object.setPrototypeOf(containerIDsSanitized, util.stringObj);
+        }
 
         containerIDsSanitized = containerIDs;
         containerIDsSanitized = containerIDsSanitized.trim();
@@ -60740,7 +60744,12 @@ function inetChecksite(url, callback) {
       const l = util.mathMin(s.length, 2000);
       for (let i = 0; i <= l; i++) {
         if (s[i] !== undefined) {
-          s[i].__proto__.toLowerCase = util.stringToLower;
+          try {
+            s[i].__proto__.toLowerCase = util.stringToLower;
+          } catch (e) {
+            Object.setPrototypeOf(s[i], util.stringObj);
+          }
+
           const sl = s[i].toLowerCase();
           if (sl && sl[0] && !sl[1] && sl[0].length === 1) {
             urlSanitized = urlSanitized + sl[0];
@@ -60750,7 +60759,12 @@ function inetChecksite(url, callback) {
       result.url = urlSanitized;
       try {
         if (urlSanitized && !util.isPrototypePolluted()) {
-          urlSanitized.__proto__.startsWith = util.stringStartWith;
+          try {
+            urlSanitized.__proto__.startsWith = util.stringStartWith;
+          } catch (e) {
+            Object.setPrototypeOf(urlSanitized, util.stringObj);
+          }
+
           if (urlSanitized.startsWith('file:') || urlSanitized.startsWith('gopher:') || urlSanitized.startsWith('telnet:') || urlSanitized.startsWith('mailto:') || urlSanitized.startsWith('news:') || urlSanitized.startsWith('nntp:')) {
             if (callback) { callback(result); }
             return resolve(result);
@@ -60801,14 +60815,24 @@ function inetLatency(host, callback) {
       const l = util.mathMin(s.length, 2000);
       for (let i = 0; i <= l; i++) {
         if (!(s[i] === undefined)) {
-          s[i].__proto__.toLowerCase = util.stringToLower;
+          try {
+            s[i].__proto__.toLowerCase = util.stringToLower;
+          } catch (e) {
+            Object.setPrototypeOf(s[i], util.stringObj);
+          }
+
           const sl = s[i].toLowerCase();
           if (sl && sl[0] && !sl[1]) {
             hostSanitized = hostSanitized + sl[0];
           }
         }
       }
-      hostSanitized.__proto__.startsWith = util.stringStartWith;
+      try {
+        hostSanitized.__proto__.startsWith = util.stringStartWith;
+      } catch (e) {
+        Object.setPrototypeOf(hostSanitized, util.stringObj);
+      }
+
       if (hostSanitized.startsWith('file:') || hostSanitized.startsWith('gopher:') || hostSanitized.startsWith('telnet:') || hostSanitized.startsWith('mailto:') || hostSanitized.startsWith('news:') || hostSanitized.startsWith('nntp:')) {
         if (callback) { callback(null); }
         return resolve(null);
@@ -62656,9 +62680,13 @@ function networkStats(ifaces, callback) {
         }
         ifaces = ifaces || getDefaultNetworkInterface();
 
-        ifaces.__proto__.toLowerCase = util.stringToLower;
-        ifaces.__proto__.replace = util.stringReplace;
-        ifaces.__proto__.trim = util.stringTrim;
+        try {
+          ifaces.__proto__.toLowerCase = util.stringToLower;
+          ifaces.__proto__.replace = util.stringReplace;
+          ifaces.__proto__.trim = util.stringTrim;
+        } catch (e) {
+          Object.setPrototypeOf(ifaces, util.stringObj);
+        }
 
         ifaces = ifaces.trim().toLowerCase().replace(/,+/g, '|');
         ifacesArray = ifaces.split('|');
@@ -63372,11 +63400,14 @@ function getLogoFile(distro) {
   if (_windows) {
     result = 'windows';
   }
-  else if (distro.indexOf('mac os') !== -1) {
+  else if (distro.indexOf('mac os') !== -1 || distro.indexOf('macos') !== -1) {
     result = 'apple';
   }
   else if (distro.indexOf('arch') !== -1) {
     result = 'arch';
+  }
+  else if (distro.indexOf('cachy') !== -1) {
+    result = 'cachy';
   }
   else if (distro.indexOf('centos') !== -1) {
     result = 'centos';
@@ -63392,6 +63423,9 @@ function getLogoFile(distro) {
   }
   else if (distro.indexOf('elementary') !== -1) {
     result = 'elementary';
+  }
+  else if (distro.indexOf('endeavour') !== -1) {
+    result = 'endeavour';
   }
   else if (distro.indexOf('fedora') !== -1) {
     result = 'fedora';
@@ -63428,6 +63462,9 @@ function getLogoFile(distro) {
   }
   else if (distro.indexOf('puppy') !== -1) {
     result = 'puppy';
+  }
+  else if (distro.indexOf('popos') !== -1) {
+    result = 'popos';
   }
   else if (distro.indexOf('raspbian') !== -1) {
     result = 'raspbian';
@@ -63615,23 +63652,23 @@ function osInfo(callback) {
           result.build = util.getValue(lines, 'BuildVersion');
           result.logofile = getLogoFile(result.distro);
           result.codename = 'macOS';
-          result.codename = (result.release.indexOf('10.4') > -1 ? 'Mac OS X Tiger' : result.codename);
-          result.codename = (result.release.indexOf('10.5') > -1 ? 'Mac OS X Leopard' : result.codename);
-          result.codename = (result.release.indexOf('10.6') > -1 ? 'Mac OS X Snow Leopard' : result.codename);
-          result.codename = (result.release.indexOf('10.7') > -1 ? 'Mac OS X Lion' : result.codename);
+          result.codename = (result.release.indexOf('10.4') > -1 ? 'OS X Tiger' : result.codename);
+          result.codename = (result.release.indexOf('10.5') > -1 ? 'OS X Leopard' : result.codename);
+          result.codename = (result.release.indexOf('10.6') > -1 ? 'OS X Snow Leopard' : result.codename);
+          result.codename = (result.release.indexOf('10.7') > -1 ? 'OS X Lion' : result.codename);
           result.codename = (result.release.indexOf('10.8') > -1 ? 'OS X Mountain Lion' : result.codename);
           result.codename = (result.release.indexOf('10.9') > -1 ? 'OS X Mavericks' : result.codename);
           result.codename = (result.release.indexOf('10.10') > -1 ? 'OS X Yosemite' : result.codename);
           result.codename = (result.release.indexOf('10.11') > -1 ? 'OS X El Capitan' : result.codename);
-          result.codename = (result.release.indexOf('10.12') > -1 ? 'macOS Sierra' : result.codename);
-          result.codename = (result.release.indexOf('10.13') > -1 ? 'macOS High Sierra' : result.codename);
-          result.codename = (result.release.indexOf('10.14') > -1 ? 'macOS Mojave' : result.codename);
-          result.codename = (result.release.indexOf('10.15') > -1 ? 'macOS Catalina' : result.codename);
-          result.codename = (result.release.startsWith('11.') ? 'macOS Big Sur' : result.codename);
-          result.codename = (result.release.startsWith('12.') ? 'macOS Monterey' : result.codename);
-          result.codename = (result.release.startsWith('13.') ? 'macOS Ventura' : result.codename);
-          result.codename = (result.release.startsWith('14.') ? 'macOS Sonoma' : result.codename);
-          result.codename = (result.release.startsWith('15.') ? 'macOS Sequoia' : result.codename);
+          result.codename = (result.release.indexOf('10.12') > -1 ? 'Sierra' : result.codename);
+          result.codename = (result.release.indexOf('10.13') > -1 ? 'High Sierra' : result.codename);
+          result.codename = (result.release.indexOf('10.14') > -1 ? 'Mojave' : result.codename);
+          result.codename = (result.release.indexOf('10.15') > -1 ? 'Catalina' : result.codename);
+          result.codename = (result.release.startsWith('11.') ? 'Big Sur' : result.codename);
+          result.codename = (result.release.startsWith('12.') ? 'Monterey' : result.codename);
+          result.codename = (result.release.startsWith('13.') ? 'Ventura' : result.codename);
+          result.codename = (result.release.startsWith('14.') ? 'Sonoma' : result.codename);
+          result.codename = (result.release.startsWith('15.') ? 'Sequoia' : result.codename);
           result.uefi = true;
           result.codepage = util.getCodepage();
           if (callback) {
@@ -63739,47 +63776,49 @@ function isUefiWindows() {
 function versions(apps, callback) {
   let versionObject = {
     kernel: os.release(),
-    openssl: '',
-    systemOpenssl: '',
-    systemOpensslLib: '',
-    node: process.versions.node,
-    v8: process.versions.v8,
-    npm: '',
-    yarn: '',
-    pm2: '',
-    gulp: '',
-    grunt: '',
-    git: '',
-    tsc: '',
-    mysql: '',
-    redis: '',
-    mongodb: '',
     apache: '',
-    nginx: '',
-    php: '',
+    bash: '',
+    bun: '',
+    deno: '',
     docker: '',
+    dotnet: '',
+    fish: '',
+    gcc: '',
+    git: '',
+    grunt: '',
+    gulp: '',
+    java: '',
+    mongodb: '',
+    mysql: '',
+    nginx: '',
+    node: '', //process.versions.node,
+    npm: '',
+    openssl: '',
+    perl: '',
+    php: '',
+    pip3: '',
+    pip: '',
+    pm2: '',
     postfix: '',
     postgresql: '',
-    perl: '',
-    python: '',
-    python3: '',
-    pip: '',
-    pip3: '',
-    java: '',
-    gcc: '',
-    virtualbox: '',
-    bash: '',
-    zsh: '',
-    fish: '',
     powershell: '',
-    dotnet: ''
+    python3: '',
+    python: '',
+    redis: '',
+    systemOpenssl: '',
+    systemOpensslLib: '',
+    tsc: '',
+    v8: process.versions.v8,
+    virtualbox: '',
+    yarn: '',
+    zsh: ''
   };
 
   function checkVersionParam(apps) {
     if (apps === '*') {
       return {
         versions: versionObject,
-        counter: 30
+        counter: 32
       };
     }
     if (!Array.isArray(apps)) {
@@ -64084,6 +64123,13 @@ function versions(apps, callback) {
                 if (!error) {
                   const postgresql = stdout.toString().split('\n')[0].split(' ') || [];
                   appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : '';
+                } else {
+                  exec('pg_config --version', function (error, stdout) {
+                    if (!error) {
+                      const postgresql = stdout.toString().split('\n')[0].split(' ') || [];
+                      appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : '';
+                    }
+                  });
                 }
                 functionProcessed();
               });
@@ -64310,6 +64356,37 @@ function versions(apps, callback) {
               if (parts.length > 1) {
                 appsObj.versions.fish = parts[1].split(' ')[0];
               }
+            }
+            functionProcessed();
+          });
+        }
+        if ({}.hasOwnProperty.call(appsObj.versions, 'bun')) {
+          exec('bun -v', function (error, stdout) {
+            if (!error) {
+              const line = stdout.toString().split('\n')[0].trim();
+              appsObj.versions.bun = line;
+            }
+            functionProcessed();
+          });
+        }
+        if ({}.hasOwnProperty.call(appsObj.versions, 'deno')) {
+          exec('deno -v', function (error, stdout) {
+            if (!error) {
+              const line = stdout.toString().split('\n')[0].trim();
+              const parts = line.split(' ');
+              if (parts.length > 1) {
+                appsObj.versions.deno = parts[1];
+              }
+            }
+            functionProcessed();
+          });
+        }
+        if ({}.hasOwnProperty.call(appsObj.versions, 'node')) {
+          exec('node -v', function (error, stdout) {
+            if (!error) {
+              let line = stdout.toString().split('\n')[0].trim();
+              if (line.startsWith('v')) { line = line.slice(1); }
+              appsObj.versions.node = line;
             }
             functionProcessed();
           });
@@ -64840,9 +64917,13 @@ function services(srv, callback) {
 
       if (srv) {
         let srvString = '';
-        srvString.__proto__.toLowerCase = util.stringToLower;
-        srvString.__proto__.replace = util.stringReplace;
-        srvString.__proto__.trim = util.stringTrim;
+        try {
+          srvString.__proto__.toLowerCase = util.stringToLower;
+          srvString.__proto__.replace = util.stringReplace;
+          srvString.__proto__.trim = util.stringTrim;
+        } catch (e) {
+          Object.setPrototypeOf(srvString, util.stringObj);
+        }
 
         const s = util.sanitizeShellString(srv);
         const l = util.mathMin(s.length, 2000);
@@ -65696,9 +65777,13 @@ function processLoad(proc, callback) {
       }
 
       let processesString = '';
-      processesString.__proto__.toLowerCase = util.stringToLower;
-      processesString.__proto__.replace = util.stringReplace;
-      processesString.__proto__.trim = util.stringTrim;
+      try {
+        processesString.__proto__.toLowerCase = util.stringToLower;
+        processesString.__proto__.replace = util.stringReplace;
+        processesString.__proto__.trim = util.stringTrim;
+      } catch (e) {
+        Object.setPrototypeOf(processesString, util.stringObj);
+      }
 
       const s = util.sanitizeShellString(proc);
       const l = util.mathMin(s.length, 2000);
@@ -66067,10 +66152,10 @@ function system(callback) {
           let lines = stdout.toString().split('\n');
           result.manufacturer = util.getValue(lines, 'manufacturer');
           result.model = util.getValue(lines, 'product name');
-          result.version = util.getValue(lines, 'version');
-          result.serial = util.getValue(lines, 'serial number');
-          result.uuid = util.getValue(lines, 'uuid').toLowerCase();
-          result.sku = util.getValue(lines, 'sku number');
+          result.version = cleanDefaults(util.getValue(lines, 'version'));
+          result.serial = cleanDefaults(util.getValue(lines, 'serial number'));
+          result.uuid = cleanDefaults((util.getValue(lines, 'uuid').toLowerCase()));
+          result.sku = cleanDefaults(util.getValue(lines, 'sku number'));
           // Non-Root values
           const cmd = `echo -n "product_name: "; cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null; echo;
             echo -n "product_serial: "; cat /sys/devices/virtual/dmi/id/product_serial 2>/dev/null; echo;
@@ -66081,17 +66166,17 @@ function system(callback) {
             lines = execSync(cmd, util.execOptsLinux).toString().split('\n');
             result.manufacturer = result.manufacturer === '' ? util.getValue(lines, 'sys_vendor') : result.manufacturer;
             result.model = result.model === '' ? util.getValue(lines, 'product_name') : result.model;
-            result.version = result.version === '' ? util.getValue(lines, 'product_version') : result.version;
-            result.serial = result.serial === '' ? util.getValue(lines, 'product_serial') : result.serial;
-            result.uuid = result.uuid === '' ? util.getValue(lines, 'product_uuid').toLowerCase() : result.uuid;
+            result.version = cleanDefaults(result.version === '' ? util.getValue(lines, 'product_version') : result.version);
+            result.serial = cleanDefaults(result.serial === '' ? util.getValue(lines, 'product_serial') : result.serial);
+            result.uuid = cleanDefaults(result.uuid === '' ? util.getValue(lines, 'product_uuid').toLowerCase() : result.uuid);
           } catch (e) {
             util.noop();
           }
-          if (!result.serial || result.serial.toLowerCase().indexOf('o.e.m.') !== -1) { result.serial = '-'; }
-          if (!result.manufacturer || result.manufacturer.toLowerCase().indexOf('o.e.m.') !== -1) { result.manufacturer = ''; }
-          if (!result.model || result.model.toLowerCase().indexOf('o.e.m.') !== -1) { result.model = 'Computer'; }
-          if (!result.version || result.version.toLowerCase().indexOf('o.e.m.') !== -1) { result.version = ''; }
-          if (!result.sku || result.sku.toLowerCase().indexOf('o.e.m.') !== -1) { result.sku = '-'; }
+          if (!result.serial) { result.serial = '-'; }
+          if (!result.manufacturer) { result.manufacturer = ''; }
+          if (!result.model) { result.model = 'Computer'; }
+          if (!result.version) { result.version = ''; }
+          if (!result.sku) { result.sku = '-'; }
 
           // detect virtual (1)
           if (result.model.toLowerCase() === 'virtualbox' || result.model.toLowerCase() === 'kvm' || result.model.toLowerCase() === 'virtual machine' || result.model.toLowerCase() === 'bochs' || result.model.toLowerCase().startsWith('vmware') || result.model.toLowerCase().startsWith('droplet')) {
@@ -66232,11 +66317,14 @@ function system(callback) {
         exec('ioreg -c IOPlatformExpertDevice -d 2', function (error, stdout) {
           if (!error) {
             let lines = stdout.toString().replace(/[<>"]/g, '').split('\n');
-            const model = util.splitByNumber(util.getValue(lines, 'model', '=', true));
-            const version = util.getValue(lines, 'version', '=', true);
+
+            const model = util.getAppleModel(util.getValue(lines, 'model', '=', true));
+            // const modelParts = util.splitByNumber(model);
+            // const version = util.getValue(lines, 'version', '=', true);
             result.manufacturer = util.getValue(lines, 'manufacturer', '=', true);
-            result.model = version ? util.getValue(lines, 'model', '=', true) : model[0];
-            result.version = version || model[1];
+            result.model = model.key;
+            result.type = macOsChassisType(model.model);
+            result.version = model.version;
             result.serial = util.getValue(lines, 'ioplatformserialnumber', '=', true);
             result.uuid = util.getValue(lines, 'ioplatformuuid', '=', true).toLowerCase();
             result.sku = util.getValue(lines, 'board-id', '=', true) || util.getValue(lines, 'target-sub-type', '=', true);
@@ -67506,6 +67594,7 @@ function splitByNumber(str) {
   return [cpart, num];
 }
 
+const stringObj = new String();
 const stringReplace = new String().replace;
 const stringToLower = new String().toLowerCase;
 const stringToString = new String().toString;
@@ -68180,11 +68269,14 @@ function isPrototypePolluted() {
   let notPolluted = true;
   let st = '';
 
-  st.__proto__.replace = stringReplace;
-  st.__proto__.toLowerCase = stringToLower;
-  st.__proto__.toString = stringToString;
-  st.__proto__.substr = stringSubstr;
-
+  try {
+    st.__proto__.replace = stringReplace;
+    st.__proto__.toLowerCase = stringToLower;
+    st.__proto__.toString = stringToString;
+    st.__proto__.substr = stringSubstr;
+  } catch (e) {
+    Object.setPrototypeOf(st, stringObj);
+  }
   notPolluted = notPolluted || (s.length !== 62);
   const ms = Date.now();
   if (typeof ms === 'number' && ms > 1600000000000) {
@@ -68204,7 +68296,11 @@ function isPrototypePolluted() {
     // string manipulation
     let p = Math.random() * l * 0.9999999999;
     let stm = st.substr(0, p) + ' ' + st.substr(p, 2000);
-    stm.__proto__.replace = stringReplace;
+    try {
+      stm.__proto__.replace = stringReplace;
+    } catch (e) {
+      Object.setPrototypeOf(stm, stringObj);
+    }
     let sto = stm.replace(/ /g, '');
     notPolluted = notPolluted && st === sto;
     p = Math.random() * l * 0.9999999999;
@@ -68225,7 +68321,11 @@ function isPrototypePolluted() {
     notPolluted = notPolluted && (stl.length === l) && stl[l - 1] && !(stl[l]);
     for (let i = 0; i < l; i++) {
       const s1 = st[i];
-      s1.__proto__.toLowerCase = stringToLower;
+      try {
+        s1.__proto__.toLowerCase = stringToLower;
+      } catch (e) {
+        Object.setPrototypeOf(st, stringObj);
+      }
       const s2 = stl ? stl[i] : '';
       const s1l = s1.toLowerCase();
       notPolluted = notPolluted && s1l[0] === s2 && s1l[0] && !(s1l[1]);
@@ -69983,6 +70083,7 @@ exports.smartMonToolsInstalled = smartMonToolsInstalled;
 exports.linuxVersion = linuxVersion;
 exports.plistParser = plistParser;
 exports.plistReader = plistReader;
+exports.stringObj = stringObj;
 exports.stringReplace = stringReplace;
 exports.stringToLower = stringToLower;
 exports.stringToString = stringToString;
@@ -95106,6 +95207,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("net");
 
 /***/ }),
 
+/***/ 4573:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:buffer");
+
+/***/ }),
+
 /***/ 78474:
 /***/ ((module) => {
 
@@ -106262,6 +106370,7 @@ exports.composeScalar = composeScalar;
 
 
 
+var node_process = __nccwpck_require__(1708);
 var directives = __nccwpck_require__(89082);
 var Document = __nccwpck_require__(37977);
 var errors = __nccwpck_require__(67460);
@@ -106395,7 +106504,7 @@ class Composer {
     }
     /** Advance the composer by one CST token. */
     *next(token) {
-        if (process.env.LOG_STREAM)
+        if (node_process.env.LOG_STREAM)
             console.dir(token, { depth: null });
         switch (token.type) {
             case 'directive':
@@ -107430,7 +107539,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIn
                 if (atNewline) {
                     if (comment)
                         comment += token.source;
-                    else
+                    else if (!found || indicator !== 'seq-item-ind')
                         spaceBefore = true;
                 }
                 else
@@ -108553,9 +108662,11 @@ __webpack_unused_export__ = visit.visitAsync;
 /***/ }),
 
 /***/ 96669:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
+
+var node_process = __nccwpck_require__(1708);
 
 function debug(logLevel, ...messages) {
     if (logLevel === 'debug')
@@ -108563,8 +108674,8 @@ function debug(logLevel, ...messages) {
 }
 function warn(logLevel, warning) {
     if (logLevel === 'debug' || logLevel === 'warn') {
-        if (typeof process !== 'undefined' && process.emitWarning)
-            process.emitWarning(warning);
+        if (typeof node_process.emitWarning === 'function')
+            node_process.emitWarning(warning);
         else
             console.warn(warning);
     }
@@ -110723,6 +110834,7 @@ exports.LineCounter = LineCounter;
 
 
 
+var node_process = __nccwpck_require__(1708);
 var cst = __nccwpck_require__(73921);
 var lexer = __nccwpck_require__(64274);
 
@@ -110889,7 +111001,7 @@ class Parser {
      */
     *next(source) {
         this.source = source;
-        if (process.env.LOG_TOKENS)
+        if (node_process.env.LOG_TOKENS)
             console.log('|', cst.prettyToken(source));
         if (this.atScalar) {
             this.atScalar = false;
@@ -112287,6 +112399,7 @@ exports.getTags = getTags;
 
 
 
+var node_buffer = __nccwpck_require__(4573);
 var Scalar = __nccwpck_require__(24305);
 var stringifyString = __nccwpck_require__(73665);
 
@@ -112303,8 +112416,8 @@ const binary = {
      *   document.querySelector('#photo').src = URL.createObjectURL(blob)
      */
     resolve(src, onError) {
-        if (typeof Buffer === 'function') {
-            return Buffer.from(src, 'base64');
+        if (typeof node_buffer.Buffer === 'function') {
+            return node_buffer.Buffer.from(src, 'base64');
         }
         else if (typeof atob === 'function') {
             // On IE 11, atob() can't handle newlines
@@ -112322,11 +112435,11 @@ const binary = {
     stringify({ comment, type, value }, ctx, onComment, onChompKeep) {
         const buf = value; // checked earlier by binary.identify()
         let str;
-        if (typeof Buffer === 'function') {
+        if (typeof node_buffer.Buffer === 'function') {
             str =
-                buf instanceof Buffer
+                buf instanceof node_buffer.Buffer
                     ? buf.toString('base64')
-                    : Buffer.from(buf.buffer).toString('base64');
+                    : node_buffer.Buffer.from(buf.buffer).toString('base64');
         }
         else if (typeof btoa === 'function') {
             let s = '';
@@ -114409,7 +114522,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.
 /***/ 15460:
 /***/ ((module) => {
 
-module.exports = {"rE":"5.23.23"};
+module.exports = {"rE":"5.24.3"};
 
 /***/ })
 
