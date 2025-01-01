@@ -143,7 +143,7 @@ async function getMsys2Install(): Promise<[root: string, pacmanPath: string]> {
   } catch {
     // finally check the default msys directory
     const defaultRoot = "C:\\msys64";
-    testMsys2Installation(defaultRoot);
+    await testMsys2Installation(defaultRoot);
     return [defaultRoot, getPacmanPath(defaultRoot)];
   }
 }
