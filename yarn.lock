@@ -440,7 +440,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.3"
+    "@types/node": "npm:22.10.5"
     "@vercel/ncc": "npm:0.38.3"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -456,7 +456,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.3"
+    "@types/node": "npm:22.10.5"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -470,7 +470,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.3"
+    "@types/node": "npm:22.10.5"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -484,7 +484,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.3"
+    "@types/node": "npm:22.10.5"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.2"
   languageName: unknown
@@ -504,12 +504,12 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.3"
+    "@types/node": "npm:22.10.5"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
     semver: "npm:7.6.3"
-    systeminformation: "npm:5.24.3"
+    systeminformation: "npm:5.25.3"
     typescript: "npm:5.7.2"
     yaml: "npm:2.7.0"
   languageName: unknown
@@ -714,12 +714,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.10.3":
-  version: 22.10.3
-  resolution: "@types/node@npm:22.10.3"
+"@types/node@npm:22.10.5":
+  version: 22.10.5
+  resolution: "@types/node@npm:22.10.5"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/0471a73c8672c803b1f2b912c2c466d00a217186933e8ff38ec7779b4a3f88a0eea3b513a59f2abf9de17cc8bbca688a3c6643c6513ac8dd1c3e45d25fab93b1
+  checksum: 10c0/6a0e7d1fe6a86ef6ee19c3c6af4c15542e61aea2f4cee655b6252efb356795f1f228bc8299921e82924e80ff8eca29b74d9dd0dd5cc1a90983f892f740b480df
   languageName: node
   linkType: hard
 
@@ -1900,12 +1900,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.24.3":
-  version: 5.24.3
-  resolution: "systeminformation@npm:5.24.3"
+"systeminformation@npm:5.25.3":
+  version: 5.25.3
+  resolution: "systeminformation@npm:5.25.3"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/157eb7f089a91afa2d483634aa329cb2c4c63b29d8b50a5aadcf3aaf629435db052c9081faa313ee7e318c3dcf2e4b31610417146764d1872017393966a4058e
+  checksum: 10c0/0002e1492ea3c8113e72e5d235e40761e01c72e5b493e691ae3b421dc8a0e15cd9179f56489180613a9168c003ba98ea8ae2cc0f871a66088329b033ed55b283
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
