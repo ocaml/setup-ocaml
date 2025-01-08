@@ -1,3 +1,4 @@
+import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as process from "node:process";
 import * as core from "@actions/core";
@@ -10,6 +11,7 @@ import {
   saveOpamCache,
 } from "./cache.js";
 import {
+  CYGWIN_BASH_ENV,
   CYGWIN_ROOT_BIN,
   DUNE_CACHE,
   DUNE_CACHE_ROOT,
@@ -47,7 +49,6 @@ export async function installer() {
     core.exportVariable("CYGWIN", "winsymlinks:native");
     core.exportVariable("HOME", process.env.USERPROFILE);
     core.exportVariable("MSYS", "winsymlinks:native");
-    core.exportVariable("SHELLOPTS", "igncr");
     await core.group(
       "Change the file system behaviour parameters",
       async () => {
@@ -70,6 +71,8 @@ export async function installer() {
     if (!cygwinCacheHit) {
       await saveCygwinCache();
     }
+    await fs.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
+    core.exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
     core.addPath(CYGWIN_ROOT_BIN);
   }
   await setupOpam();
