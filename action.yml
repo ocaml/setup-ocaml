@@ -37,6 +37,9 @@ inputs:
     description: The prefix of the cache keys.
     required: false
     default: v1
+  windows-environment:
+    description: Whether to use `cygwin` (default) or `msys2` for windows installs.
+    required: false
   github-token:
     description: DO NOT SET THIS.
     required: false

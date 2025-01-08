@@ -90,6 +90,23 @@ export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
   },
 );
 
+export const WINDOWS_ENVIRONMENT: "cygwin" | "msys2" = (() => {
+  const input = core.getInput("windows-environment");
+
+  if (!(PLATFORM === "windows" || input === "")) {
+    core.error("windows-environment is only supported on windows");
+  }
+
+  if (input === "msys2" || input === "cygwin") {
+    return input;
+  }
+
+  if (input !== "") {
+    core.error("unrecognized value for windows-environment");
+  }
+  return "cygwin";
+})();
+
 export const CACHE_PREFIX = core.getInput("cache-prefix", {
   required: false,
   trimWhitespace: true,

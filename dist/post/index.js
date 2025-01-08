@@ -114787,6 +114787,19 @@ const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam", 
     required: false,
     trimWhitespace: true,
 });
+const constants_WINDOWS_ENVIRONMENT = (() => {
+    const input = lib_core.getInput("windows-environment");
+    if (!(constants_PLATFORM === "windows" || input === "")) {
+        lib_core.error("windows-environment is only supported on windows");
+    }
+    if (input === "msys2" || input === "cygwin") {
+        return input;
+    }
+    if (input !== "") {
+        lib_core.error("unrecognized value for windows-environment");
+    }
+    return "cygwin";
+})();
 const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix", {
     required: false,
     trimWhitespace: true,
@@ -114869,6 +114882,7 @@ async function composeOpamCacheKeys() {
     const ocamlCompiler = await RESOLVED_COMPILER;
     const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
     const osInfo = await system.osInfo();
+    const msys2 = WINDOWS_ENVIRONMENT === "msys2" ? "msys2" : undefined;
     const plainKey = [
         PLATFORM,
         osInfo.release,
@@ -114877,7 +114891,9 @@ async function composeOpamCacheKeys() {
         ocamlCompiler,
         repositoryUrls,
         sandbox,
-    ].join();
+    ]
+        .concat(msys2 ?? [])
+        .join();
     const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
     const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
     const restoreKeys = [key];
@@ -114990,7 +115006,7 @@ async function restoreOpamCache() {
 }
 async function restoreOpamCaches() {
     return await core.group("Retrieve the opam cache", async () => {
-        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows"
+        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin"
             ? [restoreOpamCache(), restoreCygwinCache()]
             : [restoreOpamCache()]);
         return { opamCacheHit, cygwinCacheHit };
