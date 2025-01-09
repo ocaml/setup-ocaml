@@ -99365,7 +99365,7 @@ function versions(apps, callback) {
         if ({}.hasOwnProperty.call(appsObj.versions, 'powershell')) {
           if (_windows) {
             util.powerShell('$PSVersionTable').then(stdout => {
-              const lines = stdout.toString().split('\n').map(line => line.replace(/ +/g, ' ').replace(/ +/g, ':'));
+              const lines = stdout.toString().toLowerCase().split('\n').map(line => line.replace(/ +/g, ' ').replace(/ +/g, ':'));
               appsObj.versions.powershell = util.getValue(lines, 'psversion');
               functionProcessed();
             });
@@ -99404,7 +99404,26 @@ function shell(callback) {
   return new Promise((resolve) => {
     process.nextTick(() => {
       if (_windows) {
-        resolve('cmd');
+        try {
+          const result = 'CMD';
+          util.powerShell(`Get-CimInstance -className win32_process | where-object {$_.ProcessId -eq ${process.ppid} } | select Name`).then(stdout => {
+            let result = 'CMD';
+            if (stdout) {
+              if (stdout.toString().toLowerCase().indexOf('powershell') >= 0) {
+                result = 'PowerShell';
+              }
+            }
+            if (callback) {
+              callback(result);
+            }
+            resolve(result);
+          });
+        } catch {
+          if (callback) {
+            callback(result);
+          }
+          resolve(result);
+        }
       } else {
         let result = '';
         exec('echo $SHELL', function (error, stdout) {
@@ -101271,7 +101290,7 @@ function system(callback) {
                 const model = util.getValue(lines, 'model:', ':', true);
                 // reference values: https://elinux.org/RPi_HardwareHistory
                 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
-                if ((result.model === 'BCM2835' || result.model === 'BCM2708' || result.model === 'BCM2709' || result.model === 'BCM2710' || result.model === 'BCM2711' || result.model === 'BCM2836' || result.model === 'BCM2837') && model.toLowerCase().indexOf('raspberry') >= 0) {
+                if ((result.model === 'BCM2835' || result.model === 'BCM2708' || result.model === 'BCM2709' || result.model === 'BCM2710' || result.model === 'BCM2711' || result.model === 'BCM2836' || result.model === 'BCM2837' || result.model === '') && model.toLowerCase().indexOf('raspberry') >= 0) {
                   const rPIRevision = util.decodePiCpuinfo(lines);
                   result.model = rPIRevision.model;
                   result.version = rPIRevision.revisionCode;
@@ -103159,7 +103178,8 @@ function isRaspberry() {
   }
 
   const hardware = getValue(cpuinfo, 'hardware');
-  return (hardware && PI_MODEL_NO.indexOf(hardware) > -1);
+  const model = getValue(cpuinfo, 'model');
+  return ((hardware && PI_MODEL_NO.indexOf(hardware) > -1) || (model && model.indexOf('Raspberry Pi') > -1));
 }
 
 function isRaspbian() {
@@ -114595,7 +114615,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.
 /***/ 15460:
 /***/ ((module) => {
 
-module.exports = {"rE":"5.25.3"};
+module.exports = {"rE":"5.25.6"};
 
 /***/ })
 
