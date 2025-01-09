@@ -24,7 +24,7 @@ import { retrieveCygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
   const cygwinVersion = await retrieveCygwinVersion();
-  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${cygwinVersion}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
 }

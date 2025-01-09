@@ -114762,7 +114762,7 @@ const constants_PLATFORM = (() => {
         }
     }
 })();
-const CYGWIN_MIRROR = "https://cygwin.mirror.constant.com/";
+const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 const constants_GITHUB_WORKSPACE = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
 const constants_CYGWIN_MIRROR_ENCODED_URI = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
@@ -114845,7 +114845,7 @@ const constants_RESOLVED_COMPILER = (async () => {
 
 async function composeCygwinCacheKeys() {
     const cygwinVersion = await retrieveCygwinVersion();
-    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${cygwinVersion}`;
+    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${cygwinVersion}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
 }
