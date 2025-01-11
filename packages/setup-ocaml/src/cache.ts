@@ -1,5 +1,4 @@
 import * as crypto from "node:crypto";
-import * as os from "node:os";
 import * as path from "node:path";
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
@@ -66,22 +65,6 @@ async function composeOpamCacheKeys() {
   return { key, restoreKeys };
 }
 
-async function composeOpamDownloadCacheKeys() {
-  const isWin = PLATFORM === "windows";
-  const ocamlCompiler = await RESOLVED_COMPILER;
-  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
-  const { runId, workflow, job } = github.context;
-  const plainKey = [isWin, job, ocamlCompiler, repositoryUrls, workflow].join();
-  const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const key = `${CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-${runId}`;
-  const restoreKeys = [
-    key,
-    `${CACHE_PREFIX}-setup-ocaml-opam-download-${hash}-`,
-    `${CACHE_PREFIX}-setup-ocaml-opam-download-`,
-  ];
-  return { key, restoreKeys };
-}
-
 function composeCygwinCachePaths() {
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
   const cygwinLocalPackageDirectory = path.join(
@@ -119,15 +102,6 @@ function composeOpamCachePaths() {
     paths.push(opamCygwinLocalCachePath);
   }
   return paths;
-}
-
-function composeOpamDownloadCachePaths() {
-  const homeDir = os.homedir();
-  const opamDownloadCachePath =
-    PLATFORM === "windows"
-      ? path.join("D:", ".opam", "download-cache")
-      : path.join(homeDir, ".opam", "download-cache");
-  return [opamDownloadCachePath];
 }
 
 async function restoreCache(
@@ -211,15 +185,6 @@ export async function restoreOpamCaches() {
   });
 }
 
-export async function restoreOpamDownloadCache() {
-  return await core.group("Retrieve the opam download cache", async () => {
-    const { key, restoreKeys } = await composeOpamDownloadCacheKeys();
-    const paths = composeOpamDownloadCachePaths();
-    const cacheKey = await restoreCache(key, restoreKeys, paths);
-    return cacheKey;
-  });
-}
-
 export async function saveCygwinCache() {
   await core.group("Save the Cygwin cache", async () => {
     const { key } = await composeCygwinCacheKeys();
@@ -249,14 +214,6 @@ export async function saveOpamCache() {
     ]);
     const { key } = await composeOpamCacheKeys();
     const paths = composeOpamCachePaths();
-    await saveCache(key, paths);
-  });
-}
-
-export async function saveOpamDownloadCache() {
-  await core.group("Save the opam download cache", async () => {
-    const { key } = await composeOpamDownloadCacheKeys();
-    const paths = composeOpamDownloadCachePaths();
     await saveCache(key, paths);
   });
 }

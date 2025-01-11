@@ -6,7 +6,6 @@ import { exec } from "@actions/exec";
 import {
   restoreDuneCache,
   restoreOpamCaches,
-  restoreOpamDownloadCache,
   saveCygwinCache,
   saveOpamCache,
 } from "./cache.js";
@@ -85,7 +84,6 @@ export async function installer() {
   } else {
     await update();
   }
-  await restoreOpamDownloadCache();
   if (DUNE_CACHE) {
     await restoreDuneCache();
     await installDune();
