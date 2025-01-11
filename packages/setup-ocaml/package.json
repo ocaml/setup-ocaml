@@ -19,7 +19,7 @@
     "@actions/tool-cache": "2.0.1",
     "cheerio": "1.0.0",
     "semver": "7.6.3",
-    "systeminformation": "5.25.6",
+    "systeminformation": "5.25.10",
     "yaml": "2.7.0"
   },
   "devDependencies": {

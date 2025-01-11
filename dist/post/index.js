@@ -81587,7 +81587,7 @@ exports.buildCreatePoller = buildCreatePoller;
 // Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEFAULT_RETRY_POLICY_COUNT = exports.SDK_VERSION = void 0;
-exports.SDK_VERSION = "1.18.1";
+exports.SDK_VERSION = "1.18.2";
 exports.DEFAULT_RETRY_POLICY_COUNT = 3;
 //# sourceMappingURL=constants.js.map
 
@@ -83554,7 +83554,6 @@ function retryPolicy(strategies, options = { maxRetries: constants_js_1.DEFAULT_
             let response;
             let responseError;
             let retryCount = -1;
-            // eslint-disable-next-line no-constant-condition
             retryRequest: while (true) {
                 retryCount += 1;
                 response = undefined;
@@ -83906,9 +83905,14 @@ function tryProcessResponse(span, response) {
         if (serviceRequestId) {
             span.setAttribute("serviceRequestId", serviceRequestId);
         }
-        span.setStatus({
-            status: "success",
-        });
+        // Per semantic conventions, only set the status to error if the status code is 4xx or 5xx.
+        // Otherwise, the status MUST remain unset.
+        // https://opentelemetry.io/docs/specs/semconv/http/http-spans/#status
+        if (response.status >= 400) {
+            span.setStatus({
+                status: "error",
+            });
+        }
         span.end();
     }
     catch (e) {
@@ -84290,6 +84294,9 @@ const core_util_1 = __nccwpck_require__(30991);
 const typeGuards_js_1 = __nccwpck_require__(24449);
 const unimplementedMethods = {
     arrayBuffer: () => {
+        throw new Error("Not implemented");
+    },
+    bytes: () => {
         throw new Error("Not implemented");
     },
     slice: () => {
@@ -90296,16 +90303,13 @@ function getCpu() {
             result.governor = util.getValue(lines, 'governor') || '';
 
             // Test Raspberry
-            if (result.vendor === 'ARM') {
-              const linesRpi = fs.readFileSync('/proc/cpuinfo').toString().split('\n');
-              const rPIRevision = util.decodePiCpuinfo(linesRpi);
-              if (rPIRevision.model.toLowerCase().indexOf('raspberry') >= 0) {
-                result.family = result.manufacturer;
-                result.manufacturer = rPIRevision.manufacturer;
-                result.brand = rPIRevision.processor;
-                result.revision = rPIRevision.revisionCode;
-                result.socket = 'SOC';
-              }
+            if (result.vendor === 'ARM' && util.isRaspberry()) {
+              const rPIRevision = util.decodePiCpuinfo();
+              result.family = result.manufacturer;
+              result.manufacturer = rPIRevision.manufacturer;
+              result.brand = rPIRevision.processor;
+              result.revision = rPIRevision.revisionCode;
+              result.socket = 'SOC';
             }
 
             // Test RISC-V
@@ -94742,8 +94746,8 @@ function graphics(callback) {
       }
       if (_linux) {
         // Raspberry: https://elinux.org/RPI_vcgencmd_usage
-        if (util.isRaspberry() && util.isRaspbian()) {
-          let cmd = 'fbset -s | grep \'mode "\'; vcgencmd get_mem gpu; tvservice -s; tvservice -n;';
+        if (util.isRaspberry()) {
+          let cmd = 'fbset -s 2> /dev/null | grep \'mode "\' ; vcgencmd get_mem gpu 2> /dev/null; tvservice -s 2> /dev/null; tvservice -n 2> /dev/null;';
           exec(cmd, function (error, stdout) {
             let lines = stdout.toString().split('\n');
             if (lines.length > 3 && lines[0].indexOf('mode "') >= -1 && lines[2].indexOf('0x12000a') > -1) {
@@ -94768,7 +94772,7 @@ function graphics(callback) {
                 });
               }
             }
-            if (lines.length > 1 && stdout.toString().indexOf('gpu=') >= -1) {
+            if (lines.length >= 1 && stdout.toString().indexOf('gpu=') >= -1) {
               result.controllers.push({
                 vendor: 'Broadcom',
                 model: util.getRpiGpu(),
@@ -94777,51 +94781,55 @@ function graphics(callback) {
                 vramDynamic: true
               });
             }
-            if (callback) {
-              callback(result);
-            }
-            resolve(result);
+            // if (callback) {
+            //   callback(result);
+            // }
+            // resolve(result);
           });
-        } else {
-          let cmd = 'lspci -vvv  2>/dev/null';
-          exec(cmd, function (error, stdout) {
-            if (!error) {
-              let lines = stdout.toString().split('\n');
+        }
+        // } else {
+        let cmd = 'lspci -vvv  2>/dev/null';
+        exec(cmd, function (error, stdout) {
+          if (!error) {
+            let lines = stdout.toString().split('\n');
+            if (result.controllers.length === 0) {
               result.controllers = parseLinesLinuxControllers(lines);
+
               const nvidiaData = nvidiaDevices();
               // needs to be rewritten ... using no spread operators
               result.controllers = result.controllers.map((controller) => { // match by busAddress
                 return mergeControllerNvidia(controller, nvidiaData.find((contr) => contr.pciBus.toLowerCase().endsWith(controller.busAddress.toLowerCase())) || {});
               });
             }
-            let cmd = 'clinfo --raw';
+          }
+          let cmd = 'clinfo --raw';
+          exec(cmd, function (error, stdout) {
+            if (!error) {
+              let lines = stdout.toString().split('\n');
+              result.controllers = parseLinesLinuxClinfo(result.controllers, lines);
+            }
+            let cmd = 'xdpyinfo 2>/dev/null | grep \'depth of root window\' | awk \'{ print $5 }\'';
             exec(cmd, function (error, stdout) {
+              let depth = 0;
               if (!error) {
                 let lines = stdout.toString().split('\n');
-                result.controllers = parseLinesLinuxClinfo(result.controllers, lines);
+                depth = parseInt(lines[0]) || 0;
               }
-              let cmd = 'xdpyinfo 2>/dev/null | grep \'depth of root window\' | awk \'{ print $5 }\'';
+              let cmd = 'xrandr --verbose 2>/dev/null';
               exec(cmd, function (error, stdout) {
-                let depth = 0;
                 if (!error) {
                   let lines = stdout.toString().split('\n');
-                  depth = parseInt(lines[0]) || 0;
+                  result.displays = parseLinesLinuxDisplays(lines, depth);
                 }
-                let cmd = 'xrandr --verbose 2>/dev/null';
-                exec(cmd, function (error, stdout) {
-                  if (!error) {
-                    let lines = stdout.toString().split('\n');
-                    result.displays = parseLinesLinuxDisplays(lines, depth);
-                  }
-                  if (callback) {
-                    callback(result);
-                  }
-                  resolve(result);
-                });
+                if (callback) {
+                  callback(result);
+                }
+                resolve(result);
               });
             });
           });
-        }
+        });
+        // }
       }
       if (_freebsd || _openbsd || _netbsd) {
         if (callback) { callback(null); }
@@ -96280,19 +96288,20 @@ function memLayout(callback) {
             try {
               let stdout = execSync('cat /proc/cpuinfo 2>/dev/null', util.execOptsLinux);
               let lines = stdout.toString().split('\n');
-              let model = util.getValue(lines, 'hardware', ':', true).toUpperCase();
               let version = util.getValue(lines, 'revision', ':', true).toLowerCase();
 
-              if (model === 'BCM2835' || model === 'BCM2708' || model === 'BCM2709' || model === 'BCM2835' || model === 'BCM2837') {
+              if (util.isRaspberry(lines)) {
 
                 const clockSpeed = {
                   '0': 400,
                   '1': 450,
                   '2': 450,
-                  '3': 3200
+                  '3': 3200,
+                  '4': 4267
                 };
                 result[0].type = 'LPDDR2';
-                result[0].type = version && version[2] && version[2] === '3' ? 'LPDDR4' : result[0].type;
+                result[0].type = version && version[2] && (version[2] === '3') ? 'LPDDR4' : result[0].type;
+                result[0].type = version && version[2] && (version[2] === '4') ? 'LPDDR4X' : result[0].type;
                 result[0].ecc = false;
                 result[0].clockSpeed = version && version[2] && clockSpeed[version[2]] || 400;
                 result[0].clockSpeed = version && version[4] && version[4] === 'd' ? 500 : result[0].clockSpeed;
@@ -101290,7 +101299,7 @@ function system(callback) {
                 const model = util.getValue(lines, 'model:', ':', true);
                 // reference values: https://elinux.org/RPi_HardwareHistory
                 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
-                if ((result.model === 'BCM2835' || result.model === 'BCM2708' || result.model === 'BCM2709' || result.model === 'BCM2710' || result.model === 'BCM2711' || result.model === 'BCM2836' || result.model === 'BCM2837' || result.model === '') && model.toLowerCase().indexOf('raspberry') >= 0) {
+                if (util.isRaspberry(lines)) {
                   const rPIRevision = util.decodePiCpuinfo(lines);
                   result.model = rPIRevision.model;
                   result.version = rPIRevision.revisionCode;
@@ -101605,23 +101614,14 @@ function baseboard(callback) {
           result.memSlots = util.toInt(util.getValue(lines, 'Number Of Devices')) || null;
 
           // raspberry
-          let linesRpi = '';
-          try {
-            linesRpi = fs.readFileSync('/proc/cpuinfo').toString().split('\n');
-          } catch (e) {
-            util.noop();
-          }
-          if (linesRpi) {
-            const hardware = util.getValue(linesRpi, 'hardware');
-            if (hardware.startsWith('BCM')) {
-              const rpi = util.decodePiCpuinfo(linesRpi);
-              result.manufacturer = rpi.manufacturer;
-              result.model = 'Raspberry Pi';
-              result.serial = rpi.serial;
-              result.version = rpi.type + ' - ' + rpi.revision;
-              result.memMax = os.totalmem();
-              result.memSlots = 0;
-            }
+          if (util.isRaspberry()) {
+            const rpi = util.decodePiCpuinfo();
+            result.manufacturer = rpi.manufacturer;
+            result.model = 'Raspberry Pi';
+            result.serial = rpi.serial;
+            result.version = rpi.type + ' - ' + rpi.revision;
+            result.memMax = os.totalmem();
+            result.memSlots = 0;
           }
 
           if (callback) { callback(result); }
@@ -103152,7 +103152,7 @@ function smartMonToolsInstalled() {
   return _smartMonToolsInstalled;
 }
 
-function isRaspberry() {
+function isRaspberry(cpuinfo) {
   const PI_MODEL_NO = [
     'BCM2708',
     'BCM2709',
@@ -103164,11 +103164,9 @@ function isRaspberry() {
     'BCM2837',
     'BCM2837B0'
   ];
-  let cpuinfo = [];
-
   if (_rpi_cpuinfo !== null) {
     cpuinfo = _rpi_cpuinfo;
-  } else {
+  } else if (cpuinfo === undefined) {
     try {
       cpuinfo = fs.readFileSync('/proc/cpuinfo', { encoding: 'utf8' }).toString().split('\n');
       _rpi_cpuinfo = cpuinfo;
@@ -103401,6 +103399,8 @@ function decodePiCpuinfo(lines) {
 
   if (_rpi_cpuinfo === null) {
     _rpi_cpuinfo = lines;
+  } else if (lines === undefined) {
+    lines = _rpi_cpuinfo;
   }
 
   // https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
@@ -103611,9 +103611,11 @@ function decodePiCpuinfo(lines) {
   return result;
 }
 
-function getRpiGpu() {
-  let cpuinfo = null;
-  if (_rpi_cpuinfo !== null) {
+function getRpiGpu(cpuinfo) {
+
+  if (_rpi_cpuinfo === null && cpuinfo !== undefined) {
+    _rpi_cpuinfo = cpuinfo;
+  } else if (cpuinfo === undefined && _rpi_cpuinfo !== null) {
     cpuinfo = _rpi_cpuinfo;
   } else {
     try {
@@ -103626,7 +103628,7 @@ function getRpiGpu() {
 
   const rpi = decodePiCpuinfo(cpuinfo);
   if (rpi.type === '4B' || rpi.type === 'CM4' || rpi.type === 'CM4S' || rpi.type === '400') { return 'VideoCore VI'; }
-  if (rpi.type === '5') { return 'VideoCore VII'; }
+  if (rpi.type === '5' || rpi.type === '500') { return 'VideoCore VII'; }
   return 'VideoCore IV';
 }
 
@@ -114615,7 +114617,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.
 /***/ 15460:
 /***/ ((module) => {
 
-module.exports = {"rE":"5.25.6"};
+module.exports = {"rE":"5.25.10"};
 
 /***/ })
 

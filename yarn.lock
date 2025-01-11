@@ -183,8 +183,8 @@ __metadata:
   linkType: hard
 
 "@azure/core-rest-pipeline@npm:^1.10.1, @azure/core-rest-pipeline@npm:^1.3.0, @azure/core-rest-pipeline@npm:^1.9.1":
-  version: 1.18.1
-  resolution: "@azure/core-rest-pipeline@npm:1.18.1"
+  version: 1.18.2
+  resolution: "@azure/core-rest-pipeline@npm:1.18.2"
   dependencies:
     "@azure/abort-controller": "npm:^2.0.0"
     "@azure/core-auth": "npm:^1.8.0"
@@ -194,7 +194,7 @@ __metadata:
     http-proxy-agent: "npm:^7.0.0"
     https-proxy-agent: "npm:^7.0.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/e63d110f799a74ed20925e59ee70eced355f76130a2283393ce109b49365c97a436e8ddde29badee138c17cf0ecf33c26b9ce3cfbf64cf98b904ab50e6bdedff
+  checksum: 10c0/3e5891b948aeac8c1c255664708b3cdd02f118afa22aa60e7af9df830be6fd64e14c82a6d3d51f5ba941626115fb4950a97bc8647bc8b81d600a14c81bd83204
   languageName: node
   linkType: hard
 
@@ -509,7 +509,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
     semver: "npm:7.6.3"
-    systeminformation: "npm:5.25.6"
+    systeminformation: "npm:5.25.10"
     typescript: "npm:5.7.3"
     yaml: "npm:2.7.0"
   languageName: unknown
@@ -1900,12 +1900,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.25.6":
-  version: 5.25.6
-  resolution: "systeminformation@npm:5.25.6"
+"systeminformation@npm:5.25.10":
+  version: 5.25.10
+  resolution: "systeminformation@npm:5.25.10"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/a483a206671069c7357899295870c1f4b548aa1d6823740ef4eb02e6d64aa6f238a9873861378c66397713eea70f71de4f6d1db620456583c7f725da97c50ed6
+  checksum: 10c0/1477b7cf4eec96bd91c55666e4147e720cfab4385a4dc1ac482f269158f5175f1de24cf0d61fb39ba5b17727168619d95dcfb06f42be9858438db08e9d647189
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
