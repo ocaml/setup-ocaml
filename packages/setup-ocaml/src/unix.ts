@@ -36,6 +36,8 @@ export async function installUnixSystemPackages() {
   const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
   const optionalDependencies = await retrieveInstallableOptionalDependencies([
     "darcs",
+    "g++-multilib",
+    "gcc-multilib",
     "mercurial",
   ]);
   if (isGitHubRunner) {
@@ -45,8 +47,6 @@ export async function installUnixSystemPackages() {
         "--yes",
         "install",
         "bubblewrap",
-        "g++-multilib",
-        "gcc-multilib",
         "musl-tools",
         "rsync",
         ...optionalDependencies,
