@@ -62544,6 +62544,14 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(98253)
 const { File: UndiciFile } = __nccwpck_require__(17005)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(37246)
 
+let random
+try {
+  const crypto = __nccwpck_require__(77598)
+  random = (max) => crypto.randomInt(0, max)
+} catch {
+  random = (max) => Math.floor(Math.random(max))
+}
+
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -62629,7 +62637,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -76776,6 +76784,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("net");
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:buffer");
+
+/***/ }),
+
+/***/ 77598:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
 
 /***/ }),
 
@@ -114665,8 +114680,8 @@ var __webpack_exports__ = {};
 var external_node_process_ = __nccwpck_require__(1708);
 // EXTERNAL MODULE: ../../node_modules/@actions/core/lib/core.js
 var lib_core = __nccwpck_require__(7184);
-;// CONCATENATED MODULE: external "node:crypto"
-const external_node_crypto_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+// EXTERNAL MODULE: external "node:crypto"
+var external_node_crypto_ = __nccwpck_require__(77598);
 ;// CONCATENATED MODULE: external "node:path"
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ../../node_modules/@actions/cache/lib/cache.js
@@ -114875,7 +114890,7 @@ async function composeDuneCacheKeys() {
     const { workflow, job, runId } = lib_github.context;
     const ocamlCompiler = await constants_RESOLVED_COMPILER;
     const plainKey = [ocamlCompiler, workflow, job].join();
-    const hash = external_node_crypto_namespaceObject.createHash("sha256").update(plainKey).digest("hex");
+    const hash = external_node_crypto_.createHash("sha256").update(plainKey).digest("hex");
     const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${constants_PLATFORM}-${constants_ARCHITECTURE}-${hash}-${runId}`;
     const restoreKeys = [
         key,
