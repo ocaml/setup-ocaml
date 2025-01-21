@@ -114821,47 +114821,20 @@ const constants_OPAM_ROOT = constants_PLATFORM === "windows"
     ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
         external_node_path_namespaceObject.join("D:", ".opam")
     : external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
-const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam", {
-    required: false,
-    trimWhitespace: true,
-});
-const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix", {
-    required: false,
-    trimWhitespace: true,
-});
-const GITHUB_TOKEN = lib_core.getInput("github-token", {
-    required: false,
-    trimWhitespace: true,
-});
-const DUNE_CACHE = lib_core.getBooleanInput("dune-cache", {
-    required: false,
-    trimWhitespace: true,
-});
-const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", {
-    required: true,
-    trimWhitespace: true,
-});
+const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam");
+const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix");
+const GITHUB_TOKEN = lib_core.getInput("github-token");
+const DUNE_CACHE = lib_core.getBooleanInput("dune-cache");
+const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", { required: true });
 const constants_OPAM_DISABLE_SANDBOXING = 
 // [TODO] unlock this once sandboxing is supported on Windows
 constants_PLATFORM === "windows"
     ? true
-    : lib_core.getBooleanInput("opam-disable-sandboxing", {
-        required: false,
-        trimWhitespace: true,
-    });
-const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages", {
-    required: false,
-    trimWhitespace: true,
-});
-const OPAM_PIN = lib_core.getBooleanInput("opam-pin", {
-    required: false,
-    trimWhitespace: true,
-});
+    : lib_core.getBooleanInput("opam-disable-sandboxing");
+const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages", {});
+const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
 const constants_OPAM_REPOSITORIES = (() => {
-    const repositories_yaml = dist/* parse */.qg(lib_core.getInput("opam-repositories", {
-        required: false,
-        trimWhitespace: true,
-    }));
+    const repositories_yaml = dist/* parse */.qg(lib_core.getInput("opam-repositories"));
     return Object.entries(repositories_yaml).reverse();
 })();
 const constants_RESOLVED_COMPILER = (async () => {

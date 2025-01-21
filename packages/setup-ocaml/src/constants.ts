@@ -86,57 +86,29 @@ export const OPAM_ROOT =
 
 export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
   "allow-prerelease-opam",
-  {
-    required: false,
-    trimWhitespace: true,
-  },
 );
 
-export const CACHE_PREFIX = core.getInput("cache-prefix", {
-  required: false,
-  trimWhitespace: true,
-});
+export const CACHE_PREFIX = core.getInput("cache-prefix");
 
-export const GITHUB_TOKEN = core.getInput("github-token", {
-  required: false,
-  trimWhitespace: true,
-});
+export const GITHUB_TOKEN = core.getInput("github-token");
 
-export const DUNE_CACHE = core.getBooleanInput("dune-cache", {
-  required: false,
-  trimWhitespace: true,
-});
+export const DUNE_CACHE = core.getBooleanInput("dune-cache");
 
-const OCAML_COMPILER = core.getInput("ocaml-compiler", {
-  required: true,
-  trimWhitespace: true,
-});
+const OCAML_COMPILER = core.getInput("ocaml-compiler", { required: true });
 
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM === "windows"
     ? true
-    : core.getBooleanInput("opam-disable-sandboxing", {
-        required: false,
-        trimWhitespace: true,
-      });
+    : core.getBooleanInput("opam-disable-sandboxing");
 
-export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages", {
-  required: false,
-  trimWhitespace: true,
-});
+export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages", {});
 
-export const OPAM_PIN = core.getBooleanInput("opam-pin", {
-  required: false,
-  trimWhitespace: true,
-});
+export const OPAM_PIN = core.getBooleanInput("opam-pin");
 
 export const OPAM_REPOSITORIES: [string, string][] = (() => {
   const repositories_yaml = yaml.parse(
-    core.getInput("opam-repositories", {
-      required: false,
-      trimWhitespace: true,
-    }),
+    core.getInput("opam-repositories"),
   ) as Record<string, string>;
   return Object.entries(repositories_yaml).reverse();
 })();
