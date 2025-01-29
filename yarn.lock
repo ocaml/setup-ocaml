@@ -439,7 +439,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.10"
+    "@types/node": "npm:22.12.0"
     "@vercel/ncc": "npm:0.38.3"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -455,7 +455,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.10"
+    "@types/node": "npm:22.12.0"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.3"
   languageName: unknown
@@ -469,7 +469,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.10"
+    "@types/node": "npm:22.12.0"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.3"
   languageName: unknown
@@ -483,7 +483,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.10"
+    "@types/node": "npm:22.12.0"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.7.3"
   languageName: unknown
@@ -503,11 +503,11 @@ __metadata:
     "@actions/tool-cache": "npm:2.0.2"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.10.10"
+    "@types/node": "npm:22.12.0"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
-    semver: "npm:7.6.3"
+    semver: "npm:7.7.0"
     systeminformation: "npm:5.25.11"
     typescript: "npm:5.7.3"
     yaml: "npm:2.7.0"
@@ -713,12 +713,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.10.10":
-  version: 22.10.10
-  resolution: "@types/node@npm:22.10.10"
+"@types/node@npm:22.12.0":
+  version: 22.12.0
+  resolution: "@types/node@npm:22.12.0"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/3425772d4513cd5dbdd87c00acda088113c03a97445f84f6a89744c60a66990b56c9d3a7213d09d57b6b944ae8ff45f985565e0c1846726112588e33a22dd12b
+  checksum: 10c0/be220706732d95db2ed1c441c1e64cab90bf9a47519ce6f4c79cc5a9ec9d5c517131a149a9ac30afac1a30103e67e3a00d453ba7c1b0141608a3a7ba6397c303
   languageName: node
   linkType: hard
 
@@ -1758,12 +1758,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:7.6.3, semver@npm:^7.3.5":
-  version: 7.6.3
-  resolution: "semver@npm:7.6.3"
+"semver@npm:7.7.0, semver@npm:^7.3.5":
+  version: 7.7.0
+  resolution: "semver@npm:7.7.0"
   bin:
     semver: bin/semver.js
-  checksum: 10c0/88f33e148b210c153873cb08cfe1e281d518aaa9a666d4d148add6560db5cd3c582f3a08ccb91f38d5f379ead256da9931234ed122057f40bb5766e65e58adaf
+  checksum: 10c0/bcd1c03209b4be7d8ca86c976a0410beba7d4ec1d49d846a4be154b958db1ff5eaee50760c1d4f4070b19dee3236b8672d3e09642c53ea23740398bba2538a2d
   languageName: node
   linkType: hard
 
