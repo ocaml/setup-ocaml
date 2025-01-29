@@ -98,11 +98,9 @@ const OCAML_COMPILER = core.getInput("ocaml-compiler", { required: true });
 
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
-  PLATFORM === "windows"
-    ? true
-    : core.getBooleanInput("opam-disable-sandboxing");
+  PLATFORM !== "windows" && core.getBooleanInput("opam-disable-sandboxing");
 
-export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages", {});
+export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
 
 export const OPAM_PIN = core.getBooleanInput("opam-pin");
 

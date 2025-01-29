@@ -114836,10 +114836,8 @@ const DUNE_CACHE = lib_core.getBooleanInput("dune-cache");
 const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", { required: true });
 const constants_OPAM_DISABLE_SANDBOXING = 
 // [TODO] unlock this once sandboxing is supported on Windows
-constants_PLATFORM === "windows"
-    ? true
-    : lib_core.getBooleanInput("opam-disable-sandboxing");
-const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages", {});
+constants_PLATFORM !== "windows" && lib_core.getBooleanInput("opam-disable-sandboxing");
+const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages");
 const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
 const constants_OPAM_REPOSITORIES = (() => {
     const repositories_yaml = dist/* parse */.qg(lib_core.getInput("opam-repositories"));
