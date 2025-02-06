@@ -50672,7 +50672,7 @@ const testSet = (set, version, options) => {
 
 const debug = __nccwpck_require__(28195)
 const { MAX_LENGTH, MAX_SAFE_INTEGER } = __nccwpck_require__(1825)
-const { safeRe: re, t } = __nccwpck_require__(23227)
+const { safeRe: re, safeSrc: src, t } = __nccwpck_require__(23227)
 
 const parseOptions = __nccwpck_require__(74464)
 const { compareIdentifiers } = __nccwpck_require__(14192)
@@ -50854,7 +50854,8 @@ class SemVer {
       }
       // Avoid an invalid semver results
       if (identifier) {
-        const match = `-${identifier}`.match(this.options.loose ? re[t.PRERELEASELOOSE] : re[t.PRERELEASE])
+        const r = new RegExp(`^${this.options.loose ? src[t.PRERELEASELOOSE] : src[t.PRERELEASE]}$`)
+        const match = `-${identifier}`.match(r)
         if (!match || match[1] !== identifier) {
           throw new Error(`invalid identifier: ${identifier}`)
         }
@@ -51711,6 +51712,7 @@ exports = module.exports = {}
 const re = exports.re = []
 const safeRe = exports.safeRe = []
 const src = exports.src = []
+const safeSrc = exports.safeSrc = []
 const t = exports.t = {}
 let R = 0
 
@@ -51743,6 +51745,7 @@ const createToken = (name, value, isGlobal) => {
   debug(name, index, value)
   t[name] = index
   src[index] = value
+  safeSrc[index] = safe
   re[index] = new RegExp(value, isGlobal ? 'g' : undefined)
   safeRe[index] = new RegExp(safe, isGlobal ? 'g' : undefined)
 }
