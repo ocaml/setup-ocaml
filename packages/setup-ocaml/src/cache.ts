@@ -205,15 +205,6 @@ export async function saveDuneCache() {
 
 export async function saveOpamCache() {
   await core.group("Save the opam cache", async () => {
-    await exec("opam", [
-      "clean",
-      "--all-switches",
-      "--download-cache",
-      "--logs",
-      "--repo-cache",
-      "--untracked",
-      "--unused-repositories",
-    ]);
     const { key, restoreKeys } = await composeOpamCacheKeys();
     const paths = composeOpamCachePaths();
     const cacheHit = await restoreCache(key, restoreKeys, paths, {
@@ -224,6 +215,15 @@ export async function saveOpamCache() {
         "Cache entry with the same key, version, and scope already exists",
       );
     } else {
+      await exec("opam", [
+        "clean",
+        "--all-switches",
+        "--download-cache",
+        "--logs",
+        "--repo-cache",
+        "--untracked",
+        "--unused-repositories",
+      ]);
       await saveCache(key, paths);
     }
   });
