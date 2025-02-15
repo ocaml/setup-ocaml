@@ -1,6 +1,7 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
 import * as cache from "@actions/cache";
+import type { DownloadOptions } from "@actions/cache/lib/options.js";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
@@ -108,13 +109,14 @@ async function restoreCache(
   key: string,
   restoreKeys: string[],
   paths: string[],
+  options?: DownloadOptions,
 ) {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
     return;
   }
   try {
-    const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
+    const cacheKey = await cache.restoreCache(paths, key, restoreKeys, options);
     if (cacheKey) {
       core.info(`Cache restored from key: ${cacheKey}`);
     } else {
@@ -212,8 +214,17 @@ export async function saveOpamCache() {
       "--untracked",
       "--unused-repositories",
     ]);
-    const { key } = await composeOpamCacheKeys();
+    const { key, restoreKeys } = await composeOpamCacheKeys();
     const paths = composeOpamCachePaths();
-    await saveCache(key, paths);
+    const cacheHit = await restoreCache(key, restoreKeys, paths, {
+      lookupOnly: true,
+    });
+    if (cacheHit) {
+      core.info(
+        "Cache entry with the same key, version, and scope already exists",
+      );
+    } else {
+      await saveCache(key, paths);
+    }
   });
 }
