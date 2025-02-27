@@ -27443,7 +27443,7 @@ async function lintOdoc() {
         },
     });
     if (exitCode !== 0) {
-        throw new Error("dune build @doc failed");
+        throw new Error("Odoc build failed. The 'dune build @doc' command exited with a non-zero status. Please check your odoc comments for errors.");
     }
 }
 
@@ -27451,12 +27451,12 @@ async function lintOdoc() {
 
 
 async function installOpamPackages() {
-    await core.group("Install opam packages", async () => {
+    await core.group("Installing opam dependencies", async () => {
         await (0,exec.exec)("opam", ["install", "--deps-only", "--with-doc", "."]);
     });
 }
 async function installOdoc() {
-    await core.group("Install odoc", async () => {
+    await core.group("Installing odoc", async () => {
         await (0,exec.exec)("opam", ["install", "dune", "odoc>=1.5.0"]);
     });
 }

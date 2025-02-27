@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
 export async function installOpamPackages() {
-  await core.group("Install opam packages", async () => {
+  await core.group("Installing opam dependencies", async () => {
     await exec("opam", [
       "install",
       "--deps-only",
@@ -14,7 +14,7 @@ export async function installOpamPackages() {
 }
 
 export async function installOpamDuneLint() {
-  await core.group("Install opam-dune-lint", async () => {
+  await core.group("Installing opam-dune-lint", async () => {
     await exec("opam", ["install", "opam-dune-lint"]);
   });
 }

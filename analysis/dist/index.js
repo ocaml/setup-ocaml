@@ -35966,7 +35966,7 @@ function parseDependencies(cache, dependencies) {
 function createBuildTarget(output, filePath) {
     const opamPackage = output.tree.at(0);
     if (!opamPackage) {
-        throw new Error("No dependencies found");
+        throw new Error("No opam dependencies were found. Please ensure the opam file is valid and contains dependencies.");
     }
     const cache = new h();
     const topLevelDependencies = parseDependencies(cache, opamPackage.dependencies);
@@ -36029,7 +36029,7 @@ async function analysis() {
 
 
 async function installOpamPackages() {
-    await core.group("Install opam packages", async () => {
+    await core.group("Installing opam dependencies", async () => {
         await (0,exec.exec)("opam", [
             "install",
             "--deps-only",
@@ -36041,7 +36041,7 @@ async function installOpamPackages() {
     });
 }
 async function installDune() {
-    await core.group("Install dune", async () => {
+    await core.group("Installing dune", async () => {
         await (0,exec.exec)("opam", ["install", "dune"]);
     });
 }

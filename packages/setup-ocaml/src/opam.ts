@@ -38,7 +38,7 @@ export async function retrieveLatestOpamRelease() {
   const latestRelease = matchedReleases.at(0);
   if (!latestRelease) {
     throw new Error(
-      "Could not retrieve the opam release matching the version constraint",
+      "Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases.",
     );
   }
   const matchedAssets = latestRelease.assets.find((asset) => {
@@ -51,7 +51,7 @@ export async function retrieveLatestOpamRelease() {
   });
   if (!matchedAssets) {
     throw new Error(
-      "Could not find any assets matching the current platform or architecture",
+      `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`,
     );
   }
   return {
@@ -61,13 +61,13 @@ export async function retrieveLatestOpamRelease() {
 }
 
 async function acquireOpam() {
-  await core.group("Install opam", async () => {
+  await core.group("Installing opam", async () => {
     const { version, browserDownloadUrl } = await retrieveLatestOpamRelease();
     const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
     const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
     if (cachedPath === "") {
       const downloadedPath = await toolCache.downloadTool(browserDownloadUrl);
-      core.info(`Acquired ${version} from ${browserDownloadUrl}`);
+      core.info(`Downloaded opam ${version} from ${browserDownloadUrl}`);
       const cachedPath = await toolCache.cacheFile(
         downloadedPath,
         opam,
@@ -87,14 +87,14 @@ async function acquireOpam() {
 }
 
 async function initializeOpam() {
-  await core.group("Initialise opam state", async () => {
+  await core.group("Initialising opam state", async () => {
     if (PLATFORM !== "windows") {
       try {
         await installUnixSystemPackages();
       } catch (error) {
         if (error instanceof Error) {
           core.notice(
-            `An error has been caught in some system package index files, so the system package index files have been re-synchronised, and the system package installation has been retried: ${error.message.toLocaleLowerCase()}`,
+            `System package installation failed. Re-synchronizing package index files and retrying installation. Error details: ${error.message.toLocaleLowerCase()}`,
           );
         }
         await updateUnixPackageIndexFiles();
@@ -125,7 +125,7 @@ export async function setupOpam() {
 }
 
 export async function installOcaml(ocamlCompiler: string) {
-  await core.group("Install OCaml", async () => {
+  await core.group("Installing OCaml compiler", async () => {
     await exec("opam", [
       "switch",
       "--no-install",
@@ -140,7 +140,7 @@ export async function pin(fpaths: string[]) {
   if (fpaths.length === 0) {
     return;
   }
-  await core.group("Pin local packages", async () => {
+  await core.group("Pinning local packages", async () => {
     for (const fpath of fpaths) {
       const fname = path.basename(fpath, ".opam");
       const dname = path.dirname(fpath);
@@ -163,7 +163,7 @@ async function repositoryAdd(name: string, address: string) {
 }
 
 export async function repositoryAddAll(repositories: [string, string][]) {
-  await core.group("Initialise the opam repositories", async () => {
+  await core.group("Initialising opam repositories", async () => {
     for (const [name, address] of repositories) {
       await repositoryAdd(name, address);
     }
@@ -190,7 +190,7 @@ async function repositoryList() {
 }
 
 export async function repositoryRemoveAll() {
-  await core.group("Remove the opam repositories", async () => {
+  await core.group("Removing opam repositories", async () => {
     const repositories = await repositoryList();
     for (const repository of repositories) {
       await repositoryRemove(repository);
@@ -199,7 +199,10 @@ export async function repositoryRemoveAll() {
 }
 
 export async function update() {
-  await core.group("Update the list of available opam packages", async () => {
-    await exec("opam", ["update"]);
-  });
+  await core.group(
+    "Updating opam repositories to get latest available packages",
+    async () => {
+      await exec("opam", ["update"]);
+    },
+  );
 }

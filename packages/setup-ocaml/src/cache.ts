@@ -154,7 +154,7 @@ async function saveCache(key: string, paths: string[]) {
 }
 
 export async function restoreDuneCache() {
-  return await core.group("Retrieve the dune cache", async () => {
+  return await core.group("Restoring dune cache", async () => {
     const { key, restoreKeys } = await composeDuneCacheKeys();
     const paths = composeDuneCachePaths();
     const cacheKey = await restoreCache(key, restoreKeys, paths);
@@ -177,7 +177,7 @@ async function restoreOpamCache() {
 }
 
 export async function restoreOpamCaches() {
-  return await core.group("Retrieve the opam cache", async () => {
+  return await core.group("Restoring opam cache", async () => {
     const [opamCacheHit, cygwinCacheHit] = await Promise.all(
       PLATFORM === "windows"
         ? [restoreOpamCache(), restoreCygwinCache()]
@@ -188,7 +188,7 @@ export async function restoreOpamCaches() {
 }
 
 export async function saveCygwinCache() {
-  await core.group("Save the Cygwin cache", async () => {
+  await core.group("Saving Cygwin cache", async () => {
     const { key } = await composeCygwinCacheKeys();
     const paths = composeCygwinCachePaths();
     await saveCache(key, paths);
@@ -196,7 +196,7 @@ export async function saveCygwinCache() {
 }
 
 export async function saveDuneCache() {
-  await core.group("Save the dune cache", async () => {
+  await core.group("Saving dune cache", async () => {
     const { key } = await composeDuneCacheKeys();
     const paths = composeDuneCachePaths();
     await saveCache(key, paths);
@@ -204,7 +204,7 @@ export async function saveDuneCache() {
 }
 
 export async function saveOpamCache() {
-  await core.group("Save the opam cache", async () => {
+  await core.group("Saving opam cache", async () => {
     const { key, restoreKeys } = await composeOpamCacheKeys();
     const paths = composeOpamCachePaths();
     const cacheHit = await restoreCache(key, restoreKeys, paths, {

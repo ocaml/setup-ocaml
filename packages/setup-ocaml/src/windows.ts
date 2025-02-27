@@ -69,7 +69,7 @@ async function setGitToIgnoreCygwinLocalPackageDirectory() {
 }
 
 export async function setupCygwin() {
-  await core.group("Prepare the Cygwin environment", async () => {
+  await core.group("Setting up Cygwin environment", async () => {
     await setGitToIgnoreCygwinLocalPackageDirectory();
     const version = await retrieveCygwinVersion();
     const cachedPath = toolCache.find("cygwin", version, "x86_64");

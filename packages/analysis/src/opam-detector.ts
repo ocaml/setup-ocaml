@@ -58,7 +58,9 @@ function parseDependencies(
 export function createBuildTarget(output: Output, filePath: string) {
   const opamPackage = output.tree.at(0);
   if (!opamPackage) {
-    throw new Error("No dependencies found");
+    throw new Error(
+      "No opam dependencies were found. Please ensure the opam file is valid and contains dependencies.",
+    );
   }
   const cache = new PackageCache();
   const topLevelDependencies = parseDependencies(

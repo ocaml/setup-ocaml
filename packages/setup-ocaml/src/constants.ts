@@ -16,7 +16,6 @@ export const ARCHITECTURE = (() => {
     case "riscv64": {
       return "riscv64";
     }
-
     case "s390x": {
       return "s390x";
     }
@@ -24,7 +23,9 @@ export const ARCHITECTURE = (() => {
       return "x86_64";
     }
     default: {
-      throw new Error("The architecture is not supported.");
+      throw new Error(
+        `'${process.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`,
+      );
     }
   }
 })();
@@ -47,7 +48,9 @@ export const PLATFORM = (() => {
       return "windows";
     }
     default: {
-      throw new Error("The platform is not supported.");
+      throw new Error(
+        `'${process.platform}' is not supported. Supported platforms: darwin, freebsd, linux, openbsd, win32`,
+      );
     }
   }
 })();
@@ -67,22 +70,24 @@ export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 export const CYGWIN_BASH_ENV = path.join(CYGWIN_ROOT, "bash_env");
 
 export const DUNE_CACHE_ROOT = (() => {
-  const homeDir = os.homedir();
   const xdgCacheHome = process.env.XDG_CACHE_HOME;
-  const duneCacheDir = xdgCacheHome
-    ? path.join(xdgCacheHome, "dune")
-    : PLATFORM === "windows"
-      ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-        path.join("D:", "dune")
-      : path.join(homeDir, ".cache", "dune");
-  return duneCacheDir;
+  if (xdgCacheHome) {
+    return path.join(xdgCacheHome, "dune");
+  }
+  if (PLATFORM === "windows") {
+    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+    return path.join("D:", "dune");
+  }
+  return path.join(os.homedir(), ".cache", "dune");
 })();
 
-export const OPAM_ROOT =
-  PLATFORM === "windows"
-    ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-      path.join("D:", ".opam")
-    : path.join(os.homedir(), ".opam");
+export const OPAM_ROOT = (() => {
+  if (PLATFORM === "windows") {
+    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+    return path.join("D:", ".opam");
+  }
+  return path.join(os.homedir(), ".opam");
+})();
 
 export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
   "allow-prerelease-opam",
@@ -105,13 +110,12 @@ export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
 export const OPAM_PIN = core.getBooleanInput("opam-pin");
 
 export const OPAM_REPOSITORIES: [string, string][] = (() => {
-  const repositories_yaml = yaml.parse(
+  const repositoriesYaml = yaml.parse(
     core.getInput("opam-repositories"),
   ) as Record<string, string>;
-  return Object.entries(repositories_yaml).reverse();
+  return Object.entries(repositoriesYaml).reverse();
 })();
 
 export const RESOLVED_COMPILER = (async () => {
-  const resolvedCompiler = await resolveCompiler(OCAML_COMPILER);
-  return resolvedCompiler;
+  return await resolveCompiler(OCAML_COMPILER);
 })();

@@ -27444,7 +27444,7 @@ async function opamDuneLint() {
 
 
 async function installOpamPackages() {
-    await core.group("Install opam packages", async () => {
+    await core.group("Installing opam dependencies", async () => {
         await (0,exec.exec)("opam", [
             "install",
             "--deps-only",
@@ -27455,7 +27455,7 @@ async function installOpamPackages() {
     });
 }
 async function installOpamDuneLint() {
-    await core.group("Install opam-dune-lint", async () => {
+    await core.group("Installing opam-dune-lint", async () => {
         await (0,exec.exec)("opam", ["install", "opam-dune-lint"]);
     });
 }

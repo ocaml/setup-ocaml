@@ -48,21 +48,18 @@ export async function installer() {
     core.exportVariable("CYGWIN", "winsymlinks:native");
     core.exportVariable("HOME", process.env.USERPROFILE);
     core.exportVariable("MSYS", "winsymlinks:native");
-    await core.group(
-      "Change the file system behaviour parameters",
-      async () => {
-        await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-        // [INFO] https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
-        await exec("fsutil", [
-          "behavior",
-          "set",
-          "symlinkEvaluation",
-          "R2L:1",
-          "R2R:1",
-        ]);
-        await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-      },
-    );
+    await core.group("Configuring Windows symlink settings", async () => {
+      await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
+      // [INFO] https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
+      await exec("fsutil", [
+        "behavior",
+        "set",
+        "symlinkEvaluation",
+        "R2L:1",
+        "R2R:1",
+      ]);
+      await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
+    });
   }
   const { opamCacheHit, cygwinCacheHit } = await restoreOpamCaches();
   if (PLATFORM === "windows") {

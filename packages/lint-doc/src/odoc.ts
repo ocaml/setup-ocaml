@@ -10,6 +10,8 @@ export async function lintOdoc() {
     },
   });
   if (exitCode !== 0) {
-    throw new Error("dune build @doc failed");
+    throw new Error(
+      "Odoc build failed. The 'dune build @doc' command exited with a non-zero status. Please check your odoc comments for errors.",
+    );
   }
 }

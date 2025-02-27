@@ -25,14 +25,14 @@ async function parse() {
 export async function retrieveOcamlformatVersion() {
   const config = await parse();
   if (config === undefined) {
-    core.warning(".ocamlformat file is not found");
+    core.warning(".ocamlformat file not found");
     return;
   }
   if (config.version) {
     return config.version;
   }
   core.warning(
-    "ocamlformat version is not found in .ocamlformat: setting up your project to use the default profile and the ocamlformat version you installed in .ocamlformat file is considered good practice",
+    "No ocamlformat version found in .ocamlformat file. It's recommended to specify the version in your .ocamlformat file for better consistency.",
   );
   return;
 }

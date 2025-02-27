@@ -27475,13 +27475,13 @@ async function parse() {
 async function retrieveOcamlformatVersion() {
     const config = await parse();
     if (config === undefined) {
-        core.warning(".ocamlformat file is not found");
+        core.warning(".ocamlformat file not found");
         return;
     }
     if (config.version) {
         return config.version;
     }
-    core.warning("ocamlformat version is not found in .ocamlformat: setting up your project to use the default profile and the ocamlformat version you installed in .ocamlformat file is considered good practice");
+    core.warning("No ocamlformat version found in .ocamlformat file. It's recommended to specify the version in your .ocamlformat file for better consistency.");
     return;
 }
 
@@ -27489,12 +27489,12 @@ async function retrieveOcamlformatVersion() {
 
 
 async function installOcamlformat(version) {
-    await core.group("Install ocamlformat", async () => {
+    await core.group("Installing ocamlformat", async () => {
         await (0,exec.exec)("opam", ["install", `ocamlformat=${version}`]);
     });
 }
 async function installDune() {
-    await core.group("Install dune", async () => {
+    await core.group("Installing dune", async () => {
         await (0,exec.exec)("opam", ["install", "dune"]);
     });
 }

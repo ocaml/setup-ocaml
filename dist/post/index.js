@@ -111926,7 +111926,7 @@ async function resolveVersion(semverVersion) {
     const compilerVersions = await retrieveAllCompilerVersions();
     const matchedFullCompilerVersion = semver.maxSatisfying(compilerVersions, semverVersion, { loose: true });
     if (matchedFullCompilerVersion === null) {
-        throw new Error(`No OCaml base compiler packages matched the version ${semverVersion} in the opam-repository.`);
+        throw new Error(`Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository. Please check if you specified a valid version number or version range.`);
     }
     return matchedFullCompilerVersion;
 }
@@ -111962,7 +111962,7 @@ const constants_ARCHITECTURE = (() => {
             return "x86_64";
         }
         default: {
-            throw new Error("The architecture is not supported.");
+            throw new Error(`'${external_node_process_.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`);
         }
     }
 })();
@@ -111984,7 +111984,7 @@ const constants_PLATFORM = (() => {
             return "windows";
         }
         default: {
-            throw new Error("The platform is not supported.");
+            throw new Error(`'${external_node_process_.platform}' is not supported. Supported platforms: darwin, freebsd, linux, openbsd, win32`);
         }
     }
 })();
@@ -111996,20 +111996,23 @@ const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cyg
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
 const CYGWIN_BASH_ENV = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bash_env");
 const DUNE_CACHE_ROOT = (() => {
-    const homeDir = external_node_os_.homedir();
     const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
-    const duneCacheDir = xdgCacheHome
-        ? external_node_path_namespaceObject.join(xdgCacheHome, "dune")
-        : constants_PLATFORM === "windows"
-            ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-                external_node_path_namespaceObject.join("D:", "dune")
-            : external_node_path_namespaceObject.join(homeDir, ".cache", "dune");
-    return duneCacheDir;
+    if (xdgCacheHome) {
+        return external_node_path_namespaceObject.join(xdgCacheHome, "dune");
+    }
+    if (constants_PLATFORM === "windows") {
+        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        return external_node_path_namespaceObject.join("D:", "dune");
+    }
+    return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".cache", "dune");
 })();
-const constants_OPAM_ROOT = constants_PLATFORM === "windows"
-    ? // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-        external_node_path_namespaceObject.join("D:", ".opam")
-    : external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
+const constants_OPAM_ROOT = (() => {
+    if (constants_PLATFORM === "windows") {
+        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        return external_node_path_namespaceObject.join("D:", ".opam");
+    }
+    return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
+})();
 const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam");
 const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix");
 const GITHUB_TOKEN = lib_core.getInput("github-token");
@@ -112021,12 +112024,11 @@ constants_PLATFORM !== "windows" && lib_core.getBooleanInput("opam-disable-sandb
 const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages");
 const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
 const constants_OPAM_REPOSITORIES = (() => {
-    const repositories_yaml = dist/* parse */.qg(lib_core.getInput("opam-repositories"));
-    return Object.entries(repositories_yaml).reverse();
+    const repositoriesYaml = dist/* parse */.qg(lib_core.getInput("opam-repositories"));
+    return Object.entries(repositoriesYaml).reverse();
 })();
 const constants_RESOLVED_COMPILER = (async () => {
-    const resolvedCompiler = await resolveCompiler(OCAML_COMPILER);
-    return resolvedCompiler;
+    return await resolveCompiler(OCAML_COMPILER);
 })();
 
 ;// CONCATENATED MODULE: ./src/cache.ts
@@ -112144,7 +112146,7 @@ async function saveCache(key, paths) {
     }
 }
 async function restoreDuneCache() {
-    return await core.group("Retrieve the dune cache", async () => {
+    return await core.group("Restoring dune cache", async () => {
         const { key, restoreKeys } = await composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         const cacheKey = await restoreCache(key, restoreKeys, paths);
@@ -112164,7 +112166,7 @@ async function restoreOpamCache() {
     return cacheKey;
 }
 async function restoreOpamCaches() {
-    return await core.group("Retrieve the opam cache", async () => {
+    return await core.group("Restoring opam cache", async () => {
         const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows"
             ? [restoreOpamCache(), restoreCygwinCache()]
             : [restoreOpamCache()]);
@@ -112172,21 +112174,21 @@ async function restoreOpamCaches() {
     });
 }
 async function saveCygwinCache() {
-    await core.group("Save the Cygwin cache", async () => {
+    await core.group("Saving Cygwin cache", async () => {
         const { key } = await composeCygwinCacheKeys();
         const paths = composeCygwinCachePaths();
         await saveCache(key, paths);
     });
 }
 async function saveDuneCache() {
-    await lib_core.group("Save the dune cache", async () => {
+    await lib_core.group("Saving dune cache", async () => {
         const { key } = await composeDuneCacheKeys();
         const paths = composeDuneCachePaths();
         await saveCache(key, paths);
     });
 }
 async function saveOpamCache() {
-    await core.group("Save the opam cache", async () => {
+    await core.group("Saving opam cache", async () => {
         const { key, restoreKeys } = await composeOpamCacheKeys();
         const paths = composeOpamCachePaths();
         const cacheHit = await restoreCache(key, restoreKeys, paths, {
@@ -112217,12 +112219,12 @@ async function saveOpamCache() {
 
 const { repo: { owner, repo }, runId: run_id, } = lib_github.context;
 async function installDune() {
-    await core.group("Install dune", async () => {
+    await core.group("Installing dune", async () => {
         await exec("opam", ["install", "dune"]);
     });
 }
 async function trimDuneCache() {
-    await lib_core.group("Remove oldest files from the dune cache to free space", async () => {
+    await lib_core.group("Clearing old dune cache files to save space", async () => {
         const octokit = lib_github.getOctokit(GITHUB_TOKEN);
         const { data: { total_count: totalCount }, } = await octokit.rest.actions.listJobsForWorkflowRun({
             owner,
