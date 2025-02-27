@@ -199,10 +199,7 @@ export async function repositoryRemoveAll() {
 }
 
 export async function update() {
-  await core.group(
-    "Updating opam repositories to get latest available packages",
-    async () => {
-      await exec("opam", ["update"]);
-    },
-  );
+  await core.group("Updating opam repositories", async () => {
+    await exec("opam", ["update"]);
+  });
 }
