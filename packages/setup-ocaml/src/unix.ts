@@ -1,15 +1,24 @@
 import * as fs from "node:fs/promises";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
-import { PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
+import { PLATFORM } from "./constants.js";
 
-async function checkAptInstallability(packageName: string) {
-  const output = await getExecOutput("sudo", [
-    "apt-cache",
-    "search",
-    "--names-only",
-    `'^${packageName}$'`,
-  ]);
+async function checkInstallability(packageName: string) {
+    let output;
+    if (DISTRO === "alpine") {
+        output = await getExecOutput("apk", [
+            "search",
+            "--exact",
+            packageName,
+        ]);
+    } else {
+     output = await getExecOutput("sudo", [
+        "apt-cache",
+        "search",
+        "--names-only",
+        `'^${packageName}$'`,
+    ]);
+}
   return output.stdout.length > 0;
 }
 
@@ -20,7 +29,7 @@ async function retrieveInstallableOptionalDependencies(
     case "linux": {
       const installableOptionalDependencies: string[] = [];
       for (const optionalDependency of optionalDependencies) {
-        const isInstallable = await checkAptInstallability(optionalDependency);
+        const isInstallable = await checkInstallability(optionalDependency);
         if (isInstallable) {
           installableOptionalDependencies.push(optionalDependency);
         }
@@ -108,7 +117,6 @@ export async function updateUnixPackageIndexFiles() {
     }
     case "macos": {
       await exec("brew", ["update"]);
-      break;
     }
   }
 }

@@ -1,5 +1,6 @@
 import * as os from "node:os";
 import * as path from "node:path";
+import * as fs from "node:fs";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import * as yaml from "yaml";
@@ -54,6 +55,15 @@ export const PLATFORM = (() => {
   }
 })();
 
+export const DISTRO = (() => {
+  try {
+    const osRelease = fs.readFileSync("/etc/os-release")
+    const match = osRelease.toString().match(/^ID=(.*)$/m)
+    return match ? match[1] : "(unknown)"
+  } catch (e) {
+    return "(unknown)"
+  }
+})();
 export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
