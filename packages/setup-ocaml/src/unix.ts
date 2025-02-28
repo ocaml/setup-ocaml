@@ -1,13 +1,22 @@
 import { exec, getExecOutput } from "@actions/exec";
-import { PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
+import { PLATFORM, DISTRO } from "./constants.js";
 
-async function checkAptInstallability(packageName: string) {
-  const output = await getExecOutput("sudo", [
-    "apt-cache",
-    "search",
-    "--names-only",
-    `'^${packageName}$'`,
-  ]);
+async function checkInstallability(packageName: string) {
+    let output;
+    if (DISTRO === "alpine") {
+        output = await getExecOutput("apk", [
+            "search",
+            "--exact",
+            packageName,
+        ]);
+    } else {
+     output = await getExecOutput("sudo", [
+        "apt-cache",
+        "search",
+        "--names-only",
+        `'^${packageName}$'`,
+    ]);
+}
   return output.stdout.length > 0;
 }
 
@@ -18,7 +27,7 @@ async function retrieveInstallableOptionalDependencies(
     case "linux": {
       const installableOptionalDependencies: string[] = [];
       for (const optionalDependency of optionalDependencies) {
-        const isInstallable = await checkAptInstallability(optionalDependency);
+        const isInstallable = await checkInstallability(optionalDependency);
         if (isInstallable) {
           installableOptionalDependencies.push(optionalDependency);
         }
@@ -32,48 +41,57 @@ async function retrieveInstallableOptionalDependencies(
 }
 
 export async function installUnixSystemPackages() {
-  if (RUNNER_ENVIRONMENT === "self-hosted") {
-    return;
-  }
-  switch (PLATFORM) {
-    case "linux": {
-      const optionalDependencies =
-        await retrieveInstallableOptionalDependencies([
-          "darcs",
-          "g++-multilib",
-          "gcc-multilib",
-          "mercurial",
-        ]);
-      await exec("sudo", [
-        "apt-get",
-        "--yes",
-        "install",
-        "bubblewrap",
-        "musl-tools",
-        "rsync",
-        ...optionalDependencies,
-      ]);
-      break;
-    }
-    case "macos": {
+  const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
+  
+  if (isGitHubRunner) {
+    if (PLATFORM === "linux") {
+        if (DISTRO === "alpine") {
+            const optionalDependencies = await retrieveInstallableOptionalDependencies([
+                //"darcs", does not exist on alpine?
+                "mercurial",
+            ]);
+            await exec("apk", [
+                "add",
+                "make",
+                "build-base",
+                "bubblewrap",
+                "rsync",
+                ...optionalDependencies,
+            ]); 
+        } else {
+            const optionalDependencies = await retrieveInstallableOptionalDependencies([
+                "darcs",
+                "g++-multilib",
+                "gcc-multilib",
+                "mercurial",
+            ]);
+            await exec("sudo", [
+                "apt-get",
+                "--yes",
+                "install",
+                "bubblewrap",
+                "musl-tools",
+                "rsync",
+                ...optionalDependencies,
+            ]);
+        }
+    } else if (PLATFORM === "macos") {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
-      break;
     }
   }
 }
 
 export async function updateUnixPackageIndexFiles() {
-  if (RUNNER_ENVIRONMENT === "self-hosted") {
-    return;
-  }
-  switch (PLATFORM) {
-    case "linux": {
-      await exec("sudo", ["apt-get", "update"]);
-      break;
-    }
-    case "macos": {
+  const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
+  if (isGitHubRunner) {
+    if (PLATFORM === "linux") {
+        if (DISTRO === "alpine") {
+            await exec("apk", ["update"]);
+        } else {
+            await exec("sudo", ["apt-get", "update"]);
+        }
+    } else if (PLATFORM === "macos") {
       await exec("brew", ["update"]);
-      break;
     }
   }
 }
