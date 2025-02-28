@@ -123,6 +123,10 @@ export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   required: true,
 });
 
+export const SAVE_OPAM_POST_RUN = core.getBooleanInput(
+  "save-opam-post-run",
+);
+
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && core.getBooleanInput("opam-disable-sandboxing");

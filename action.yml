@@ -36,7 +36,11 @@ inputs:
   cache-prefix:
     description: The prefix of the cache keys.
     required: false
-    default: v1
+    default: v3
+  save-opam-post-run:
+    description: Save the opam state after the workflow is run.
+    required: false
+    default: "false"
   github-token:
     description: DO NOT SET THIS.
     required: false
