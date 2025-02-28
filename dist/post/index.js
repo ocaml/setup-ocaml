@@ -111557,9 +111557,12 @@ var lib_github = __nccwpck_require__(58064);
 var lib = __nccwpck_require__(8134);
 // EXTERNAL MODULE: external "node:os"
 var external_node_os_ = __nccwpck_require__(48161);
+;// CONCATENATED MODULE: external "node:fs"
+const external_node_fs_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
 // EXTERNAL MODULE: ../../node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(33483);
 ;// CONCATENATED MODULE: ./src/constants.ts
+
 
 
 
@@ -111607,6 +111610,16 @@ const constants_PLATFORM = (() => {
         default: {
             throw new Error(`'${external_node_process_.platform}' is not supported. Supported platforms: darwin, freebsd, linux, openbsd, win32`);
         }
+    }
+})();
+const DISTRO = (() => {
+    try {
+        const osRelease = external_node_fs_namespaceObject.readFileSync("/etc/os-release");
+        const match = osRelease.toString().match(/^ID=(.*)$/m);
+        return match ? match[1] : "(unknown)";
+    }
+    catch (e) {
+        return "(unknown)";
     }
 })();
 const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
