@@ -19,6 +19,7 @@ import {
   OPAM_ROOT,
   PLATFORM,
   RESOLVED_COMPILER,
+  SAVE_OPAM_POST_RUN,
 } from "./constants.js";
 import { installDune } from "./dune.js";
 import {
@@ -77,7 +78,9 @@ export async function installer() {
     await repositoryAddAll(OPAM_REPOSITORIES);
     const ocamlCompiler = await RESOLVED_COMPILER;
     await installOcaml(ocamlCompiler);
-    await saveOpamCache();
+    if (!SAVE_OPAM_POST_RUN) {
+        await saveOpamCache();
+    }
   } else {
     await update();
   }
