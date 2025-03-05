@@ -76,9 +76,9 @@ export async function installer() {
     core.addPath(CYGWIN_ROOT_BIN);
   }
   await setupOpam();
+  await repositoryRemoveAll();
+  await repositoryAddAll(OPAM_REPOSITORIES);
   if (!opamCacheHit) {
-    await repositoryRemoveAll();
-    await repositoryAddAll(OPAM_REPOSITORIES);
     const ocamlCompiler = await resolvedCompiler;
     await installOcaml(ocamlCompiler);
     if (!SAVE_OPAM_POST_RUN) {

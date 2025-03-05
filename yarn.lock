@@ -640,33 +640,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ocaml/setup-ocaml@workspace:packages/setup-ocaml":
-  version: 0.0.0-use.local
-  resolution: "@ocaml/setup-ocaml@workspace:packages/setup-ocaml"
-  dependencies:
-    "@actions/cache": "npm:4.0.3"
-    "@actions/core": "npm:1.11.1"
-    "@actions/exec": "npm:1.1.1"
-    "@actions/github": "npm:6.0.1"
-    "@actions/glob": "npm:0.5.0"
-    "@actions/http-client": "npm:2.2.3"
-    "@actions/io": "npm:1.1.3"
-    "@actions/tool-cache": "npm:2.0.2"
-    "@octokit/plugin-retry": "npm:8.0.1"
-    "@tsconfig/node20": "npm:20.1.5"
-    "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.21"
-    "@types/semver": "npm:7.7.0"
-    cheerio: "npm:1.0.0"
-    esbuild: "npm:0.25.5"
-    exponential-backoff: "npm:3.1.2"
-    semver: "npm:7.7.2"
-    systeminformation: "npm:5.27.1"
-    typescript: "npm:5.8.3"
-    yaml: "npm:2.8.0"
-  languageName: unknown
-  linkType: soft
-
 "@octokit/auth-token@npm:^4.0.0":
   version: 4.0.0
   resolution: "@octokit/auth-token@npm:4.0.0"
@@ -778,11 +751,11 @@ __metadata:
   linkType: hard
 
 "@octokit/request-error@npm:^6.1.1":
-  version: 6.1.8
-  resolution: "@octokit/request-error@npm:6.1.8"
+  version: 6.1.7
+  resolution: "@octokit/request-error@npm:6.1.7"
   dependencies:
-    "@octokit/types": "npm:^14.0.0"
-  checksum: 10c0/02aa5bfebb5b1b9e152558b4a6f4f7dcb149b41538778ffe0fce3395fd0da5c0862311a78e94723435667581b2a58a7cefa458cf7aa19ae2948ae419276f7ee1
+    "@octokit/types": "npm:^13.6.2"
+  checksum: 10c0/24bd6f98b1d7b2d4062de34777b4195d3cc4dc40c3187a0321dd588291ec5e13b5760765aacdef3a73796a529d3dec0bfb820780be6ef526a3e774d13566b5b0
   languageName: node
   linkType: hard
 
@@ -816,7 +789,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:^13.0.0, @octokit/types@npm:^13.1.0":
+"@octokit/types@npm:^13.0.0, @octokit/types@npm:^13.1.0, @octokit/types@npm:^13.6.2":
   version: 13.10.0
   resolution: "@octokit/types@npm:13.10.0"
   dependencies:
@@ -882,6 +855,33 @@ __metadata:
   checksum: 10c0/522ce07ff0adc19c31332b54c9056e8865f3bd5788a59ddd936b947cb19a25fdeaa4acbb4493ce52f7c78b2e5d400e6fe6239b10e996e9fffc466ee5be3a3d95
   languageName: node
   linkType: hard
+
+"@semgrep/setup-ocaml@workspace:packages/setup-ocaml":
+  version: 0.0.0-use.local
+  resolution: "@semgrep/setup-ocaml@workspace:packages/setup-ocaml"
+  dependencies:
+    "@actions/cache": "npm:4.0.3"
+    "@actions/core": "npm:1.11.1"
+    "@actions/exec": "npm:1.1.1"
+    "@actions/github": "npm:6.0.1"
+    "@actions/glob": "npm:0.5.0"
+    "@actions/http-client": "npm:2.2.3"
+    "@actions/io": "npm:1.1.3"
+    "@actions/tool-cache": "npm:2.0.2"
+    "@octokit/plugin-retry": "npm:8.0.1"
+    "@tsconfig/node20": "npm:20.1.5"
+    "@tsconfig/strictest": "npm:2.0.5"
+    "@types/node": "npm:22.15.21"
+    "@types/semver": "npm:7.7.0"
+    cheerio: "npm:1.0.0"
+    esbuild: "npm:0.25.5"
+    exponential-backoff: "npm:3.1.2"
+    semver: "npm:7.7.2"
+    systeminformation: "npm:5.27.1"
+    typescript: "npm:5.8.3"
+    yaml: "npm:2.8.0"
+  languageName: unknown
+  linkType: soft
 
 "@tsconfig/node20@npm:20.1.5":
   version: 20.1.5
@@ -1082,7 +1082,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.1, debug@npm:^4.3.4":
+"debug@npm:4, debug@npm:^4.3.4":
+  version: 4.4.0
+  resolution: "debug@npm:4.4.0"
+  dependencies:
+    ms: "npm:^2.1.3"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10c0/db94f1a182bf886f57b4755f85b3a74c39b5114b9377b7ab375dc2cfa3454f09490cc6c30f829df3fc8042bc8b8995f6567ce5cd96f3bc3688bd24027197d9de
+  languageName: node
+  linkType: hard
+
+"debug@npm:^4.1.1":
   version: 4.4.1
   resolution: "debug@npm:4.4.1"
   dependencies:
