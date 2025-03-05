@@ -114757,9 +114757,16 @@ async function repositoryRemoveAll() {
     });
 }
 async function update() {
-    await core.group("Updating opam repositories", async () => {
-        await exec("opam", ["update"]);
-    });
+    try {
+        await core.group("Updating opam repositories", async () => {
+            await exec("opam", ["update"]);
+        });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.notice(`Failed to update opam. Error details: ${error.message.toLocaleLowerCase()}`);
+        }
+    }
 }
 
 ;// CONCATENATED MODULE: ./src/cache.ts
