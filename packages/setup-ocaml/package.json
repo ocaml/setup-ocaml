@@ -1,5 +1,5 @@
 {
-  "name": "@ocaml/setup-ocaml",
+  "name": "@semgrep/setup-ocaml",
   "private": true,
   "sideEffects": false,
   "type": "module",
