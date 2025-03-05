@@ -1,4 +1,4 @@
-name: Austin's Set up OCaml
+name: Semgrep's fork of Set up OCaml
 description: Set up an OCaml and opam environment and add to PATH
 author: Anil Madhavapeddy
 branding:
