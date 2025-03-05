@@ -664,33 +664,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ocaml/setup-ocaml@workspace:packages/setup-ocaml":
-  version: 0.0.0-use.local
-  resolution: "@ocaml/setup-ocaml@workspace:packages/setup-ocaml"
-  dependencies:
-    "@actions/cache": "npm:4.1.0"
-    "@actions/core": "npm:1.11.1"
-    "@actions/exec": "npm:1.1.1"
-    "@actions/github": "npm:6.0.1"
-    "@actions/glob": "npm:0.5.0"
-    "@actions/http-client": "npm:3.0.0"
-    "@actions/io": "npm:2.0.0"
-    "@actions/tool-cache": "npm:2.0.2"
-    "@octokit/plugin-retry": "npm:8.0.3"
-    "@tsconfig/node24": "npm:24.0.3"
-    "@tsconfig/strictest": "npm:2.0.8"
-    "@types/node": "npm:24.10.1"
-    "@types/semver": "npm:7.7.1"
-    cheerio: "npm:1.1.2"
-    esbuild: "npm:0.27.0"
-    exponential-backoff: "npm:3.1.3"
-    semver: "npm:7.7.3"
-    systeminformation: "npm:5.27.11"
-    typescript: "npm:5.9.3"
-    yaml: "npm:2.8.2"
-  languageName: unknown
-  linkType: soft
-
 "@octokit/auth-token@npm:^4.0.0":
   version: 4.0.0
   resolution: "@octokit/auth-token@npm:4.0.0"
@@ -896,6 +869,33 @@ __metadata:
   checksum: 10c0/6071c0373251e915cebb449fb7bf3254e946534edf4c4eb6e89933989a3ab5dcb148ed82cc0ea844bbc2f4346d0dc76f852c2b5f900a6bdaa35e5fb2cb4666f9
   languageName: node
   linkType: hard
+
+"@semgrep/setup-ocaml@workspace:packages/setup-ocaml":
+  version: 0.0.0-use.local
+  resolution: "@semgrep/setup-ocaml@workspace:packages/setup-ocaml"
+  dependencies:
+    "@actions/cache": "npm:4.1.0"
+    "@actions/core": "npm:1.11.1"
+    "@actions/exec": "npm:1.1.1"
+    "@actions/github": "npm:6.0.1"
+    "@actions/glob": "npm:0.5.0"
+    "@actions/http-client": "npm:3.0.0"
+    "@actions/io": "npm:2.0.0"
+    "@actions/tool-cache": "npm:2.0.2"
+    "@octokit/plugin-retry": "npm:8.0.3"
+    "@tsconfig/node24": "npm:24.0.3"
+    "@tsconfig/strictest": "npm:2.0.8"
+    "@types/node": "npm:24.10.1"
+    "@types/semver": "npm:7.7.1"
+    cheerio: "npm:1.1.2"
+    esbuild: "npm:0.27.0"
+    exponential-backoff: "npm:3.1.3"
+    semver: "npm:7.7.3"
+    systeminformation: "npm:5.27.11"
+    typescript: "npm:5.9.3"
+    yaml: "npm:2.8.2"
+  languageName: unknown
+  linkType: soft
 
 "@tsconfig/node24@npm:24.0.3":
   version: 24.0.3
