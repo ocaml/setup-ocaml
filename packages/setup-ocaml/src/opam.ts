@@ -4,6 +4,7 @@ import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import * as toolCache from "@actions/tool-cache";
+import { retry } from "@octokit/plugin-retry";
 import * as semver from "semver";
 import {
   ALLOW_PRERELEASE_OPAM,
@@ -20,7 +21,7 @@ import {
 
 export async function retrieveLatestOpamRelease() {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.4.0";
-  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam",
