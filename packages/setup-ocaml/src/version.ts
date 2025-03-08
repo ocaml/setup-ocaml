@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import * as github from "@actions/github";
+import { retry } from "@octokit/plugin-retry";
 import * as semver from "semver";
 import { GITHUB_TOKEN } from "./constants.js";
 
@@ -8,7 +9,7 @@ function isSemverValidRange(semverVersion: string) {
 }
 
 async function retrieveAllCompilerVersions() {
-  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
     repo: "opam-repository",

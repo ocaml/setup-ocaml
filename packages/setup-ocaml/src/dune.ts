@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
+import { retry } from "@octokit/plugin-retry";
 import { GITHUB_TOKEN } from "./constants.js";
 
 const {
@@ -16,7 +17,7 @@ export async function installDune() {
 
 export async function trimDuneCache() {
   await core.group("Clearing old dune cache files to save space", async () => {
-    const octokit = github.getOctokit(GITHUB_TOKEN);
+    const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
     const {
       data: { total_count: totalCount },
     } = await octokit.rest.actions.listJobsForWorkflowRun({
