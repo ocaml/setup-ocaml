@@ -111485,6 +111485,98 @@ var lib = __nccwpck_require__(8134);
 var external_node_os_ = __nccwpck_require__(48161);
 // EXTERNAL MODULE: ../../node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(33483);
+;// CONCATENATED MODULE: ./src/constants.ts
+
+
+
+
+
+const constants_ARCHITECTURE = (() => {
+    switch (external_node_process_.arch) {
+        case "arm": {
+            return "armhf";
+        }
+        case "arm64": {
+            return "arm64";
+        }
+        case "riscv64": {
+            return "riscv64";
+        }
+        case "s390x": {
+            return "s390x";
+        }
+        case "x64": {
+            return "x86_64";
+        }
+        default: {
+            throw new Error(`'${external_node_process_.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`);
+        }
+    }
+})();
+const constants_PLATFORM = (() => {
+    switch (external_node_process_.platform) {
+        case "darwin": {
+            return "macos";
+        }
+        case "freebsd": {
+            return "freebsd";
+        }
+        case "linux": {
+            return "linux";
+        }
+        case "openbsd": {
+            return "openbsd";
+        }
+        case "win32": {
+            return "windows";
+        }
+        default: {
+            throw new Error(`'${external_node_process_.platform}' is not supported. Supported platforms: darwin, freebsd, linux, openbsd, win32`);
+        }
+    }
+})();
+const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
+const constants_GITHUB_WORKSPACE = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
+const constants_CYGWIN_MIRROR_ENCODED_URI = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
+// [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
+const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
+const CYGWIN_BASH_ENV = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bash_env");
+const DUNE_CACHE_ROOT = (() => {
+    const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
+    if (xdgCacheHome) {
+        return external_node_path_namespaceObject.join(xdgCacheHome, "dune");
+    }
+    if (constants_PLATFORM === "windows") {
+        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        return external_node_path_namespaceObject.join("D:", "dune");
+    }
+    return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".cache", "dune");
+})();
+const constants_OPAM_ROOT = (() => {
+    if (constants_PLATFORM === "windows") {
+        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
+        return external_node_path_namespaceObject.join("D:", ".opam");
+    }
+    return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
+})();
+const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam");
+const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix");
+const GITHUB_TOKEN = lib_core.getInput("github-token");
+const DUNE_CACHE = lib_core.getBooleanInput("dune-cache");
+const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", {
+    required: true,
+});
+const constants_OPAM_DISABLE_SANDBOXING = 
+// [TODO] unlock this once sandboxing is supported on Windows
+constants_PLATFORM !== "windows" && lib_core.getBooleanInput("opam-disable-sandboxing");
+const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages");
+const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
+const constants_OPAM_REPOSITORIES = (() => {
+    const repositoriesYaml = dist/* parse */.qg(lib_core.getInput("opam-repositories"));
+    return Object.entries(repositoriesYaml).reverse();
+})();
+
 // EXTERNAL MODULE: ../../node_modules/bottleneck/light.js
 var light = __nccwpck_require__(46503);
 ;// CONCATENATED MODULE: ../../node_modules/@octokit/plugin-retry/node_modules/@octokit/request-error/dist-src/index.js
@@ -111652,105 +111744,11 @@ async function resolveVersion(semverVersion) {
     }
     return matchedFullCompilerVersion;
 }
-async function resolveCompiler(compiler) {
-    const resolvedCompiler = isSemverValidRange(compiler)
-        ? `ocaml-base-compiler.${await resolveVersion(compiler)}`
-        : compiler;
+const version_resolvedCompiler = (async () => {
+    const resolvedCompiler = isSemverValidRange(OCAML_COMPILER)
+        ? `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
+        : OCAML_COMPILER;
     return resolvedCompiler;
-}
-
-;// CONCATENATED MODULE: ./src/constants.ts
-
-
-
-
-
-
-const constants_ARCHITECTURE = (() => {
-    switch (external_node_process_.arch) {
-        case "arm": {
-            return "armhf";
-        }
-        case "arm64": {
-            return "arm64";
-        }
-        case "riscv64": {
-            return "riscv64";
-        }
-        case "s390x": {
-            return "s390x";
-        }
-        case "x64": {
-            return "x86_64";
-        }
-        default: {
-            throw new Error(`'${external_node_process_.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`);
-        }
-    }
-})();
-const constants_PLATFORM = (() => {
-    switch (external_node_process_.platform) {
-        case "darwin": {
-            return "macos";
-        }
-        case "freebsd": {
-            return "freebsd";
-        }
-        case "linux": {
-            return "linux";
-        }
-        case "openbsd": {
-            return "openbsd";
-        }
-        case "win32": {
-            return "windows";
-        }
-        default: {
-            throw new Error(`'${external_node_process_.platform}' is not supported. Supported platforms: darwin, freebsd, linux, openbsd, win32`);
-        }
-    }
-})();
-const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
-const constants_GITHUB_WORKSPACE = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
-const constants_CYGWIN_MIRROR_ENCODED_URI = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
-// [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
-const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
-const CYGWIN_BASH_ENV = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bash_env");
-const DUNE_CACHE_ROOT = (() => {
-    const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
-    if (xdgCacheHome) {
-        return external_node_path_namespaceObject.join(xdgCacheHome, "dune");
-    }
-    if (constants_PLATFORM === "windows") {
-        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-        return external_node_path_namespaceObject.join("D:", "dune");
-    }
-    return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".cache", "dune");
-})();
-const constants_OPAM_ROOT = (() => {
-    if (constants_PLATFORM === "windows") {
-        // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-        return external_node_path_namespaceObject.join("D:", ".opam");
-    }
-    return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
-})();
-const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam");
-const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix");
-const GITHUB_TOKEN = lib_core.getInput("github-token");
-const DUNE_CACHE = lib_core.getBooleanInput("dune-cache");
-const OCAML_COMPILER = lib_core.getInput("ocaml-compiler", { required: true });
-const constants_OPAM_DISABLE_SANDBOXING = 
-// [TODO] unlock this once sandboxing is supported on Windows
-constants_PLATFORM !== "windows" && lib_core.getBooleanInput("opam-disable-sandboxing");
-const OPAM_LOCAL_PACKAGES = lib_core.getInput("opam-local-packages");
-const OPAM_PIN = lib_core.getBooleanInput("opam-pin");
-const constants_OPAM_REPOSITORIES = (() => {
-    const repositoriesYaml = dist/* parse */.qg(lib_core.getInput("opam-repositories"));
-    return Object.entries(repositoriesYaml).reverse();
-})();
-const constants_RESOLVED_COMPILER = (async () => {
-    return await resolveCompiler(OCAML_COMPILER);
 })();
 
 ;// CONCATENATED MODULE: ./src/cache.ts
@@ -111764,15 +111762,16 @@ const constants_RESOLVED_COMPILER = (async () => {
 
 
 
+
 async function composeCygwinCacheKeys() {
-    const cygwinVersion = await retrieveCygwinVersion();
-    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${cygwinVersion}`;
+    const version = await cygwinVersion;
+    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${version}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
 }
 async function composeDuneCacheKeys() {
     const { workflow, job, runId } = lib_github.context;
-    const ocamlCompiler = await constants_RESOLVED_COMPILER;
+    const ocamlCompiler = await version_resolvedCompiler;
     const plainKey = [ocamlCompiler, workflow, job].join();
     const hash = external_node_crypto_.createHash("sha256").update(plainKey).digest("hex");
     const key = `${constants_CACHE_PREFIX}-setup-ocaml-dune-${constants_PLATFORM}-${constants_ARCHITECTURE}-${hash}-${runId}`;
@@ -111785,9 +111784,9 @@ async function composeDuneCacheKeys() {
     return { key, restoreKeys };
 }
 async function composeOpamCacheKeys() {
-    const { version: opamVersion } = await retrieveLatestOpamRelease();
+    const { version: opamVersion } = await latestOpamRelease;
     const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-    const ocamlCompiler = await RESOLVED_COMPILER;
+    const ocamlCompiler = await resolvedCompiler;
     const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
     const osInfo = await system.osInfo();
     const plainKey = [

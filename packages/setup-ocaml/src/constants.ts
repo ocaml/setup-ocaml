@@ -3,7 +3,6 @@ import * as path from "node:path";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import * as yaml from "yaml";
-import { resolveCompiler } from "./version.js";
 
 export const ARCHITECTURE = (() => {
   switch (process.arch) {
@@ -99,7 +98,9 @@ export const GITHUB_TOKEN = core.getInput("github-token");
 
 export const DUNE_CACHE = core.getBooleanInput("dune-cache");
 
-const OCAML_COMPILER = core.getInput("ocaml-compiler", { required: true });
+export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
+  required: true,
+});
 
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
@@ -114,8 +115,4 @@ export const OPAM_REPOSITORIES: [string, string][] = (() => {
     core.getInput("opam-repositories"),
   ) as Record<string, string>;
   return Object.entries(repositoriesYaml).reverse();
-})();
-
-export const RESOLVED_COMPILER = (async () => {
-  return await resolveCompiler(OCAML_COMPILER);
 })();

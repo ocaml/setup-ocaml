@@ -17,21 +17,21 @@ import {
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
-  RESOLVED_COMPILER,
 } from "./constants.js";
-import { retrieveLatestOpamRelease } from "./opam.js";
-import { retrieveCygwinVersion } from "./windows.js";
+import { latestOpamRelease } from "./opam.js";
+import { resolvedCompiler } from "./version.js";
+import { cygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
-  const cygwinVersion = await retrieveCygwinVersion();
-  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${cygwinVersion}`;
+  const version = await cygwinVersion;
+  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${version}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
 }
 
 async function composeDuneCacheKeys() {
   const { workflow, job, runId } = github.context;
-  const ocamlCompiler = await RESOLVED_COMPILER;
+  const ocamlCompiler = await resolvedCompiler;
   const plainKey = [ocamlCompiler, workflow, job].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
@@ -45,9 +45,9 @@ async function composeDuneCacheKeys() {
 }
 
 async function composeOpamCacheKeys() {
-  const { version: opamVersion } = await retrieveLatestOpamRelease();
+  const { version: opamVersion } = await latestOpamRelease;
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-  const ocamlCompiler = await RESOLVED_COMPILER;
+  const ocamlCompiler = await resolvedCompiler;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
   const osInfo = await system.osInfo();
   const plainKey = [
