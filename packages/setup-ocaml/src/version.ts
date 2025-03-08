@@ -2,7 +2,7 @@ import * as path from "node:path";
 import * as github from "@actions/github";
 import { retry } from "@octokit/plugin-retry";
 import * as semver from "semver";
-import { GITHUB_TOKEN } from "./constants.js";
+import { GITHUB_TOKEN, OCAML_COMPILER } from "./constants.js";
 
 function isSemverValidRange(semverVersion: string) {
   return semver.validRange(semverVersion, { loose: true }) !== null;
@@ -52,9 +52,9 @@ async function resolveVersion(semverVersion: string) {
   return matchedFullCompilerVersion;
 }
 
-export async function resolveCompiler(compiler: string) {
-  const resolvedCompiler = isSemverValidRange(compiler)
-    ? `ocaml-base-compiler.${await resolveVersion(compiler)}`
-    : compiler;
+export const resolvedCompiler = (async () => {
+  const resolvedCompiler = isSemverValidRange(OCAML_COMPILER)
+    ? `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
+    : OCAML_COMPILER;
   return resolvedCompiler;
-}
+})();

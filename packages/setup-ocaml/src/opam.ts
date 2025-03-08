@@ -19,7 +19,7 @@ import {
   updateUnixPackageIndexFiles,
 } from "./unix.js";
 
-export async function retrieveLatestOpamRelease() {
+export const latestOpamRelease = (async () => {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.4.0";
   const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
   const { data: releases } = await octokit.rest.repos.listReleases({
@@ -59,11 +59,11 @@ export async function retrieveLatestOpamRelease() {
     version: latestRelease.tag_name,
     browserDownloadUrl: matchedAssets.browser_download_url,
   };
-}
+})();
 
 async function acquireOpam() {
   await core.group("Installing opam", async () => {
-    const { version, browserDownloadUrl } = await retrieveLatestOpamRelease();
+    const { version, browserDownloadUrl } = await latestOpamRelease;
     const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
     const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
     if (cachedPath === "") {
