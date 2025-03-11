@@ -95,21 +95,20 @@ export async function setupCygwin() {
       "make",
       "mingw64-i686-gcc-core",
       "mingw64-i686-gcc-g++",
-      "mingw64-i686-openssl=1.1.1w-0.1",
       "mingw64-x86_64-gcc-core",
       "mingw64-x86_64-gcc-g++",
-      "mingw64-x86_64-openssl=1.1.1w-0.1",
       "patch",
       "perl",
       "rsync",
       "unzip",
     ].join(",");
     await exec("setup-x86_64", [
-      `--packages=${packages}`,
       "--quiet-mode",
+      "--symlink-type=sys",
+      "--upgrade-also",
+      `--packages=${packages}`,
       `--root=${CYGWIN_ROOT}`,
       `--site=${CYGWIN_MIRROR}`,
-      "--symlink-type=sys",
     ]);
     const setup = await io.which("setup-x86_64");
     await io.cp(setup, CYGWIN_ROOT);
