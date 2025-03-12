@@ -111537,10 +111537,10 @@ const constants_PLATFORM = (() => {
 })();
 const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 const constants_GITHUB_WORKSPACE = external_node_process_.env.GITHUB_WORKSPACE ?? external_node_process_.cwd();
-const constants_CYGWIN_MIRROR_ENCODED_URI = encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 const constants_CYGWIN_ROOT = external_node_path_namespaceObject.join("D:", "cygwin");
 const CYGWIN_ROOT_BIN = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bin");
+const CYGWIN_LOCAL_PACKAGE_DIR = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "packages");
 const CYGWIN_BASH_ENV = external_node_path_namespaceObject.join(constants_CYGWIN_ROOT, "bash_env");
 const DUNE_CACHE_ROOT = (() => {
     const xdgCacheHome = external_node_process_.env.XDG_CACHE_HOME;
@@ -111765,7 +111765,7 @@ const version_resolvedCompiler = (async () => {
 
 async function composeCygwinCacheKeys() {
     const version = await cygwinVersion;
-    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${version}`;
+    const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${version}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
 }
@@ -111806,12 +111806,7 @@ async function composeOpamCacheKeys() {
 }
 function composeCygwinCachePaths() {
     const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
-    const cygwinLocalPackageDirectory = path.join(GITHUB_WORKSPACE, CYGWIN_MIRROR_ENCODED_URI);
-    const paths = [
-        CYGWIN_ROOT,
-        cygwinLocalPackageDirectory,
-        cygwinRootSymlinkPath,
-    ];
+    const paths = [CYGWIN_ROOT, cygwinRootSymlinkPath];
     return paths;
 }
 function composeDuneCachePaths() {

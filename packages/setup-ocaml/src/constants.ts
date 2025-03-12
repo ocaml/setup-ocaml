@@ -58,13 +58,12 @@ export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
-export const CYGWIN_MIRROR_ENCODED_URI =
-  encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
-
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 export const CYGWIN_ROOT = path.join("D:", "cygwin");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
+
+export const CYGWIN_LOCAL_PACKAGE_DIR = path.join(CYGWIN_ROOT, "packages");
 
 export const CYGWIN_BASH_ENV = path.join(CYGWIN_ROOT, "bash_env");
 

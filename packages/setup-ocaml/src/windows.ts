@@ -1,6 +1,3 @@
-import * as fs from "node:fs/promises";
-import * as os from "node:os";
-import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import { HttpClient } from "@actions/http-client";
@@ -9,8 +6,8 @@ import * as toolCache from "@actions/tool-cache";
 import * as cheerio from "cheerio";
 import * as semver from "semver";
 import {
+  CYGWIN_LOCAL_PACKAGE_DIR,
   CYGWIN_MIRROR,
-  CYGWIN_MIRROR_ENCODED_URI,
   CYGWIN_ROOT,
 } from "./constants.js";
 
@@ -37,40 +34,8 @@ export const cygwinVersion = (async () => {
   return version;
 })();
 
-async function setGitToIgnoreCygwinLocalPackageDirectory() {
-  const xdgConfigHome = process.env.XDG_CONFIG_HOME;
-  const homeDir = os.homedir();
-  const globalGitConfigDir = xdgConfigHome
-    ? path.join(xdgConfigHome, "git")
-    : path.join(homeDir, ".config", "git");
-  await fs.mkdir(globalGitConfigDir, { recursive: true });
-  const globalGitIgnorePath = path.join(globalGitConfigDir, "ignore");
-  try {
-    await fs.access(globalGitIgnorePath, fs.constants.R_OK);
-    const contents = await fs.readFile(globalGitIgnorePath, {
-      encoding: "utf8",
-    });
-    if (!contents.includes(CYGWIN_MIRROR_ENCODED_URI)) {
-      await fs.appendFile(globalGitIgnorePath, CYGWIN_MIRROR_ENCODED_URI, {
-        encoding: "utf8",
-      });
-    }
-  } catch {
-    await fs.writeFile(globalGitIgnorePath, CYGWIN_MIRROR_ENCODED_URI, {
-      encoding: "utf8",
-    });
-  } finally {
-    await exec(
-      "git",
-      ["config", "--add", "--global", "core.excludesfile", globalGitIgnorePath],
-      { windowsVerbatimArguments: true },
-    );
-  }
-}
-
 export async function setupCygwin() {
   await core.group("Setting up Cygwin environment", async () => {
-    await setGitToIgnoreCygwinLocalPackageDirectory();
     const version = await cygwinVersion;
     const cachedPath = toolCache.find("cygwin", version, "x86_64");
     if (cachedPath === "") {
@@ -106,6 +71,7 @@ export async function setupCygwin() {
       "--quiet-mode",
       "--symlink-type=sys",
       "--upgrade-also",
+      `--local-package-dir=${CYGWIN_LOCAL_PACKAGE_DIR}`,
       `--packages=${packages}`,
       `--root=${CYGWIN_ROOT}`,
       `--site=${CYGWIN_MIRROR}`,
