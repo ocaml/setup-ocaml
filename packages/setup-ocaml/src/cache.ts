@@ -9,7 +9,6 @@ import * as system from "systeminformation";
 import {
   ARCHITECTURE,
   CACHE_PREFIX,
-  CYGWIN_MIRROR_ENCODED_URI,
   CYGWIN_ROOT,
   DUNE_CACHE_ROOT,
   GITHUB_WORKSPACE,
@@ -24,7 +23,7 @@ import { cygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
   const version = await cygwinVersion;
-  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${version}`;
+  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${version}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
 }
@@ -68,15 +67,7 @@ async function composeOpamCacheKeys() {
 
 function composeCygwinCachePaths() {
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
-  const cygwinLocalPackageDirectory = path.join(
-    GITHUB_WORKSPACE,
-    CYGWIN_MIRROR_ENCODED_URI,
-  );
-  const paths = [
-    CYGWIN_ROOT,
-    cygwinLocalPackageDirectory,
-    cygwinRootSymlinkPath,
-  ];
+  const paths = [CYGWIN_ROOT, cygwinRootSymlinkPath];
   return paths;
 }
 
