@@ -111887,9 +111887,17 @@ async function restoreOpamCache() {
 }
 async function restoreOpamCaches() {
     return await core.group("Restoring opam cache", async () => {
-        const [opamCacheHit, cygwinCacheHit] = await Promise.all(PLATFORM === "windows"
+        const [opamCache, cygwinCache] = await Promise.allSettled(PLATFORM === "windows"
             ? [restoreOpamCache(), restoreCygwinCache()]
             : [restoreOpamCache()]);
+        let opamCacheHit = undefined;
+        let cygwinCacheHit = undefined;
+        if (opamCache.status === "fulfilled") {
+            opamCacheHit = opamCache.value;
+        }
+        if (cygwinCache?.status === "fulfilled") {
+            cygwinCacheHit = cygwinCache.value;
+        }
         return { opamCacheHit, cygwinCacheHit };
     });
 }
