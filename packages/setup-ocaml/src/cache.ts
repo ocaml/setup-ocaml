@@ -60,7 +60,7 @@ async function composeOpamCacheKeys() {
   ].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
-  const restoreKeys = [key];
+  const restoreKeys = [`-setup-ocaml-opam-${hash}`];
   core.debug(`opam cache key: ${plainKey}`);
   return { key, restoreKeys };
 }
