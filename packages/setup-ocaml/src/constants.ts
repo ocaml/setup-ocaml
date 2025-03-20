@@ -4,7 +4,6 @@ import * as fs from "node:fs";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import * as yaml from "yaml";
-import { resolveCompiler } from "./version.js";
 
 export const ARCHITECTURE = (() => {
   switch (process.arch) {
@@ -69,13 +68,12 @@ export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
-export const CYGWIN_MIRROR_ENCODED_URI =
-  encodeURIComponent(CYGWIN_MIRROR).toLowerCase();
-
 // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
 export const CYGWIN_ROOT = path.join("D:", "cygwin");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
+
+export const CYGWIN_LOCAL_PACKAGE_DIR = path.join(CYGWIN_ROOT, "packages");
 
 export const CYGWIN_BASH_ENV = path.join(CYGWIN_ROOT, "bash_env");
 
@@ -109,11 +107,13 @@ export const GITHUB_TOKEN = core.getInput("github-token");
 
 export const DUNE_CACHE = core.getBooleanInput("dune-cache");
 
+export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
+  required: true,
+});
+
 export const SAVE_OPAM_POST_RUN = core.getBooleanInput(
   "save-opam-post-run",
 );
-
-const OCAML_COMPILER = core.getInput("ocaml-compiler", { required: true });
 
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
@@ -128,8 +128,4 @@ export const OPAM_REPOSITORIES: [string, string][] = (() => {
     core.getInput("opam-repositories"),
   ) as Record<string, string>;
   return Object.entries(repositoriesYaml).reverse();
-})();
-
-export const RESOLVED_COMPILER = (async () => {
-  return await resolveCompiler(OCAML_COMPILER);
 })();

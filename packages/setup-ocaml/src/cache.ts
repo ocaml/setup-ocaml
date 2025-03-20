@@ -9,7 +9,6 @@ import * as system from "systeminformation";
 import {
   ARCHITECTURE,
   CACHE_PREFIX,
-  CYGWIN_MIRROR_ENCODED_URI,
   CYGWIN_ROOT,
   DUNE_CACHE_ROOT,
   GITHUB_WORKSPACE,
@@ -17,21 +16,21 @@ import {
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
-  RESOLVED_COMPILER,
 } from "./constants.js";
-import { retrieveLatestOpamRelease } from "./opam.js";
-import { retrieveCygwinVersion } from "./windows.js";
+import { latestOpamRelease } from "./opam.js";
+import { resolvedCompiler } from "./version.js";
+import { cygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
-  const cygwinVersion = await retrieveCygwinVersion();
-  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${CYGWIN_MIRROR_ENCODED_URI}-${cygwinVersion}`;
+  const version = await cygwinVersion;
+  const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${version}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
 }
 
 async function composeDuneCacheKeys() {
   const { workflow, job, runId } = github.context;
-  const ocamlCompiler = await RESOLVED_COMPILER;
+  const ocamlCompiler = await resolvedCompiler;
   const plainKey = [ocamlCompiler, workflow, job].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
@@ -45,9 +44,9 @@ async function composeDuneCacheKeys() {
 }
 
 async function composeOpamCacheKeys() {
-  const { version: opamVersion } = await retrieveLatestOpamRelease();
+  const { version: opamVersion } = await latestOpamRelease;
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-  const ocamlCompiler = await RESOLVED_COMPILER;
+  const ocamlCompiler = await resolvedCompiler;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
   const osInfo = await system.osInfo();
   const plainKey = [
@@ -68,15 +67,7 @@ async function composeOpamCacheKeys() {
 
 function composeCygwinCachePaths() {
   const cygwinRootSymlinkPath = path.posix.join("/cygdrive", "d", "cygwin");
-  const cygwinLocalPackageDirectory = path.join(
-    GITHUB_WORKSPACE,
-    CYGWIN_MIRROR_ENCODED_URI,
-  );
-  const paths = [
-    CYGWIN_ROOT,
-    cygwinLocalPackageDirectory,
-    cygwinRootSymlinkPath,
-  ];
+  const paths = [CYGWIN_ROOT, cygwinRootSymlinkPath];
   return paths;
 }
 
@@ -178,11 +169,19 @@ async function restoreOpamCache() {
 
 export async function restoreOpamCaches() {
   return await core.group("Restoring opam cache", async () => {
-    const [opamCacheHit, cygwinCacheHit] = await Promise.all(
+    const [opamCache, cygwinCache] = await Promise.allSettled(
       PLATFORM === "windows"
         ? [restoreOpamCache(), restoreCygwinCache()]
         : [restoreOpamCache()],
     );
+    let opamCacheHit = undefined;
+    let cygwinCacheHit = undefined;
+    if (opamCache.status === "fulfilled") {
+      opamCacheHit = opamCache.value;
+    }
+    if (cygwinCache?.status === "fulfilled") {
+      cygwinCacheHit = cygwinCache.value;
+    }
     return { opamCacheHit, cygwinCacheHit };
   });
 }

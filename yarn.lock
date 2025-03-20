@@ -5,9 +5,9 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
-"@actions/cache@npm:4.0.2":
-  version: 4.0.2
-  resolution: "@actions/cache@npm:4.0.2"
+"@actions/cache@npm:4.0.3":
+  version: 4.0.3
+  resolution: "@actions/cache@npm:4.0.3"
   dependencies:
     "@actions/core": "npm:^1.11.1"
     "@actions/exec": "npm:^1.0.1"
@@ -19,7 +19,7 @@ __metadata:
     "@azure/storage-blob": "npm:^12.13.0"
     "@protobuf-ts/plugin": "npm:^2.9.4"
     semver: "npm:^6.3.1"
-  checksum: 10c0/c29c2e92255bfd4857802be2f873e8d22f970e1a2ba91591b5d9e362565bd8a8e12e1499448e08f90da9dd22b05e9e8ba4b844112e6ffbffec5778859d57f038
+  checksum: 10c0/5558ffe4b02ffab1e62d96579736d04664e340cfe5ab70909f8e5c898d5530bd4b81015de3f280cd038bc6d69bc20c1c0c82a1f42b9c4a0cd2f6ad99f4b2aaab
   languageName: node
   linkType: hard
 
@@ -438,7 +438,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.4"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.8"
+    "@types/node": "npm:22.13.10"
     "@vercel/ncc": "npm:0.38.3"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -454,7 +454,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.8"
+    "@types/node": "npm:22.13.10"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.8.2"
   languageName: unknown
@@ -468,7 +468,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.8"
+    "@types/node": "npm:22.13.10"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.8.2"
   languageName: unknown
@@ -482,7 +482,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.8"
+    "@types/node": "npm:22.13.10"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.8.2"
   languageName: unknown
@@ -538,10 +538,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/openapi-types@npm:^23.0.1":
-  version: 23.0.1
-  resolution: "@octokit/openapi-types@npm:23.0.1"
-  checksum: 10c0/ab734ceb26343d9f051a59503b8cb5bdc7fec9ca044b60511b227179bec73141dd9144a6b2d68bcd737741881b136c1b7d5392da89ae2e35e39acc489e5eb4c1
+"@octokit/openapi-types@npm:^24.2.0":
+  version: 24.2.0
+  resolution: "@octokit/openapi-types@npm:24.2.0"
+  checksum: 10c0/8f47918b35e9b7f6109be6f7c8fc3a64ad13a48233112b29e92559e64a564b810eb3ebf81b4cd0af1bb2989d27b9b95cca96e841ec4e23a3f68703cefe62fd9e
   languageName: node
   linkType: hard
 
@@ -567,6 +567,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@octokit/plugin-retry@npm:7.2.0":
+  version: 7.2.0
+  resolution: "@octokit/plugin-retry@npm:7.2.0"
+  dependencies:
+    "@octokit/request-error": "npm:^6.1.7"
+    "@octokit/types": "npm:^13.6.2"
+    bottleneck: "npm:^2.15.3"
+  peerDependencies:
+    "@octokit/core": ">=6"
+  checksum: 10c0/71ea3672ac2595d080412430057b3317e00566ca7cea0b3bfceaee60a39f533dc9a915b6f5abf6cd23e4ac5ca9a46edfa3f191cf792dbc3af08d873300920385
+  languageName: node
+  linkType: hard
+
 "@octokit/request-error@npm:^5.0.1, @octokit/request-error@npm:^5.1.0, @octokit/request-error@npm:^5.1.1":
   version: 5.1.1
   resolution: "@octokit/request-error@npm:5.1.1"
@@ -575,6 +588,15 @@ __metadata:
     deprecation: "npm:^2.0.0"
     once: "npm:^1.4.0"
   checksum: 10c0/dc9fc76ea5e4199273e4665ce9ddf345fe8f25578d9999c9a16f276298e61ee6fe0e6f5a6147b91ba3b34fdf5b9e6b7af6ae13d6333175e95b30c574088f7a2d
+  languageName: node
+  linkType: hard
+
+"@octokit/request-error@npm:^6.1.7":
+  version: 6.1.7
+  resolution: "@octokit/request-error@npm:6.1.7"
+  dependencies:
+    "@octokit/types": "npm:^13.6.2"
+  checksum: 10c0/24bd6f98b1d7b2d4062de34777b4195d3cc4dc40c3187a0321dd588291ec5e13b5760765aacdef3a73796a529d3dec0bfb820780be6ef526a3e774d13566b5b0
   languageName: node
   linkType: hard
 
@@ -599,12 +621,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:^13.0.0, @octokit/types@npm:^13.1.0":
-  version: 13.8.0
-  resolution: "@octokit/types@npm:13.8.0"
+"@octokit/types@npm:^13.0.0, @octokit/types@npm:^13.1.0, @octokit/types@npm:^13.6.2":
+  version: 13.10.0
+  resolution: "@octokit/types@npm:13.10.0"
   dependencies:
-    "@octokit/openapi-types": "npm:^23.0.1"
-  checksum: 10c0/e08c2fcf10e374f18e4c9fa12a6ada33a40f112d1209012a39f0ce40ae7aa9dcf0598b6007b467f63cc4a97e7b1388d6eed34ddef61494655e08b5a95afaad97
+    "@octokit/openapi-types": "npm:^24.2.0"
+  checksum: 10c0/f66a401b89d653ec28e5c1529abdb7965752db4d9d40fa54c80e900af4c6bf944af6bd0a83f5b4f1eecb72e3d646899dfb27ffcf272ac243552de7e3b97a038d
   languageName: node
   linkType: hard
 
@@ -677,7 +699,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@semgrep/setup-ocaml@workspace:packages/setup-ocaml"
   dependencies:
-    "@actions/cache": "npm:4.0.2"
+    "@actions/cache": "npm:4.0.3"
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
     "@actions/github": "npm:6.0.0"
@@ -685,9 +707,10 @@ __metadata:
     "@actions/http-client": "npm:2.2.3"
     "@actions/io": "npm:1.1.3"
     "@actions/tool-cache": "npm:2.0.2"
+    "@octokit/plugin-retry": "npm:7.2.0"
     "@tsconfig/node20": "npm:20.1.4"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.8"
+    "@types/node": "npm:22.13.10"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
@@ -712,12 +735,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.13.8":
-  version: 22.13.8
-  resolution: "@types/node@npm:22.13.8"
+"@types/node@npm:22.13.10":
+  version: 22.13.10
+  resolution: "@types/node@npm:22.13.10"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/bfc92b734a9dce6ac5daee0a52feccdf5dcb3804d895e4bc5384e2f4644612b8801725cd03c8c3c0888fb5eeb16b875877ac44b77641e0196dc1a837b1c2a366
+  checksum: 10c0/a3865f9503d6f718002374f7b87efaadfae62faa499c1a33b12c527cfb9fd86f733e1a1b026b80c5a0e4a965701174bc3305595a7d36078aa1abcf09daa5dee9
   languageName: node
   linkType: hard
 
@@ -817,6 +840,13 @@ __metadata:
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
   checksum: 10c0/e4b53deb4f2b85c52be0e21a273f2045c7b6a6ea002b0e139c744cb6f95e9ec044439a52883b0d74dedd1ff3da55ed140cfdddfed7fb0cccbed373de5dce1bcf
+  languageName: node
+  linkType: hard
+
+"bottleneck@npm:^2.15.3":
+  version: 2.19.5
+  resolution: "bottleneck@npm:2.19.5"
+  checksum: 10c0/b0f72e45b2e0f56a21ba720183f16bef8e693452fb0495d997fa354e42904353a94bd8fd429868e6751bc85e54b6755190519eed5a0ae0a94a5185209ae7c6d0
   languageName: node
   linkType: hard
 

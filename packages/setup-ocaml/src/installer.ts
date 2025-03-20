@@ -18,7 +18,6 @@ import {
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
-  RESOLVED_COMPILER,
   SAVE_OPAM_POST_RUN,
 } from "./constants.js";
 import { installDune } from "./dune.js";
@@ -31,6 +30,7 @@ import {
   update,
 } from "./opam.js";
 import { retrieveOpamLocalPackages } from "./packages.js";
+import { resolvedCompiler } from "./version.js";
 import { setupCygwin } from "./windows.js";
 
 export async function installer() {
@@ -76,7 +76,7 @@ export async function installer() {
   await repositoryRemoveAll();
   await repositoryAddAll(OPAM_REPOSITORIES);
   if (!opamCacheHit) {
-    const ocamlCompiler = await RESOLVED_COMPILER;
+    const ocamlCompiler = await resolvedCompiler;
     await installOcaml(ocamlCompiler);
     if (!SAVE_OPAM_POST_RUN) {
         await saveOpamCache();
