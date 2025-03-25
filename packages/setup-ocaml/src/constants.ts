@@ -87,6 +87,10 @@ export const OPAM_ROOT = (() => {
   return path.join(os.homedir(), ".opam");
 })();
 
+export const RUNNER_ENVIRONMENT = process.env.RUNNER_ENVIRONMENT as
+  | "github-hosted"
+  | "self-hosted";
+
 export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
   "allow-prerelease-opam",
 );
