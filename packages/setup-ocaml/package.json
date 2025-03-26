@@ -24,9 +24,9 @@
     "yaml": "2.7.0"
   },
   "devDependencies": {
-    "@tsconfig/node20": "20.1.4",
+    "@tsconfig/node20": "20.1.5",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "22.13.11",
+    "@types/node": "22.13.13",
     "@types/semver": "7.5.8",
     "@vercel/ncc": "0.38.3",
     "typescript": "5.8.2"

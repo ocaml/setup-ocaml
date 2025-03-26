@@ -436,9 +436,9 @@ __metadata:
     "@actions/github": "npm:6.0.0"
     "@actions/glob": "npm:0.5.0"
     "@github/dependency-submission-toolkit": "npm:2.0.5"
-    "@tsconfig/node20": "npm:20.1.4"
+    "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.11"
+    "@types/node": "npm:22.13.13"
     "@vercel/ncc": "npm:0.38.3"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -452,9 +452,9 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
-    "@tsconfig/node20": "npm:20.1.4"
+    "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.11"
+    "@types/node": "npm:22.13.13"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.8.2"
   languageName: unknown
@@ -466,9 +466,9 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
-    "@tsconfig/node20": "npm:20.1.4"
+    "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.11"
+    "@types/node": "npm:22.13.13"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.8.2"
   languageName: unknown
@@ -480,9 +480,9 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
-    "@tsconfig/node20": "npm:20.1.4"
+    "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.11"
+    "@types/node": "npm:22.13.13"
     "@vercel/ncc": "npm:0.38.3"
     typescript: "npm:5.8.2"
   languageName: unknown
@@ -501,9 +501,9 @@ __metadata:
     "@actions/io": "npm:1.1.3"
     "@actions/tool-cache": "npm:2.0.2"
     "@octokit/plugin-retry": "npm:7.2.0"
-    "@tsconfig/node20": "npm:20.1.4"
+    "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.13.11"
+    "@types/node": "npm:22.13.13"
     "@types/semver": "npm:7.5.8"
     "@vercel/ncc": "npm:0.38.3"
     cheerio: "npm:1.0.0"
@@ -721,10 +721,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node20@npm:20.1.4":
-  version: 20.1.4
-  resolution: "@tsconfig/node20@npm:20.1.4"
-  checksum: 10c0/239cd6abaceaaffc758e7a9dd3748ec1acfdabd6de28a9a16a3824c21f17ad69a16184870298460345d2fb6f3663d092c21d5b764bef669a179658b4a7eac739
+"@tsconfig/node20@npm:20.1.5":
+  version: 20.1.5
+  resolution: "@tsconfig/node20@npm:20.1.5"
+  checksum: 10c0/aec70cc8a573d49ee65878d0b6929e23a83d990fe451fc4d288bda7b37607afd8841ef59c1fa239c698bd4d087e2a7815d1719b796294b32a356c26dc52c3dd2
   languageName: node
   linkType: hard
 
@@ -735,12 +735,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.13.11":
-  version: 22.13.11
-  resolution: "@types/node@npm:22.13.11"
+"@types/node@npm:22.13.13":
+  version: 22.13.13
+  resolution: "@types/node@npm:22.13.13"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/f6ee33d36372242535c38640fe7550a6640d8a775ec19b55bfc11775b521cba072d892ca92a912332ce01b317293d645c1bf767f3f882ec719f2404a3d2a5b96
+  checksum: 10c0/daf792ba5dcff1316abf4b33680f94b792f8d54d6ae495efc8929531e0ba1284a248d29aab117d2259f9280284d986ad5799b193b0516e2b926d713aab835f7d
   languageName: node
   linkType: hard
 
