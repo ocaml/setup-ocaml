@@ -111634,6 +111634,17 @@ const constants_OPAM_ROOT = (() => {
     }
     return external_node_path_namespaceObject.join(external_node_os_.homedir(), ".opam");
 })();
+const RUNNER_ENVIRONMENT = (() => {
+    const ImageOS = external_node_process_.env.ImageOS;
+    const RUNNER_ENVIRONMENT = external_node_process_.env.RUNNER_ENVIRONMENT;
+    if (ImageOS) {
+        return "github-hosted";
+    }
+    if (!RUNNER_ENVIRONMENT) {
+        return "self-hosted";
+    }
+    return RUNNER_ENVIRONMENT;
+})();
 const ALLOW_PRERELEASE_OPAM = lib_core.getBooleanInput("allow-prerelease-opam");
 const constants_CACHE_PREFIX = lib_core.getInput("cache-prefix");
 const GITHUB_TOKEN = lib_core.getInput("github-token");

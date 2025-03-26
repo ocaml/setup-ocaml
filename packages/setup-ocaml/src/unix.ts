@@ -1,6 +1,5 @@
-import * as process from "node:process";
 import { exec, getExecOutput } from "@actions/exec";
-import { PLATFORM } from "./constants.js";
+import { PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
 
 async function checkAptInstallability(packageName: string) {
   const output = await getExecOutput("sudo", [
@@ -33,15 +32,18 @@ async function retrieveInstallableOptionalDependencies(
 }
 
 export async function installUnixSystemPackages() {
-  const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
-  const optionalDependencies = await retrieveInstallableOptionalDependencies([
-    "darcs",
-    "g++-multilib",
-    "gcc-multilib",
-    "mercurial",
-  ]);
-  if (isGitHubRunner) {
-    if (PLATFORM === "linux") {
+  if (RUNNER_ENVIRONMENT === "self-hosted") {
+    return;
+  }
+  switch (PLATFORM) {
+    case "linux": {
+      const optionalDependencies =
+        await retrieveInstallableOptionalDependencies([
+          "darcs",
+          "g++-multilib",
+          "gcc-multilib",
+          "mercurial",
+        ]);
       await exec("sudo", [
         "apt-get",
         "--yes",
@@ -51,19 +53,27 @@ export async function installUnixSystemPackages() {
         "rsync",
         ...optionalDependencies,
       ]);
-    } else if (PLATFORM === "macos") {
+      break;
+    }
+    case "macos": {
       await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
+      break;
     }
   }
 }
 
 export async function updateUnixPackageIndexFiles() {
-  const isGitHubRunner = process.env.GITHUB_ACTIONS === "true";
-  if (isGitHubRunner) {
-    if (PLATFORM === "linux") {
+  if (RUNNER_ENVIRONMENT === "self-hosted") {
+    return;
+  }
+  switch (PLATFORM) {
+    case "linux": {
       await exec("sudo", ["apt-get", "update"]);
-    } else if (PLATFORM === "macos") {
+      break;
+    }
+    case "macos": {
       await exec("brew", ["update"]);
+      break;
     }
   }
 }
