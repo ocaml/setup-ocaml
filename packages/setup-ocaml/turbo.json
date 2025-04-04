@@ -6,7 +6,7 @@
       "dependsOn": ["build:main", "build:post"]
     },
     "build:main": {
-      "outputs": ["../../dist/*"],
+      "outputs": ["$TURBO_ROOT$/dist/*"],
       "passThroughEnv": [
         "GITHUB_ACTIONS",
         "GITHUB_WORKSPACE",
@@ -16,7 +16,7 @@
       ]
     },
     "build:post": {
-      "outputs": ["../../dist/post/*"],
+      "outputs": ["$TURBO_ROOT$/dist/post/*"],
       "passThroughEnv": [
         "GITHUB_ACTIONS",
         "GITHUB_WORKSPACE",

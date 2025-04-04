@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../lint-doc/dist/*"],
+      "outputs": ["$TURBO_ROOT$/lint-doc/dist/*"],
       "passThroughEnv": ["PATH"]
     }
   }

@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../lint-opam/dist/*"]
+      "outputs": ["$TURBO_ROOT$/lint-opam/dist/*"]
     }
   }
 }

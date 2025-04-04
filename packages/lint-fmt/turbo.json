@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": ["../../lint-fmt/dist/*"],
+      "outputs": ["$TURBO_ROOT$/lint-fmt/dist/*"],
       "passThroughEnv": ["GITHUB_WORKSPACE"]
     }
   }
