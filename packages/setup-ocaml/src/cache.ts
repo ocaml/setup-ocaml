@@ -20,10 +20,10 @@ import {
 } from "./constants.js";
 import { latestOpamRelease } from "./opam.js";
 import { resolvedCompiler } from "./version.js";
-import { cygwinVersion } from "./windows.js";
+import { getCygwinVersion } from "./windows.js";
 
 async function composeCygwinCacheKeys() {
-  const version = await cygwinVersion;
+  const version = await getCygwinVersion();
   const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${version}`;
   const restoreKeys = [key];
   return { key, restoreKeys };
