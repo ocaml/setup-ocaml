@@ -112069,7 +112069,7 @@ const version_resolvedCompiler = (async () => {
 
 
 async function composeCygwinCacheKeys() {
-    const version = await cygwinVersion;
+    const version = await getCygwinVersion();
     const key = `${CACHE_PREFIX}-setup-ocaml-cygwin-${version}`;
     const restoreKeys = [key];
     return { key, restoreKeys };
