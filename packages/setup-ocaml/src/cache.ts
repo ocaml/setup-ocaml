@@ -5,6 +5,7 @@ import type { DownloadOptions } from "@actions/cache/lib/options.js";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
+import { backOff } from "exponential-backoff";
 import * as system from "systeminformation";
 import {
   ARCHITECTURE,
@@ -107,7 +108,10 @@ async function restoreCache(
     return;
   }
   try {
-    const cacheKey = await cache.restoreCache(paths, key, restoreKeys, options);
+    const cacheKey = await backOff(
+      async () => await cache.restoreCache(paths, key, restoreKeys, options),
+      { numOfAttempts: 5 },
+    );
     if (cacheKey) {
       core.info(`Cache restored from key: ${cacheKey}`);
     } else {
@@ -133,7 +137,9 @@ async function saveCache(key: string, paths: string[]) {
     return;
   }
   try {
-    await cache.saveCache(paths, key);
+    await backOff(async () => await cache.saveCache(paths, key), {
+      numOfAttempts: 5,
+    });
   } catch (error) {
     if (error instanceof Error) {
       core.info(error.message);
