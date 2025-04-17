@@ -41,6 +41,7 @@ export async function installer() {
   core.exportVariable("OPAMDOWNLOADJOBS", os.availableParallelism());
   core.exportVariable("OPAMERRLOGLEN", 0);
   core.exportVariable("OPAMPRECISETRACKING", 1);
+  core.exportVariable("OPAMRETRIES", 10);
   core.exportVariable("OPAMROOT", OPAM_ROOT);
   core.exportVariable("OPAMSOLVERTIMEOUT", 600);
   core.exportVariable("OPAMYES", 1);
