@@ -3,13 +3,13 @@
 
 # the linguist-vendored/linguist-generated attribute suppresses changes being
 # displayed by default in pull requests.
-/analysis/dist/*.js -diff linguist-generated
+/analysis/dist/*.cjs -diff linguist-generated
 /analysis/dist/*.txt -diff linguist-generated
-/dist/**/*.js -diff linguist-generated
+/dist/**/*.cjs -diff linguist-generated
 /dist/**/*.txt -diff linguist-generated
-/lint-doc/dist/*.js -diff linguist-generated
+/lint-doc/dist/*.cjs -diff linguist-generated
 /lint-doc/dist/*.txt -diff linguist-generated
-/lint-fmt/dist/*.js -diff linguist-generated
+/lint-fmt/dist/*.cjs -diff linguist-generated
 /lint-fmt/dist/*.txt -diff linguist-generated
-/lint-opam/dist/*.js -diff linguist-generated
+/lint-opam/dist/*.cjs -diff linguist-generated
 /lint-opam/dist/*.txt -diff linguist-generated
