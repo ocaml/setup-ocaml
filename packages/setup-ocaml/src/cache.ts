@@ -109,7 +109,12 @@ async function restoreCache(
   }
   try {
     const cacheKey = await backOff(
-      async () => await cache.restoreCache(paths, key, restoreKeys, options),
+      async () =>
+        await cache.restoreCache(paths, key, restoreKeys, {
+          useAzureSdk: true,
+          downloadConcurrency: 8,
+          ...options,
+        }),
       { numOfAttempts: 5 },
     );
     if (cacheKey) {
@@ -137,9 +142,14 @@ async function saveCache(key: string, paths: string[]) {
     return;
   }
   try {
-    await backOff(async () => await cache.saveCache(paths, key), {
-      numOfAttempts: 5,
-    });
+    await backOff(
+      async () =>
+        await cache.saveCache(paths, key, {
+          useAzureSdk: true,
+          uploadConcurrency: 8,
+        }),
+      { numOfAttempts: 5 },
+    );
   } catch (error) {
     if (error instanceof Error) {
       core.info(error.message);

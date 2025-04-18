@@ -96364,9 +96364,13 @@ async function saveCache2(key, paths) {
     return;
   }
   try {
-    await (0, import_exponential_backoff.backOff)(async () => await cache.saveCache(paths, key), {
-      numOfAttempts: 5
-    });
+    await (0, import_exponential_backoff.backOff)(
+      async () => await cache.saveCache(paths, key, {
+        useAzureSdk: true,
+        uploadConcurrency: 8
+      }),
+      { numOfAttempts: 5 }
+    );
   } catch (error2) {
     if (error2 instanceof Error) {
       core2.info(error2.message);
