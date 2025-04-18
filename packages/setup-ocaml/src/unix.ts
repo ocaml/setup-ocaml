@@ -70,7 +70,7 @@ export async function installUnixSystemPackages() {
       break;
     }
     case "macos": {
-      await exec("brew", ["install", "darcs", "gpatch", "mercurial"]);
+      await exec("brew", ["install", "darcs", "mercurial"]);
       break;
     }
   }
