@@ -96366,8 +96366,7 @@ async function saveCache2(key, paths) {
   try {
     await (0, import_exponential_backoff.backOff)(
       async () => await cache.saveCache(paths, key, {
-        useAzureSdk: true,
-        uploadConcurrency: 8
+        useAzureSdk: true
       }),
       { numOfAttempts: 5 }
     );

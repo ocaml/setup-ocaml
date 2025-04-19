@@ -112,7 +112,6 @@ async function restoreCache(
       async () =>
         await cache.restoreCache(paths, key, restoreKeys, {
           useAzureSdk: true,
-          downloadConcurrency: 8,
           ...options,
         }),
       { numOfAttempts: 5 },
@@ -146,7 +145,6 @@ async function saveCache(key: string, paths: string[]) {
       async () =>
         await cache.saveCache(paths, key, {
           useAzureSdk: true,
-          uploadConcurrency: 8,
         }),
       { numOfAttempts: 5 },
     );
