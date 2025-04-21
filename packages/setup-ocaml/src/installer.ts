@@ -40,6 +40,7 @@ export async function installer() {
   core.exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
   core.exportVariable("OPAMDOWNLOADJOBS", os.availableParallelism());
   core.exportVariable("OPAMERRLOGLEN", 0);
+  core.exportVariable("OPAMEXTERNALSOLVER", "builtin-0install");
   core.exportVariable("OPAMPRECISETRACKING", 1);
   core.exportVariable("OPAMRETRIES", 10);
   core.exportVariable("OPAMROOT", OPAM_ROOT);
