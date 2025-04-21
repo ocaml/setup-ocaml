@@ -92,6 +92,5 @@ export async function installer() {
     const fnames = await retrieveOpamLocalPackages();
     await pin(fnames);
   }
-  await exec("opam", ["--version"]);
-  await exec("opam", ["exec", "--", "ocaml", "-version"]);
+  await exec("opam", ["config", "report"]);
 }
