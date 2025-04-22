@@ -1,3 +1,5 @@
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import { HttpClient } from "@actions/http-client";
@@ -78,5 +80,26 @@ export async function setupCygwin() {
     ]);
     const setup = await io.which("setup-x86_64");
     await io.cp(setup, CYGWIN_ROOT);
+  });
+}
+
+export async function fixFstab() {
+  await core.group("Fixing Cygwin fstab configuration", async () => {
+    try {
+      const fstabPath = path.join(CYGWIN_ROOT, "etc", "fstab");
+      await fs.access(fstabPath, fs.constants.W_OK);
+      const contents = await fs.readFile(fstabPath, { encoding: "utf8" });
+      core.info(contents);
+      const patchedContents = contents.replace(
+        /(?<=\s)binary(?=,posix)/,
+        "noacl,binary",
+      );
+      core.info(patchedContents);
+      await fs.writeFile(fstabPath, patchedContents, { encoding: "utf8" });
+    } catch (error) {
+      if (error instanceof Error) {
+        core.warning(error);
+      }
+    }
   });
 }
