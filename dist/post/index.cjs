@@ -61001,6 +61001,7 @@ var require_rpc_output_stream = __commonJS({
           cmp: []
         };
         this._closed = false;
+        this._itState = { q: [] };
       }
       // --- RpcOutputStream callback API
       onNext(callback) {
@@ -61100,9 +61101,6 @@ var require_rpc_output_stream = __commonJS({
        *   messages are queued.
        */
       [Symbol.asyncIterator]() {
-        if (!this._itState) {
-          this._itState = { q: [] };
-        }
         if (this._closed === true)
           this.pushIt({ value: null, done: true });
         else if (this._closed !== false)
@@ -61124,8 +61122,6 @@ var require_rpc_output_stream = __commonJS({
       // this either resolves a pending promise, or enqueues the result.
       pushIt(result2) {
         let state = this._itState;
-        if (!state)
-          return;
         if (state.p) {
           const p = state.p;
           runtime_1.assert(p.state == deferred_1.DeferredState.PENDING, "iterator contract broken");
