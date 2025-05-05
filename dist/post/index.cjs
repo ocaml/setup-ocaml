@@ -22941,194 +22941,6 @@ var require_cacheUtils = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/pipeline.js
-var require_pipeline = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/pipeline.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.createEmptyPipeline = createEmptyPipeline;
-    var ValidPhaseNames = /* @__PURE__ */ new Set(["Deserialize", "Serialize", "Retry", "Sign"]);
-    var HttpPipeline = class _HttpPipeline {
-      constructor(policies) {
-        var _a;
-        this._policies = [];
-        this._policies = (_a = policies === null || policies === void 0 ? void 0 : policies.slice(0)) !== null && _a !== void 0 ? _a : [];
-        this._orderedPolicies = void 0;
-      }
-      addPolicy(policy, options = {}) {
-        if (options.phase && options.afterPhase) {
-          throw new Error("Policies inside a phase cannot specify afterPhase.");
-        }
-        if (options.phase && !ValidPhaseNames.has(options.phase)) {
-          throw new Error(`Invalid phase name: ${options.phase}`);
-        }
-        if (options.afterPhase && !ValidPhaseNames.has(options.afterPhase)) {
-          throw new Error(`Invalid afterPhase name: ${options.afterPhase}`);
-        }
-        this._policies.push({
-          policy,
-          options
-        });
-        this._orderedPolicies = void 0;
-      }
-      removePolicy(options) {
-        const removedPolicies = [];
-        this._policies = this._policies.filter((policyDescriptor) => {
-          if (options.name && policyDescriptor.policy.name === options.name || options.phase && policyDescriptor.options.phase === options.phase) {
-            removedPolicies.push(policyDescriptor.policy);
-            return false;
-          } else {
-            return true;
-          }
-        });
-        this._orderedPolicies = void 0;
-        return removedPolicies;
-      }
-      sendRequest(httpClient, request) {
-        const policies = this.getOrderedPolicies();
-        const pipeline = policies.reduceRight((next, policy) => {
-          return (req) => {
-            return policy.sendRequest(req, next);
-          };
-        }, (req) => httpClient.sendRequest(req));
-        return pipeline(request);
-      }
-      getOrderedPolicies() {
-        if (!this._orderedPolicies) {
-          this._orderedPolicies = this.orderPolicies();
-        }
-        return this._orderedPolicies;
-      }
-      clone() {
-        return new _HttpPipeline(this._policies);
-      }
-      static create() {
-        return new _HttpPipeline();
-      }
-      orderPolicies() {
-        const result2 = [];
-        const policyMap = /* @__PURE__ */ new Map();
-        function createPhase(name) {
-          return {
-            name,
-            policies: /* @__PURE__ */ new Set(),
-            hasRun: false,
-            hasAfterPolicies: false
-          };
-        }
-        const serializePhase = createPhase("Serialize");
-        const noPhase = createPhase("None");
-        const deserializePhase = createPhase("Deserialize");
-        const retryPhase = createPhase("Retry");
-        const signPhase = createPhase("Sign");
-        const orderedPhases = [serializePhase, noPhase, deserializePhase, retryPhase, signPhase];
-        function getPhase(phase) {
-          if (phase === "Retry") {
-            return retryPhase;
-          } else if (phase === "Serialize") {
-            return serializePhase;
-          } else if (phase === "Deserialize") {
-            return deserializePhase;
-          } else if (phase === "Sign") {
-            return signPhase;
-          } else {
-            return noPhase;
-          }
-        }
-        for (const descriptor of this._policies) {
-          const policy = descriptor.policy;
-          const options = descriptor.options;
-          const policyName = policy.name;
-          if (policyMap.has(policyName)) {
-            throw new Error("Duplicate policy names not allowed in pipeline");
-          }
-          const node = {
-            policy,
-            dependsOn: /* @__PURE__ */ new Set(),
-            dependants: /* @__PURE__ */ new Set()
-          };
-          if (options.afterPhase) {
-            node.afterPhase = getPhase(options.afterPhase);
-            node.afterPhase.hasAfterPolicies = true;
-          }
-          policyMap.set(policyName, node);
-          const phase = getPhase(options.phase);
-          phase.policies.add(node);
-        }
-        for (const descriptor of this._policies) {
-          const { policy, options } = descriptor;
-          const policyName = policy.name;
-          const node = policyMap.get(policyName);
-          if (!node) {
-            throw new Error(`Missing node for policy ${policyName}`);
-          }
-          if (options.afterPolicies) {
-            for (const afterPolicyName of options.afterPolicies) {
-              const afterNode = policyMap.get(afterPolicyName);
-              if (afterNode) {
-                node.dependsOn.add(afterNode);
-                afterNode.dependants.add(node);
-              }
-            }
-          }
-          if (options.beforePolicies) {
-            for (const beforePolicyName of options.beforePolicies) {
-              const beforeNode = policyMap.get(beforePolicyName);
-              if (beforeNode) {
-                beforeNode.dependsOn.add(node);
-                node.dependants.add(beforeNode);
-              }
-            }
-          }
-        }
-        function walkPhase(phase) {
-          phase.hasRun = true;
-          for (const node of phase.policies) {
-            if (node.afterPhase && (!node.afterPhase.hasRun || node.afterPhase.policies.size)) {
-              continue;
-            }
-            if (node.dependsOn.size === 0) {
-              result2.push(node.policy);
-              for (const dependant of node.dependants) {
-                dependant.dependsOn.delete(node);
-              }
-              policyMap.delete(node.policy.name);
-              phase.policies.delete(node);
-            }
-          }
-        }
-        function walkPhases() {
-          for (const phase of orderedPhases) {
-            walkPhase(phase);
-            if (phase.policies.size > 0 && phase !== noPhase) {
-              if (!noPhase.hasRun) {
-                walkPhase(noPhase);
-              }
-              return;
-            }
-            if (phase.hasAfterPolicies) {
-              walkPhase(noPhase);
-            }
-          }
-        }
-        let iteration = 0;
-        while (policyMap.size > 0) {
-          iteration++;
-          const initialResultLength = result2.length;
-          walkPhases();
-          if (result2.length <= initialResultLength && iteration > 1) {
-            throw new Error("Cannot satisfy policy dependencies due to requirements cycle.");
-          }
-        }
-        return result2;
-      }
-    };
-    function createEmptyPipeline() {
-      return HttpPipeline.create();
-    }
-  }
-});
-
 // ../../node_modules/tslib/tslib.es6.mjs
 var tslib_es6_exports = {};
 __export(tslib_es6_exports, {
@@ -23654,9 +23466,25 @@ var init_tslib_es6 = __esm({
   }
 });
 
-// ../../node_modules/@azure/logger/dist/commonjs/log.js
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/abort-controller/AbortError.js
+var require_AbortError = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/abort-controller/AbortError.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.AbortError = void 0;
+    var AbortError = class extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "AbortError";
+      }
+    };
+    exports2.AbortError = AbortError;
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/log.js
 var require_log = __commonJS({
-  "../../node_modules/@azure/logger/dist/commonjs/log.js"(exports2) {
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/log.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.log = log;
@@ -23670,9 +23498,9 @@ var require_log = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/logger/dist/commonjs/debug.js
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/debug.js
 var require_debug = __commonJS({
-  "../../node_modules/@azure/logger/dist/commonjs/debug.js"(exports2) {
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/debug.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     var log_js_1 = require_log();
@@ -23767,1343 +23595,113 @@ var require_debug = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/logger/dist/commonjs/index.js
-var require_commonjs = __commonJS({
-  "../../node_modules/@azure/logger/dist/commonjs/index.js"(exports2) {
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/logger.js
+var require_logger = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/logger.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.AzureLogger = void 0;
+    exports2.TypeSpecRuntimeLogger = void 0;
+    exports2.createLoggerContext = createLoggerContext;
     exports2.setLogLevel = setLogLevel;
     exports2.getLogLevel = getLogLevel;
     exports2.createClientLogger = createClientLogger;
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
     var debug_js_1 = tslib_1.__importDefault(require_debug());
-    var registeredLoggers = /* @__PURE__ */ new Set();
-    var logLevelFromEnv = typeof process !== "undefined" && process.env && process.env.AZURE_LOG_LEVEL || void 0;
-    var azureLogLevel;
-    exports2.AzureLogger = (0, debug_js_1.default)("azure");
-    exports2.AzureLogger.log = (...args) => {
-      debug_js_1.default.log(...args);
-    };
-    var AZURE_LOG_LEVELS = ["verbose", "info", "warning", "error"];
-    if (logLevelFromEnv) {
-      if (isAzureLogLevel(logLevelFromEnv)) {
-        setLogLevel(logLevelFromEnv);
-      } else {
-        console.error(`AZURE_LOG_LEVEL set to unknown log level '${logLevelFromEnv}'; logging is not enabled. Acceptable values: ${AZURE_LOG_LEVELS.join(", ")}.`);
-      }
-    }
-    function setLogLevel(level) {
-      if (level && !isAzureLogLevel(level)) {
-        throw new Error(`Unknown log level '${level}'. Acceptable values: ${AZURE_LOG_LEVELS.join(",")}`);
-      }
-      azureLogLevel = level;
-      const enabledNamespaces = [];
-      for (const logger of registeredLoggers) {
-        if (shouldEnable(logger)) {
-          enabledNamespaces.push(logger.namespace);
-        }
-      }
-      debug_js_1.default.enable(enabledNamespaces.join(","));
-    }
-    function getLogLevel() {
-      return azureLogLevel;
-    }
+    var TYPESPEC_RUNTIME_LOG_LEVELS = ["verbose", "info", "warning", "error"];
     var levelMap = {
       verbose: 400,
       info: 300,
       warning: 200,
       error: 100
     };
-    function createClientLogger(namespace) {
-      const clientRootLogger = exports2.AzureLogger.extend(namespace);
-      patchLogMethod(exports2.AzureLogger, clientRootLogger);
-      return {
-        error: createLogger(clientRootLogger, "error"),
-        warning: createLogger(clientRootLogger, "warning"),
-        info: createLogger(clientRootLogger, "info"),
-        verbose: createLogger(clientRootLogger, "verbose")
-      };
-    }
     function patchLogMethod(parent, child) {
       child.log = (...args) => {
         parent.log(...args);
       };
     }
-    function createLogger(parent, level) {
-      const logger = Object.assign(parent.extend(level), {
-        level
-      });
-      patchLogMethod(parent, logger);
-      if (shouldEnable(logger)) {
-        const enabledNamespaces = debug_js_1.default.disable();
-        debug_js_1.default.enable(enabledNamespaces + "," + logger.namespace);
-      }
-      registeredLoggers.add(logger);
-      return logger;
+    function isTypeSpecRuntimeLogLevel(level) {
+      return TYPESPEC_RUNTIME_LOG_LEVELS.includes(level);
     }
-    function shouldEnable(logger) {
-      return Boolean(azureLogLevel && levelMap[logger.level] <= levelMap[azureLogLevel]);
-    }
-    function isAzureLogLevel(logLevel) {
-      return AZURE_LOG_LEVELS.includes(logLevel);
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/log.js
-var require_log2 = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/log.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.logger = void 0;
-    var logger_1 = require_commonjs();
-    exports2.logger = (0, logger_1.createClientLogger)("core-rest-pipeline");
-  }
-});
-
-// ../../node_modules/@azure/abort-controller/dist/commonjs/AbortError.js
-var require_AbortError = __commonJS({
-  "../../node_modules/@azure/abort-controller/dist/commonjs/AbortError.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.AbortError = void 0;
-    var AbortError = class extends Error {
-      constructor(message) {
-        super(message);
-        this.name = "AbortError";
-      }
-    };
-    exports2.AbortError = AbortError;
-  }
-});
-
-// ../../node_modules/@azure/abort-controller/dist/commonjs/index.js
-var require_commonjs2 = __commonJS({
-  "../../node_modules/@azure/abort-controller/dist/commonjs/index.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.AbortError = void 0;
-    var AbortError_js_1 = require_AbortError();
-    Object.defineProperty(exports2, "AbortError", { enumerable: true, get: function() {
-      return AbortError_js_1.AbortError;
-    } });
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/createAbortablePromise.js
-var require_createAbortablePromise = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/createAbortablePromise.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.createAbortablePromise = createAbortablePromise;
-    var abort_controller_1 = require_commonjs2();
-    function createAbortablePromise(buildPromise, options) {
-      const { cleanupBeforeAbort, abortSignal, abortErrorMsg } = options !== null && options !== void 0 ? options : {};
-      return new Promise((resolve, reject) => {
-        function rejectOnAbort() {
-          reject(new abort_controller_1.AbortError(abortErrorMsg !== null && abortErrorMsg !== void 0 ? abortErrorMsg : "The operation was aborted."));
-        }
-        function removeListeners() {
-          abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.removeEventListener("abort", onAbort);
-        }
-        function onAbort() {
-          cleanupBeforeAbort === null || cleanupBeforeAbort === void 0 ? void 0 : cleanupBeforeAbort();
-          removeListeners();
-          rejectOnAbort();
-        }
-        if (abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.aborted) {
-          return rejectOnAbort();
-        }
-        try {
-          buildPromise((x) => {
-            removeListeners();
-            resolve(x);
-          }, (x) => {
-            removeListeners();
-            reject(x);
-          });
-        } catch (err) {
-          reject(err);
-        }
-        abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.addEventListener("abort", onAbort);
-      });
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/random.js
-var require_random = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/random.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getRandomIntegerInclusive = getRandomIntegerInclusive;
-    function getRandomIntegerInclusive(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      const offset = Math.floor(Math.random() * (max - min + 1));
-      return offset + min;
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/delay.js
-var require_delay = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/delay.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.delay = delay;
-    exports2.calculateRetryDelay = calculateRetryDelay;
-    var createAbortablePromise_js_1 = require_createAbortablePromise();
-    var random_js_1 = require_random();
-    var StandardAbortMessage = "The delay was aborted.";
-    function delay(timeInMs, options) {
-      let token;
-      const { abortSignal, abortErrorMsg } = options !== null && options !== void 0 ? options : {};
-      return (0, createAbortablePromise_js_1.createAbortablePromise)((resolve) => {
-        token = setTimeout(resolve, timeInMs);
-      }, {
-        cleanupBeforeAbort: () => clearTimeout(token),
-        abortSignal,
-        abortErrorMsg: abortErrorMsg !== null && abortErrorMsg !== void 0 ? abortErrorMsg : StandardAbortMessage
-      });
-    }
-    function calculateRetryDelay(retryAttempt, config) {
-      const exponentialDelay = config.retryDelayInMs * Math.pow(2, retryAttempt);
-      const clampedDelay = Math.min(config.maxRetryDelayInMs, exponentialDelay);
-      const retryAfterInMs = clampedDelay / 2 + (0, random_js_1.getRandomIntegerInclusive)(0, clampedDelay / 2);
-      return { retryAfterInMs };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/aborterUtils.js
-var require_aborterUtils = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/aborterUtils.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.cancelablePromiseRace = cancelablePromiseRace;
-    async function cancelablePromiseRace(abortablePromiseBuilders, options) {
-      var _a, _b;
-      const aborter = new AbortController();
-      function abortHandler() {
-        aborter.abort();
-      }
-      (_a = options === null || options === void 0 ? void 0 : options.abortSignal) === null || _a === void 0 ? void 0 : _a.addEventListener("abort", abortHandler);
-      try {
-        return await Promise.race(abortablePromiseBuilders.map((p) => p({ abortSignal: aborter.signal })));
-      } finally {
-        aborter.abort();
-        (_b = options === null || options === void 0 ? void 0 : options.abortSignal) === null || _b === void 0 ? void 0 : _b.removeEventListener("abort", abortHandler);
-      }
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/object.js
-var require_object = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/object.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isObject = isObject;
-    function isObject(input) {
-      return typeof input === "object" && input !== null && !Array.isArray(input) && !(input instanceof RegExp) && !(input instanceof Date);
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/error.js
-var require_error = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/error.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isError = isError;
-    exports2.getErrorMessage = getErrorMessage;
-    var object_js_1 = require_object();
-    function isError(e) {
-      if ((0, object_js_1.isObject)(e)) {
-        const hasName = typeof e.name === "string";
-        const hasMessage = typeof e.message === "string";
-        return hasName && hasMessage;
-      }
-      return false;
-    }
-    function getErrorMessage(e) {
-      if (isError(e)) {
-        return e.message;
-      } else {
-        let stringified;
-        try {
-          if (typeof e === "object" && e) {
-            stringified = JSON.stringify(e);
-          } else {
-            stringified = String(e);
-          }
-        } catch (err) {
-          stringified = "[unable to stringify input]";
-        }
-        return `Unknown error ${stringified}`;
-      }
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/sha256.js
-var require_sha256 = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/sha256.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.computeSha256Hmac = computeSha256Hmac;
-    exports2.computeSha256Hash = computeSha256Hash;
-    var crypto_1 = require("crypto");
-    async function computeSha256Hmac(key, stringToSign, encoding) {
-      const decodedKey = Buffer.from(key, "base64");
-      return (0, crypto_1.createHmac)("sha256", decodedKey).update(stringToSign).digest(encoding);
-    }
-    async function computeSha256Hash(content, encoding) {
-      return (0, crypto_1.createHash)("sha256").update(content).digest(encoding);
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/typeGuards.js
-var require_typeGuards = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/typeGuards.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isDefined = isDefined;
-    exports2.isObjectWithProperties = isObjectWithProperties;
-    exports2.objectHasProperty = objectHasProperty;
-    function isDefined(thing) {
-      return typeof thing !== "undefined" && thing !== null;
-    }
-    function isObjectWithProperties(thing, properties) {
-      if (!isDefined(thing) || typeof thing !== "object") {
-        return false;
-      }
-      for (const property of properties) {
-        if (!objectHasProperty(thing, property)) {
-          return false;
-        }
-      }
-      return true;
-    }
-    function objectHasProperty(thing, property) {
-      return isDefined(thing) && typeof thing === "object" && property in thing;
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/uuidUtils.js
-var require_uuidUtils = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/uuidUtils.js"(exports2) {
-    "use strict";
-    var _a;
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.randomUUID = randomUUID;
-    var crypto_1 = require("crypto");
-    var uuidFunction = typeof ((_a = globalThis === null || globalThis === void 0 ? void 0 : globalThis.crypto) === null || _a === void 0 ? void 0 : _a.randomUUID) === "function" ? globalThis.crypto.randomUUID.bind(globalThis.crypto) : crypto_1.randomUUID;
-    function randomUUID() {
-      return uuidFunction();
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/checkEnvironment.js
-var require_checkEnvironment = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/checkEnvironment.js"(exports2) {
-    "use strict";
-    var _a;
-    var _b;
-    var _c;
-    var _d;
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isReactNative = exports2.isNodeRuntime = exports2.isNode = exports2.isNodeLike = exports2.isBun = exports2.isDeno = exports2.isWebWorker = exports2.isBrowser = void 0;
-    exports2.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
-    exports2.isWebWorker = typeof self === "object" && typeof (self === null || self === void 0 ? void 0 : self.importScripts) === "function" && (((_a = self.constructor) === null || _a === void 0 ? void 0 : _a.name) === "DedicatedWorkerGlobalScope" || ((_b = self.constructor) === null || _b === void 0 ? void 0 : _b.name) === "ServiceWorkerGlobalScope" || ((_c = self.constructor) === null || _c === void 0 ? void 0 : _c.name) === "SharedWorkerGlobalScope");
-    exports2.isDeno = typeof Deno !== "undefined" && typeof Deno.version !== "undefined" && typeof Deno.version.deno !== "undefined";
-    exports2.isBun = typeof Bun !== "undefined" && typeof Bun.version !== "undefined";
-    exports2.isNodeLike = typeof globalThis.process !== "undefined" && Boolean(globalThis.process.version) && Boolean((_d = globalThis.process.versions) === null || _d === void 0 ? void 0 : _d.node);
-    exports2.isNode = exports2.isNodeLike;
-    exports2.isNodeRuntime = exports2.isNodeLike && !exports2.isBun && !exports2.isDeno;
-    exports2.isReactNative = typeof navigator !== "undefined" && (navigator === null || navigator === void 0 ? void 0 : navigator.product) === "ReactNative";
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/bytesEncoding.js
-var require_bytesEncoding = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/bytesEncoding.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.uint8ArrayToString = uint8ArrayToString;
-    exports2.stringToUint8Array = stringToUint8Array;
-    function uint8ArrayToString(bytes, format) {
-      return Buffer.from(bytes).toString(format);
-    }
-    function stringToUint8Array(value, format) {
-      return Buffer.from(value, format);
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-util/dist/commonjs/index.js
-var require_commonjs3 = __commonJS({
-  "../../node_modules/@azure/core-util/dist/commonjs/index.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.stringToUint8Array = exports2.uint8ArrayToString = exports2.isWebWorker = exports2.isReactNative = exports2.isDeno = exports2.isNodeRuntime = exports2.isNodeLike = exports2.isNode = exports2.isBun = exports2.isBrowser = exports2.randomUUID = exports2.objectHasProperty = exports2.isObjectWithProperties = exports2.isDefined = exports2.computeSha256Hmac = exports2.computeSha256Hash = exports2.getErrorMessage = exports2.isError = exports2.isObject = exports2.getRandomIntegerInclusive = exports2.createAbortablePromise = exports2.cancelablePromiseRace = exports2.calculateRetryDelay = exports2.delay = void 0;
-    var delay_js_1 = require_delay();
-    Object.defineProperty(exports2, "delay", { enumerable: true, get: function() {
-      return delay_js_1.delay;
-    } });
-    Object.defineProperty(exports2, "calculateRetryDelay", { enumerable: true, get: function() {
-      return delay_js_1.calculateRetryDelay;
-    } });
-    var aborterUtils_js_1 = require_aborterUtils();
-    Object.defineProperty(exports2, "cancelablePromiseRace", { enumerable: true, get: function() {
-      return aborterUtils_js_1.cancelablePromiseRace;
-    } });
-    var createAbortablePromise_js_1 = require_createAbortablePromise();
-    Object.defineProperty(exports2, "createAbortablePromise", { enumerable: true, get: function() {
-      return createAbortablePromise_js_1.createAbortablePromise;
-    } });
-    var random_js_1 = require_random();
-    Object.defineProperty(exports2, "getRandomIntegerInclusive", { enumerable: true, get: function() {
-      return random_js_1.getRandomIntegerInclusive;
-    } });
-    var object_js_1 = require_object();
-    Object.defineProperty(exports2, "isObject", { enumerable: true, get: function() {
-      return object_js_1.isObject;
-    } });
-    var error_js_1 = require_error();
-    Object.defineProperty(exports2, "isError", { enumerable: true, get: function() {
-      return error_js_1.isError;
-    } });
-    Object.defineProperty(exports2, "getErrorMessage", { enumerable: true, get: function() {
-      return error_js_1.getErrorMessage;
-    } });
-    var sha256_js_1 = require_sha256();
-    Object.defineProperty(exports2, "computeSha256Hash", { enumerable: true, get: function() {
-      return sha256_js_1.computeSha256Hash;
-    } });
-    Object.defineProperty(exports2, "computeSha256Hmac", { enumerable: true, get: function() {
-      return sha256_js_1.computeSha256Hmac;
-    } });
-    var typeGuards_js_1 = require_typeGuards();
-    Object.defineProperty(exports2, "isDefined", { enumerable: true, get: function() {
-      return typeGuards_js_1.isDefined;
-    } });
-    Object.defineProperty(exports2, "isObjectWithProperties", { enumerable: true, get: function() {
-      return typeGuards_js_1.isObjectWithProperties;
-    } });
-    Object.defineProperty(exports2, "objectHasProperty", { enumerable: true, get: function() {
-      return typeGuards_js_1.objectHasProperty;
-    } });
-    var uuidUtils_js_1 = require_uuidUtils();
-    Object.defineProperty(exports2, "randomUUID", { enumerable: true, get: function() {
-      return uuidUtils_js_1.randomUUID;
-    } });
-    var checkEnvironment_js_1 = require_checkEnvironment();
-    Object.defineProperty(exports2, "isBrowser", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isBrowser;
-    } });
-    Object.defineProperty(exports2, "isBun", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isBun;
-    } });
-    Object.defineProperty(exports2, "isNode", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isNode;
-    } });
-    Object.defineProperty(exports2, "isNodeLike", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isNodeLike;
-    } });
-    Object.defineProperty(exports2, "isNodeRuntime", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isNodeRuntime;
-    } });
-    Object.defineProperty(exports2, "isDeno", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isDeno;
-    } });
-    Object.defineProperty(exports2, "isReactNative", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isReactNative;
-    } });
-    Object.defineProperty(exports2, "isWebWorker", { enumerable: true, get: function() {
-      return checkEnvironment_js_1.isWebWorker;
-    } });
-    var bytesEncoding_js_1 = require_bytesEncoding();
-    Object.defineProperty(exports2, "uint8ArrayToString", { enumerable: true, get: function() {
-      return bytesEncoding_js_1.uint8ArrayToString;
-    } });
-    Object.defineProperty(exports2, "stringToUint8Array", { enumerable: true, get: function() {
-      return bytesEncoding_js_1.stringToUint8Array;
-    } });
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/sanitizer.js
-var require_sanitizer = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/sanitizer.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.Sanitizer = void 0;
-    var core_util_1 = require_commonjs3();
-    var RedactedString = "REDACTED";
-    var defaultAllowedHeaderNames = [
-      "x-ms-client-request-id",
-      "x-ms-return-client-request-id",
-      "x-ms-useragent",
-      "x-ms-correlation-request-id",
-      "x-ms-request-id",
-      "client-request-id",
-      "ms-cv",
-      "return-client-request-id",
-      "traceparent",
-      "Access-Control-Allow-Credentials",
-      "Access-Control-Allow-Headers",
-      "Access-Control-Allow-Methods",
-      "Access-Control-Allow-Origin",
-      "Access-Control-Expose-Headers",
-      "Access-Control-Max-Age",
-      "Access-Control-Request-Headers",
-      "Access-Control-Request-Method",
-      "Origin",
-      "Accept",
-      "Accept-Encoding",
-      "Cache-Control",
-      "Connection",
-      "Content-Length",
-      "Content-Type",
-      "Date",
-      "ETag",
-      "Expires",
-      "If-Match",
-      "If-Modified-Since",
-      "If-None-Match",
-      "If-Unmodified-Since",
-      "Last-Modified",
-      "Pragma",
-      "Request-Id",
-      "Retry-After",
-      "Server",
-      "Transfer-Encoding",
-      "User-Agent",
-      "WWW-Authenticate"
-    ];
-    var defaultAllowedQueryParameters = ["api-version"];
-    var Sanitizer = class {
-      constructor({ additionalAllowedHeaderNames: allowedHeaderNames = [], additionalAllowedQueryParameters: allowedQueryParameters = [] } = {}) {
-        allowedHeaderNames = defaultAllowedHeaderNames.concat(allowedHeaderNames);
-        allowedQueryParameters = defaultAllowedQueryParameters.concat(allowedQueryParameters);
-        this.allowedHeaderNames = new Set(allowedHeaderNames.map((n) => n.toLowerCase()));
-        this.allowedQueryParameters = new Set(allowedQueryParameters.map((p) => p.toLowerCase()));
-      }
-      sanitize(obj) {
-        const seen = /* @__PURE__ */ new Set();
-        return JSON.stringify(obj, (key, value) => {
-          if (value instanceof Error) {
-            return Object.assign(Object.assign({}, value), { name: value.name, message: value.message });
-          }
-          if (key === "headers") {
-            return this.sanitizeHeaders(value);
-          } else if (key === "url") {
-            return this.sanitizeUrl(value);
-          } else if (key === "query") {
-            return this.sanitizeQuery(value);
-          } else if (key === "body") {
-            return void 0;
-          } else if (key === "response") {
-            return void 0;
-          } else if (key === "operationSpec") {
-            return void 0;
-          } else if (Array.isArray(value) || (0, core_util_1.isObject)(value)) {
-            if (seen.has(value)) {
-              return "[Circular]";
-            }
-            seen.add(value);
-          }
-          return value;
-        }, 2);
-      }
-      sanitizeUrl(value) {
-        if (typeof value !== "string" || value === null || value === "") {
-          return value;
-        }
-        const url = new URL(value);
-        if (!url.search) {
-          return value;
-        }
-        for (const [key] of url.searchParams) {
-          if (!this.allowedQueryParameters.has(key.toLowerCase())) {
-            url.searchParams.set(key, RedactedString);
-          }
-        }
-        return url.toString();
-      }
-      sanitizeHeaders(obj) {
-        const sanitized = {};
-        for (const key of Object.keys(obj)) {
-          if (this.allowedHeaderNames.has(key.toLowerCase())) {
-            sanitized[key] = obj[key];
-          } else {
-            sanitized[key] = RedactedString;
-          }
-        }
-        return sanitized;
-      }
-      sanitizeQuery(value) {
-        if (typeof value !== "object" || value === null) {
-          return value;
-        }
-        const sanitized = {};
-        for (const k of Object.keys(value)) {
-          if (this.allowedQueryParameters.has(k.toLowerCase())) {
-            sanitized[k] = value[k];
-          } else {
-            sanitized[k] = RedactedString;
-          }
-        }
-        return sanitized;
-      }
-    };
-    exports2.Sanitizer = Sanitizer;
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/logPolicy.js
-var require_logPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/logPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.logPolicyName = void 0;
-    exports2.logPolicy = logPolicy;
-    var log_js_1 = require_log2();
-    var sanitizer_js_1 = require_sanitizer();
-    exports2.logPolicyName = "logPolicy";
-    function logPolicy(options = {}) {
-      var _a;
-      const logger = (_a = options.logger) !== null && _a !== void 0 ? _a : log_js_1.logger.info;
-      const sanitizer = new sanitizer_js_1.Sanitizer({
-        additionalAllowedHeaderNames: options.additionalAllowedHeaderNames,
-        additionalAllowedQueryParameters: options.additionalAllowedQueryParameters
-      });
-      return {
-        name: exports2.logPolicyName,
-        async sendRequest(request, next) {
-          if (!logger.enabled) {
-            return next(request);
-          }
-          logger(`Request: ${sanitizer.sanitize(request)}`);
-          const response = await next(request);
-          logger(`Response status code: ${response.status}`);
-          logger(`Headers: ${sanitizer.sanitize(response.headers)}`);
-          return response;
-        }
+    function createLoggerContext(options) {
+      const registeredLoggers = /* @__PURE__ */ new Set();
+      const logLevelFromEnv = typeof process !== "undefined" && process.env && process.env[options.logLevelEnvVarName] || void 0;
+      let logLevel;
+      const clientLogger = (0, debug_js_1.default)(options.namespace);
+      clientLogger.log = (...args) => {
+        debug_js_1.default.log(...args);
       };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/redirectPolicy.js
-var require_redirectPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/redirectPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.redirectPolicyName = void 0;
-    exports2.redirectPolicy = redirectPolicy;
-    exports2.redirectPolicyName = "redirectPolicy";
-    var allowedRedirect = ["GET", "HEAD"];
-    function redirectPolicy(options = {}) {
-      const { maxRetries = 20 } = options;
-      return {
-        name: exports2.redirectPolicyName,
-        async sendRequest(request, next) {
-          const response = await next(request);
-          return handleRedirect(next, response, maxRetries);
-        }
-      };
-    }
-    async function handleRedirect(next, response, maxRetries, currentRetries = 0) {
-      const { request, status, headers } = response;
-      const locationHeader = headers.get("location");
-      if (locationHeader && (status === 300 || status === 301 && allowedRedirect.includes(request.method) || status === 302 && allowedRedirect.includes(request.method) || status === 303 && request.method === "POST" || status === 307) && currentRetries < maxRetries) {
-        const url = new URL(locationHeader, request.url);
-        request.url = url.toString();
-        if (status === 303) {
-          request.method = "GET";
-          request.headers.delete("Content-Length");
-          delete request.body;
-        }
-        request.headers.delete("Authorization");
-        const res = await next(request);
-        return handleRedirect(next, res, maxRetries, currentRetries + 1);
-      }
-      return response;
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgentPlatform.js
-var require_userAgentPlatform = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgentPlatform.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getHeaderName = getHeaderName;
-    exports2.setPlatformSpecificData = setPlatformSpecificData;
-    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var os2 = tslib_1.__importStar(require("node:os"));
-    var process4 = tslib_1.__importStar(require("node:process"));
-    function getHeaderName() {
-      return "User-Agent";
-    }
-    async function setPlatformSpecificData(map) {
-      if (process4 && process4.versions) {
-        const versions = process4.versions;
-        if (versions.bun) {
-          map.set("Bun", versions.bun);
-        } else if (versions.deno) {
-          map.set("Deno", versions.deno);
-        } else if (versions.node) {
-          map.set("Node", versions.node);
-        }
-      }
-      map.set("OS", `(${os2.arch()}-${os2.type()}-${os2.release()})`);
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/constants.js
-var require_constants7 = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/constants.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "1.19.1";
-    exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgent.js
-var require_userAgent = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgent.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getUserAgentHeaderName = getUserAgentHeaderName;
-    exports2.getUserAgentValue = getUserAgentValue;
-    var userAgentPlatform_js_1 = require_userAgentPlatform();
-    var constants_js_1 = require_constants7();
-    function getUserAgentString(telemetryInfo) {
-      const parts = [];
-      for (const [key, value] of telemetryInfo) {
-        const token = value ? `${key}/${value}` : key;
-        parts.push(token);
-      }
-      return parts.join(" ");
-    }
-    function getUserAgentHeaderName() {
-      return (0, userAgentPlatform_js_1.getHeaderName)();
-    }
-    async function getUserAgentValue(prefix) {
-      const runtimeInfo = /* @__PURE__ */ new Map();
-      runtimeInfo.set("core-rest-pipeline", constants_js_1.SDK_VERSION);
-      await (0, userAgentPlatform_js_1.setPlatformSpecificData)(runtimeInfo);
-      const defaultAgent = getUserAgentString(runtimeInfo);
-      const userAgentValue = prefix ? `${prefix} ${defaultAgent}` : defaultAgent;
-      return userAgentValue;
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/userAgentPolicy.js
-var require_userAgentPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/userAgentPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.userAgentPolicyName = void 0;
-    exports2.userAgentPolicy = userAgentPolicy;
-    var userAgent_js_1 = require_userAgent();
-    var UserAgentHeaderName = (0, userAgent_js_1.getUserAgentHeaderName)();
-    exports2.userAgentPolicyName = "userAgentPolicy";
-    function userAgentPolicy(options = {}) {
-      const userAgentValue = (0, userAgent_js_1.getUserAgentValue)(options.userAgentPrefix);
-      return {
-        name: exports2.userAgentPolicyName,
-        async sendRequest(request, next) {
-          if (!request.headers.has(UserAgentHeaderName)) {
-            request.headers.set(UserAgentHeaderName, await userAgentValue);
-          }
-          return next(request);
-        }
-      };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/typeGuards.js
-var require_typeGuards2 = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/typeGuards.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isNodeReadableStream = isNodeReadableStream;
-    exports2.isWebReadableStream = isWebReadableStream;
-    exports2.isReadableStream = isReadableStream;
-    exports2.isBlob = isBlob;
-    function isNodeReadableStream(x) {
-      return Boolean(x && typeof x["pipe"] === "function");
-    }
-    function isWebReadableStream(x) {
-      return Boolean(x && typeof x.getReader === "function" && typeof x.tee === "function");
-    }
-    function isReadableStream(x) {
-      return isNodeReadableStream(x) || isWebReadableStream(x);
-    }
-    function isBlob(x) {
-      return typeof x.stream === "function";
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/file.js
-var require_file2 = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/file.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getRawContent = getRawContent;
-    exports2.createFileFromStream = createFileFromStream;
-    exports2.createFile = createFile;
-    var core_util_1 = require_commonjs3();
-    var typeGuards_js_1 = require_typeGuards2();
-    var unimplementedMethods = {
-      arrayBuffer: () => {
-        throw new Error("Not implemented");
-      },
-      bytes: () => {
-        throw new Error("Not implemented");
-      },
-      slice: () => {
-        throw new Error("Not implemented");
-      },
-      text: () => {
-        throw new Error("Not implemented");
-      }
-    };
-    var rawContent = Symbol("rawContent");
-    function hasRawContent(x) {
-      return typeof x[rawContent] === "function";
-    }
-    function getRawContent(blob) {
-      if (hasRawContent(blob)) {
-        return blob[rawContent]();
-      } else {
-        return blob.stream();
-      }
-    }
-    function createFileFromStream(stream, name, options = {}) {
-      var _a, _b, _c, _d;
-      return Object.assign(Object.assign({}, unimplementedMethods), { type: (_a = options.type) !== null && _a !== void 0 ? _a : "", lastModified: (_b = options.lastModified) !== null && _b !== void 0 ? _b : (/* @__PURE__ */ new Date()).getTime(), webkitRelativePath: (_c = options.webkitRelativePath) !== null && _c !== void 0 ? _c : "", size: (_d = options.size) !== null && _d !== void 0 ? _d : -1, name, stream: () => {
-        const s = stream();
-        if ((0, typeGuards_js_1.isNodeReadableStream)(s)) {
-          throw new Error("Not supported: a Node stream was provided as input to createFileFromStream.");
-        }
-        return s;
-      }, [rawContent]: stream });
-    }
-    function createFile(content, name, options = {}) {
-      var _a, _b, _c;
-      if (core_util_1.isNodeLike) {
-        return Object.assign(Object.assign({}, unimplementedMethods), { type: (_a = options.type) !== null && _a !== void 0 ? _a : "", lastModified: (_b = options.lastModified) !== null && _b !== void 0 ? _b : (/* @__PURE__ */ new Date()).getTime(), webkitRelativePath: (_c = options.webkitRelativePath) !== null && _c !== void 0 ? _c : "", size: content.byteLength, name, arrayBuffer: async () => content.buffer, stream: () => new Blob([content]).stream(), [rawContent]: () => content });
-      } else {
-        return new File([content], name, options);
-      }
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/concat.js
-var require_concat = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/concat.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.concat = concat;
-    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var node_stream_1 = require("node:stream");
-    var typeGuards_js_1 = require_typeGuards2();
-    var file_js_1 = require_file2();
-    function streamAsyncIterator() {
-      return tslib_1.__asyncGenerator(this, arguments, function* streamAsyncIterator_1() {
-        const reader = this.getReader();
-        try {
-          while (true) {
-            const { done, value } = yield tslib_1.__await(reader.read());
-            if (done) {
-              return yield tslib_1.__await(void 0);
-            }
-            yield yield tslib_1.__await(value);
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      });
-    }
-    function makeAsyncIterable(webStream) {
-      if (!webStream[Symbol.asyncIterator]) {
-        webStream[Symbol.asyncIterator] = streamAsyncIterator.bind(webStream);
-      }
-      if (!webStream.values) {
-        webStream.values = streamAsyncIterator.bind(webStream);
-      }
-    }
-    function ensureNodeStream(stream) {
-      if (stream instanceof ReadableStream) {
-        makeAsyncIterable(stream);
-        return node_stream_1.Readable.fromWeb(stream);
-      } else {
-        return stream;
-      }
-    }
-    function toStream(source) {
-      if (source instanceof Uint8Array) {
-        return node_stream_1.Readable.from(Buffer.from(source));
-      } else if ((0, typeGuards_js_1.isBlob)(source)) {
-        return toStream((0, file_js_1.getRawContent)(source));
-      } else {
-        return ensureNodeStream(source);
-      }
-    }
-    async function concat(sources) {
-      return function() {
-        const streams = sources.map((x) => typeof x === "function" ? x() : x).map(toStream);
-        return node_stream_1.Readable.from(function() {
-          return tslib_1.__asyncGenerator(this, arguments, function* () {
-            var _a, e_1, _b, _c;
-            for (const stream of streams) {
-              try {
-                for (var _d = true, stream_1 = (e_1 = void 0, tslib_1.__asyncValues(stream)), stream_1_1; stream_1_1 = yield tslib_1.__await(stream_1.next()), _a = stream_1_1.done, !_a; _d = true) {
-                  _c = stream_1_1.value;
-                  _d = false;
-                  const chunk = _c;
-                  yield yield tslib_1.__await(chunk);
-                }
-              } catch (e_1_1) {
-                e_1 = { error: e_1_1 };
-              } finally {
-                try {
-                  if (!_d && !_a && (_b = stream_1.return)) yield tslib_1.__await(_b.call(stream_1));
-                } finally {
-                  if (e_1) throw e_1.error;
-                }
-              }
-            }
-          });
-        }());
-      };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/multipartPolicy.js
-var require_multipartPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/multipartPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.multipartPolicyName = void 0;
-    exports2.multipartPolicy = multipartPolicy;
-    var core_util_1 = require_commonjs3();
-    var concat_js_1 = require_concat();
-    var typeGuards_js_1 = require_typeGuards2();
-    function generateBoundary() {
-      return `----AzSDKFormBoundary${(0, core_util_1.randomUUID)()}`;
-    }
-    function encodeHeaders(headers) {
-      let result2 = "";
-      for (const [key, value] of headers) {
-        result2 += `${key}: ${value}\r
-`;
-      }
-      return result2;
-    }
-    function getLength(source) {
-      if (source instanceof Uint8Array) {
-        return source.byteLength;
-      } else if ((0, typeGuards_js_1.isBlob)(source)) {
-        return source.size === -1 ? void 0 : source.size;
-      } else {
-        return void 0;
-      }
-    }
-    function getTotalLength(sources) {
-      let total = 0;
-      for (const source of sources) {
-        const partLength = getLength(source);
-        if (partLength === void 0) {
-          return void 0;
+      if (logLevelFromEnv) {
+        if (isTypeSpecRuntimeLogLevel(logLevelFromEnv)) {
+          setLogLevel(logLevelFromEnv);
         } else {
-          total += partLength;
+          console.error(`${options.logLevelEnvVarName} set to unknown log level '${logLevelFromEnv}'; logging is not enabled. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(", ")}.`);
         }
       }
-      return total;
-    }
-    async function buildRequestBody(request, parts, boundary) {
-      const sources = [
-        (0, core_util_1.stringToUint8Array)(`--${boundary}`, "utf-8"),
-        ...parts.flatMap((part) => [
-          (0, core_util_1.stringToUint8Array)("\r\n", "utf-8"),
-          (0, core_util_1.stringToUint8Array)(encodeHeaders(part.headers), "utf-8"),
-          (0, core_util_1.stringToUint8Array)("\r\n", "utf-8"),
-          part.body,
-          (0, core_util_1.stringToUint8Array)(`\r
---${boundary}`, "utf-8")
-        ]),
-        (0, core_util_1.stringToUint8Array)("--\r\n\r\n", "utf-8")
-      ];
-      const contentLength = getTotalLength(sources);
-      if (contentLength) {
-        request.headers.set("Content-Length", contentLength);
+      function shouldEnable(logger) {
+        return Boolean(logLevel && levelMap[logger.level] <= levelMap[logLevel]);
       }
-      request.body = await (0, concat_js_1.concat)(sources);
-    }
-    exports2.multipartPolicyName = "multipartPolicy";
-    var maxBoundaryLength = 70;
-    var validBoundaryCharacters = new Set(`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()+,-./:=?`);
-    function assertValidBoundary(boundary) {
-      if (boundary.length > maxBoundaryLength) {
-        throw new Error(`Multipart boundary "${boundary}" exceeds maximum length of 70 characters`);
+      function createLogger(parent, level) {
+        const logger = Object.assign(parent.extend(level), {
+          level
+        });
+        patchLogMethod(parent, logger);
+        if (shouldEnable(logger)) {
+          const enabledNamespaces = debug_js_1.default.disable();
+          debug_js_1.default.enable(enabledNamespaces + "," + logger.namespace);
+        }
+        registeredLoggers.add(logger);
+        return logger;
       }
-      if (Array.from(boundary).some((x) => !validBoundaryCharacters.has(x))) {
-        throw new Error(`Multipart boundary "${boundary}" contains invalid characters`);
-      }
-    }
-    function multipartPolicy() {
       return {
-        name: exports2.multipartPolicyName,
-        async sendRequest(request, next) {
-          var _a;
-          if (!request.multipartBody) {
-            return next(request);
+        setLogLevel(level) {
+          if (level && !isTypeSpecRuntimeLogLevel(level)) {
+            throw new Error(`Unknown log level '${level}'. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(",")}`);
           }
-          if (request.body) {
-            throw new Error("multipartBody and regular body cannot be set at the same time");
+          logLevel = level;
+          const enabledNamespaces = [];
+          for (const logger of registeredLoggers) {
+            if (shouldEnable(logger)) {
+              enabledNamespaces.push(logger.namespace);
+            }
           }
-          let boundary = request.multipartBody.boundary;
-          const contentTypeHeader = (_a = request.headers.get("Content-Type")) !== null && _a !== void 0 ? _a : "multipart/mixed";
-          const parsedHeader = contentTypeHeader.match(/^(multipart\/[^ ;]+)(?:; *boundary=(.+))?$/);
-          if (!parsedHeader) {
-            throw new Error(`Got multipart request body, but content-type header was not multipart: ${contentTypeHeader}`);
-          }
-          const [, contentType, parsedBoundary] = parsedHeader;
-          if (parsedBoundary && boundary && parsedBoundary !== boundary) {
-            throw new Error(`Multipart boundary was specified as ${parsedBoundary} in the header, but got ${boundary} in the request body`);
-          }
-          boundary !== null && boundary !== void 0 ? boundary : boundary = parsedBoundary;
-          if (boundary) {
-            assertValidBoundary(boundary);
-          } else {
-            boundary = generateBoundary();
-          }
-          request.headers.set("Content-Type", `${contentType}; boundary=${boundary}`);
-          await buildRequestBody(request, request.multipartBody.parts, boundary);
-          request.multipartBody = void 0;
-          return next(request);
-        }
-      };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/decompressResponsePolicy.js
-var require_decompressResponsePolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/decompressResponsePolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.decompressResponsePolicyName = void 0;
-    exports2.decompressResponsePolicy = decompressResponsePolicy;
-    exports2.decompressResponsePolicyName = "decompressResponsePolicy";
-    function decompressResponsePolicy() {
-      return {
-        name: exports2.decompressResponsePolicyName,
-        async sendRequest(request, next) {
-          if (request.method !== "HEAD") {
-            request.headers.set("Accept-Encoding", "gzip,deflate");
-          }
-          return next(request);
-        }
-      };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/helpers.js
-var require_helpers = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/helpers.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.delay = delay;
-    exports2.parseHeaderValueAsNumber = parseHeaderValueAsNumber;
-    var abort_controller_1 = require_commonjs2();
-    var StandardAbortMessage = "The operation was aborted.";
-    function delay(delayInMs, value, options) {
-      return new Promise((resolve, reject) => {
-        let timer = void 0;
-        let onAborted = void 0;
-        const rejectOnAbort = () => {
-          return reject(new abort_controller_1.AbortError((options === null || options === void 0 ? void 0 : options.abortErrorMsg) ? options === null || options === void 0 ? void 0 : options.abortErrorMsg : StandardAbortMessage));
-        };
-        const removeListeners = () => {
-          if ((options === null || options === void 0 ? void 0 : options.abortSignal) && onAborted) {
-            options.abortSignal.removeEventListener("abort", onAborted);
-          }
-        };
-        onAborted = () => {
-          if (timer) {
-            clearTimeout(timer);
-          }
-          removeListeners();
-          return rejectOnAbort();
-        };
-        if ((options === null || options === void 0 ? void 0 : options.abortSignal) && options.abortSignal.aborted) {
-          return rejectOnAbort();
-        }
-        timer = setTimeout(() => {
-          removeListeners();
-          resolve(value);
-        }, delayInMs);
-        if (options === null || options === void 0 ? void 0 : options.abortSignal) {
-          options.abortSignal.addEventListener("abort", onAborted);
-        }
-      });
-    }
-    function parseHeaderValueAsNumber(response, headerName) {
-      const value = response.headers.get(headerName);
-      if (!value)
-        return;
-      const valueAsNum = Number(value);
-      if (Number.isNaN(valueAsNum))
-        return;
-      return valueAsNum;
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/retryStrategies/throttlingRetryStrategy.js
-var require_throttlingRetryStrategy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/retryStrategies/throttlingRetryStrategy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isThrottlingRetryResponse = isThrottlingRetryResponse;
-    exports2.throttlingRetryStrategy = throttlingRetryStrategy;
-    var helpers_js_1 = require_helpers();
-    var RetryAfterHeader = "Retry-After";
-    var AllRetryAfterHeaders = ["retry-after-ms", "x-ms-retry-after-ms", RetryAfterHeader];
-    function getRetryAfterInMs(response) {
-      if (!(response && [429, 503].includes(response.status)))
-        return void 0;
-      try {
-        for (const header of AllRetryAfterHeaders) {
-          const retryAfterValue = (0, helpers_js_1.parseHeaderValueAsNumber)(response, header);
-          if (retryAfterValue === 0 || retryAfterValue) {
-            const multiplyingFactor = header === RetryAfterHeader ? 1e3 : 1;
-            return retryAfterValue * multiplyingFactor;
-          }
-        }
-        const retryAfterHeader = response.headers.get(RetryAfterHeader);
-        if (!retryAfterHeader)
-          return;
-        const date = Date.parse(retryAfterHeader);
-        const diff = date - Date.now();
-        return Number.isFinite(diff) ? Math.max(0, diff) : void 0;
-      } catch (_a) {
-        return void 0;
-      }
-    }
-    function isThrottlingRetryResponse(response) {
-      return Number.isFinite(getRetryAfterInMs(response));
-    }
-    function throttlingRetryStrategy() {
-      return {
-        name: "throttlingRetryStrategy",
-        retry({ response }) {
-          const retryAfterInMs = getRetryAfterInMs(response);
-          if (!Number.isFinite(retryAfterInMs)) {
-            return { skipStrategy: true };
-          }
+          debug_js_1.default.enable(enabledNamespaces.join(","));
+        },
+        getLogLevel() {
+          return logLevel;
+        },
+        createClientLogger(namespace) {
+          const clientRootLogger = clientLogger.extend(namespace);
+          patchLogMethod(clientLogger, clientRootLogger);
           return {
-            retryAfterInMs
+            error: createLogger(clientRootLogger, "error"),
+            warning: createLogger(clientRootLogger, "warning"),
+            info: createLogger(clientRootLogger, "info"),
+            verbose: createLogger(clientRootLogger, "verbose")
           };
-        }
+        },
+        logger: clientLogger
       };
+    }
+    var context3 = createLoggerContext({
+      logLevelEnvVarName: "TYPESPEC_RUNTIME_LOG_LEVEL",
+      namespace: "typeSpecRuntime"
+    });
+    exports2.TypeSpecRuntimeLogger = context3.logger;
+    function setLogLevel(logLevel) {
+      context3.setLogLevel(logLevel);
+    }
+    function getLogLevel() {
+      return context3.getLogLevel();
+    }
+    function createClientLogger(namespace) {
+      return context3.createClientLogger(namespace);
     }
   }
 });
 
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/retryStrategies/exponentialRetryStrategy.js
-var require_exponentialRetryStrategy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/retryStrategies/exponentialRetryStrategy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.exponentialRetryStrategy = exponentialRetryStrategy;
-    exports2.isExponentialRetryResponse = isExponentialRetryResponse;
-    exports2.isSystemError = isSystemError;
-    var core_util_1 = require_commonjs3();
-    var throttlingRetryStrategy_js_1 = require_throttlingRetryStrategy();
-    var DEFAULT_CLIENT_RETRY_INTERVAL = 1e3;
-    var DEFAULT_CLIENT_MAX_RETRY_INTERVAL = 1e3 * 64;
-    function exponentialRetryStrategy(options = {}) {
-      var _a, _b;
-      const retryInterval = (_a = options.retryDelayInMs) !== null && _a !== void 0 ? _a : DEFAULT_CLIENT_RETRY_INTERVAL;
-      const maxRetryInterval = (_b = options.maxRetryDelayInMs) !== null && _b !== void 0 ? _b : DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
-      return {
-        name: "exponentialRetryStrategy",
-        retry({ retryCount, response, responseError }) {
-          const matchedSystemError = isSystemError(responseError);
-          const ignoreSystemErrors = matchedSystemError && options.ignoreSystemErrors;
-          const isExponential = isExponentialRetryResponse(response);
-          const ignoreExponentialResponse = isExponential && options.ignoreHttpStatusCodes;
-          const unknownResponse = response && ((0, throttlingRetryStrategy_js_1.isThrottlingRetryResponse)(response) || !isExponential);
-          if (unknownResponse || ignoreExponentialResponse || ignoreSystemErrors) {
-            return { skipStrategy: true };
-          }
-          if (responseError && !matchedSystemError && !isExponential) {
-            return { errorToThrow: responseError };
-          }
-          return (0, core_util_1.calculateRetryDelay)(retryCount, {
-            retryDelayInMs: retryInterval,
-            maxRetryDelayInMs: maxRetryInterval
-          });
-        }
-      };
-    }
-    function isExponentialRetryResponse(response) {
-      return Boolean(response && response.status !== void 0 && (response.status >= 500 || response.status === 408) && response.status !== 501 && response.status !== 505);
-    }
-    function isSystemError(err) {
-      if (!err) {
-        return false;
-      }
-      return err.code === "ETIMEDOUT" || err.code === "ESOCKETTIMEDOUT" || err.code === "ECONNREFUSED" || err.code === "ECONNRESET" || err.code === "ENOENT" || err.code === "ENOTFOUND";
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/retryPolicy.js
-var require_retryPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/retryPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.retryPolicy = retryPolicy;
-    var helpers_js_1 = require_helpers();
-    var logger_1 = require_commonjs();
-    var abort_controller_1 = require_commonjs2();
-    var constants_js_1 = require_constants7();
-    var retryPolicyLogger = (0, logger_1.createClientLogger)("core-rest-pipeline retryPolicy");
-    var retryPolicyName = "retryPolicy";
-    function retryPolicy(strategies, options = { maxRetries: constants_js_1.DEFAULT_RETRY_POLICY_COUNT }) {
-      const logger = options.logger || retryPolicyLogger;
-      return {
-        name: retryPolicyName,
-        async sendRequest(request, next) {
-          var _a, _b;
-          let response;
-          let responseError;
-          let retryCount = -1;
-          retryRequest: while (true) {
-            retryCount += 1;
-            response = void 0;
-            responseError = void 0;
-            try {
-              logger.info(`Retry ${retryCount}: Attempting to send request`, request.requestId);
-              response = await next(request);
-              logger.info(`Retry ${retryCount}: Received a response from request`, request.requestId);
-            } catch (e) {
-              logger.error(`Retry ${retryCount}: Received an error from request`, request.requestId);
-              responseError = e;
-              if (!e || responseError.name !== "RestError") {
-                throw e;
-              }
-              response = responseError.response;
-            }
-            if ((_a = request.abortSignal) === null || _a === void 0 ? void 0 : _a.aborted) {
-              logger.error(`Retry ${retryCount}: Request aborted.`);
-              const abortError = new abort_controller_1.AbortError();
-              throw abortError;
-            }
-            if (retryCount >= ((_b = options.maxRetries) !== null && _b !== void 0 ? _b : constants_js_1.DEFAULT_RETRY_POLICY_COUNT)) {
-              logger.info(`Retry ${retryCount}: Maximum retries reached. Returning the last received response, or throwing the last received error.`);
-              if (responseError) {
-                throw responseError;
-              } else if (response) {
-                return response;
-              } else {
-                throw new Error("Maximum retries reached with no response or error to throw");
-              }
-            }
-            logger.info(`Retry ${retryCount}: Processing ${strategies.length} retry strategies.`);
-            strategiesLoop: for (const strategy of strategies) {
-              const strategyLogger = strategy.logger || retryPolicyLogger;
-              strategyLogger.info(`Retry ${retryCount}: Processing retry strategy ${strategy.name}.`);
-              const modifiers = strategy.retry({
-                retryCount,
-                response,
-                responseError
-              });
-              if (modifiers.skipStrategy) {
-                strategyLogger.info(`Retry ${retryCount}: Skipped.`);
-                continue strategiesLoop;
-              }
-              const { errorToThrow, retryAfterInMs, redirectTo } = modifiers;
-              if (errorToThrow) {
-                strategyLogger.error(`Retry ${retryCount}: Retry strategy ${strategy.name} throws error:`, errorToThrow);
-                throw errorToThrow;
-              }
-              if (retryAfterInMs || retryAfterInMs === 0) {
-                strategyLogger.info(`Retry ${retryCount}: Retry strategy ${strategy.name} retries after ${retryAfterInMs}`);
-                await (0, helpers_js_1.delay)(retryAfterInMs, void 0, { abortSignal: request.abortSignal });
-                continue retryRequest;
-              }
-              if (redirectTo) {
-                strategyLogger.info(`Retry ${retryCount}: Retry strategy ${strategy.name} redirects to ${redirectTo}`);
-                request.url = redirectTo;
-                continue retryRequest;
-              }
-            }
-            if (responseError) {
-              logger.info(`None of the retry strategies could work with the received error. Throwing it.`);
-              throw responseError;
-            }
-            if (response) {
-              logger.info(`None of the retry strategies could work with the received response. Returning it.`);
-              return response;
-            }
-          }
-        }
-      };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/defaultRetryPolicy.js
-var require_defaultRetryPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/defaultRetryPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.defaultRetryPolicyName = void 0;
-    exports2.defaultRetryPolicy = defaultRetryPolicy;
-    var exponentialRetryStrategy_js_1 = require_exponentialRetryStrategy();
-    var throttlingRetryStrategy_js_1 = require_throttlingRetryStrategy();
-    var retryPolicy_js_1 = require_retryPolicy();
-    var constants_js_1 = require_constants7();
-    exports2.defaultRetryPolicyName = "defaultRetryPolicy";
-    function defaultRetryPolicy(options = {}) {
-      var _a;
-      return {
-        name: exports2.defaultRetryPolicyName,
-        sendRequest: (0, retryPolicy_js_1.retryPolicy)([(0, throttlingRetryStrategy_js_1.throttlingRetryStrategy)(), (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(options)], {
-          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
-        }).sendRequest
-      };
-    }
-  }
-});
-
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/httpHeaders.js
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/httpHeaders.js
 var require_httpHeaders = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/httpHeaders.js"(exports2) {
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/httpHeaders.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createHttpHeaders = createHttpHeaders;
@@ -25191,14 +23789,1352 @@ var require_httpHeaders = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/formDataPolicy.js
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/schemes.js
+var require_schemes = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/schemes.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/oauth2Flows.js
+var require_oauth2Flows = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/oauth2Flows.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/uuidUtils.js
+var require_uuidUtils = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/uuidUtils.js"(exports2) {
+    "use strict";
+    var _a;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.randomUUID = randomUUID;
+    var node_crypto_1 = require("node:crypto");
+    var uuidFunction = typeof ((_a = globalThis === null || globalThis === void 0 ? void 0 : globalThis.crypto) === null || _a === void 0 ? void 0 : _a.randomUUID) === "function" ? globalThis.crypto.randomUUID.bind(globalThis.crypto) : node_crypto_1.randomUUID;
+    function randomUUID() {
+      return uuidFunction();
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/pipelineRequest.js
+var require_pipelineRequest = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/pipelineRequest.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createPipelineRequest = createPipelineRequest;
+    var httpHeaders_js_1 = require_httpHeaders();
+    var uuidUtils_js_1 = require_uuidUtils();
+    var PipelineRequestImpl = class {
+      constructor(options) {
+        var _a, _b, _c, _d, _e, _f, _g;
+        this.url = options.url;
+        this.body = options.body;
+        this.headers = (_a = options.headers) !== null && _a !== void 0 ? _a : (0, httpHeaders_js_1.createHttpHeaders)();
+        this.method = (_b = options.method) !== null && _b !== void 0 ? _b : "GET";
+        this.timeout = (_c = options.timeout) !== null && _c !== void 0 ? _c : 0;
+        this.multipartBody = options.multipartBody;
+        this.formData = options.formData;
+        this.disableKeepAlive = (_d = options.disableKeepAlive) !== null && _d !== void 0 ? _d : false;
+        this.proxySettings = options.proxySettings;
+        this.streamResponseStatusCodes = options.streamResponseStatusCodes;
+        this.withCredentials = (_e = options.withCredentials) !== null && _e !== void 0 ? _e : false;
+        this.abortSignal = options.abortSignal;
+        this.onUploadProgress = options.onUploadProgress;
+        this.onDownloadProgress = options.onDownloadProgress;
+        this.requestId = options.requestId || (0, uuidUtils_js_1.randomUUID)();
+        this.allowInsecureConnection = (_f = options.allowInsecureConnection) !== null && _f !== void 0 ? _f : false;
+        this.enableBrowserStreams = (_g = options.enableBrowserStreams) !== null && _g !== void 0 ? _g : false;
+        this.requestOverrides = options.requestOverrides;
+      }
+    };
+    function createPipelineRequest(options) {
+      return new PipelineRequestImpl(options);
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/pipeline.js
+var require_pipeline = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/pipeline.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createEmptyPipeline = createEmptyPipeline;
+    var ValidPhaseNames = /* @__PURE__ */ new Set(["Deserialize", "Serialize", "Retry", "Sign"]);
+    var HttpPipeline = class _HttpPipeline {
+      constructor(policies) {
+        var _a;
+        this._policies = [];
+        this._policies = (_a = policies === null || policies === void 0 ? void 0 : policies.slice(0)) !== null && _a !== void 0 ? _a : [];
+        this._orderedPolicies = void 0;
+      }
+      addPolicy(policy, options = {}) {
+        if (options.phase && options.afterPhase) {
+          throw new Error("Policies inside a phase cannot specify afterPhase.");
+        }
+        if (options.phase && !ValidPhaseNames.has(options.phase)) {
+          throw new Error(`Invalid phase name: ${options.phase}`);
+        }
+        if (options.afterPhase && !ValidPhaseNames.has(options.afterPhase)) {
+          throw new Error(`Invalid afterPhase name: ${options.afterPhase}`);
+        }
+        this._policies.push({
+          policy,
+          options
+        });
+        this._orderedPolicies = void 0;
+      }
+      removePolicy(options) {
+        const removedPolicies = [];
+        this._policies = this._policies.filter((policyDescriptor) => {
+          if (options.name && policyDescriptor.policy.name === options.name || options.phase && policyDescriptor.options.phase === options.phase) {
+            removedPolicies.push(policyDescriptor.policy);
+            return false;
+          } else {
+            return true;
+          }
+        });
+        this._orderedPolicies = void 0;
+        return removedPolicies;
+      }
+      sendRequest(httpClient, request) {
+        const policies = this.getOrderedPolicies();
+        const pipeline = policies.reduceRight((next, policy) => {
+          return (req) => {
+            return policy.sendRequest(req, next);
+          };
+        }, (req) => httpClient.sendRequest(req));
+        return pipeline(request);
+      }
+      getOrderedPolicies() {
+        if (!this._orderedPolicies) {
+          this._orderedPolicies = this.orderPolicies();
+        }
+        return this._orderedPolicies;
+      }
+      clone() {
+        return new _HttpPipeline(this._policies);
+      }
+      static create() {
+        return new _HttpPipeline();
+      }
+      orderPolicies() {
+        const result2 = [];
+        const policyMap = /* @__PURE__ */ new Map();
+        function createPhase(name) {
+          return {
+            name,
+            policies: /* @__PURE__ */ new Set(),
+            hasRun: false,
+            hasAfterPolicies: false
+          };
+        }
+        const serializePhase = createPhase("Serialize");
+        const noPhase = createPhase("None");
+        const deserializePhase = createPhase("Deserialize");
+        const retryPhase = createPhase("Retry");
+        const signPhase = createPhase("Sign");
+        const orderedPhases = [serializePhase, noPhase, deserializePhase, retryPhase, signPhase];
+        function getPhase(phase) {
+          if (phase === "Retry") {
+            return retryPhase;
+          } else if (phase === "Serialize") {
+            return serializePhase;
+          } else if (phase === "Deserialize") {
+            return deserializePhase;
+          } else if (phase === "Sign") {
+            return signPhase;
+          } else {
+            return noPhase;
+          }
+        }
+        for (const descriptor of this._policies) {
+          const policy = descriptor.policy;
+          const options = descriptor.options;
+          const policyName = policy.name;
+          if (policyMap.has(policyName)) {
+            throw new Error("Duplicate policy names not allowed in pipeline");
+          }
+          const node = {
+            policy,
+            dependsOn: /* @__PURE__ */ new Set(),
+            dependants: /* @__PURE__ */ new Set()
+          };
+          if (options.afterPhase) {
+            node.afterPhase = getPhase(options.afterPhase);
+            node.afterPhase.hasAfterPolicies = true;
+          }
+          policyMap.set(policyName, node);
+          const phase = getPhase(options.phase);
+          phase.policies.add(node);
+        }
+        for (const descriptor of this._policies) {
+          const { policy, options } = descriptor;
+          const policyName = policy.name;
+          const node = policyMap.get(policyName);
+          if (!node) {
+            throw new Error(`Missing node for policy ${policyName}`);
+          }
+          if (options.afterPolicies) {
+            for (const afterPolicyName of options.afterPolicies) {
+              const afterNode = policyMap.get(afterPolicyName);
+              if (afterNode) {
+                node.dependsOn.add(afterNode);
+                afterNode.dependants.add(node);
+              }
+            }
+          }
+          if (options.beforePolicies) {
+            for (const beforePolicyName of options.beforePolicies) {
+              const beforeNode = policyMap.get(beforePolicyName);
+              if (beforeNode) {
+                beforeNode.dependsOn.add(node);
+                node.dependants.add(beforeNode);
+              }
+            }
+          }
+        }
+        function walkPhase(phase) {
+          phase.hasRun = true;
+          for (const node of phase.policies) {
+            if (node.afterPhase && (!node.afterPhase.hasRun || node.afterPhase.policies.size)) {
+              continue;
+            }
+            if (node.dependsOn.size === 0) {
+              result2.push(node.policy);
+              for (const dependant of node.dependants) {
+                dependant.dependsOn.delete(node);
+              }
+              policyMap.delete(node.policy.name);
+              phase.policies.delete(node);
+            }
+          }
+        }
+        function walkPhases() {
+          for (const phase of orderedPhases) {
+            walkPhase(phase);
+            if (phase.policies.size > 0 && phase !== noPhase) {
+              if (!noPhase.hasRun) {
+                walkPhase(noPhase);
+              }
+              return;
+            }
+            if (phase.hasAfterPolicies) {
+              walkPhase(noPhase);
+            }
+          }
+        }
+        let iteration = 0;
+        while (policyMap.size > 0) {
+          iteration++;
+          const initialResultLength = result2.length;
+          walkPhases();
+          if (result2.length <= initialResultLength && iteration > 1) {
+            throw new Error("Cannot satisfy policy dependencies due to requirements cycle.");
+          }
+        }
+        return result2;
+      }
+    };
+    function createEmptyPipeline() {
+      return HttpPipeline.create();
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/object.js
+var require_object = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/object.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isObject = isObject;
+    function isObject(input) {
+      return typeof input === "object" && input !== null && !Array.isArray(input) && !(input instanceof RegExp) && !(input instanceof Date);
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/error.js
+var require_error = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/error.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isError = isError;
+    var object_js_1 = require_object();
+    function isError(e) {
+      if ((0, object_js_1.isObject)(e)) {
+        const hasName = typeof e.name === "string";
+        const hasMessage = typeof e.message === "string";
+        return hasName && hasMessage;
+      }
+      return false;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/inspect.js
+var require_inspect = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/inspect.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.custom = void 0;
+    var node_util_1 = require("node:util");
+    exports2.custom = node_util_1.inspect.custom;
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/sanitizer.js
+var require_sanitizer = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/sanitizer.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.Sanitizer = void 0;
+    var object_js_1 = require_object();
+    var RedactedString = "REDACTED";
+    var defaultAllowedHeaderNames = [
+      "x-ms-client-request-id",
+      "x-ms-return-client-request-id",
+      "x-ms-useragent",
+      "x-ms-correlation-request-id",
+      "x-ms-request-id",
+      "client-request-id",
+      "ms-cv",
+      "return-client-request-id",
+      "traceparent",
+      "Access-Control-Allow-Credentials",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Expose-Headers",
+      "Access-Control-Max-Age",
+      "Access-Control-Request-Headers",
+      "Access-Control-Request-Method",
+      "Origin",
+      "Accept",
+      "Accept-Encoding",
+      "Cache-Control",
+      "Connection",
+      "Content-Length",
+      "Content-Type",
+      "Date",
+      "ETag",
+      "Expires",
+      "If-Match",
+      "If-Modified-Since",
+      "If-None-Match",
+      "If-Unmodified-Since",
+      "Last-Modified",
+      "Pragma",
+      "Request-Id",
+      "Retry-After",
+      "Server",
+      "Transfer-Encoding",
+      "User-Agent",
+      "WWW-Authenticate"
+    ];
+    var defaultAllowedQueryParameters = ["api-version"];
+    var Sanitizer = class {
+      constructor({ additionalAllowedHeaderNames: allowedHeaderNames = [], additionalAllowedQueryParameters: allowedQueryParameters = [] } = {}) {
+        allowedHeaderNames = defaultAllowedHeaderNames.concat(allowedHeaderNames);
+        allowedQueryParameters = defaultAllowedQueryParameters.concat(allowedQueryParameters);
+        this.allowedHeaderNames = new Set(allowedHeaderNames.map((n) => n.toLowerCase()));
+        this.allowedQueryParameters = new Set(allowedQueryParameters.map((p) => p.toLowerCase()));
+      }
+      /**
+       * Sanitizes an object for logging.
+       * @param obj - The object to sanitize
+       * @returns - The sanitized object as a string
+       */
+      sanitize(obj) {
+        const seen = /* @__PURE__ */ new Set();
+        return JSON.stringify(obj, (key, value) => {
+          if (value instanceof Error) {
+            return Object.assign(Object.assign({}, value), { name: value.name, message: value.message });
+          }
+          if (key === "headers") {
+            return this.sanitizeHeaders(value);
+          } else if (key === "url") {
+            return this.sanitizeUrl(value);
+          } else if (key === "query") {
+            return this.sanitizeQuery(value);
+          } else if (key === "body") {
+            return void 0;
+          } else if (key === "response") {
+            return void 0;
+          } else if (key === "operationSpec") {
+            return void 0;
+          } else if (Array.isArray(value) || (0, object_js_1.isObject)(value)) {
+            if (seen.has(value)) {
+              return "[Circular]";
+            }
+            seen.add(value);
+          }
+          return value;
+        }, 2);
+      }
+      /**
+       * Sanitizes a URL for logging.
+       * @param value - The URL to sanitize
+       * @returns - The sanitized URL as a string
+       */
+      sanitizeUrl(value) {
+        if (typeof value !== "string" || value === null || value === "") {
+          return value;
+        }
+        const url = new URL(value);
+        if (!url.search) {
+          return value;
+        }
+        for (const [key] of url.searchParams) {
+          if (!this.allowedQueryParameters.has(key.toLowerCase())) {
+            url.searchParams.set(key, RedactedString);
+          }
+        }
+        return url.toString();
+      }
+      sanitizeHeaders(obj) {
+        const sanitized = {};
+        for (const key of Object.keys(obj)) {
+          if (this.allowedHeaderNames.has(key.toLowerCase())) {
+            sanitized[key] = obj[key];
+          } else {
+            sanitized[key] = RedactedString;
+          }
+        }
+        return sanitized;
+      }
+      sanitizeQuery(value) {
+        if (typeof value !== "object" || value === null) {
+          return value;
+        }
+        const sanitized = {};
+        for (const k of Object.keys(value)) {
+          if (this.allowedQueryParameters.has(k.toLowerCase())) {
+            sanitized[k] = value[k];
+          } else {
+            sanitized[k] = RedactedString;
+          }
+        }
+        return sanitized;
+      }
+    };
+    exports2.Sanitizer = Sanitizer;
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/restError.js
+var require_restError = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/restError.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.RestError = void 0;
+    exports2.isRestError = isRestError;
+    var error_js_1 = require_error();
+    var inspect_js_1 = require_inspect();
+    var sanitizer_js_1 = require_sanitizer();
+    var errorSanitizer = new sanitizer_js_1.Sanitizer();
+    var RestError = class _RestError extends Error {
+      constructor(message, options = {}) {
+        super(message);
+        this.name = "RestError";
+        this.code = options.code;
+        this.statusCode = options.statusCode;
+        Object.defineProperty(this, "request", { value: options.request, enumerable: false });
+        Object.defineProperty(this, "response", { value: options.response, enumerable: false });
+        Object.defineProperty(this, inspect_js_1.custom, {
+          value: () => {
+            return `RestError: ${this.message} 
+ ${errorSanitizer.sanitize(Object.assign(Object.assign({}, this), { request: this.request, response: this.response }))}`;
+          },
+          enumerable: false
+        });
+        Object.setPrototypeOf(this, _RestError.prototype);
+      }
+    };
+    exports2.RestError = RestError;
+    RestError.REQUEST_SEND_ERROR = "REQUEST_SEND_ERROR";
+    RestError.PARSE_ERROR = "PARSE_ERROR";
+    function isRestError(e) {
+      if (e instanceof RestError) {
+        return true;
+      }
+      return (0, error_js_1.isError)(e) && e.name === "RestError";
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/bytesEncoding.js
+var require_bytesEncoding = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/bytesEncoding.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.uint8ArrayToString = uint8ArrayToString;
+    exports2.stringToUint8Array = stringToUint8Array;
+    function uint8ArrayToString(bytes, format) {
+      return Buffer.from(bytes).toString(format);
+    }
+    function stringToUint8Array(value, format) {
+      return Buffer.from(value, format);
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/log.js
+var require_log2 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/log.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.logger = void 0;
+    var logger_js_1 = require_logger();
+    exports2.logger = (0, logger_js_1.createClientLogger)("ts-http-runtime");
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/nodeHttpClient.js
+var require_nodeHttpClient = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/nodeHttpClient.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getBodyLength = getBodyLength;
+    exports2.createNodeHttpClient = createNodeHttpClient;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var http = tslib_1.__importStar(require("node:http"));
+    var https = tslib_1.__importStar(require("node:https"));
+    var zlib = tslib_1.__importStar(require("node:zlib"));
+    var node_stream_1 = require("node:stream");
+    var AbortError_js_1 = require_AbortError();
+    var httpHeaders_js_1 = require_httpHeaders();
+    var restError_js_1 = require_restError();
+    var log_js_1 = require_log2();
+    var sanitizer_js_1 = require_sanitizer();
+    var DEFAULT_TLS_SETTINGS = {};
+    function isReadableStream(body) {
+      return body && typeof body.pipe === "function";
+    }
+    function isStreamComplete(stream) {
+      if (stream.readable === false) {
+        return Promise.resolve();
+      }
+      return new Promise((resolve) => {
+        const handler = () => {
+          resolve();
+          stream.removeListener("close", handler);
+          stream.removeListener("end", handler);
+          stream.removeListener("error", handler);
+        };
+        stream.on("close", handler);
+        stream.on("end", handler);
+        stream.on("error", handler);
+      });
+    }
+    function isArrayBuffer(body) {
+      return body && typeof body.byteLength === "number";
+    }
+    var ReportTransform = class extends node_stream_1.Transform {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+      _transform(chunk, _encoding, callback) {
+        this.push(chunk);
+        this.loadedBytes += chunk.length;
+        try {
+          this.progressCallback({ loadedBytes: this.loadedBytes });
+          callback();
+        } catch (e) {
+          callback(e);
+        }
+      }
+      constructor(progressCallback) {
+        super();
+        this.loadedBytes = 0;
+        this.progressCallback = progressCallback;
+      }
+    };
+    var NodeHttpClient = class {
+      constructor() {
+        this.cachedHttpsAgents = /* @__PURE__ */ new WeakMap();
+      }
+      /**
+       * Makes a request over an underlying transport layer and returns the response.
+       * @param request - The request to be made.
+       */
+      async sendRequest(request) {
+        var _a, _b, _c;
+        const abortController = new AbortController();
+        let abortListener;
+        if (request.abortSignal) {
+          if (request.abortSignal.aborted) {
+            throw new AbortError_js_1.AbortError("The operation was aborted. Request has already been canceled.");
+          }
+          abortListener = (event) => {
+            if (event.type === "abort") {
+              abortController.abort();
+            }
+          };
+          request.abortSignal.addEventListener("abort", abortListener);
+        }
+        let timeoutId;
+        if (request.timeout > 0) {
+          timeoutId = setTimeout(() => {
+            const sanitizer = new sanitizer_js_1.Sanitizer();
+            log_js_1.logger.info(`request to '${sanitizer.sanitizeUrl(request.url)}' timed out. canceling...`);
+            abortController.abort();
+          }, request.timeout);
+        }
+        const acceptEncoding = request.headers.get("Accept-Encoding");
+        const shouldDecompress = (acceptEncoding === null || acceptEncoding === void 0 ? void 0 : acceptEncoding.includes("gzip")) || (acceptEncoding === null || acceptEncoding === void 0 ? void 0 : acceptEncoding.includes("deflate"));
+        let body = typeof request.body === "function" ? request.body() : request.body;
+        if (body && !request.headers.has("Content-Length")) {
+          const bodyLength = getBodyLength(body);
+          if (bodyLength !== null) {
+            request.headers.set("Content-Length", bodyLength);
+          }
+        }
+        let responseStream;
+        try {
+          if (body && request.onUploadProgress) {
+            const onUploadProgress = request.onUploadProgress;
+            const uploadReportStream = new ReportTransform(onUploadProgress);
+            uploadReportStream.on("error", (e) => {
+              log_js_1.logger.error("Error in upload progress", e);
+            });
+            if (isReadableStream(body)) {
+              body.pipe(uploadReportStream);
+            } else {
+              uploadReportStream.end(body);
+            }
+            body = uploadReportStream;
+          }
+          const res = await this.makeRequest(request, abortController, body);
+          if (timeoutId !== void 0) {
+            clearTimeout(timeoutId);
+          }
+          const headers = getResponseHeaders(res);
+          const status = (_a = res.statusCode) !== null && _a !== void 0 ? _a : 0;
+          const response = {
+            status,
+            headers,
+            request
+          };
+          if (request.method === "HEAD") {
+            res.resume();
+            return response;
+          }
+          responseStream = shouldDecompress ? getDecodedResponseStream(res, headers) : res;
+          const onDownloadProgress = request.onDownloadProgress;
+          if (onDownloadProgress) {
+            const downloadReportStream = new ReportTransform(onDownloadProgress);
+            downloadReportStream.on("error", (e) => {
+              log_js_1.logger.error("Error in download progress", e);
+            });
+            responseStream.pipe(downloadReportStream);
+            responseStream = downloadReportStream;
+          }
+          if (
+            // Value of POSITIVE_INFINITY in streamResponseStatusCodes is considered as any status code
+            ((_b = request.streamResponseStatusCodes) === null || _b === void 0 ? void 0 : _b.has(Number.POSITIVE_INFINITY)) || ((_c = request.streamResponseStatusCodes) === null || _c === void 0 ? void 0 : _c.has(response.status))
+          ) {
+            response.readableStreamBody = responseStream;
+          } else {
+            response.bodyAsText = await streamToText(responseStream);
+          }
+          return response;
+        } finally {
+          if (request.abortSignal && abortListener) {
+            let uploadStreamDone = Promise.resolve();
+            if (isReadableStream(body)) {
+              uploadStreamDone = isStreamComplete(body);
+            }
+            let downloadStreamDone = Promise.resolve();
+            if (isReadableStream(responseStream)) {
+              downloadStreamDone = isStreamComplete(responseStream);
+            }
+            Promise.all([uploadStreamDone, downloadStreamDone]).then(() => {
+              var _a2;
+              if (abortListener) {
+                (_a2 = request.abortSignal) === null || _a2 === void 0 ? void 0 : _a2.removeEventListener("abort", abortListener);
+              }
+            }).catch((e) => {
+              log_js_1.logger.warning("Error when cleaning up abortListener on httpRequest", e);
+            });
+          }
+        }
+      }
+      makeRequest(request, abortController, body) {
+        var _a;
+        const url = new URL(request.url);
+        const isInsecure = url.protocol !== "https:";
+        if (isInsecure && !request.allowInsecureConnection) {
+          throw new Error(`Cannot connect to ${request.url} while allowInsecureConnection is false.`);
+        }
+        const agent = (_a = request.agent) !== null && _a !== void 0 ? _a : this.getOrCreateAgent(request, isInsecure);
+        const options = Object.assign({ agent, hostname: url.hostname, path: `${url.pathname}${url.search}`, port: url.port, method: request.method, headers: request.headers.toJSON({ preserveCase: true }) }, request.requestOverrides);
+        return new Promise((resolve, reject) => {
+          const req = isInsecure ? http.request(options, resolve) : https.request(options, resolve);
+          req.once("error", (err) => {
+            var _a2;
+            reject(new restError_js_1.RestError(err.message, { code: (_a2 = err.code) !== null && _a2 !== void 0 ? _a2 : restError_js_1.RestError.REQUEST_SEND_ERROR, request }));
+          });
+          abortController.signal.addEventListener("abort", () => {
+            const abortError = new AbortError_js_1.AbortError("The operation was aborted. Rejecting from abort signal callback while making request.");
+            req.destroy(abortError);
+            reject(abortError);
+          });
+          if (body && isReadableStream(body)) {
+            body.pipe(req);
+          } else if (body) {
+            if (typeof body === "string" || Buffer.isBuffer(body)) {
+              req.end(body);
+            } else if (isArrayBuffer(body)) {
+              req.end(ArrayBuffer.isView(body) ? Buffer.from(body.buffer) : Buffer.from(body));
+            } else {
+              log_js_1.logger.error("Unrecognized body type", body);
+              reject(new restError_js_1.RestError("Unrecognized body type"));
+            }
+          } else {
+            req.end();
+          }
+        });
+      }
+      getOrCreateAgent(request, isInsecure) {
+        var _a;
+        const disableKeepAlive = request.disableKeepAlive;
+        if (isInsecure) {
+          if (disableKeepAlive) {
+            return http.globalAgent;
+          }
+          if (!this.cachedHttpAgent) {
+            this.cachedHttpAgent = new http.Agent({ keepAlive: true });
+          }
+          return this.cachedHttpAgent;
+        } else {
+          if (disableKeepAlive && !request.tlsSettings) {
+            return https.globalAgent;
+          }
+          const tlsSettings = (_a = request.tlsSettings) !== null && _a !== void 0 ? _a : DEFAULT_TLS_SETTINGS;
+          let agent = this.cachedHttpsAgents.get(tlsSettings);
+          if (agent && agent.options.keepAlive === !disableKeepAlive) {
+            return agent;
+          }
+          log_js_1.logger.info("No cached TLS Agent exist, creating a new Agent");
+          agent = new https.Agent(Object.assign({
+            // keepAlive is true if disableKeepAlive is false.
+            keepAlive: !disableKeepAlive
+          }, tlsSettings));
+          this.cachedHttpsAgents.set(tlsSettings, agent);
+          return agent;
+        }
+      }
+    };
+    function getResponseHeaders(res) {
+      const headers = (0, httpHeaders_js_1.createHttpHeaders)();
+      for (const header of Object.keys(res.headers)) {
+        const value = res.headers[header];
+        if (Array.isArray(value)) {
+          if (value.length > 0) {
+            headers.set(header, value[0]);
+          }
+        } else if (value) {
+          headers.set(header, value);
+        }
+      }
+      return headers;
+    }
+    function getDecodedResponseStream(stream, headers) {
+      const contentEncoding = headers.get("Content-Encoding");
+      if (contentEncoding === "gzip") {
+        const unzip = zlib.createGunzip();
+        stream.pipe(unzip);
+        return unzip;
+      } else if (contentEncoding === "deflate") {
+        const inflate = zlib.createInflate();
+        stream.pipe(inflate);
+        return inflate;
+      }
+      return stream;
+    }
+    function streamToText(stream) {
+      return new Promise((resolve, reject) => {
+        const buffer = [];
+        stream.on("data", (chunk) => {
+          if (Buffer.isBuffer(chunk)) {
+            buffer.push(chunk);
+          } else {
+            buffer.push(Buffer.from(chunk));
+          }
+        });
+        stream.on("end", () => {
+          resolve(Buffer.concat(buffer).toString("utf8"));
+        });
+        stream.on("error", (e) => {
+          if (e && (e === null || e === void 0 ? void 0 : e.name) === "AbortError") {
+            reject(e);
+          } else {
+            reject(new restError_js_1.RestError(`Error reading response as text: ${e.message}`, {
+              code: restError_js_1.RestError.PARSE_ERROR
+            }));
+          }
+        });
+      });
+    }
+    function getBodyLength(body) {
+      if (!body) {
+        return 0;
+      } else if (Buffer.isBuffer(body)) {
+        return body.length;
+      } else if (isReadableStream(body)) {
+        return null;
+      } else if (isArrayBuffer(body)) {
+        return body.byteLength;
+      } else if (typeof body === "string") {
+        return Buffer.from(body).length;
+      } else {
+        return null;
+      }
+    }
+    function createNodeHttpClient() {
+      return new NodeHttpClient();
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/defaultHttpClient.js
+var require_defaultHttpClient = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/defaultHttpClient.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createDefaultHttpClient = createDefaultHttpClient;
+    var nodeHttpClient_js_1 = require_nodeHttpClient();
+    function createDefaultHttpClient() {
+      return (0, nodeHttpClient_js_1.createNodeHttpClient)();
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/logPolicy.js
+var require_logPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/logPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.logPolicyName = void 0;
+    exports2.logPolicy = logPolicy;
+    var log_js_1 = require_log2();
+    var sanitizer_js_1 = require_sanitizer();
+    exports2.logPolicyName = "logPolicy";
+    function logPolicy(options = {}) {
+      var _a;
+      const logger = (_a = options.logger) !== null && _a !== void 0 ? _a : log_js_1.logger.info;
+      const sanitizer = new sanitizer_js_1.Sanitizer({
+        additionalAllowedHeaderNames: options.additionalAllowedHeaderNames,
+        additionalAllowedQueryParameters: options.additionalAllowedQueryParameters
+      });
+      return {
+        name: exports2.logPolicyName,
+        async sendRequest(request, next) {
+          if (!logger.enabled) {
+            return next(request);
+          }
+          logger(`Request: ${sanitizer.sanitize(request)}`);
+          const response = await next(request);
+          logger(`Response status code: ${response.status}`);
+          logger(`Headers: ${sanitizer.sanitize(response.headers)}`);
+          return response;
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/redirectPolicy.js
+var require_redirectPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/redirectPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.redirectPolicyName = void 0;
+    exports2.redirectPolicy = redirectPolicy;
+    exports2.redirectPolicyName = "redirectPolicy";
+    var allowedRedirect = ["GET", "HEAD"];
+    function redirectPolicy(options = {}) {
+      const { maxRetries = 20 } = options;
+      return {
+        name: exports2.redirectPolicyName,
+        async sendRequest(request, next) {
+          const response = await next(request);
+          return handleRedirect(next, response, maxRetries);
+        }
+      };
+    }
+    async function handleRedirect(next, response, maxRetries, currentRetries = 0) {
+      const { request, status, headers } = response;
+      const locationHeader = headers.get("location");
+      if (locationHeader && (status === 300 || status === 301 && allowedRedirect.includes(request.method) || status === 302 && allowedRedirect.includes(request.method) || status === 303 && request.method === "POST" || status === 307) && currentRetries < maxRetries) {
+        const url = new URL(locationHeader, request.url);
+        request.url = url.toString();
+        if (status === 303) {
+          request.method = "GET";
+          request.headers.delete("Content-Length");
+          delete request.body;
+        }
+        request.headers.delete("Authorization");
+        const res = await next(request);
+        return handleRedirect(next, res, maxRetries, currentRetries + 1);
+      }
+      return response;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/userAgentPlatform.js
+var require_userAgentPlatform = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/userAgentPlatform.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getHeaderName = getHeaderName;
+    exports2.setPlatformSpecificData = setPlatformSpecificData;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var os2 = tslib_1.__importStar(require("node:os"));
+    var process4 = tslib_1.__importStar(require("node:process"));
+    function getHeaderName() {
+      return "User-Agent";
+    }
+    async function setPlatformSpecificData(map) {
+      if (process4 && process4.versions) {
+        const versions = process4.versions;
+        if (versions.bun) {
+          map.set("Bun", versions.bun);
+        } else if (versions.deno) {
+          map.set("Deno", versions.deno);
+        } else if (versions.node) {
+          map.set("Node", versions.node);
+        }
+      }
+      map.set("OS", `(${os2.arch()}-${os2.type()}-${os2.release()})`);
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/constants.js
+var require_constants7 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/constants.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
+    exports2.SDK_VERSION = "0.2.2";
+    exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/userAgent.js
+var require_userAgent = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/userAgent.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getUserAgentHeaderName = getUserAgentHeaderName;
+    exports2.getUserAgentValue = getUserAgentValue;
+    var userAgentPlatform_js_1 = require_userAgentPlatform();
+    var constants_js_1 = require_constants7();
+    function getUserAgentString(telemetryInfo) {
+      const parts = [];
+      for (const [key, value] of telemetryInfo) {
+        const token = value ? `${key}/${value}` : key;
+        parts.push(token);
+      }
+      return parts.join(" ");
+    }
+    function getUserAgentHeaderName() {
+      return (0, userAgentPlatform_js_1.getHeaderName)();
+    }
+    async function getUserAgentValue(prefix) {
+      const runtimeInfo = /* @__PURE__ */ new Map();
+      runtimeInfo.set("ts-http-runtime", constants_js_1.SDK_VERSION);
+      await (0, userAgentPlatform_js_1.setPlatformSpecificData)(runtimeInfo);
+      const defaultAgent = getUserAgentString(runtimeInfo);
+      const userAgentValue = prefix ? `${prefix} ${defaultAgent}` : defaultAgent;
+      return userAgentValue;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/userAgentPolicy.js
+var require_userAgentPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/userAgentPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.userAgentPolicyName = void 0;
+    exports2.userAgentPolicy = userAgentPolicy;
+    var userAgent_js_1 = require_userAgent();
+    var UserAgentHeaderName = (0, userAgent_js_1.getUserAgentHeaderName)();
+    exports2.userAgentPolicyName = "userAgentPolicy";
+    function userAgentPolicy(options = {}) {
+      const userAgentValue = (0, userAgent_js_1.getUserAgentValue)(options.userAgentPrefix);
+      return {
+        name: exports2.userAgentPolicyName,
+        async sendRequest(request, next) {
+          if (!request.headers.has(UserAgentHeaderName)) {
+            request.headers.set(UserAgentHeaderName, await userAgentValue);
+          }
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/decompressResponsePolicy.js
+var require_decompressResponsePolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/decompressResponsePolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.decompressResponsePolicyName = void 0;
+    exports2.decompressResponsePolicy = decompressResponsePolicy;
+    exports2.decompressResponsePolicyName = "decompressResponsePolicy";
+    function decompressResponsePolicy() {
+      return {
+        name: exports2.decompressResponsePolicyName,
+        async sendRequest(request, next) {
+          if (request.method !== "HEAD") {
+            request.headers.set("Accept-Encoding", "gzip,deflate");
+          }
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/random.js
+var require_random = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/random.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getRandomIntegerInclusive = getRandomIntegerInclusive;
+    function getRandomIntegerInclusive(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      const offset = Math.floor(Math.random() * (max - min + 1));
+      return offset + min;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/delay.js
+var require_delay = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/delay.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.calculateRetryDelay = calculateRetryDelay;
+    var random_js_1 = require_random();
+    function calculateRetryDelay(retryAttempt, config) {
+      const exponentialDelay = config.retryDelayInMs * Math.pow(2, retryAttempt);
+      const clampedDelay = Math.min(config.maxRetryDelayInMs, exponentialDelay);
+      const retryAfterInMs = clampedDelay / 2 + (0, random_js_1.getRandomIntegerInclusive)(0, clampedDelay / 2);
+      return { retryAfterInMs };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/helpers.js
+var require_helpers = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/helpers.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.delay = delay;
+    exports2.parseHeaderValueAsNumber = parseHeaderValueAsNumber;
+    var AbortError_js_1 = require_AbortError();
+    var StandardAbortMessage = "The operation was aborted.";
+    function delay(delayInMs, value, options) {
+      return new Promise((resolve, reject) => {
+        let timer = void 0;
+        let onAborted = void 0;
+        const rejectOnAbort = () => {
+          return reject(new AbortError_js_1.AbortError((options === null || options === void 0 ? void 0 : options.abortErrorMsg) ? options === null || options === void 0 ? void 0 : options.abortErrorMsg : StandardAbortMessage));
+        };
+        const removeListeners = () => {
+          if ((options === null || options === void 0 ? void 0 : options.abortSignal) && onAborted) {
+            options.abortSignal.removeEventListener("abort", onAborted);
+          }
+        };
+        onAborted = () => {
+          if (timer) {
+            clearTimeout(timer);
+          }
+          removeListeners();
+          return rejectOnAbort();
+        };
+        if ((options === null || options === void 0 ? void 0 : options.abortSignal) && options.abortSignal.aborted) {
+          return rejectOnAbort();
+        }
+        timer = setTimeout(() => {
+          removeListeners();
+          resolve(value);
+        }, delayInMs);
+        if (options === null || options === void 0 ? void 0 : options.abortSignal) {
+          options.abortSignal.addEventListener("abort", onAborted);
+        }
+      });
+    }
+    function parseHeaderValueAsNumber(response, headerName) {
+      const value = response.headers.get(headerName);
+      if (!value)
+        return;
+      const valueAsNum = Number(value);
+      if (Number.isNaN(valueAsNum))
+        return;
+      return valueAsNum;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/retryStrategies/throttlingRetryStrategy.js
+var require_throttlingRetryStrategy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/retryStrategies/throttlingRetryStrategy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isThrottlingRetryResponse = isThrottlingRetryResponse;
+    exports2.throttlingRetryStrategy = throttlingRetryStrategy;
+    var helpers_js_1 = require_helpers();
+    var RetryAfterHeader = "Retry-After";
+    var AllRetryAfterHeaders = ["retry-after-ms", "x-ms-retry-after-ms", RetryAfterHeader];
+    function getRetryAfterInMs(response) {
+      if (!(response && [429, 503].includes(response.status)))
+        return void 0;
+      try {
+        for (const header of AllRetryAfterHeaders) {
+          const retryAfterValue = (0, helpers_js_1.parseHeaderValueAsNumber)(response, header);
+          if (retryAfterValue === 0 || retryAfterValue) {
+            const multiplyingFactor = header === RetryAfterHeader ? 1e3 : 1;
+            return retryAfterValue * multiplyingFactor;
+          }
+        }
+        const retryAfterHeader = response.headers.get(RetryAfterHeader);
+        if (!retryAfterHeader)
+          return;
+        const date = Date.parse(retryAfterHeader);
+        const diff = date - Date.now();
+        return Number.isFinite(diff) ? Math.max(0, diff) : void 0;
+      } catch (_a) {
+        return void 0;
+      }
+    }
+    function isThrottlingRetryResponse(response) {
+      return Number.isFinite(getRetryAfterInMs(response));
+    }
+    function throttlingRetryStrategy() {
+      return {
+        name: "throttlingRetryStrategy",
+        retry({ response }) {
+          const retryAfterInMs = getRetryAfterInMs(response);
+          if (!Number.isFinite(retryAfterInMs)) {
+            return { skipStrategy: true };
+          }
+          return {
+            retryAfterInMs
+          };
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/retryStrategies/exponentialRetryStrategy.js
+var require_exponentialRetryStrategy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/retryStrategies/exponentialRetryStrategy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.exponentialRetryStrategy = exponentialRetryStrategy;
+    exports2.isExponentialRetryResponse = isExponentialRetryResponse;
+    exports2.isSystemError = isSystemError;
+    var delay_js_1 = require_delay();
+    var throttlingRetryStrategy_js_1 = require_throttlingRetryStrategy();
+    var DEFAULT_CLIENT_RETRY_INTERVAL = 1e3;
+    var DEFAULT_CLIENT_MAX_RETRY_INTERVAL = 1e3 * 64;
+    function exponentialRetryStrategy(options = {}) {
+      var _a, _b;
+      const retryInterval = (_a = options.retryDelayInMs) !== null && _a !== void 0 ? _a : DEFAULT_CLIENT_RETRY_INTERVAL;
+      const maxRetryInterval = (_b = options.maxRetryDelayInMs) !== null && _b !== void 0 ? _b : DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
+      return {
+        name: "exponentialRetryStrategy",
+        retry({ retryCount, response, responseError }) {
+          const matchedSystemError = isSystemError(responseError);
+          const ignoreSystemErrors = matchedSystemError && options.ignoreSystemErrors;
+          const isExponential = isExponentialRetryResponse(response);
+          const ignoreExponentialResponse = isExponential && options.ignoreHttpStatusCodes;
+          const unknownResponse = response && ((0, throttlingRetryStrategy_js_1.isThrottlingRetryResponse)(response) || !isExponential);
+          if (unknownResponse || ignoreExponentialResponse || ignoreSystemErrors) {
+            return { skipStrategy: true };
+          }
+          if (responseError && !matchedSystemError && !isExponential) {
+            return { errorToThrow: responseError };
+          }
+          return (0, delay_js_1.calculateRetryDelay)(retryCount, {
+            retryDelayInMs: retryInterval,
+            maxRetryDelayInMs: maxRetryInterval
+          });
+        }
+      };
+    }
+    function isExponentialRetryResponse(response) {
+      return Boolean(response && response.status !== void 0 && (response.status >= 500 || response.status === 408) && response.status !== 501 && response.status !== 505);
+    }
+    function isSystemError(err) {
+      if (!err) {
+        return false;
+      }
+      return err.code === "ETIMEDOUT" || err.code === "ESOCKETTIMEDOUT" || err.code === "ECONNREFUSED" || err.code === "ECONNRESET" || err.code === "ENOENT" || err.code === "ENOTFOUND";
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/retryPolicy.js
+var require_retryPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/retryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.retryPolicy = retryPolicy;
+    var helpers_js_1 = require_helpers();
+    var AbortError_js_1 = require_AbortError();
+    var logger_js_1 = require_logger();
+    var constants_js_1 = require_constants7();
+    var retryPolicyLogger = (0, logger_js_1.createClientLogger)("ts-http-runtime retryPolicy");
+    var retryPolicyName = "retryPolicy";
+    function retryPolicy(strategies, options = { maxRetries: constants_js_1.DEFAULT_RETRY_POLICY_COUNT }) {
+      const logger = options.logger || retryPolicyLogger;
+      return {
+        name: retryPolicyName,
+        async sendRequest(request, next) {
+          var _a, _b;
+          let response;
+          let responseError;
+          let retryCount = -1;
+          retryRequest: while (true) {
+            retryCount += 1;
+            response = void 0;
+            responseError = void 0;
+            try {
+              logger.info(`Retry ${retryCount}: Attempting to send request`, request.requestId);
+              response = await next(request);
+              logger.info(`Retry ${retryCount}: Received a response from request`, request.requestId);
+            } catch (e) {
+              logger.error(`Retry ${retryCount}: Received an error from request`, request.requestId);
+              responseError = e;
+              if (!e || responseError.name !== "RestError") {
+                throw e;
+              }
+              response = responseError.response;
+            }
+            if ((_a = request.abortSignal) === null || _a === void 0 ? void 0 : _a.aborted) {
+              logger.error(`Retry ${retryCount}: Request aborted.`);
+              const abortError = new AbortError_js_1.AbortError();
+              throw abortError;
+            }
+            if (retryCount >= ((_b = options.maxRetries) !== null && _b !== void 0 ? _b : constants_js_1.DEFAULT_RETRY_POLICY_COUNT)) {
+              logger.info(`Retry ${retryCount}: Maximum retries reached. Returning the last received response, or throwing the last received error.`);
+              if (responseError) {
+                throw responseError;
+              } else if (response) {
+                return response;
+              } else {
+                throw new Error("Maximum retries reached with no response or error to throw");
+              }
+            }
+            logger.info(`Retry ${retryCount}: Processing ${strategies.length} retry strategies.`);
+            strategiesLoop: for (const strategy of strategies) {
+              const strategyLogger = strategy.logger || logger;
+              strategyLogger.info(`Retry ${retryCount}: Processing retry strategy ${strategy.name}.`);
+              const modifiers = strategy.retry({
+                retryCount,
+                response,
+                responseError
+              });
+              if (modifiers.skipStrategy) {
+                strategyLogger.info(`Retry ${retryCount}: Skipped.`);
+                continue strategiesLoop;
+              }
+              const { errorToThrow, retryAfterInMs, redirectTo } = modifiers;
+              if (errorToThrow) {
+                strategyLogger.error(`Retry ${retryCount}: Retry strategy ${strategy.name} throws error:`, errorToThrow);
+                throw errorToThrow;
+              }
+              if (retryAfterInMs || retryAfterInMs === 0) {
+                strategyLogger.info(`Retry ${retryCount}: Retry strategy ${strategy.name} retries after ${retryAfterInMs}`);
+                await (0, helpers_js_1.delay)(retryAfterInMs, void 0, { abortSignal: request.abortSignal });
+                continue retryRequest;
+              }
+              if (redirectTo) {
+                strategyLogger.info(`Retry ${retryCount}: Retry strategy ${strategy.name} redirects to ${redirectTo}`);
+                request.url = redirectTo;
+                continue retryRequest;
+              }
+            }
+            if (responseError) {
+              logger.info(`None of the retry strategies could work with the received error. Throwing it.`);
+              throw responseError;
+            }
+            if (response) {
+              logger.info(`None of the retry strategies could work with the received response. Returning it.`);
+              return response;
+            }
+          }
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/defaultRetryPolicy.js
+var require_defaultRetryPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/defaultRetryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.defaultRetryPolicyName = void 0;
+    exports2.defaultRetryPolicy = defaultRetryPolicy;
+    var exponentialRetryStrategy_js_1 = require_exponentialRetryStrategy();
+    var throttlingRetryStrategy_js_1 = require_throttlingRetryStrategy();
+    var retryPolicy_js_1 = require_retryPolicy();
+    var constants_js_1 = require_constants7();
+    exports2.defaultRetryPolicyName = "defaultRetryPolicy";
+    function defaultRetryPolicy(options = {}) {
+      var _a;
+      return {
+        name: exports2.defaultRetryPolicyName,
+        sendRequest: (0, retryPolicy_js_1.retryPolicy)([(0, throttlingRetryStrategy_js_1.throttlingRetryStrategy)(), (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(options)], {
+          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+        }).sendRequest
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/checkEnvironment.js
+var require_checkEnvironment = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/checkEnvironment.js"(exports2) {
+    "use strict";
+    var _a;
+    var _b;
+    var _c;
+    var _d;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isReactNative = exports2.isNodeRuntime = exports2.isNodeLike = exports2.isBun = exports2.isDeno = exports2.isWebWorker = exports2.isBrowser = void 0;
+    exports2.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
+    exports2.isWebWorker = typeof self === "object" && typeof (self === null || self === void 0 ? void 0 : self.importScripts) === "function" && (((_a = self.constructor) === null || _a === void 0 ? void 0 : _a.name) === "DedicatedWorkerGlobalScope" || ((_b = self.constructor) === null || _b === void 0 ? void 0 : _b.name) === "ServiceWorkerGlobalScope" || ((_c = self.constructor) === null || _c === void 0 ? void 0 : _c.name) === "SharedWorkerGlobalScope");
+    exports2.isDeno = typeof Deno !== "undefined" && typeof Deno.version !== "undefined" && typeof Deno.version.deno !== "undefined";
+    exports2.isBun = typeof Bun !== "undefined" && typeof Bun.version !== "undefined";
+    exports2.isNodeLike = typeof globalThis.process !== "undefined" && Boolean(globalThis.process.version) && Boolean((_d = globalThis.process.versions) === null || _d === void 0 ? void 0 : _d.node);
+    exports2.isNodeRuntime = exports2.isNodeLike && !exports2.isBun && !exports2.isDeno;
+    exports2.isReactNative = typeof navigator !== "undefined" && (navigator === null || navigator === void 0 ? void 0 : navigator.product) === "ReactNative";
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/formDataPolicy.js
 var require_formDataPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/formDataPolicy.js"(exports2) {
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/formDataPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.formDataPolicyName = void 0;
     exports2.formDataPolicy = formDataPolicy;
-    var core_util_1 = require_commonjs3();
+    var bytesEncoding_js_1 = require_bytesEncoding();
+    var checkEnvironment_js_1 = require_checkEnvironment();
     var httpHeaders_js_1 = require_httpHeaders();
     exports2.formDataPolicyName = "formDataPolicy";
     function formDataToFormDataMap(formData) {
@@ -25214,7 +25150,7 @@ var require_formDataPolicy = __commonJS({
       return {
         name: exports2.formDataPolicyName,
         async sendRequest(request, next) {
-          if (core_util_1.isNodeLike && typeof FormData !== "undefined" && request.body instanceof FormData) {
+          if (checkEnvironment_js_1.isNodeLike && typeof FormData !== "undefined" && request.body instanceof FormData) {
             request.formData = formDataToFormDataMap(request.body);
             request.body = void 0;
           }
@@ -25258,7 +25194,7 @@ var require_formDataPolicy = __commonJS({
               headers: (0, httpHeaders_js_1.createHttpHeaders)({
                 "Content-Disposition": `form-data; name="${fieldName}"`
               }),
-              body: (0, core_util_1.stringToUint8Array)(value, "utf-8")
+              body: (0, bytesEncoding_js_1.stringToUint8Array)(value, "utf-8")
             });
           } else if (value === void 0 || value === null || typeof value !== "object") {
             throw new Error(`Unexpected value for key ${fieldName}: ${value}. Value should be serialized to string first.`);
@@ -26529,9 +26465,9 @@ var require_dist3 = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/proxyPolicy.js
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/proxyPolicy.js
 var require_proxyPolicy = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/proxyPolicy.js"(exports2) {
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/proxyPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.globalNoProxyList = exports2.proxyPolicyName = void 0;
@@ -26681,6 +26617,2023 @@ var require_proxyPolicy = __commonJS({
   }
 });
 
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/agentPolicy.js
+var require_agentPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/agentPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.agentPolicyName = void 0;
+    exports2.agentPolicy = agentPolicy;
+    exports2.agentPolicyName = "agentPolicy";
+    function agentPolicy(agent) {
+      return {
+        name: exports2.agentPolicyName,
+        sendRequest: async (req, next) => {
+          if (!req.agent) {
+            req.agent = agent;
+          }
+          return next(req);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/tlsPolicy.js
+var require_tlsPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/tlsPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.tlsPolicyName = void 0;
+    exports2.tlsPolicy = tlsPolicy;
+    exports2.tlsPolicyName = "tlsPolicy";
+    function tlsPolicy(tlsSettings) {
+      return {
+        name: exports2.tlsPolicyName,
+        sendRequest: async (req, next) => {
+          if (!req.tlsSettings) {
+            req.tlsSettings = tlsSettings;
+          }
+          return next(req);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/typeGuards.js
+var require_typeGuards = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/typeGuards.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isNodeReadableStream = isNodeReadableStream;
+    exports2.isWebReadableStream = isWebReadableStream;
+    exports2.isBinaryBody = isBinaryBody;
+    exports2.isReadableStream = isReadableStream;
+    exports2.isBlob = isBlob;
+    function isNodeReadableStream(x) {
+      return Boolean(x && typeof x["pipe"] === "function");
+    }
+    function isWebReadableStream(x) {
+      return Boolean(x && typeof x.getReader === "function" && typeof x.tee === "function");
+    }
+    function isBinaryBody(body) {
+      return body !== void 0 && (body instanceof Uint8Array || isReadableStream(body) || typeof body === "function" || body instanceof Blob);
+    }
+    function isReadableStream(x) {
+      return isNodeReadableStream(x) || isWebReadableStream(x);
+    }
+    function isBlob(x) {
+      return typeof x.stream === "function";
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/concat.js
+var require_concat = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/concat.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.concat = concat;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var stream_1 = require("stream");
+    var typeGuards_js_1 = require_typeGuards();
+    function streamAsyncIterator() {
+      return tslib_1.__asyncGenerator(this, arguments, function* streamAsyncIterator_1() {
+        const reader = this.getReader();
+        try {
+          while (true) {
+            const { done, value } = yield tslib_1.__await(reader.read());
+            if (done) {
+              return yield tslib_1.__await(void 0);
+            }
+            yield yield tslib_1.__await(value);
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      });
+    }
+    function makeAsyncIterable(webStream) {
+      if (!webStream[Symbol.asyncIterator]) {
+        webStream[Symbol.asyncIterator] = streamAsyncIterator.bind(webStream);
+      }
+      if (!webStream.values) {
+        webStream.values = streamAsyncIterator.bind(webStream);
+      }
+    }
+    function ensureNodeStream(stream) {
+      if (stream instanceof ReadableStream) {
+        makeAsyncIterable(stream);
+        return stream_1.Readable.fromWeb(stream);
+      } else {
+        return stream;
+      }
+    }
+    function toStream(source) {
+      if (source instanceof Uint8Array) {
+        return stream_1.Readable.from(Buffer.from(source));
+      } else if ((0, typeGuards_js_1.isBlob)(source)) {
+        return ensureNodeStream(source.stream());
+      } else {
+        return ensureNodeStream(source);
+      }
+    }
+    async function concat(sources) {
+      return function() {
+        const streams = sources.map((x) => typeof x === "function" ? x() : x).map(toStream);
+        return stream_1.Readable.from(function() {
+          return tslib_1.__asyncGenerator(this, arguments, function* () {
+            var _a, e_1, _b, _c;
+            for (const stream of streams) {
+              try {
+                for (var _d = true, stream_2 = (e_1 = void 0, tslib_1.__asyncValues(stream)), stream_2_1; stream_2_1 = yield tslib_1.__await(stream_2.next()), _a = stream_2_1.done, !_a; _d = true) {
+                  _c = stream_2_1.value;
+                  _d = false;
+                  const chunk = _c;
+                  yield yield tslib_1.__await(chunk);
+                }
+              } catch (e_1_1) {
+                e_1 = { error: e_1_1 };
+              } finally {
+                try {
+                  if (!_d && !_a && (_b = stream_2.return)) yield tslib_1.__await(_b.call(stream_2));
+                } finally {
+                  if (e_1) throw e_1.error;
+                }
+              }
+            }
+          });
+        }());
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/multipartPolicy.js
+var require_multipartPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/multipartPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.multipartPolicyName = void 0;
+    exports2.multipartPolicy = multipartPolicy;
+    var bytesEncoding_js_1 = require_bytesEncoding();
+    var typeGuards_js_1 = require_typeGuards();
+    var uuidUtils_js_1 = require_uuidUtils();
+    var concat_js_1 = require_concat();
+    function generateBoundary() {
+      return `----AzSDKFormBoundary${(0, uuidUtils_js_1.randomUUID)()}`;
+    }
+    function encodeHeaders(headers) {
+      let result2 = "";
+      for (const [key, value] of headers) {
+        result2 += `${key}: ${value}\r
+`;
+      }
+      return result2;
+    }
+    function getLength(source) {
+      if (source instanceof Uint8Array) {
+        return source.byteLength;
+      } else if ((0, typeGuards_js_1.isBlob)(source)) {
+        return source.size === -1 ? void 0 : source.size;
+      } else {
+        return void 0;
+      }
+    }
+    function getTotalLength(sources) {
+      let total = 0;
+      for (const source of sources) {
+        const partLength = getLength(source);
+        if (partLength === void 0) {
+          return void 0;
+        } else {
+          total += partLength;
+        }
+      }
+      return total;
+    }
+    async function buildRequestBody(request, parts, boundary) {
+      const sources = [
+        (0, bytesEncoding_js_1.stringToUint8Array)(`--${boundary}`, "utf-8"),
+        ...parts.flatMap((part) => [
+          (0, bytesEncoding_js_1.stringToUint8Array)("\r\n", "utf-8"),
+          (0, bytesEncoding_js_1.stringToUint8Array)(encodeHeaders(part.headers), "utf-8"),
+          (0, bytesEncoding_js_1.stringToUint8Array)("\r\n", "utf-8"),
+          part.body,
+          (0, bytesEncoding_js_1.stringToUint8Array)(`\r
+--${boundary}`, "utf-8")
+        ]),
+        (0, bytesEncoding_js_1.stringToUint8Array)("--\r\n\r\n", "utf-8")
+      ];
+      const contentLength = getTotalLength(sources);
+      if (contentLength) {
+        request.headers.set("Content-Length", contentLength);
+      }
+      request.body = await (0, concat_js_1.concat)(sources);
+    }
+    exports2.multipartPolicyName = "multipartPolicy";
+    var maxBoundaryLength = 70;
+    var validBoundaryCharacters = new Set(`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()+,-./:=?`);
+    function assertValidBoundary(boundary) {
+      if (boundary.length > maxBoundaryLength) {
+        throw new Error(`Multipart boundary "${boundary}" exceeds maximum length of 70 characters`);
+      }
+      if (Array.from(boundary).some((x) => !validBoundaryCharacters.has(x))) {
+        throw new Error(`Multipart boundary "${boundary}" contains invalid characters`);
+      }
+    }
+    function multipartPolicy() {
+      return {
+        name: exports2.multipartPolicyName,
+        async sendRequest(request, next) {
+          var _a;
+          if (!request.multipartBody) {
+            return next(request);
+          }
+          if (request.body) {
+            throw new Error("multipartBody and regular body cannot be set at the same time");
+          }
+          let boundary = request.multipartBody.boundary;
+          const contentTypeHeader = (_a = request.headers.get("Content-Type")) !== null && _a !== void 0 ? _a : "multipart/mixed";
+          const parsedHeader = contentTypeHeader.match(/^(multipart\/[^ ;]+)(?:; *boundary=(.+))?$/);
+          if (!parsedHeader) {
+            throw new Error(`Got multipart request body, but content-type header was not multipart: ${contentTypeHeader}`);
+          }
+          const [, contentType, parsedBoundary] = parsedHeader;
+          if (parsedBoundary && boundary && parsedBoundary !== boundary) {
+            throw new Error(`Multipart boundary was specified as ${parsedBoundary} in the header, but got ${boundary} in the request body`);
+          }
+          boundary !== null && boundary !== void 0 ? boundary : boundary = parsedBoundary;
+          if (boundary) {
+            assertValidBoundary(boundary);
+          } else {
+            boundary = generateBoundary();
+          }
+          request.headers.set("Content-Type", `${contentType}; boundary=${boundary}`);
+          await buildRequestBody(request, request.multipartBody.parts, boundary);
+          request.multipartBody = void 0;
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/createPipelineFromOptions.js
+var require_createPipelineFromOptions = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/createPipelineFromOptions.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createPipelineFromOptions = createPipelineFromOptions;
+    var logPolicy_js_1 = require_logPolicy();
+    var pipeline_js_1 = require_pipeline();
+    var redirectPolicy_js_1 = require_redirectPolicy();
+    var userAgentPolicy_js_1 = require_userAgentPolicy();
+    var decompressResponsePolicy_js_1 = require_decompressResponsePolicy();
+    var defaultRetryPolicy_js_1 = require_defaultRetryPolicy();
+    var formDataPolicy_js_1 = require_formDataPolicy();
+    var checkEnvironment_js_1 = require_checkEnvironment();
+    var proxyPolicy_js_1 = require_proxyPolicy();
+    var agentPolicy_js_1 = require_agentPolicy();
+    var tlsPolicy_js_1 = require_tlsPolicy();
+    var multipartPolicy_js_1 = require_multipartPolicy();
+    function createPipelineFromOptions(options) {
+      const pipeline = (0, pipeline_js_1.createEmptyPipeline)();
+      if (checkEnvironment_js_1.isNodeLike) {
+        if (options.agent) {
+          pipeline.addPolicy((0, agentPolicy_js_1.agentPolicy)(options.agent));
+        }
+        if (options.tlsOptions) {
+          pipeline.addPolicy((0, tlsPolicy_js_1.tlsPolicy)(options.tlsOptions));
+        }
+        pipeline.addPolicy((0, proxyPolicy_js_1.proxyPolicy)(options.proxyOptions));
+        pipeline.addPolicy((0, decompressResponsePolicy_js_1.decompressResponsePolicy)());
+      }
+      pipeline.addPolicy((0, formDataPolicy_js_1.formDataPolicy)(), { beforePolicies: [multipartPolicy_js_1.multipartPolicyName] });
+      pipeline.addPolicy((0, userAgentPolicy_js_1.userAgentPolicy)(options.userAgentOptions));
+      pipeline.addPolicy((0, multipartPolicy_js_1.multipartPolicy)(), { afterPhase: "Deserialize" });
+      pipeline.addPolicy((0, defaultRetryPolicy_js_1.defaultRetryPolicy)(options.retryOptions), { phase: "Retry" });
+      if (checkEnvironment_js_1.isNodeLike) {
+        pipeline.addPolicy((0, redirectPolicy_js_1.redirectPolicy)(options.redirectOptions), { afterPhase: "Retry" });
+      }
+      pipeline.addPolicy((0, logPolicy_js_1.logPolicy)(options.loggingOptions), { afterPhase: "Sign" });
+      return pipeline;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/apiVersionPolicy.js
+var require_apiVersionPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/apiVersionPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.apiVersionPolicyName = void 0;
+    exports2.apiVersionPolicy = apiVersionPolicy;
+    exports2.apiVersionPolicyName = "ApiVersionPolicy";
+    function apiVersionPolicy(options) {
+      return {
+        name: exports2.apiVersionPolicyName,
+        sendRequest: (req, next) => {
+          const url = new URL(req.url);
+          if (!url.searchParams.get("api-version") && options.apiVersion) {
+            req.url = `${req.url}${Array.from(url.searchParams.keys()).length > 0 ? "&" : "?"}api-version=${options.apiVersion}`;
+          }
+          return next(req);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/credentials.js
+var require_credentials = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/credentials.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isOAuth2TokenCredential = isOAuth2TokenCredential;
+    exports2.isBearerTokenCredential = isBearerTokenCredential;
+    exports2.isBasicCredential = isBasicCredential;
+    exports2.isApiKeyCredential = isApiKeyCredential;
+    function isOAuth2TokenCredential(credential) {
+      return "getOAuth2Token" in credential;
+    }
+    function isBearerTokenCredential(credential) {
+      return "getBearerToken" in credential;
+    }
+    function isBasicCredential(credential) {
+      return "username" in credential && "password" in credential;
+    }
+    function isApiKeyCredential(credential) {
+      return "key" in credential;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/checkInsecureConnection.js
+var require_checkInsecureConnection = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/checkInsecureConnection.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.ensureSecureConnection = ensureSecureConnection;
+    var log_js_1 = require_log2();
+    var insecureConnectionWarningEmmitted = false;
+    function allowInsecureConnection(request, options) {
+      if (options.allowInsecureConnection && request.allowInsecureConnection) {
+        const url = new URL(request.url);
+        if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+          return true;
+        }
+      }
+      return false;
+    }
+    function emitInsecureConnectionWarning() {
+      const warning = "Sending token over insecure transport. Assume any token issued is compromised.";
+      log_js_1.logger.warning(warning);
+      if (typeof (process === null || process === void 0 ? void 0 : process.emitWarning) === "function" && !insecureConnectionWarningEmmitted) {
+        insecureConnectionWarningEmmitted = true;
+        process.emitWarning(warning);
+      }
+    }
+    function ensureSecureConnection(request, options) {
+      if (!request.url.toLowerCase().startsWith("https://")) {
+        if (allowInsecureConnection(request, options)) {
+          emitInsecureConnectionWarning();
+        } else {
+          throw new Error("Authentication is not permitted for non-TLS protected (non-https) URLs when allowInsecureConnection is false.");
+        }
+      }
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/apiKeyAuthenticationPolicy.js
+var require_apiKeyAuthenticationPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/apiKeyAuthenticationPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.apiKeyAuthenticationPolicyName = void 0;
+    exports2.apiKeyAuthenticationPolicy = apiKeyAuthenticationPolicy;
+    var checkInsecureConnection_js_1 = require_checkInsecureConnection();
+    exports2.apiKeyAuthenticationPolicyName = "apiKeyAuthenticationPolicy";
+    function apiKeyAuthenticationPolicy(options) {
+      return {
+        name: exports2.apiKeyAuthenticationPolicyName,
+        async sendRequest(request, next) {
+          var _a, _b;
+          (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
+          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "apiKey");
+          if (!scheme) {
+            return next(request);
+          }
+          if (scheme.apiKeyLocation !== "header") {
+            throw new Error(`Unsupported API key location: ${scheme.apiKeyLocation}`);
+          }
+          request.headers.set(scheme.name, options.credential.key);
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/basicAuthenticationPolicy.js
+var require_basicAuthenticationPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/basicAuthenticationPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.basicAuthenticationPolicyName = void 0;
+    exports2.basicAuthenticationPolicy = basicAuthenticationPolicy;
+    var bytesEncoding_js_1 = require_bytesEncoding();
+    var checkInsecureConnection_js_1 = require_checkInsecureConnection();
+    exports2.basicAuthenticationPolicyName = "bearerAuthenticationPolicy";
+    function basicAuthenticationPolicy(options) {
+      return {
+        name: exports2.basicAuthenticationPolicyName,
+        async sendRequest(request, next) {
+          var _a, _b;
+          (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
+          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "http" && x.scheme === "basic");
+          if (!scheme) {
+            return next(request);
+          }
+          const { username, password } = options.credential;
+          const headerValue = (0, bytesEncoding_js_1.uint8ArrayToString)((0, bytesEncoding_js_1.stringToUint8Array)(`${username}:${password}`, "utf-8"), "base64");
+          request.headers.set("Authorization", `Basic ${headerValue}`);
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/bearerAuthenticationPolicy.js
+var require_bearerAuthenticationPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/bearerAuthenticationPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.bearerAuthenticationPolicyName = void 0;
+    exports2.bearerAuthenticationPolicy = bearerAuthenticationPolicy;
+    var checkInsecureConnection_js_1 = require_checkInsecureConnection();
+    exports2.bearerAuthenticationPolicyName = "bearerAuthenticationPolicy";
+    function bearerAuthenticationPolicy(options) {
+      return {
+        name: exports2.bearerAuthenticationPolicyName,
+        async sendRequest(request, next) {
+          var _a, _b;
+          (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
+          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "http" && x.scheme === "bearer");
+          if (!scheme) {
+            return next(request);
+          }
+          const token = await options.credential.getBearerToken({
+            abortSignal: request.abortSignal
+          });
+          request.headers.set("Authorization", `Bearer ${token}`);
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/oauth2AuthenticationPolicy.js
+var require_oauth2AuthenticationPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/auth/oauth2AuthenticationPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.oauth2AuthenticationPolicyName = void 0;
+    exports2.oauth2AuthenticationPolicy = oauth2AuthenticationPolicy;
+    var checkInsecureConnection_js_1 = require_checkInsecureConnection();
+    exports2.oauth2AuthenticationPolicyName = "oauth2AuthenticationPolicy";
+    function oauth2AuthenticationPolicy(options) {
+      return {
+        name: exports2.oauth2AuthenticationPolicyName,
+        async sendRequest(request, next) {
+          var _a, _b;
+          (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
+          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "oauth2");
+          if (!scheme) {
+            return next(request);
+          }
+          const token = await options.credential.getOAuth2Token(scheme.flows, {
+            abortSignal: request.abortSignal
+          });
+          request.headers.set("Authorization", `Bearer ${token}`);
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/clientHelpers.js
+var require_clientHelpers = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/clientHelpers.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createDefaultPipeline = createDefaultPipeline;
+    exports2.getCachedDefaultHttpsClient = getCachedDefaultHttpsClient;
+    var defaultHttpClient_js_1 = require_defaultHttpClient();
+    var createPipelineFromOptions_js_1 = require_createPipelineFromOptions();
+    var apiVersionPolicy_js_1 = require_apiVersionPolicy();
+    var credentials_js_1 = require_credentials();
+    var apiKeyAuthenticationPolicy_js_1 = require_apiKeyAuthenticationPolicy();
+    var basicAuthenticationPolicy_js_1 = require_basicAuthenticationPolicy();
+    var bearerAuthenticationPolicy_js_1 = require_bearerAuthenticationPolicy();
+    var oauth2AuthenticationPolicy_js_1 = require_oauth2AuthenticationPolicy();
+    var cachedHttpClient;
+    function createDefaultPipeline(options = {}) {
+      const pipeline = (0, createPipelineFromOptions_js_1.createPipelineFromOptions)(options);
+      pipeline.addPolicy((0, apiVersionPolicy_js_1.apiVersionPolicy)(options));
+      const { credential, authSchemes, allowInsecureConnection } = options;
+      if (credential) {
+        if ((0, credentials_js_1.isApiKeyCredential)(credential)) {
+          pipeline.addPolicy((0, apiKeyAuthenticationPolicy_js_1.apiKeyAuthenticationPolicy)({ authSchemes, credential, allowInsecureConnection }));
+        } else if ((0, credentials_js_1.isBasicCredential)(credential)) {
+          pipeline.addPolicy((0, basicAuthenticationPolicy_js_1.basicAuthenticationPolicy)({ authSchemes, credential, allowInsecureConnection }));
+        } else if ((0, credentials_js_1.isBearerTokenCredential)(credential)) {
+          pipeline.addPolicy((0, bearerAuthenticationPolicy_js_1.bearerAuthenticationPolicy)({ authSchemes, credential, allowInsecureConnection }));
+        } else if ((0, credentials_js_1.isOAuth2TokenCredential)(credential)) {
+          pipeline.addPolicy((0, oauth2AuthenticationPolicy_js_1.oauth2AuthenticationPolicy)({ authSchemes, credential, allowInsecureConnection }));
+        }
+      }
+      return pipeline;
+    }
+    function getCachedDefaultHttpsClient() {
+      if (!cachedHttpClient) {
+        cachedHttpClient = (0, defaultHttpClient_js_1.createDefaultHttpClient)();
+      }
+      return cachedHttpClient;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/multipart.js
+var require_multipart2 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/multipart.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.buildBodyPart = buildBodyPart;
+    exports2.buildMultipartBody = buildMultipartBody;
+    var restError_js_1 = require_restError();
+    var httpHeaders_js_1 = require_httpHeaders();
+    var bytesEncoding_js_1 = require_bytesEncoding();
+    var typeGuards_js_1 = require_typeGuards();
+    function getHeaderValue(descriptor, headerName) {
+      if (descriptor.headers) {
+        const actualHeaderName = Object.keys(descriptor.headers).find((x) => x.toLowerCase() === headerName.toLowerCase());
+        if (actualHeaderName) {
+          return descriptor.headers[actualHeaderName];
+        }
+      }
+      return void 0;
+    }
+    function getPartContentType(descriptor) {
+      const contentTypeHeader = getHeaderValue(descriptor, "content-type");
+      if (contentTypeHeader) {
+        return contentTypeHeader;
+      }
+      if (descriptor.contentType === null) {
+        return void 0;
+      }
+      if (descriptor.contentType) {
+        return descriptor.contentType;
+      }
+      const { body } = descriptor;
+      if (body === null || body === void 0) {
+        return void 0;
+      }
+      if (typeof body === "string" || typeof body === "number" || typeof body === "boolean") {
+        return "text/plain; charset=UTF-8";
+      }
+      if (body instanceof Blob) {
+        return body.type || "application/octet-stream";
+      }
+      if ((0, typeGuards_js_1.isBinaryBody)(body)) {
+        return "application/octet-stream";
+      }
+      return "application/json";
+    }
+    function escapeDispositionField(value) {
+      return JSON.stringify(value);
+    }
+    function getContentDisposition(descriptor) {
+      var _a;
+      const contentDispositionHeader = getHeaderValue(descriptor, "content-disposition");
+      if (contentDispositionHeader) {
+        return contentDispositionHeader;
+      }
+      if (descriptor.dispositionType === void 0 && descriptor.name === void 0 && descriptor.filename === void 0) {
+        return void 0;
+      }
+      const dispositionType = (_a = descriptor.dispositionType) !== null && _a !== void 0 ? _a : "form-data";
+      let disposition = dispositionType;
+      if (descriptor.name) {
+        disposition += `; name=${escapeDispositionField(descriptor.name)}`;
+      }
+      let filename = void 0;
+      if (descriptor.filename) {
+        filename = descriptor.filename;
+      } else if (typeof File !== "undefined" && descriptor.body instanceof File) {
+        const filenameFromFile = descriptor.body.name;
+        if (filenameFromFile !== "") {
+          filename = filenameFromFile;
+        }
+      }
+      if (filename) {
+        disposition += `; filename=${escapeDispositionField(filename)}`;
+      }
+      return disposition;
+    }
+    function normalizeBody(body, contentType) {
+      if (body === void 0) {
+        return new Uint8Array([]);
+      }
+      if ((0, typeGuards_js_1.isBinaryBody)(body)) {
+        return body;
+      }
+      if (typeof body === "string" || typeof body === "number" || typeof body === "boolean") {
+        return (0, bytesEncoding_js_1.stringToUint8Array)(String(body), "utf-8");
+      }
+      if (contentType && /application\/(.+\+)?json(;.+)?/i.test(String(contentType))) {
+        return (0, bytesEncoding_js_1.stringToUint8Array)(JSON.stringify(body), "utf-8");
+      }
+      throw new restError_js_1.RestError(`Unsupported body/content-type combination: ${body}, ${contentType}`);
+    }
+    function buildBodyPart(descriptor) {
+      var _a;
+      const contentType = getPartContentType(descriptor);
+      const contentDisposition = getContentDisposition(descriptor);
+      const headers = (0, httpHeaders_js_1.createHttpHeaders)((_a = descriptor.headers) !== null && _a !== void 0 ? _a : {});
+      if (contentType) {
+        headers.set("content-type", contentType);
+      }
+      if (contentDisposition) {
+        headers.set("content-disposition", contentDisposition);
+      }
+      const body = normalizeBody(descriptor.body, contentType);
+      return {
+        headers,
+        body
+      };
+    }
+    function buildMultipartBody(parts) {
+      return { parts: parts.map(buildBodyPart) };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/sendRequest.js
+var require_sendRequest = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/sendRequest.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.sendRequest = sendRequest;
+    var restError_js_1 = require_restError();
+    var httpHeaders_js_1 = require_httpHeaders();
+    var pipelineRequest_js_1 = require_pipelineRequest();
+    var clientHelpers_js_1 = require_clientHelpers();
+    var typeGuards_js_1 = require_typeGuards();
+    var multipart_js_1 = require_multipart2();
+    async function sendRequest(method, url, pipeline, options = {}, customHttpClient) {
+      var _a;
+      const httpClient = customHttpClient !== null && customHttpClient !== void 0 ? customHttpClient : (0, clientHelpers_js_1.getCachedDefaultHttpsClient)();
+      const request = buildPipelineRequest(method, url, options);
+      try {
+        const response = await pipeline.sendRequest(httpClient, request);
+        const headers = response.headers.toJSON();
+        const stream = (_a = response.readableStreamBody) !== null && _a !== void 0 ? _a : response.browserStreamBody;
+        const parsedBody = options.responseAsStream || stream !== void 0 ? void 0 : getResponseBody(response);
+        const body = stream !== null && stream !== void 0 ? stream : parsedBody;
+        if (options === null || options === void 0 ? void 0 : options.onResponse) {
+          options.onResponse(Object.assign(Object.assign({}, response), { request, rawHeaders: headers, parsedBody }));
+        }
+        return {
+          request,
+          headers,
+          status: `${response.status}`,
+          body
+        };
+      } catch (e) {
+        if ((0, restError_js_1.isRestError)(e) && e.response && options.onResponse) {
+          const { response } = e;
+          const rawHeaders = response.headers.toJSON();
+          options === null || options === void 0 ? void 0 : options.onResponse(Object.assign(Object.assign({}, response), { request, rawHeaders }), e);
+        }
+        throw e;
+      }
+    }
+    function getRequestContentType(options = {}) {
+      var _a, _b, _c;
+      return (_c = (_a = options.contentType) !== null && _a !== void 0 ? _a : (_b = options.headers) === null || _b === void 0 ? void 0 : _b["content-type"]) !== null && _c !== void 0 ? _c : getContentType(options.body);
+    }
+    function getContentType(body) {
+      if (ArrayBuffer.isView(body)) {
+        return "application/octet-stream";
+      }
+      if (typeof body === "string") {
+        try {
+          JSON.parse(body);
+          return "application/json";
+        } catch (error2) {
+          return void 0;
+        }
+      }
+      return "application/json";
+    }
+    function buildPipelineRequest(method, url, options = {}) {
+      var _a, _b, _c;
+      const requestContentType = getRequestContentType(options);
+      const { body, multipartBody } = getRequestBody(options.body, requestContentType);
+      const hasContent = body !== void 0 || multipartBody !== void 0;
+      const headers = (0, httpHeaders_js_1.createHttpHeaders)(Object.assign(Object.assign(Object.assign({}, options.headers ? options.headers : {}), { accept: (_c = (_a = options.accept) !== null && _a !== void 0 ? _a : (_b = options.headers) === null || _b === void 0 ? void 0 : _b.accept) !== null && _c !== void 0 ? _c : "application/json" }), hasContent && requestContentType && {
+        "content-type": requestContentType
+      }));
+      return (0, pipelineRequest_js_1.createPipelineRequest)({
+        url,
+        method,
+        body,
+        multipartBody,
+        headers,
+        allowInsecureConnection: options.allowInsecureConnection,
+        abortSignal: options.abortSignal,
+        onUploadProgress: options.onUploadProgress,
+        onDownloadProgress: options.onDownloadProgress,
+        timeout: options.timeout,
+        enableBrowserStreams: true,
+        streamResponseStatusCodes: options.responseAsStream ? /* @__PURE__ */ new Set([Number.POSITIVE_INFINITY]) : void 0
+      });
+    }
+    function getRequestBody(body, contentType = "") {
+      if (body === void 0) {
+        return { body: void 0 };
+      }
+      if (typeof FormData !== "undefined" && body instanceof FormData) {
+        return { body };
+      }
+      if ((0, typeGuards_js_1.isReadableStream)(body)) {
+        return { body };
+      }
+      if (ArrayBuffer.isView(body)) {
+        return { body: body instanceof Uint8Array ? body : JSON.stringify(body) };
+      }
+      const firstType = contentType.split(";")[0];
+      switch (firstType) {
+        case "application/json":
+          return { body: JSON.stringify(body) };
+        case "multipart/form-data":
+          if (Array.isArray(body)) {
+            return { multipartBody: (0, multipart_js_1.buildMultipartBody)(body) };
+          }
+          return { body: JSON.stringify(body) };
+        case "text/plain":
+          return { body: String(body) };
+        default:
+          if (typeof body === "string") {
+            return { body };
+          }
+          return { body: JSON.stringify(body) };
+      }
+    }
+    function getResponseBody(response) {
+      var _a, _b;
+      const contentType = (_a = response.headers.get("content-type")) !== null && _a !== void 0 ? _a : "";
+      const firstType = contentType.split(";")[0];
+      const bodyToParse = (_b = response.bodyAsText) !== null && _b !== void 0 ? _b : "";
+      if (firstType === "text/plain") {
+        return String(bodyToParse);
+      }
+      try {
+        return bodyToParse ? JSON.parse(bodyToParse) : void 0;
+      } catch (error2) {
+        if (firstType === "application/json") {
+          throw createParseError(response, error2);
+        }
+        return String(bodyToParse);
+      }
+    }
+    function createParseError(response, err) {
+      var _a;
+      const msg = `Error "${err}" occurred while parsing the response body - ${response.bodyAsText}.`;
+      const errCode = (_a = err.code) !== null && _a !== void 0 ? _a : restError_js_1.RestError.PARSE_ERROR;
+      return new restError_js_1.RestError(msg, {
+        code: errCode,
+        statusCode: response.status,
+        request: response.request,
+        response
+      });
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/urlHelpers.js
+var require_urlHelpers = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/urlHelpers.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.buildRequestUrl = buildRequestUrl;
+    exports2.buildBaseUrl = buildBaseUrl;
+    exports2.replaceAll = replaceAll;
+    function isQueryParameterWithOptions(x) {
+      const value = x.value;
+      return value !== void 0 && value.toString !== void 0 && typeof value.toString === "function";
+    }
+    function buildRequestUrl(endpoint, routePath, pathParameters, options = {}) {
+      if (routePath.startsWith("https://") || routePath.startsWith("http://")) {
+        return routePath;
+      }
+      endpoint = buildBaseUrl(endpoint, options);
+      routePath = buildRoutePath(routePath, pathParameters, options);
+      const requestUrl = appendQueryParams(`${endpoint}/${routePath}`, options);
+      const url = new URL(requestUrl);
+      return url.toString().replace(/([^:]\/)\/+/g, "$1");
+    }
+    function getQueryParamValue(key, allowReserved, style, param) {
+      let separator;
+      if (style === "pipeDelimited") {
+        separator = "|";
+      } else if (style === "spaceDelimited") {
+        separator = "%20";
+      } else {
+        separator = ",";
+      }
+      let paramValues;
+      if (Array.isArray(param)) {
+        paramValues = param;
+      } else if (typeof param === "object" && param.toString === Object.prototype.toString) {
+        paramValues = Object.entries(param).flat();
+      } else {
+        paramValues = [param];
+      }
+      const value = paramValues.map((p) => {
+        if (p === null || p === void 0) {
+          return "";
+        }
+        if (!p.toString || typeof p.toString !== "function") {
+          throw new Error(`Query parameters must be able to be represented as string, ${key} can't`);
+        }
+        const rawValue = p.toISOString !== void 0 ? p.toISOString() : p.toString();
+        return allowReserved ? rawValue : encodeURIComponent(rawValue);
+      }).join(separator);
+      return `${allowReserved ? key : encodeURIComponent(key)}=${value}`;
+    }
+    function appendQueryParams(url, options = {}) {
+      var _a, _b, _c, _d;
+      if (!options.queryParameters) {
+        return url;
+      }
+      const parsedUrl = new URL(url);
+      const queryParams = options.queryParameters;
+      const paramStrings = [];
+      for (const key of Object.keys(queryParams)) {
+        const param = queryParams[key];
+        if (param === void 0 || param === null) {
+          continue;
+        }
+        const hasMetadata = isQueryParameterWithOptions(param);
+        const rawValue = hasMetadata ? param.value : param;
+        const explode = hasMetadata ? (_a = param.explode) !== null && _a !== void 0 ? _a : false : false;
+        const style = hasMetadata && param.style ? param.style : "form";
+        if (explode) {
+          if (Array.isArray(rawValue)) {
+            for (const item of rawValue) {
+              paramStrings.push(getQueryParamValue(key, (_b = options.skipUrlEncoding) !== null && _b !== void 0 ? _b : false, style, item));
+            }
+          } else if (typeof rawValue === "object") {
+            for (const [actualKey, value] of Object.entries(rawValue)) {
+              paramStrings.push(getQueryParamValue(actualKey, (_c = options.skipUrlEncoding) !== null && _c !== void 0 ? _c : false, style, value));
+            }
+          } else {
+            throw new Error("explode can only be set to true for objects and arrays");
+          }
+        } else {
+          paramStrings.push(getQueryParamValue(key, (_d = options.skipUrlEncoding) !== null && _d !== void 0 ? _d : false, style, rawValue));
+        }
+      }
+      if (parsedUrl.search !== "") {
+        parsedUrl.search += "&";
+      }
+      parsedUrl.search += paramStrings.join("&");
+      return parsedUrl.toString();
+    }
+    function buildBaseUrl(endpoint, options) {
+      var _a;
+      if (!options.pathParameters) {
+        return endpoint;
+      }
+      const pathParams = options.pathParameters;
+      for (const [key, param] of Object.entries(pathParams)) {
+        if (param === void 0 || param === null) {
+          throw new Error(`Path parameters ${key} must not be undefined or null`);
+        }
+        if (!param.toString || typeof param.toString !== "function") {
+          throw new Error(`Path parameters must be able to be represented as string, ${key} can't`);
+        }
+        let value = param.toISOString !== void 0 ? param.toISOString() : String(param);
+        if (!options.skipUrlEncoding) {
+          value = encodeURIComponent(param);
+        }
+        endpoint = (_a = replaceAll(endpoint, `{${key}}`, value)) !== null && _a !== void 0 ? _a : "";
+      }
+      return endpoint;
+    }
+    function buildRoutePath(routePath, pathParameters, options = {}) {
+      var _a;
+      for (const pathParam of pathParameters) {
+        const allowReserved = typeof pathParam === "object" && ((_a = pathParam.allowReserved) !== null && _a !== void 0 ? _a : false);
+        let value = typeof pathParam === "object" ? pathParam.value : pathParam;
+        if (!options.skipUrlEncoding && !allowReserved) {
+          value = encodeURIComponent(value);
+        }
+        routePath = routePath.replace(/\{[\w-]+\}/, String(value));
+      }
+      return routePath;
+    }
+    function replaceAll(value, searchValue, replaceValue) {
+      return !value || !searchValue ? value : value.split(searchValue).join(replaceValue || "");
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/getClient.js
+var require_getClient = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/getClient.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getClient = getClient;
+    var clientHelpers_js_1 = require_clientHelpers();
+    var sendRequest_js_1 = require_sendRequest();
+    var urlHelpers_js_1 = require_urlHelpers();
+    var checkEnvironment_js_1 = require_checkEnvironment();
+    function getClient(endpoint, clientOptions = {}) {
+      var _a, _b, _c;
+      const pipeline = (_a = clientOptions.pipeline) !== null && _a !== void 0 ? _a : (0, clientHelpers_js_1.createDefaultPipeline)(clientOptions);
+      if ((_b = clientOptions.additionalPolicies) === null || _b === void 0 ? void 0 : _b.length) {
+        for (const { policy, position } of clientOptions.additionalPolicies) {
+          const afterPhase = position === "perRetry" ? "Sign" : void 0;
+          pipeline.addPolicy(policy, {
+            afterPhase
+          });
+        }
+      }
+      const { allowInsecureConnection, httpClient } = clientOptions;
+      const endpointUrl = (_c = clientOptions.endpoint) !== null && _c !== void 0 ? _c : endpoint;
+      const client = (path3, ...args) => {
+        const getUrl = (requestOptions) => (0, urlHelpers_js_1.buildRequestUrl)(endpointUrl, path3, args, Object.assign({ allowInsecureConnection }, requestOptions));
+        return {
+          get: (requestOptions = {}) => {
+            return buildOperation("GET", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          post: (requestOptions = {}) => {
+            return buildOperation("POST", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          put: (requestOptions = {}) => {
+            return buildOperation("PUT", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          patch: (requestOptions = {}) => {
+            return buildOperation("PATCH", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          delete: (requestOptions = {}) => {
+            return buildOperation("DELETE", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          head: (requestOptions = {}) => {
+            return buildOperation("HEAD", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          options: (requestOptions = {}) => {
+            return buildOperation("OPTIONS", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          },
+          trace: (requestOptions = {}) => {
+            return buildOperation("TRACE", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
+          }
+        };
+      };
+      return {
+        path: client,
+        pathUnchecked: client,
+        pipeline
+      };
+    }
+    function buildOperation(method, url, pipeline, options, allowInsecureConnection, httpClient) {
+      var _a;
+      allowInsecureConnection = (_a = options.allowInsecureConnection) !== null && _a !== void 0 ? _a : allowInsecureConnection;
+      return {
+        then: function(onFulfilled, onrejected) {
+          return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, Object.assign(Object.assign({}, options), { allowInsecureConnection }), httpClient).then(onFulfilled, onrejected);
+        },
+        async asBrowserStream() {
+          if (checkEnvironment_js_1.isNodeLike) {
+            throw new Error("`asBrowserStream` is supported only in the browser environment. Use `asNodeStream` instead to obtain the response body stream. If you require a Web stream of the response in Node, consider using `Readable.toWeb` on the result of `asNodeStream`.");
+          } else {
+            return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, Object.assign(Object.assign({}, options), { allowInsecureConnection, responseAsStream: true }), httpClient);
+          }
+        },
+        async asNodeStream() {
+          if (checkEnvironment_js_1.isNodeLike) {
+            return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, Object.assign(Object.assign({}, options), { allowInsecureConnection, responseAsStream: true }), httpClient);
+          } else {
+            throw new Error("`isNodeStream` is not supported in the browser environment. Use `asBrowserStream` to obtain the response body stream.");
+          }
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/operationOptionHelpers.js
+var require_operationOptionHelpers = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/operationOptionHelpers.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.operationOptionsToRequestParameters = operationOptionsToRequestParameters;
+    function operationOptionsToRequestParameters(options) {
+      var _a, _b, _c, _d, _e, _f;
+      return {
+        allowInsecureConnection: (_a = options.requestOptions) === null || _a === void 0 ? void 0 : _a.allowInsecureConnection,
+        timeout: (_b = options.requestOptions) === null || _b === void 0 ? void 0 : _b.timeout,
+        skipUrlEncoding: (_c = options.requestOptions) === null || _c === void 0 ? void 0 : _c.skipUrlEncoding,
+        abortSignal: options.abortSignal,
+        onUploadProgress: (_d = options.requestOptions) === null || _d === void 0 ? void 0 : _d.onUploadProgress,
+        onDownloadProgress: (_e = options.requestOptions) === null || _e === void 0 ? void 0 : _e.onDownloadProgress,
+        headers: Object.assign({}, (_f = options.requestOptions) === null || _f === void 0 ? void 0 : _f.headers),
+        onResponse: options.onResponse
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/restError.js
+var require_restError2 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/client/restError.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createRestError = createRestError;
+    var restError_js_1 = require_restError();
+    var httpHeaders_js_1 = require_httpHeaders();
+    function createRestError(messageOrResponse, response) {
+      var _a, _b, _c;
+      const resp = typeof messageOrResponse === "string" ? response : messageOrResponse;
+      const internalError = (_b = (_a = resp.body) === null || _a === void 0 ? void 0 : _a.error) !== null && _b !== void 0 ? _b : resp.body;
+      const message = typeof messageOrResponse === "string" ? messageOrResponse : (_c = internalError === null || internalError === void 0 ? void 0 : internalError.message) !== null && _c !== void 0 ? _c : `Unexpected status code: ${resp.status}`;
+      return new restError_js_1.RestError(message, {
+        statusCode: statusCodeToNumber(resp.status),
+        code: internalError === null || internalError === void 0 ? void 0 : internalError.code,
+        request: resp.request,
+        response: toPipelineResponse(resp)
+      });
+    }
+    function toPipelineResponse(response) {
+      var _a;
+      return {
+        headers: (0, httpHeaders_js_1.createHttpHeaders)(response.headers),
+        request: response.request,
+        status: (_a = statusCodeToNumber(response.status)) !== null && _a !== void 0 ? _a : -1
+      };
+    }
+    function statusCodeToNumber(statusCode) {
+      const status = Number.parseInt(statusCode);
+      return Number.isNaN(status) ? void 0 : status;
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/index.js
+var require_commonjs = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createRestError = exports2.operationOptionsToRequestParameters = exports2.getClient = exports2.createDefaultHttpClient = exports2.uint8ArrayToString = exports2.stringToUint8Array = exports2.isRestError = exports2.RestError = exports2.createEmptyPipeline = exports2.createPipelineRequest = exports2.createHttpHeaders = exports2.TypeSpecRuntimeLogger = exports2.setLogLevel = exports2.getLogLevel = exports2.createClientLogger = exports2.AbortError = void 0;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var AbortError_js_1 = require_AbortError();
+    Object.defineProperty(exports2, "AbortError", { enumerable: true, get: function() {
+      return AbortError_js_1.AbortError;
+    } });
+    var logger_js_1 = require_logger();
+    Object.defineProperty(exports2, "createClientLogger", { enumerable: true, get: function() {
+      return logger_js_1.createClientLogger;
+    } });
+    Object.defineProperty(exports2, "getLogLevel", { enumerable: true, get: function() {
+      return logger_js_1.getLogLevel;
+    } });
+    Object.defineProperty(exports2, "setLogLevel", { enumerable: true, get: function() {
+      return logger_js_1.setLogLevel;
+    } });
+    Object.defineProperty(exports2, "TypeSpecRuntimeLogger", { enumerable: true, get: function() {
+      return logger_js_1.TypeSpecRuntimeLogger;
+    } });
+    var httpHeaders_js_1 = require_httpHeaders();
+    Object.defineProperty(exports2, "createHttpHeaders", { enumerable: true, get: function() {
+      return httpHeaders_js_1.createHttpHeaders;
+    } });
+    tslib_1.__exportStar(require_schemes(), exports2);
+    tslib_1.__exportStar(require_oauth2Flows(), exports2);
+    var pipelineRequest_js_1 = require_pipelineRequest();
+    Object.defineProperty(exports2, "createPipelineRequest", { enumerable: true, get: function() {
+      return pipelineRequest_js_1.createPipelineRequest;
+    } });
+    var pipeline_js_1 = require_pipeline();
+    Object.defineProperty(exports2, "createEmptyPipeline", { enumerable: true, get: function() {
+      return pipeline_js_1.createEmptyPipeline;
+    } });
+    var restError_js_1 = require_restError();
+    Object.defineProperty(exports2, "RestError", { enumerable: true, get: function() {
+      return restError_js_1.RestError;
+    } });
+    Object.defineProperty(exports2, "isRestError", { enumerable: true, get: function() {
+      return restError_js_1.isRestError;
+    } });
+    var bytesEncoding_js_1 = require_bytesEncoding();
+    Object.defineProperty(exports2, "stringToUint8Array", { enumerable: true, get: function() {
+      return bytesEncoding_js_1.stringToUint8Array;
+    } });
+    Object.defineProperty(exports2, "uint8ArrayToString", { enumerable: true, get: function() {
+      return bytesEncoding_js_1.uint8ArrayToString;
+    } });
+    var defaultHttpClient_js_1 = require_defaultHttpClient();
+    Object.defineProperty(exports2, "createDefaultHttpClient", { enumerable: true, get: function() {
+      return defaultHttpClient_js_1.createDefaultHttpClient;
+    } });
+    var getClient_js_1 = require_getClient();
+    Object.defineProperty(exports2, "getClient", { enumerable: true, get: function() {
+      return getClient_js_1.getClient;
+    } });
+    var operationOptionHelpers_js_1 = require_operationOptionHelpers();
+    Object.defineProperty(exports2, "operationOptionsToRequestParameters", { enumerable: true, get: function() {
+      return operationOptionHelpers_js_1.operationOptionsToRequestParameters;
+    } });
+    var restError_js_2 = require_restError2();
+    Object.defineProperty(exports2, "createRestError", { enumerable: true, get: function() {
+      return restError_js_2.createRestError;
+    } });
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/pipeline.js
+var require_pipeline2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/pipeline.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createEmptyPipeline = createEmptyPipeline;
+    var ts_http_runtime_1 = require_commonjs();
+    function createEmptyPipeline() {
+      return (0, ts_http_runtime_1.createEmptyPipeline)();
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/internal.js
+var require_internal = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/logger/internal.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createLoggerContext = void 0;
+    var logger_js_1 = require_logger();
+    Object.defineProperty(exports2, "createLoggerContext", { enumerable: true, get: function() {
+      return logger_js_1.createLoggerContext;
+    } });
+  }
+});
+
+// ../../node_modules/@azure/logger/dist/commonjs/index.js
+var require_commonjs2 = __commonJS({
+  "../../node_modules/@azure/logger/dist/commonjs/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.AzureLogger = void 0;
+    exports2.setLogLevel = setLogLevel;
+    exports2.getLogLevel = getLogLevel;
+    exports2.createClientLogger = createClientLogger;
+    var logger_1 = require_internal();
+    var context3 = (0, logger_1.createLoggerContext)({
+      logLevelEnvVarName: "AZURE_LOG_LEVEL",
+      namespace: "azure"
+    });
+    exports2.AzureLogger = context3.logger;
+    function setLogLevel(level) {
+      context3.setLogLevel(level);
+    }
+    function getLogLevel() {
+      return context3.getLogLevel();
+    }
+    function createClientLogger(namespace) {
+      return context3.createClientLogger(namespace);
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/log.js
+var require_log3 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/log.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.logger = void 0;
+    var logger_1 = require_commonjs2();
+    exports2.logger = (0, logger_1.createClientLogger)("core-rest-pipeline");
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/exponentialRetryPolicy.js
+var require_exponentialRetryPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/exponentialRetryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.exponentialRetryPolicyName = void 0;
+    exports2.exponentialRetryPolicy = exponentialRetryPolicy;
+    var exponentialRetryStrategy_js_1 = require_exponentialRetryStrategy();
+    var retryPolicy_js_1 = require_retryPolicy();
+    var constants_js_1 = require_constants7();
+    exports2.exponentialRetryPolicyName = "exponentialRetryPolicy";
+    function exponentialRetryPolicy(options = {}) {
+      var _a;
+      return (0, retryPolicy_js_1.retryPolicy)([
+        (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(Object.assign(Object.assign({}, options), { ignoreSystemErrors: true }))
+      ], {
+        maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+      });
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/systemErrorRetryPolicy.js
+var require_systemErrorRetryPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/systemErrorRetryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.systemErrorRetryPolicyName = void 0;
+    exports2.systemErrorRetryPolicy = systemErrorRetryPolicy;
+    var exponentialRetryStrategy_js_1 = require_exponentialRetryStrategy();
+    var retryPolicy_js_1 = require_retryPolicy();
+    var constants_js_1 = require_constants7();
+    exports2.systemErrorRetryPolicyName = "systemErrorRetryPolicy";
+    function systemErrorRetryPolicy(options = {}) {
+      var _a;
+      return {
+        name: exports2.systemErrorRetryPolicyName,
+        sendRequest: (0, retryPolicy_js_1.retryPolicy)([
+          (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(Object.assign(Object.assign({}, options), { ignoreHttpStatusCodes: true }))
+        ], {
+          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+        }).sendRequest
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/throttlingRetryPolicy.js
+var require_throttlingRetryPolicy = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/throttlingRetryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.throttlingRetryPolicyName = void 0;
+    exports2.throttlingRetryPolicy = throttlingRetryPolicy;
+    var throttlingRetryStrategy_js_1 = require_throttlingRetryStrategy();
+    var retryPolicy_js_1 = require_retryPolicy();
+    var constants_js_1 = require_constants7();
+    exports2.throttlingRetryPolicyName = "throttlingRetryPolicy";
+    function throttlingRetryPolicy(options = {}) {
+      var _a;
+      return {
+        name: exports2.throttlingRetryPolicyName,
+        sendRequest: (0, retryPolicy_js_1.retryPolicy)([(0, throttlingRetryStrategy_js_1.throttlingRetryStrategy)()], {
+          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+        }).sendRequest
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/internal.js
+var require_internal2 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/policies/internal.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.userAgentPolicyName = exports2.userAgentPolicy = exports2.tlsPolicyName = exports2.tlsPolicy = exports2.redirectPolicyName = exports2.redirectPolicy = exports2.getDefaultProxySettings = exports2.proxyPolicyName = exports2.proxyPolicy = exports2.multipartPolicyName = exports2.multipartPolicy = exports2.logPolicyName = exports2.logPolicy = exports2.formDataPolicyName = exports2.formDataPolicy = exports2.throttlingRetryPolicyName = exports2.throttlingRetryPolicy = exports2.systemErrorRetryPolicyName = exports2.systemErrorRetryPolicy = exports2.retryPolicy = exports2.exponentialRetryPolicyName = exports2.exponentialRetryPolicy = exports2.defaultRetryPolicyName = exports2.defaultRetryPolicy = exports2.decompressResponsePolicyName = exports2.decompressResponsePolicy = exports2.agentPolicyName = exports2.agentPolicy = void 0;
+    var agentPolicy_js_1 = require_agentPolicy();
+    Object.defineProperty(exports2, "agentPolicy", { enumerable: true, get: function() {
+      return agentPolicy_js_1.agentPolicy;
+    } });
+    Object.defineProperty(exports2, "agentPolicyName", { enumerable: true, get: function() {
+      return agentPolicy_js_1.agentPolicyName;
+    } });
+    var decompressResponsePolicy_js_1 = require_decompressResponsePolicy();
+    Object.defineProperty(exports2, "decompressResponsePolicy", { enumerable: true, get: function() {
+      return decompressResponsePolicy_js_1.decompressResponsePolicy;
+    } });
+    Object.defineProperty(exports2, "decompressResponsePolicyName", { enumerable: true, get: function() {
+      return decompressResponsePolicy_js_1.decompressResponsePolicyName;
+    } });
+    var defaultRetryPolicy_js_1 = require_defaultRetryPolicy();
+    Object.defineProperty(exports2, "defaultRetryPolicy", { enumerable: true, get: function() {
+      return defaultRetryPolicy_js_1.defaultRetryPolicy;
+    } });
+    Object.defineProperty(exports2, "defaultRetryPolicyName", { enumerable: true, get: function() {
+      return defaultRetryPolicy_js_1.defaultRetryPolicyName;
+    } });
+    var exponentialRetryPolicy_js_1 = require_exponentialRetryPolicy();
+    Object.defineProperty(exports2, "exponentialRetryPolicy", { enumerable: true, get: function() {
+      return exponentialRetryPolicy_js_1.exponentialRetryPolicy;
+    } });
+    Object.defineProperty(exports2, "exponentialRetryPolicyName", { enumerable: true, get: function() {
+      return exponentialRetryPolicy_js_1.exponentialRetryPolicyName;
+    } });
+    var retryPolicy_js_1 = require_retryPolicy();
+    Object.defineProperty(exports2, "retryPolicy", { enumerable: true, get: function() {
+      return retryPolicy_js_1.retryPolicy;
+    } });
+    var systemErrorRetryPolicy_js_1 = require_systemErrorRetryPolicy();
+    Object.defineProperty(exports2, "systemErrorRetryPolicy", { enumerable: true, get: function() {
+      return systemErrorRetryPolicy_js_1.systemErrorRetryPolicy;
+    } });
+    Object.defineProperty(exports2, "systemErrorRetryPolicyName", { enumerable: true, get: function() {
+      return systemErrorRetryPolicy_js_1.systemErrorRetryPolicyName;
+    } });
+    var throttlingRetryPolicy_js_1 = require_throttlingRetryPolicy();
+    Object.defineProperty(exports2, "throttlingRetryPolicy", { enumerable: true, get: function() {
+      return throttlingRetryPolicy_js_1.throttlingRetryPolicy;
+    } });
+    Object.defineProperty(exports2, "throttlingRetryPolicyName", { enumerable: true, get: function() {
+      return throttlingRetryPolicy_js_1.throttlingRetryPolicyName;
+    } });
+    var formDataPolicy_js_1 = require_formDataPolicy();
+    Object.defineProperty(exports2, "formDataPolicy", { enumerable: true, get: function() {
+      return formDataPolicy_js_1.formDataPolicy;
+    } });
+    Object.defineProperty(exports2, "formDataPolicyName", { enumerable: true, get: function() {
+      return formDataPolicy_js_1.formDataPolicyName;
+    } });
+    var logPolicy_js_1 = require_logPolicy();
+    Object.defineProperty(exports2, "logPolicy", { enumerable: true, get: function() {
+      return logPolicy_js_1.logPolicy;
+    } });
+    Object.defineProperty(exports2, "logPolicyName", { enumerable: true, get: function() {
+      return logPolicy_js_1.logPolicyName;
+    } });
+    var multipartPolicy_js_1 = require_multipartPolicy();
+    Object.defineProperty(exports2, "multipartPolicy", { enumerable: true, get: function() {
+      return multipartPolicy_js_1.multipartPolicy;
+    } });
+    Object.defineProperty(exports2, "multipartPolicyName", { enumerable: true, get: function() {
+      return multipartPolicy_js_1.multipartPolicyName;
+    } });
+    var proxyPolicy_js_1 = require_proxyPolicy();
+    Object.defineProperty(exports2, "proxyPolicy", { enumerable: true, get: function() {
+      return proxyPolicy_js_1.proxyPolicy;
+    } });
+    Object.defineProperty(exports2, "proxyPolicyName", { enumerable: true, get: function() {
+      return proxyPolicy_js_1.proxyPolicyName;
+    } });
+    Object.defineProperty(exports2, "getDefaultProxySettings", { enumerable: true, get: function() {
+      return proxyPolicy_js_1.getDefaultProxySettings;
+    } });
+    var redirectPolicy_js_1 = require_redirectPolicy();
+    Object.defineProperty(exports2, "redirectPolicy", { enumerable: true, get: function() {
+      return redirectPolicy_js_1.redirectPolicy;
+    } });
+    Object.defineProperty(exports2, "redirectPolicyName", { enumerable: true, get: function() {
+      return redirectPolicy_js_1.redirectPolicyName;
+    } });
+    var tlsPolicy_js_1 = require_tlsPolicy();
+    Object.defineProperty(exports2, "tlsPolicy", { enumerable: true, get: function() {
+      return tlsPolicy_js_1.tlsPolicy;
+    } });
+    Object.defineProperty(exports2, "tlsPolicyName", { enumerable: true, get: function() {
+      return tlsPolicy_js_1.tlsPolicyName;
+    } });
+    var userAgentPolicy_js_1 = require_userAgentPolicy();
+    Object.defineProperty(exports2, "userAgentPolicy", { enumerable: true, get: function() {
+      return userAgentPolicy_js_1.userAgentPolicy;
+    } });
+    Object.defineProperty(exports2, "userAgentPolicyName", { enumerable: true, get: function() {
+      return userAgentPolicy_js_1.userAgentPolicyName;
+    } });
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/logPolicy.js
+var require_logPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/logPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.logPolicyName = void 0;
+    exports2.logPolicy = logPolicy;
+    var log_js_1 = require_log3();
+    var policies_1 = require_internal2();
+    exports2.logPolicyName = policies_1.logPolicyName;
+    function logPolicy(options = {}) {
+      return (0, policies_1.logPolicy)(Object.assign({ logger: log_js_1.logger.info }, options));
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/redirectPolicy.js
+var require_redirectPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/redirectPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.redirectPolicyName = void 0;
+    exports2.redirectPolicy = redirectPolicy;
+    var policies_1 = require_internal2();
+    exports2.redirectPolicyName = policies_1.redirectPolicyName;
+    function redirectPolicy(options = {}) {
+      return (0, policies_1.redirectPolicy)(options);
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgentPlatform.js
+var require_userAgentPlatform2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgentPlatform.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getHeaderName = getHeaderName;
+    exports2.setPlatformSpecificData = setPlatformSpecificData;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var os2 = tslib_1.__importStar(require("node:os"));
+    var process4 = tslib_1.__importStar(require("node:process"));
+    function getHeaderName() {
+      return "User-Agent";
+    }
+    async function setPlatformSpecificData(map) {
+      if (process4 && process4.versions) {
+        const versions = process4.versions;
+        if (versions.bun) {
+          map.set("Bun", versions.bun);
+        } else if (versions.deno) {
+          map.set("Deno", versions.deno);
+        } else if (versions.node) {
+          map.set("Node", versions.node);
+        }
+      }
+      map.set("OS", `(${os2.arch()}-${os2.type()}-${os2.release()})`);
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/constants.js
+var require_constants8 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/constants.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
+    exports2.SDK_VERSION = "1.20.0";
+    exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgent.js
+var require_userAgent2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/userAgent.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getUserAgentHeaderName = getUserAgentHeaderName;
+    exports2.getUserAgentValue = getUserAgentValue;
+    var userAgentPlatform_js_1 = require_userAgentPlatform2();
+    var constants_js_1 = require_constants8();
+    function getUserAgentString(telemetryInfo) {
+      const parts = [];
+      for (const [key, value] of telemetryInfo) {
+        const token = value ? `${key}/${value}` : key;
+        parts.push(token);
+      }
+      return parts.join(" ");
+    }
+    function getUserAgentHeaderName() {
+      return (0, userAgentPlatform_js_1.getHeaderName)();
+    }
+    async function getUserAgentValue(prefix) {
+      const runtimeInfo = /* @__PURE__ */ new Map();
+      runtimeInfo.set("core-rest-pipeline", constants_js_1.SDK_VERSION);
+      await (0, userAgentPlatform_js_1.setPlatformSpecificData)(runtimeInfo);
+      const defaultAgent = getUserAgentString(runtimeInfo);
+      const userAgentValue = prefix ? `${prefix} ${defaultAgent}` : defaultAgent;
+      return userAgentValue;
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/userAgentPolicy.js
+var require_userAgentPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/userAgentPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.userAgentPolicyName = void 0;
+    exports2.userAgentPolicy = userAgentPolicy;
+    var userAgent_js_1 = require_userAgent2();
+    var UserAgentHeaderName = (0, userAgent_js_1.getUserAgentHeaderName)();
+    exports2.userAgentPolicyName = "userAgentPolicy";
+    function userAgentPolicy(options = {}) {
+      const userAgentValue = (0, userAgent_js_1.getUserAgentValue)(options.userAgentPrefix);
+      return {
+        name: exports2.userAgentPolicyName,
+        async sendRequest(request, next) {
+          if (!request.headers.has(UserAgentHeaderName)) {
+            request.headers.set(UserAgentHeaderName, await userAgentValue);
+          }
+          return next(request);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/sha256.js
+var require_sha256 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/sha256.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.computeSha256Hmac = computeSha256Hmac;
+    exports2.computeSha256Hash = computeSha256Hash;
+    var node_crypto_1 = require("node:crypto");
+    async function computeSha256Hmac(key, stringToSign, encoding) {
+      const decodedKey = Buffer.from(key, "base64");
+      return (0, node_crypto_1.createHmac)("sha256", decodedKey).update(stringToSign).digest(encoding);
+    }
+    async function computeSha256Hash(content, encoding) {
+      return (0, node_crypto_1.createHash)("sha256").update(content).digest(encoding);
+    }
+  }
+});
+
+// ../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/internal.js
+var require_internal3 = __commonJS({
+  "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/internal.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.Sanitizer = exports2.uint8ArrayToString = exports2.stringToUint8Array = exports2.isWebWorker = exports2.isReactNative = exports2.isDeno = exports2.isNodeRuntime = exports2.isNodeLike = exports2.isBun = exports2.isBrowser = exports2.randomUUID = exports2.computeSha256Hmac = exports2.computeSha256Hash = exports2.isError = exports2.isObject = exports2.getRandomIntegerInclusive = exports2.calculateRetryDelay = void 0;
+    var delay_js_1 = require_delay();
+    Object.defineProperty(exports2, "calculateRetryDelay", { enumerable: true, get: function() {
+      return delay_js_1.calculateRetryDelay;
+    } });
+    var random_js_1 = require_random();
+    Object.defineProperty(exports2, "getRandomIntegerInclusive", { enumerable: true, get: function() {
+      return random_js_1.getRandomIntegerInclusive;
+    } });
+    var object_js_1 = require_object();
+    Object.defineProperty(exports2, "isObject", { enumerable: true, get: function() {
+      return object_js_1.isObject;
+    } });
+    var error_js_1 = require_error();
+    Object.defineProperty(exports2, "isError", { enumerable: true, get: function() {
+      return error_js_1.isError;
+    } });
+    var sha256_js_1 = require_sha256();
+    Object.defineProperty(exports2, "computeSha256Hash", { enumerable: true, get: function() {
+      return sha256_js_1.computeSha256Hash;
+    } });
+    Object.defineProperty(exports2, "computeSha256Hmac", { enumerable: true, get: function() {
+      return sha256_js_1.computeSha256Hmac;
+    } });
+    var uuidUtils_js_1 = require_uuidUtils();
+    Object.defineProperty(exports2, "randomUUID", { enumerable: true, get: function() {
+      return uuidUtils_js_1.randomUUID;
+    } });
+    var checkEnvironment_js_1 = require_checkEnvironment();
+    Object.defineProperty(exports2, "isBrowser", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isBrowser;
+    } });
+    Object.defineProperty(exports2, "isBun", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isBun;
+    } });
+    Object.defineProperty(exports2, "isNodeLike", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isNodeLike;
+    } });
+    Object.defineProperty(exports2, "isNodeRuntime", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isNodeRuntime;
+    } });
+    Object.defineProperty(exports2, "isDeno", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isDeno;
+    } });
+    Object.defineProperty(exports2, "isReactNative", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isReactNative;
+    } });
+    Object.defineProperty(exports2, "isWebWorker", { enumerable: true, get: function() {
+      return checkEnvironment_js_1.isWebWorker;
+    } });
+    var bytesEncoding_js_1 = require_bytesEncoding();
+    Object.defineProperty(exports2, "stringToUint8Array", { enumerable: true, get: function() {
+      return bytesEncoding_js_1.stringToUint8Array;
+    } });
+    Object.defineProperty(exports2, "uint8ArrayToString", { enumerable: true, get: function() {
+      return bytesEncoding_js_1.uint8ArrayToString;
+    } });
+    var sanitizer_js_1 = require_sanitizer();
+    Object.defineProperty(exports2, "Sanitizer", { enumerable: true, get: function() {
+      return sanitizer_js_1.Sanitizer;
+    } });
+  }
+});
+
+// ../../node_modules/@azure/core-util/dist/commonjs/aborterUtils.js
+var require_aborterUtils = __commonJS({
+  "../../node_modules/@azure/core-util/dist/commonjs/aborterUtils.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.cancelablePromiseRace = cancelablePromiseRace;
+    async function cancelablePromiseRace(abortablePromiseBuilders, options) {
+      var _a, _b;
+      const aborter = new AbortController();
+      function abortHandler() {
+        aborter.abort();
+      }
+      (_a = options === null || options === void 0 ? void 0 : options.abortSignal) === null || _a === void 0 ? void 0 : _a.addEventListener("abort", abortHandler);
+      try {
+        return await Promise.race(abortablePromiseBuilders.map((p) => p({ abortSignal: aborter.signal })));
+      } finally {
+        aborter.abort();
+        (_b = options === null || options === void 0 ? void 0 : options.abortSignal) === null || _b === void 0 ? void 0 : _b.removeEventListener("abort", abortHandler);
+      }
+    }
+  }
+});
+
+// ../../node_modules/@azure/abort-controller/dist/commonjs/AbortError.js
+var require_AbortError2 = __commonJS({
+  "../../node_modules/@azure/abort-controller/dist/commonjs/AbortError.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.AbortError = void 0;
+    var AbortError = class extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "AbortError";
+      }
+    };
+    exports2.AbortError = AbortError;
+  }
+});
+
+// ../../node_modules/@azure/abort-controller/dist/commonjs/index.js
+var require_commonjs3 = __commonJS({
+  "../../node_modules/@azure/abort-controller/dist/commonjs/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.AbortError = void 0;
+    var AbortError_js_1 = require_AbortError2();
+    Object.defineProperty(exports2, "AbortError", { enumerable: true, get: function() {
+      return AbortError_js_1.AbortError;
+    } });
+  }
+});
+
+// ../../node_modules/@azure/core-util/dist/commonjs/createAbortablePromise.js
+var require_createAbortablePromise = __commonJS({
+  "../../node_modules/@azure/core-util/dist/commonjs/createAbortablePromise.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createAbortablePromise = createAbortablePromise;
+    var abort_controller_1 = require_commonjs3();
+    function createAbortablePromise(buildPromise, options) {
+      const { cleanupBeforeAbort, abortSignal, abortErrorMsg } = options !== null && options !== void 0 ? options : {};
+      return new Promise((resolve, reject) => {
+        function rejectOnAbort() {
+          reject(new abort_controller_1.AbortError(abortErrorMsg !== null && abortErrorMsg !== void 0 ? abortErrorMsg : "The operation was aborted."));
+        }
+        function removeListeners() {
+          abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.removeEventListener("abort", onAbort);
+        }
+        function onAbort() {
+          cleanupBeforeAbort === null || cleanupBeforeAbort === void 0 ? void 0 : cleanupBeforeAbort();
+          removeListeners();
+          rejectOnAbort();
+        }
+        if (abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.aborted) {
+          return rejectOnAbort();
+        }
+        try {
+          buildPromise((x) => {
+            removeListeners();
+            resolve(x);
+          }, (x) => {
+            removeListeners();
+            reject(x);
+          });
+        } catch (err) {
+          reject(err);
+        }
+        abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.addEventListener("abort", onAbort);
+      });
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-util/dist/commonjs/delay.js
+var require_delay2 = __commonJS({
+  "../../node_modules/@azure/core-util/dist/commonjs/delay.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.delay = delay;
+    exports2.calculateRetryDelay = calculateRetryDelay;
+    var createAbortablePromise_js_1 = require_createAbortablePromise();
+    var util_1 = require_internal3();
+    var StandardAbortMessage = "The delay was aborted.";
+    function delay(timeInMs, options) {
+      let token;
+      const { abortSignal, abortErrorMsg } = options !== null && options !== void 0 ? options : {};
+      return (0, createAbortablePromise_js_1.createAbortablePromise)((resolve) => {
+        token = setTimeout(resolve, timeInMs);
+      }, {
+        cleanupBeforeAbort: () => clearTimeout(token),
+        abortSignal,
+        abortErrorMsg: abortErrorMsg !== null && abortErrorMsg !== void 0 ? abortErrorMsg : StandardAbortMessage
+      });
+    }
+    function calculateRetryDelay(retryAttempt, config) {
+      const exponentialDelay = config.retryDelayInMs * Math.pow(2, retryAttempt);
+      const clampedDelay = Math.min(config.maxRetryDelayInMs, exponentialDelay);
+      const retryAfterInMs = clampedDelay / 2 + (0, util_1.getRandomIntegerInclusive)(0, clampedDelay / 2);
+      return { retryAfterInMs };
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-util/dist/commonjs/error.js
+var require_error2 = __commonJS({
+  "../../node_modules/@azure/core-util/dist/commonjs/error.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getErrorMessage = getErrorMessage;
+    var util_1 = require_internal3();
+    function getErrorMessage(e) {
+      if ((0, util_1.isError)(e)) {
+        return e.message;
+      } else {
+        let stringified;
+        try {
+          if (typeof e === "object" && e) {
+            stringified = JSON.stringify(e);
+          } else {
+            stringified = String(e);
+          }
+        } catch (err) {
+          stringified = "[unable to stringify input]";
+        }
+        return `Unknown error ${stringified}`;
+      }
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-util/dist/commonjs/typeGuards.js
+var require_typeGuards2 = __commonJS({
+  "../../node_modules/@azure/core-util/dist/commonjs/typeGuards.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isDefined = isDefined;
+    exports2.isObjectWithProperties = isObjectWithProperties;
+    exports2.objectHasProperty = objectHasProperty;
+    function isDefined(thing) {
+      return typeof thing !== "undefined" && thing !== null;
+    }
+    function isObjectWithProperties(thing, properties) {
+      if (!isDefined(thing) || typeof thing !== "object") {
+        return false;
+      }
+      for (const property of properties) {
+        if (!objectHasProperty(thing, property)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function objectHasProperty(thing, property) {
+      return isDefined(thing) && typeof thing === "object" && property in thing;
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-util/dist/commonjs/index.js
+var require_commonjs4 = __commonJS({
+  "../../node_modules/@azure/core-util/dist/commonjs/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.isWebWorker = exports2.isReactNative = exports2.isNodeRuntime = exports2.isNodeLike = exports2.isNode = exports2.isDeno = exports2.isBun = exports2.isBrowser = exports2.objectHasProperty = exports2.isObjectWithProperties = exports2.isDefined = exports2.getErrorMessage = exports2.delay = exports2.createAbortablePromise = exports2.cancelablePromiseRace = void 0;
+    exports2.calculateRetryDelay = calculateRetryDelay;
+    exports2.computeSha256Hash = computeSha256Hash;
+    exports2.computeSha256Hmac = computeSha256Hmac;
+    exports2.getRandomIntegerInclusive = getRandomIntegerInclusive;
+    exports2.isError = isError;
+    exports2.isObject = isObject;
+    exports2.randomUUID = randomUUID;
+    exports2.uint8ArrayToString = uint8ArrayToString;
+    exports2.stringToUint8Array = stringToUint8Array;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var tspRuntime = tslib_1.__importStar(require_internal3());
+    var aborterUtils_js_1 = require_aborterUtils();
+    Object.defineProperty(exports2, "cancelablePromiseRace", { enumerable: true, get: function() {
+      return aborterUtils_js_1.cancelablePromiseRace;
+    } });
+    var createAbortablePromise_js_1 = require_createAbortablePromise();
+    Object.defineProperty(exports2, "createAbortablePromise", { enumerable: true, get: function() {
+      return createAbortablePromise_js_1.createAbortablePromise;
+    } });
+    var delay_js_1 = require_delay2();
+    Object.defineProperty(exports2, "delay", { enumerable: true, get: function() {
+      return delay_js_1.delay;
+    } });
+    var error_js_1 = require_error2();
+    Object.defineProperty(exports2, "getErrorMessage", { enumerable: true, get: function() {
+      return error_js_1.getErrorMessage;
+    } });
+    var typeGuards_js_1 = require_typeGuards2();
+    Object.defineProperty(exports2, "isDefined", { enumerable: true, get: function() {
+      return typeGuards_js_1.isDefined;
+    } });
+    Object.defineProperty(exports2, "isObjectWithProperties", { enumerable: true, get: function() {
+      return typeGuards_js_1.isObjectWithProperties;
+    } });
+    Object.defineProperty(exports2, "objectHasProperty", { enumerable: true, get: function() {
+      return typeGuards_js_1.objectHasProperty;
+    } });
+    function calculateRetryDelay(retryAttempt, config) {
+      return tspRuntime.calculateRetryDelay(retryAttempt, config);
+    }
+    function computeSha256Hash(content, encoding) {
+      return tspRuntime.computeSha256Hash(content, encoding);
+    }
+    function computeSha256Hmac(key, stringToSign, encoding) {
+      return tspRuntime.computeSha256Hmac(key, stringToSign, encoding);
+    }
+    function getRandomIntegerInclusive(min, max) {
+      return tspRuntime.getRandomIntegerInclusive(min, max);
+    }
+    function isError(e) {
+      return tspRuntime.isError(e);
+    }
+    function isObject(input) {
+      return tspRuntime.isObject(input);
+    }
+    function randomUUID() {
+      return tspRuntime.randomUUID();
+    }
+    exports2.isBrowser = tspRuntime.isBrowser;
+    exports2.isBun = tspRuntime.isBun;
+    exports2.isDeno = tspRuntime.isDeno;
+    exports2.isNode = tspRuntime.isNodeLike;
+    exports2.isNodeLike = tspRuntime.isNodeLike;
+    exports2.isNodeRuntime = tspRuntime.isNodeRuntime;
+    exports2.isReactNative = tspRuntime.isReactNative;
+    exports2.isWebWorker = tspRuntime.isWebWorker;
+    function uint8ArrayToString(bytes, format) {
+      return tspRuntime.uint8ArrayToString(bytes, format);
+    }
+    function stringToUint8Array(value, format) {
+      return tspRuntime.stringToUint8Array(value, format);
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/file.js
+var require_file2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/file.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.hasRawContent = hasRawContent;
+    exports2.getRawContent = getRawContent;
+    exports2.createFileFromStream = createFileFromStream;
+    exports2.createFile = createFile;
+    var core_util_1 = require_commonjs4();
+    function isNodeReadableStream(x) {
+      return Boolean(x && typeof x["pipe"] === "function");
+    }
+    var unimplementedMethods = {
+      arrayBuffer: () => {
+        throw new Error("Not implemented");
+      },
+      bytes: () => {
+        throw new Error("Not implemented");
+      },
+      slice: () => {
+        throw new Error("Not implemented");
+      },
+      text: () => {
+        throw new Error("Not implemented");
+      }
+    };
+    var rawContent = Symbol("rawContent");
+    function hasRawContent(x) {
+      return typeof x[rawContent] === "function";
+    }
+    function getRawContent(blob) {
+      if (hasRawContent(blob)) {
+        return blob[rawContent]();
+      } else {
+        return blob;
+      }
+    }
+    function createFileFromStream(stream, name, options = {}) {
+      var _a, _b, _c, _d;
+      return Object.assign(Object.assign({}, unimplementedMethods), { type: (_a = options.type) !== null && _a !== void 0 ? _a : "", lastModified: (_b = options.lastModified) !== null && _b !== void 0 ? _b : (/* @__PURE__ */ new Date()).getTime(), webkitRelativePath: (_c = options.webkitRelativePath) !== null && _c !== void 0 ? _c : "", size: (_d = options.size) !== null && _d !== void 0 ? _d : -1, name, stream: () => {
+        const s = stream();
+        if (isNodeReadableStream(s)) {
+          throw new Error("Not supported: a Node stream was provided as input to createFileFromStream.");
+        }
+        return s;
+      }, [rawContent]: stream });
+    }
+    function createFile(content, name, options = {}) {
+      var _a, _b, _c;
+      if (core_util_1.isNodeLike) {
+        return Object.assign(Object.assign({}, unimplementedMethods), { type: (_a = options.type) !== null && _a !== void 0 ? _a : "", lastModified: (_b = options.lastModified) !== null && _b !== void 0 ? _b : (/* @__PURE__ */ new Date()).getTime(), webkitRelativePath: (_c = options.webkitRelativePath) !== null && _c !== void 0 ? _c : "", size: content.byteLength, name, arrayBuffer: async () => content.buffer, stream: () => new Blob([content]).stream(), [rawContent]: () => content });
+      } else {
+        return new File([content], name, options);
+      }
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/multipartPolicy.js
+var require_multipartPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/multipartPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.multipartPolicyName = void 0;
+    exports2.multipartPolicy = multipartPolicy;
+    var policies_1 = require_internal2();
+    var file_js_1 = require_file2();
+    exports2.multipartPolicyName = policies_1.multipartPolicyName;
+    function multipartPolicy() {
+      const tspPolicy = (0, policies_1.multipartPolicy)();
+      return {
+        name: exports2.multipartPolicyName,
+        sendRequest: async (request, next) => {
+          if (request.multipartBody) {
+            for (const part of request.multipartBody.parts) {
+              if ((0, file_js_1.hasRawContent)(part.body)) {
+                part.body = (0, file_js_1.getRawContent)(part.body);
+              }
+            }
+          }
+          return tspPolicy.sendRequest(request, next);
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/decompressResponsePolicy.js
+var require_decompressResponsePolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/decompressResponsePolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.decompressResponsePolicyName = void 0;
+    exports2.decompressResponsePolicy = decompressResponsePolicy;
+    var policies_1 = require_internal2();
+    exports2.decompressResponsePolicyName = policies_1.decompressResponsePolicyName;
+    function decompressResponsePolicy() {
+      return (0, policies_1.decompressResponsePolicy)();
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/defaultRetryPolicy.js
+var require_defaultRetryPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/defaultRetryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.defaultRetryPolicyName = void 0;
+    exports2.defaultRetryPolicy = defaultRetryPolicy;
+    var policies_1 = require_internal2();
+    exports2.defaultRetryPolicyName = policies_1.defaultRetryPolicyName;
+    function defaultRetryPolicy(options = {}) {
+      return (0, policies_1.defaultRetryPolicy)(options);
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/formDataPolicy.js
+var require_formDataPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/formDataPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.formDataPolicyName = void 0;
+    exports2.formDataPolicy = formDataPolicy;
+    var policies_1 = require_internal2();
+    exports2.formDataPolicyName = policies_1.formDataPolicyName;
+    function formDataPolicy() {
+      return (0, policies_1.formDataPolicy)();
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/proxyPolicy.js
+var require_proxyPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/proxyPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.proxyPolicyName = void 0;
+    exports2.getDefaultProxySettings = getDefaultProxySettings;
+    exports2.proxyPolicy = proxyPolicy;
+    var policies_1 = require_internal2();
+    exports2.proxyPolicyName = policies_1.proxyPolicyName;
+    function getDefaultProxySettings(proxyUrl) {
+      return (0, policies_1.getDefaultProxySettings)(proxyUrl);
+    }
+    function proxyPolicy(proxySettings, options) {
+      return (0, policies_1.proxyPolicy)(proxySettings, options);
+    }
+  }
+});
+
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/setClientRequestIdPolicy.js
 var require_setClientRequestIdPolicy = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/setClientRequestIdPolicy.js"(exports2) {
@@ -26704,45 +28657,31 @@ var require_setClientRequestIdPolicy = __commonJS({
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/agentPolicy.js
-var require_agentPolicy = __commonJS({
+var require_agentPolicy2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/agentPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.agentPolicyName = void 0;
     exports2.agentPolicy = agentPolicy;
-    exports2.agentPolicyName = "agentPolicy";
+    var policies_1 = require_internal2();
+    exports2.agentPolicyName = policies_1.agentPolicyName;
     function agentPolicy(agent) {
-      return {
-        name: exports2.agentPolicyName,
-        sendRequest: async (req, next) => {
-          if (!req.agent) {
-            req.agent = agent;
-          }
-          return next(req);
-        }
-      };
+      return (0, policies_1.agentPolicy)(agent);
     }
   }
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/tlsPolicy.js
-var require_tlsPolicy = __commonJS({
+var require_tlsPolicy2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/tlsPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.tlsPolicyName = void 0;
     exports2.tlsPolicy = tlsPolicy;
-    exports2.tlsPolicyName = "tlsPolicy";
+    var policies_1 = require_internal2();
+    exports2.tlsPolicyName = policies_1.tlsPolicyName;
     function tlsPolicy(tlsSettings) {
-      return {
-        name: exports2.tlsPolicyName,
-        sendRequest: async (req, next) => {
-          if (!req.tlsSettings) {
-            req.tlsSettings = tlsSettings;
-          }
-          return next(req);
-        }
-      };
+      return (0, policies_1.tlsPolicy)(tlsSettings);
     }
   }
 });
@@ -26920,7 +28859,7 @@ var require_tracingClient = __commonJS({
 });
 
 // ../../node_modules/@azure/core-tracing/dist/commonjs/index.js
-var require_commonjs4 = __commonJS({
+var require_commonjs5 = __commonJS({
   "../../node_modules/@azure/core-tracing/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -26936,54 +28875,25 @@ var require_commonjs4 = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/inspect.js
-var require_inspect = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/inspect.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.custom = void 0;
-    var node_util_1 = require("node:util");
-    exports2.custom = node_util_1.inspect.custom;
-  }
-});
-
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/restError.js
-var require_restError = __commonJS({
+var require_restError3 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/restError.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.RestError = void 0;
     exports2.isRestError = isRestError;
-    var core_util_1 = require_commonjs3();
-    var inspect_js_1 = require_inspect();
-    var sanitizer_js_1 = require_sanitizer();
-    var errorSanitizer = new sanitizer_js_1.Sanitizer();
-    var RestError = class _RestError extends Error {
+    var ts_http_runtime_1 = require_commonjs();
+    var RestError = class extends Error {
       constructor(message, options = {}) {
         super(message);
-        this.name = "RestError";
-        this.code = options.code;
-        this.statusCode = options.statusCode;
-        Object.defineProperty(this, "request", { value: options.request, enumerable: false });
-        Object.defineProperty(this, "response", { value: options.response, enumerable: false });
-        Object.setPrototypeOf(this, _RestError.prototype);
-      }
-      /**
-       * Logging method for util.inspect in Node
-       */
-      [inspect_js_1.custom]() {
-        return `RestError: ${this.message} 
- ${errorSanitizer.sanitize(Object.assign(Object.assign({}, this), { request: this.request, response: this.response }))}`;
+        return new ts_http_runtime_1.RestError(message, options);
       }
     };
     exports2.RestError = RestError;
     RestError.REQUEST_SEND_ERROR = "REQUEST_SEND_ERROR";
     RestError.PARSE_ERROR = "PARSE_ERROR";
     function isRestError(e) {
-      if (e instanceof RestError) {
-        return true;
-      }
-      return (0, core_util_1.isError)(e) && e.name === "RestError";
+      return (0, ts_http_runtime_1.isRestError)(e);
     }
   }
 });
@@ -26995,17 +28905,17 @@ var require_tracingPolicy = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.tracingPolicyName = void 0;
     exports2.tracingPolicy = tracingPolicy;
-    var core_tracing_1 = require_commonjs4();
-    var constants_js_1 = require_constants7();
-    var userAgent_js_1 = require_userAgent();
-    var log_js_1 = require_log2();
-    var core_util_1 = require_commonjs3();
-    var restError_js_1 = require_restError();
-    var sanitizer_js_1 = require_sanitizer();
+    var core_tracing_1 = require_commonjs5();
+    var constants_js_1 = require_constants8();
+    var userAgent_js_1 = require_userAgent2();
+    var log_js_1 = require_log3();
+    var core_util_1 = require_commonjs4();
+    var restError_js_1 = require_restError3();
+    var util_1 = require_internal3();
     exports2.tracingPolicyName = "tracingPolicy";
     function tracingPolicy(options = {}) {
       const userAgentPromise = (0, userAgent_js_1.getUserAgentValue)(options.userAgentPrefix);
-      const sanitizer = new sanitizer_js_1.Sanitizer({
+      const sanitizer = new util_1.Sanitizer({
         additionalAllowedQueryParameters: options.additionalAllowedQueryParameters
       });
       const tracingClient = tryCreateTracingClient();
@@ -27107,26 +29017,87 @@ var require_tracingPolicy = __commonJS({
   }
 });
 
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/wrapAbortSignal.js
+var require_wrapAbortSignal = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/util/wrapAbortSignal.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.wrapAbortSignalLike = wrapAbortSignalLike;
+    function wrapAbortSignalLike(abortSignalLike) {
+      if (abortSignalLike instanceof AbortSignal) {
+        return { abortSignal: abortSignalLike };
+      }
+      if (abortSignalLike.aborted) {
+        return { abortSignal: AbortSignal.abort(abortSignalLike.reason) };
+      }
+      const controller = new AbortController();
+      let needsCleanup = true;
+      function cleanup() {
+        if (needsCleanup) {
+          abortSignalLike.removeEventListener("abort", listener);
+          needsCleanup = false;
+        }
+      }
+      function listener() {
+        controller.abort(abortSignalLike.reason);
+        cleanup();
+      }
+      abortSignalLike.addEventListener("abort", listener);
+      return { abortSignal: controller.signal, cleanup };
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/wrapAbortSignalLikePolicy.js
+var require_wrapAbortSignalLikePolicy = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/wrapAbortSignalLikePolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.wrapAbortSignalLikePolicyName = void 0;
+    exports2.wrapAbortSignalLikePolicy = wrapAbortSignalLikePolicy;
+    var wrapAbortSignal_js_1 = require_wrapAbortSignal();
+    exports2.wrapAbortSignalLikePolicyName = "wrapAbortSignalLikePolicy";
+    function wrapAbortSignalLikePolicy() {
+      return {
+        name: exports2.wrapAbortSignalLikePolicyName,
+        sendRequest: async (request, next) => {
+          if (!request.abortSignal) {
+            return next(request);
+          }
+          const { abortSignal, cleanup } = (0, wrapAbortSignal_js_1.wrapAbortSignalLike)(request.abortSignal);
+          request.abortSignal = abortSignal;
+          try {
+            return await next(request);
+          } finally {
+            cleanup === null || cleanup === void 0 ? void 0 : cleanup();
+          }
+        }
+      };
+    }
+  }
+});
+
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/createPipelineFromOptions.js
-var require_createPipelineFromOptions = __commonJS({
+var require_createPipelineFromOptions2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/createPipelineFromOptions.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createPipelineFromOptions = createPipelineFromOptions;
-    var logPolicy_js_1 = require_logPolicy();
-    var pipeline_js_1 = require_pipeline();
-    var redirectPolicy_js_1 = require_redirectPolicy();
-    var userAgentPolicy_js_1 = require_userAgentPolicy();
-    var multipartPolicy_js_1 = require_multipartPolicy();
-    var decompressResponsePolicy_js_1 = require_decompressResponsePolicy();
-    var defaultRetryPolicy_js_1 = require_defaultRetryPolicy();
-    var formDataPolicy_js_1 = require_formDataPolicy();
-    var core_util_1 = require_commonjs3();
-    var proxyPolicy_js_1 = require_proxyPolicy();
+    var logPolicy_js_1 = require_logPolicy2();
+    var pipeline_js_1 = require_pipeline2();
+    var redirectPolicy_js_1 = require_redirectPolicy2();
+    var userAgentPolicy_js_1 = require_userAgentPolicy2();
+    var multipartPolicy_js_1 = require_multipartPolicy2();
+    var decompressResponsePolicy_js_1 = require_decompressResponsePolicy2();
+    var defaultRetryPolicy_js_1 = require_defaultRetryPolicy2();
+    var formDataPolicy_js_1 = require_formDataPolicy2();
+    var core_util_1 = require_commonjs4();
+    var proxyPolicy_js_1 = require_proxyPolicy2();
     var setClientRequestIdPolicy_js_1 = require_setClientRequestIdPolicy();
-    var agentPolicy_js_1 = require_agentPolicy();
-    var tlsPolicy_js_1 = require_tlsPolicy();
+    var agentPolicy_js_1 = require_agentPolicy2();
+    var tlsPolicy_js_1 = require_tlsPolicy2();
     var tracingPolicy_js_1 = require_tracingPolicy();
+    var wrapAbortSignalLikePolicy_js_1 = require_wrapAbortSignalLikePolicy();
     function createPipelineFromOptions(options) {
       var _a;
       const pipeline = (0, pipeline_js_1.createEmptyPipeline)();
@@ -27140,6 +29111,7 @@ var require_createPipelineFromOptions = __commonJS({
         pipeline.addPolicy((0, proxyPolicy_js_1.proxyPolicy)(options.proxyOptions));
         pipeline.addPolicy((0, decompressResponsePolicy_js_1.decompressResponsePolicy)());
       }
+      pipeline.addPolicy((0, wrapAbortSignalLikePolicy_js_1.wrapAbortSignalLikePolicy)());
       pipeline.addPolicy((0, formDataPolicy_js_1.formDataPolicy)(), { beforePolicies: [multipartPolicy_js_1.multipartPolicyName] });
       pipeline.addPolicy((0, userAgentPolicy_js_1.userAgentPolicy)(options.userAgentOptions));
       pipeline.addPolicy((0, setClientRequestIdPolicy_js_1.setClientRequestIdPolicy)((_a = options.telemetryOptions) === null || _a === void 0 ? void 0 : _a.clientRequestIdHeaderName));
@@ -27157,437 +29129,114 @@ var require_createPipelineFromOptions = __commonJS({
   }
 });
 
-// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/nodeHttpClient.js
-var require_nodeHttpClient = __commonJS({
-  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/nodeHttpClient.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getBodyLength = getBodyLength;
-    exports2.createNodeHttpClient = createNodeHttpClient;
-    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var http = tslib_1.__importStar(require("node:http"));
-    var https = tslib_1.__importStar(require("node:https"));
-    var zlib = tslib_1.__importStar(require("node:zlib"));
-    var node_stream_1 = require("node:stream");
-    var abort_controller_1 = require_commonjs2();
-    var httpHeaders_js_1 = require_httpHeaders();
-    var restError_js_1 = require_restError();
-    var log_js_1 = require_log2();
-    var sanitizer_js_1 = require_sanitizer();
-    var DEFAULT_TLS_SETTINGS = {};
-    function isReadableStream(body) {
-      return body && typeof body.pipe === "function";
-    }
-    function isStreamComplete(stream) {
-      if (stream.readable === false) {
-        return Promise.resolve();
-      }
-      return new Promise((resolve) => {
-        const handler = () => {
-          resolve();
-          stream.removeListener("close", handler);
-          stream.removeListener("end", handler);
-          stream.removeListener("error", handler);
-        };
-        stream.on("close", handler);
-        stream.on("end", handler);
-        stream.on("error", handler);
-      });
-    }
-    function isArrayBuffer(body) {
-      return body && typeof body.byteLength === "number";
-    }
-    var ReportTransform = class extends node_stream_1.Transform {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-      _transform(chunk, _encoding, callback) {
-        this.push(chunk);
-        this.loadedBytes += chunk.length;
-        try {
-          this.progressCallback({ loadedBytes: this.loadedBytes });
-          callback();
-        } catch (e) {
-          callback(e);
-        }
-      }
-      constructor(progressCallback) {
-        super();
-        this.loadedBytes = 0;
-        this.progressCallback = progressCallback;
-      }
-    };
-    var NodeHttpClient = class {
-      constructor() {
-        this.cachedHttpsAgents = /* @__PURE__ */ new WeakMap();
-      }
-      /**
-       * Makes a request over an underlying transport layer and returns the response.
-       * @param request - The request to be made.
-       */
-      async sendRequest(request) {
-        var _a, _b, _c;
-        const abortController = new AbortController();
-        let abortListener;
-        if (request.abortSignal) {
-          if (request.abortSignal.aborted) {
-            throw new abort_controller_1.AbortError("The operation was aborted. Request has already been canceled.");
-          }
-          abortListener = (event) => {
-            if (event.type === "abort") {
-              abortController.abort();
-            }
-          };
-          request.abortSignal.addEventListener("abort", abortListener);
-        }
-        let timeoutId;
-        if (request.timeout > 0) {
-          timeoutId = setTimeout(() => {
-            const sanitizer = new sanitizer_js_1.Sanitizer();
-            log_js_1.logger.info(`request to '${sanitizer.sanitizeUrl(request.url)}' timed out. canceling...`);
-            abortController.abort();
-          }, request.timeout);
-        }
-        const acceptEncoding = request.headers.get("Accept-Encoding");
-        const shouldDecompress = (acceptEncoding === null || acceptEncoding === void 0 ? void 0 : acceptEncoding.includes("gzip")) || (acceptEncoding === null || acceptEncoding === void 0 ? void 0 : acceptEncoding.includes("deflate"));
-        let body = typeof request.body === "function" ? request.body() : request.body;
-        if (body && !request.headers.has("Content-Length")) {
-          const bodyLength = getBodyLength(body);
-          if (bodyLength !== null) {
-            request.headers.set("Content-Length", bodyLength);
-          }
-        }
-        let responseStream;
-        try {
-          if (body && request.onUploadProgress) {
-            const onUploadProgress = request.onUploadProgress;
-            const uploadReportStream = new ReportTransform(onUploadProgress);
-            uploadReportStream.on("error", (e) => {
-              log_js_1.logger.error("Error in upload progress", e);
-            });
-            if (isReadableStream(body)) {
-              body.pipe(uploadReportStream);
-            } else {
-              uploadReportStream.end(body);
-            }
-            body = uploadReportStream;
-          }
-          const res = await this.makeRequest(request, abortController, body);
-          if (timeoutId !== void 0) {
-            clearTimeout(timeoutId);
-          }
-          const headers = getResponseHeaders(res);
-          const status = (_a = res.statusCode) !== null && _a !== void 0 ? _a : 0;
-          const response = {
-            status,
-            headers,
-            request
-          };
-          if (request.method === "HEAD") {
-            res.resume();
-            return response;
-          }
-          responseStream = shouldDecompress ? getDecodedResponseStream(res, headers) : res;
-          const onDownloadProgress = request.onDownloadProgress;
-          if (onDownloadProgress) {
-            const downloadReportStream = new ReportTransform(onDownloadProgress);
-            downloadReportStream.on("error", (e) => {
-              log_js_1.logger.error("Error in download progress", e);
-            });
-            responseStream.pipe(downloadReportStream);
-            responseStream = downloadReportStream;
-          }
-          if (
-            // Value of POSITIVE_INFINITY in streamResponseStatusCodes is considered as any status code
-            ((_b = request.streamResponseStatusCodes) === null || _b === void 0 ? void 0 : _b.has(Number.POSITIVE_INFINITY)) || ((_c = request.streamResponseStatusCodes) === null || _c === void 0 ? void 0 : _c.has(response.status))
-          ) {
-            response.readableStreamBody = responseStream;
-          } else {
-            response.bodyAsText = await streamToText(responseStream);
-          }
-          return response;
-        } finally {
-          if (request.abortSignal && abortListener) {
-            let uploadStreamDone = Promise.resolve();
-            if (isReadableStream(body)) {
-              uploadStreamDone = isStreamComplete(body);
-            }
-            let downloadStreamDone = Promise.resolve();
-            if (isReadableStream(responseStream)) {
-              downloadStreamDone = isStreamComplete(responseStream);
-            }
-            Promise.all([uploadStreamDone, downloadStreamDone]).then(() => {
-              var _a2;
-              if (abortListener) {
-                (_a2 = request.abortSignal) === null || _a2 === void 0 ? void 0 : _a2.removeEventListener("abort", abortListener);
-              }
-            }).catch((e) => {
-              log_js_1.logger.warning("Error when cleaning up abortListener on httpRequest", e);
-            });
-          }
-        }
-      }
-      makeRequest(request, abortController, body) {
-        var _a;
-        const url = new URL(request.url);
-        const isInsecure = url.protocol !== "https:";
-        if (isInsecure && !request.allowInsecureConnection) {
-          throw new Error(`Cannot connect to ${request.url} while allowInsecureConnection is false.`);
-        }
-        const agent = (_a = request.agent) !== null && _a !== void 0 ? _a : this.getOrCreateAgent(request, isInsecure);
-        const options = {
-          agent,
-          hostname: url.hostname,
-          path: `${url.pathname}${url.search}`,
-          port: url.port,
-          method: request.method,
-          headers: request.headers.toJSON({ preserveCase: true })
-        };
-        return new Promise((resolve, reject) => {
-          const req = isInsecure ? http.request(options, resolve) : https.request(options, resolve);
-          req.once("error", (err) => {
-            var _a2;
-            reject(new restError_js_1.RestError(err.message, { code: (_a2 = err.code) !== null && _a2 !== void 0 ? _a2 : restError_js_1.RestError.REQUEST_SEND_ERROR, request }));
-          });
-          abortController.signal.addEventListener("abort", () => {
-            const abortError = new abort_controller_1.AbortError("The operation was aborted. Rejecting from abort signal callback while making request.");
-            req.destroy(abortError);
-            reject(abortError);
-          });
-          if (body && isReadableStream(body)) {
-            body.pipe(req);
-          } else if (body) {
-            if (typeof body === "string" || Buffer.isBuffer(body)) {
-              req.end(body);
-            } else if (isArrayBuffer(body)) {
-              req.end(ArrayBuffer.isView(body) ? Buffer.from(body.buffer) : Buffer.from(body));
-            } else {
-              log_js_1.logger.error("Unrecognized body type", body);
-              reject(new restError_js_1.RestError("Unrecognized body type"));
-            }
-          } else {
-            req.end();
-          }
-        });
-      }
-      getOrCreateAgent(request, isInsecure) {
-        var _a;
-        const disableKeepAlive = request.disableKeepAlive;
-        if (isInsecure) {
-          if (disableKeepAlive) {
-            return http.globalAgent;
-          }
-          if (!this.cachedHttpAgent) {
-            this.cachedHttpAgent = new http.Agent({ keepAlive: true });
-          }
-          return this.cachedHttpAgent;
-        } else {
-          if (disableKeepAlive && !request.tlsSettings) {
-            return https.globalAgent;
-          }
-          const tlsSettings = (_a = request.tlsSettings) !== null && _a !== void 0 ? _a : DEFAULT_TLS_SETTINGS;
-          let agent = this.cachedHttpsAgents.get(tlsSettings);
-          if (agent && agent.options.keepAlive === !disableKeepAlive) {
-            return agent;
-          }
-          log_js_1.logger.info("No cached TLS Agent exist, creating a new Agent");
-          agent = new https.Agent(Object.assign({
-            // keepAlive is true if disableKeepAlive is false.
-            keepAlive: !disableKeepAlive
-          }, tlsSettings));
-          this.cachedHttpsAgents.set(tlsSettings, agent);
-          return agent;
-        }
-      }
-    };
-    function getResponseHeaders(res) {
-      const headers = (0, httpHeaders_js_1.createHttpHeaders)();
-      for (const header of Object.keys(res.headers)) {
-        const value = res.headers[header];
-        if (Array.isArray(value)) {
-          if (value.length > 0) {
-            headers.set(header, value[0]);
-          }
-        } else if (value) {
-          headers.set(header, value);
-        }
-      }
-      return headers;
-    }
-    function getDecodedResponseStream(stream, headers) {
-      const contentEncoding = headers.get("Content-Encoding");
-      if (contentEncoding === "gzip") {
-        const unzip = zlib.createGunzip();
-        stream.pipe(unzip);
-        return unzip;
-      } else if (contentEncoding === "deflate") {
-        const inflate = zlib.createInflate();
-        stream.pipe(inflate);
-        return inflate;
-      }
-      return stream;
-    }
-    function streamToText(stream) {
-      return new Promise((resolve, reject) => {
-        const buffer = [];
-        stream.on("data", (chunk) => {
-          if (Buffer.isBuffer(chunk)) {
-            buffer.push(chunk);
-          } else {
-            buffer.push(Buffer.from(chunk));
-          }
-        });
-        stream.on("end", () => {
-          resolve(Buffer.concat(buffer).toString("utf8"));
-        });
-        stream.on("error", (e) => {
-          if (e && (e === null || e === void 0 ? void 0 : e.name) === "AbortError") {
-            reject(e);
-          } else {
-            reject(new restError_js_1.RestError(`Error reading response as text: ${e.message}`, {
-              code: restError_js_1.RestError.PARSE_ERROR
-            }));
-          }
-        });
-      });
-    }
-    function getBodyLength(body) {
-      if (!body) {
-        return 0;
-      } else if (Buffer.isBuffer(body)) {
-        return body.length;
-      } else if (isReadableStream(body)) {
-        return null;
-      } else if (isArrayBuffer(body)) {
-        return body.byteLength;
-      } else if (typeof body === "string") {
-        return Buffer.from(body).length;
-      } else {
-        return null;
-      }
-    }
-    function createNodeHttpClient() {
-      return new NodeHttpClient();
-    }
-  }
-});
-
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/defaultHttpClient.js
-var require_defaultHttpClient = __commonJS({
+var require_defaultHttpClient2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/defaultHttpClient.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createDefaultHttpClient = createDefaultHttpClient;
-    var nodeHttpClient_js_1 = require_nodeHttpClient();
+    var ts_http_runtime_1 = require_commonjs();
+    var wrapAbortSignal_js_1 = require_wrapAbortSignal();
     function createDefaultHttpClient() {
-      return (0, nodeHttpClient_js_1.createNodeHttpClient)();
+      const client = (0, ts_http_runtime_1.createDefaultHttpClient)();
+      return {
+        async sendRequest(request) {
+          const { abortSignal, cleanup } = request.abortSignal ? (0, wrapAbortSignal_js_1.wrapAbortSignalLike)(request.abortSignal) : {};
+          try {
+            request.abortSignal = abortSignal;
+            return await client.sendRequest(request);
+          } finally {
+            cleanup === null || cleanup === void 0 ? void 0 : cleanup();
+          }
+        }
+      };
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/httpHeaders.js
+var require_httpHeaders2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/httpHeaders.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.createHttpHeaders = createHttpHeaders;
+    var ts_http_runtime_1 = require_commonjs();
+    function createHttpHeaders(rawHeaders) {
+      return (0, ts_http_runtime_1.createHttpHeaders)(rawHeaders);
     }
   }
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/pipelineRequest.js
-var require_pipelineRequest = __commonJS({
+var require_pipelineRequest2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/pipelineRequest.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createPipelineRequest = createPipelineRequest;
-    var httpHeaders_js_1 = require_httpHeaders();
-    var core_util_1 = require_commonjs3();
-    var PipelineRequestImpl = class {
-      constructor(options) {
-        var _a, _b, _c, _d, _e, _f, _g;
-        this.url = options.url;
-        this.body = options.body;
-        this.headers = (_a = options.headers) !== null && _a !== void 0 ? _a : (0, httpHeaders_js_1.createHttpHeaders)();
-        this.method = (_b = options.method) !== null && _b !== void 0 ? _b : "GET";
-        this.timeout = (_c = options.timeout) !== null && _c !== void 0 ? _c : 0;
-        this.multipartBody = options.multipartBody;
-        this.formData = options.formData;
-        this.disableKeepAlive = (_d = options.disableKeepAlive) !== null && _d !== void 0 ? _d : false;
-        this.proxySettings = options.proxySettings;
-        this.streamResponseStatusCodes = options.streamResponseStatusCodes;
-        this.withCredentials = (_e = options.withCredentials) !== null && _e !== void 0 ? _e : false;
-        this.abortSignal = options.abortSignal;
-        this.tracingOptions = options.tracingOptions;
-        this.onUploadProgress = options.onUploadProgress;
-        this.onDownloadProgress = options.onDownloadProgress;
-        this.requestId = options.requestId || (0, core_util_1.randomUUID)();
-        this.allowInsecureConnection = (_f = options.allowInsecureConnection) !== null && _f !== void 0 ? _f : false;
-        this.enableBrowserStreams = (_g = options.enableBrowserStreams) !== null && _g !== void 0 ? _g : false;
-        this.agent = options.agent;
-        this.tlsSettings = options.tlsSettings;
-      }
-    };
+    var ts_http_runtime_1 = require_commonjs();
     function createPipelineRequest(options) {
-      return new PipelineRequestImpl(options);
+      return (0, ts_http_runtime_1.createPipelineRequest)(options);
     }
   }
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/exponentialRetryPolicy.js
-var require_exponentialRetryPolicy = __commonJS({
+var require_exponentialRetryPolicy2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/exponentialRetryPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.exponentialRetryPolicyName = void 0;
     exports2.exponentialRetryPolicy = exponentialRetryPolicy;
-    var exponentialRetryStrategy_js_1 = require_exponentialRetryStrategy();
-    var retryPolicy_js_1 = require_retryPolicy();
-    var constants_js_1 = require_constants7();
-    exports2.exponentialRetryPolicyName = "exponentialRetryPolicy";
+    var policies_1 = require_internal2();
+    exports2.exponentialRetryPolicyName = policies_1.exponentialRetryPolicyName;
     function exponentialRetryPolicy(options = {}) {
-      var _a;
-      return (0, retryPolicy_js_1.retryPolicy)([
-        (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(Object.assign(Object.assign({}, options), { ignoreSystemErrors: true }))
-      ], {
-        maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
-      });
+      return (0, policies_1.exponentialRetryPolicy)(options);
     }
   }
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/systemErrorRetryPolicy.js
-var require_systemErrorRetryPolicy = __commonJS({
+var require_systemErrorRetryPolicy2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/systemErrorRetryPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.systemErrorRetryPolicyName = void 0;
     exports2.systemErrorRetryPolicy = systemErrorRetryPolicy;
-    var exponentialRetryStrategy_js_1 = require_exponentialRetryStrategy();
-    var retryPolicy_js_1 = require_retryPolicy();
-    var constants_js_1 = require_constants7();
-    exports2.systemErrorRetryPolicyName = "systemErrorRetryPolicy";
+    var policies_1 = require_internal2();
+    exports2.systemErrorRetryPolicyName = policies_1.systemErrorRetryPolicyName;
     function systemErrorRetryPolicy(options = {}) {
-      var _a;
-      return {
-        name: exports2.systemErrorRetryPolicyName,
-        sendRequest: (0, retryPolicy_js_1.retryPolicy)([
-          (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(Object.assign(Object.assign({}, options), { ignoreHttpStatusCodes: true }))
-        ], {
-          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
-        }).sendRequest
-      };
+      return (0, policies_1.systemErrorRetryPolicy)(options);
     }
   }
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/throttlingRetryPolicy.js
-var require_throttlingRetryPolicy = __commonJS({
+var require_throttlingRetryPolicy2 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/throttlingRetryPolicy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.throttlingRetryPolicyName = void 0;
     exports2.throttlingRetryPolicy = throttlingRetryPolicy;
-    var throttlingRetryStrategy_js_1 = require_throttlingRetryStrategy();
-    var retryPolicy_js_1 = require_retryPolicy();
-    var constants_js_1 = require_constants7();
-    exports2.throttlingRetryPolicyName = "throttlingRetryPolicy";
+    var policies_1 = require_internal2();
+    exports2.throttlingRetryPolicyName = policies_1.throttlingRetryPolicyName;
     function throttlingRetryPolicy(options = {}) {
-      var _a;
-      return {
-        name: exports2.throttlingRetryPolicyName,
-        sendRequest: (0, retryPolicy_js_1.retryPolicy)([(0, throttlingRetryStrategy_js_1.throttlingRetryStrategy)()], {
-          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
-        }).sendRequest
-      };
+      return (0, policies_1.throttlingRetryPolicy)(options);
+    }
+  }
+});
+
+// ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/retryPolicy.js
+var require_retryPolicy2 = __commonJS({
+  "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/policies/retryPolicy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.retryPolicy = retryPolicy;
+    var logger_1 = require_commonjs2();
+    var constants_js_1 = require_constants8();
+    var policies_1 = require_internal2();
+    var retryPolicyLogger = (0, logger_1.createClientLogger)("core-rest-pipeline retryPolicy");
+    function retryPolicy(strategies, options = { maxRetries: constants_js_1.DEFAULT_RETRY_POLICY_COUNT }) {
+      return (0, policies_1.retryPolicy)(strategies, Object.assign({ logger: retryPolicyLogger }, options));
     }
   }
 });
@@ -27599,7 +29248,7 @@ var require_tokenCycler = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_CYCLER_OPTIONS = void 0;
     exports2.createTokenCycler = createTokenCycler;
-    var helpers_js_1 = require_helpers();
+    var core_util_1 = require_commonjs4();
     exports2.DEFAULT_CYCLER_OPTIONS = {
       forcedRefreshWindowInMs: 1e3,
       // Force waiting for a refresh 1s before the token expires
@@ -27626,7 +29275,7 @@ var require_tokenCycler = __commonJS({
       }
       let token = await tryGetAccessToken();
       while (token === null) {
-        await (0, helpers_js_1.delay)(retryIntervalInMs);
+        await (0, core_util_1.delay)(retryIntervalInMs);
         token = await tryGetAccessToken();
       }
       return token;
@@ -27716,8 +29365,8 @@ var require_bearerTokenAuthenticationPolicy = __commonJS({
     exports2.bearerTokenAuthenticationPolicy = bearerTokenAuthenticationPolicy;
     exports2.parseChallenges = parseChallenges;
     var tokenCycler_js_1 = require_tokenCycler();
-    var log_js_1 = require_log2();
-    var restError_js_1 = require_restError();
+    var log_js_1 = require_log3();
+    var restError_js_1 = require_restError3();
     exports2.bearerTokenAuthenticationPolicyName = "bearerTokenAuthenticationPolicy";
     async function trySendRequest(request, next) {
       try {
@@ -27923,7 +29572,7 @@ var require_auxiliaryAuthenticationHeaderPolicy = __commonJS({
     exports2.auxiliaryAuthenticationHeaderPolicyName = void 0;
     exports2.auxiliaryAuthenticationHeaderPolicy = auxiliaryAuthenticationHeaderPolicy;
     var tokenCycler_js_1 = require_tokenCycler();
-    var log_js_1 = require_log2();
+    var log_js_1 = require_log3();
     exports2.auxiliaryAuthenticationHeaderPolicyName = "auxiliaryAuthenticationHeaderPolicy";
     var AUTHORIZATION_AUXILIARY_HEADER = "x-ms-authorization-auxiliary";
     async function sendAuthorizeRequest(options) {
@@ -27977,46 +29626,46 @@ var require_auxiliaryAuthenticationHeaderPolicy = __commonJS({
 });
 
 // ../../node_modules/@azure/core-rest-pipeline/dist/commonjs/index.js
-var require_commonjs5 = __commonJS({
+var require_commonjs6 = __commonJS({
   "../../node_modules/@azure/core-rest-pipeline/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createFileFromStream = exports2.createFile = exports2.agentPolicyName = exports2.agentPolicy = exports2.auxiliaryAuthenticationHeaderPolicyName = exports2.auxiliaryAuthenticationHeaderPolicy = exports2.ndJsonPolicyName = exports2.ndJsonPolicy = exports2.bearerTokenAuthenticationPolicyName = exports2.bearerTokenAuthenticationPolicy = exports2.formDataPolicyName = exports2.formDataPolicy = exports2.tlsPolicyName = exports2.tlsPolicy = exports2.userAgentPolicyName = exports2.userAgentPolicy = exports2.defaultRetryPolicy = exports2.tracingPolicyName = exports2.tracingPolicy = exports2.retryPolicy = exports2.throttlingRetryPolicyName = exports2.throttlingRetryPolicy = exports2.systemErrorRetryPolicyName = exports2.systemErrorRetryPolicy = exports2.redirectPolicyName = exports2.redirectPolicy = exports2.getDefaultProxySettings = exports2.proxyPolicyName = exports2.proxyPolicy = exports2.multipartPolicyName = exports2.multipartPolicy = exports2.logPolicyName = exports2.logPolicy = exports2.setClientRequestIdPolicyName = exports2.setClientRequestIdPolicy = exports2.exponentialRetryPolicyName = exports2.exponentialRetryPolicy = exports2.decompressResponsePolicyName = exports2.decompressResponsePolicy = exports2.isRestError = exports2.RestError = exports2.createPipelineRequest = exports2.createHttpHeaders = exports2.createDefaultHttpClient = exports2.createPipelineFromOptions = exports2.createEmptyPipeline = void 0;
-    var pipeline_js_1 = require_pipeline();
+    var pipeline_js_1 = require_pipeline2();
     Object.defineProperty(exports2, "createEmptyPipeline", { enumerable: true, get: function() {
       return pipeline_js_1.createEmptyPipeline;
     } });
-    var createPipelineFromOptions_js_1 = require_createPipelineFromOptions();
+    var createPipelineFromOptions_js_1 = require_createPipelineFromOptions2();
     Object.defineProperty(exports2, "createPipelineFromOptions", { enumerable: true, get: function() {
       return createPipelineFromOptions_js_1.createPipelineFromOptions;
     } });
-    var defaultHttpClient_js_1 = require_defaultHttpClient();
+    var defaultHttpClient_js_1 = require_defaultHttpClient2();
     Object.defineProperty(exports2, "createDefaultHttpClient", { enumerable: true, get: function() {
       return defaultHttpClient_js_1.createDefaultHttpClient;
     } });
-    var httpHeaders_js_1 = require_httpHeaders();
+    var httpHeaders_js_1 = require_httpHeaders2();
     Object.defineProperty(exports2, "createHttpHeaders", { enumerable: true, get: function() {
       return httpHeaders_js_1.createHttpHeaders;
     } });
-    var pipelineRequest_js_1 = require_pipelineRequest();
+    var pipelineRequest_js_1 = require_pipelineRequest2();
     Object.defineProperty(exports2, "createPipelineRequest", { enumerable: true, get: function() {
       return pipelineRequest_js_1.createPipelineRequest;
     } });
-    var restError_js_1 = require_restError();
+    var restError_js_1 = require_restError3();
     Object.defineProperty(exports2, "RestError", { enumerable: true, get: function() {
       return restError_js_1.RestError;
     } });
     Object.defineProperty(exports2, "isRestError", { enumerable: true, get: function() {
       return restError_js_1.isRestError;
     } });
-    var decompressResponsePolicy_js_1 = require_decompressResponsePolicy();
+    var decompressResponsePolicy_js_1 = require_decompressResponsePolicy2();
     Object.defineProperty(exports2, "decompressResponsePolicy", { enumerable: true, get: function() {
       return decompressResponsePolicy_js_1.decompressResponsePolicy;
     } });
     Object.defineProperty(exports2, "decompressResponsePolicyName", { enumerable: true, get: function() {
       return decompressResponsePolicy_js_1.decompressResponsePolicyName;
     } });
-    var exponentialRetryPolicy_js_1 = require_exponentialRetryPolicy();
+    var exponentialRetryPolicy_js_1 = require_exponentialRetryPolicy2();
     Object.defineProperty(exports2, "exponentialRetryPolicy", { enumerable: true, get: function() {
       return exponentialRetryPolicy_js_1.exponentialRetryPolicy;
     } });
@@ -28030,21 +29679,21 @@ var require_commonjs5 = __commonJS({
     Object.defineProperty(exports2, "setClientRequestIdPolicyName", { enumerable: true, get: function() {
       return setClientRequestIdPolicy_js_1.setClientRequestIdPolicyName;
     } });
-    var logPolicy_js_1 = require_logPolicy();
+    var logPolicy_js_1 = require_logPolicy2();
     Object.defineProperty(exports2, "logPolicy", { enumerable: true, get: function() {
       return logPolicy_js_1.logPolicy;
     } });
     Object.defineProperty(exports2, "logPolicyName", { enumerable: true, get: function() {
       return logPolicy_js_1.logPolicyName;
     } });
-    var multipartPolicy_js_1 = require_multipartPolicy();
+    var multipartPolicy_js_1 = require_multipartPolicy2();
     Object.defineProperty(exports2, "multipartPolicy", { enumerable: true, get: function() {
       return multipartPolicy_js_1.multipartPolicy;
     } });
     Object.defineProperty(exports2, "multipartPolicyName", { enumerable: true, get: function() {
       return multipartPolicy_js_1.multipartPolicyName;
     } });
-    var proxyPolicy_js_1 = require_proxyPolicy();
+    var proxyPolicy_js_1 = require_proxyPolicy2();
     Object.defineProperty(exports2, "proxyPolicy", { enumerable: true, get: function() {
       return proxyPolicy_js_1.proxyPolicy;
     } });
@@ -28054,28 +29703,28 @@ var require_commonjs5 = __commonJS({
     Object.defineProperty(exports2, "getDefaultProxySettings", { enumerable: true, get: function() {
       return proxyPolicy_js_1.getDefaultProxySettings;
     } });
-    var redirectPolicy_js_1 = require_redirectPolicy();
+    var redirectPolicy_js_1 = require_redirectPolicy2();
     Object.defineProperty(exports2, "redirectPolicy", { enumerable: true, get: function() {
       return redirectPolicy_js_1.redirectPolicy;
     } });
     Object.defineProperty(exports2, "redirectPolicyName", { enumerable: true, get: function() {
       return redirectPolicy_js_1.redirectPolicyName;
     } });
-    var systemErrorRetryPolicy_js_1 = require_systemErrorRetryPolicy();
+    var systemErrorRetryPolicy_js_1 = require_systemErrorRetryPolicy2();
     Object.defineProperty(exports2, "systemErrorRetryPolicy", { enumerable: true, get: function() {
       return systemErrorRetryPolicy_js_1.systemErrorRetryPolicy;
     } });
     Object.defineProperty(exports2, "systemErrorRetryPolicyName", { enumerable: true, get: function() {
       return systemErrorRetryPolicy_js_1.systemErrorRetryPolicyName;
     } });
-    var throttlingRetryPolicy_js_1 = require_throttlingRetryPolicy();
+    var throttlingRetryPolicy_js_1 = require_throttlingRetryPolicy2();
     Object.defineProperty(exports2, "throttlingRetryPolicy", { enumerable: true, get: function() {
       return throttlingRetryPolicy_js_1.throttlingRetryPolicy;
     } });
     Object.defineProperty(exports2, "throttlingRetryPolicyName", { enumerable: true, get: function() {
       return throttlingRetryPolicy_js_1.throttlingRetryPolicyName;
     } });
-    var retryPolicy_js_1 = require_retryPolicy();
+    var retryPolicy_js_1 = require_retryPolicy2();
     Object.defineProperty(exports2, "retryPolicy", { enumerable: true, get: function() {
       return retryPolicy_js_1.retryPolicy;
     } });
@@ -28086,25 +29735,25 @@ var require_commonjs5 = __commonJS({
     Object.defineProperty(exports2, "tracingPolicyName", { enumerable: true, get: function() {
       return tracingPolicy_js_1.tracingPolicyName;
     } });
-    var defaultRetryPolicy_js_1 = require_defaultRetryPolicy();
+    var defaultRetryPolicy_js_1 = require_defaultRetryPolicy2();
     Object.defineProperty(exports2, "defaultRetryPolicy", { enumerable: true, get: function() {
       return defaultRetryPolicy_js_1.defaultRetryPolicy;
     } });
-    var userAgentPolicy_js_1 = require_userAgentPolicy();
+    var userAgentPolicy_js_1 = require_userAgentPolicy2();
     Object.defineProperty(exports2, "userAgentPolicy", { enumerable: true, get: function() {
       return userAgentPolicy_js_1.userAgentPolicy;
     } });
     Object.defineProperty(exports2, "userAgentPolicyName", { enumerable: true, get: function() {
       return userAgentPolicy_js_1.userAgentPolicyName;
     } });
-    var tlsPolicy_js_1 = require_tlsPolicy();
+    var tlsPolicy_js_1 = require_tlsPolicy2();
     Object.defineProperty(exports2, "tlsPolicy", { enumerable: true, get: function() {
       return tlsPolicy_js_1.tlsPolicy;
     } });
     Object.defineProperty(exports2, "tlsPolicyName", { enumerable: true, get: function() {
       return tlsPolicy_js_1.tlsPolicyName;
     } });
-    var formDataPolicy_js_1 = require_formDataPolicy();
+    var formDataPolicy_js_1 = require_formDataPolicy2();
     Object.defineProperty(exports2, "formDataPolicy", { enumerable: true, get: function() {
       return formDataPolicy_js_1.formDataPolicy;
     } });
@@ -28132,7 +29781,7 @@ var require_commonjs5 = __commonJS({
     Object.defineProperty(exports2, "auxiliaryAuthenticationHeaderPolicyName", { enumerable: true, get: function() {
       return auxiliaryAuthenticationHeaderPolicy_js_1.auxiliaryAuthenticationHeaderPolicyName;
     } });
-    var agentPolicy_js_1 = require_agentPolicy();
+    var agentPolicy_js_1 = require_agentPolicy2();
     Object.defineProperty(exports2, "agentPolicy", { enumerable: true, get: function() {
       return agentPolicy_js_1.agentPolicy;
     } });
@@ -28196,7 +29845,7 @@ var require_keyCredential = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.isKeyCredential = isKeyCredential;
-    var core_util_1 = require_commonjs3();
+    var core_util_1 = require_commonjs4();
     function isKeyCredential(credential) {
       return (0, core_util_1.isObjectWithProperties)(credential, ["key"]) && typeof credential.key === "string";
     }
@@ -28210,7 +29859,7 @@ var require_azureNamedKeyCredential = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AzureNamedKeyCredential = void 0;
     exports2.isNamedKeyCredential = isNamedKeyCredential;
-    var core_util_1 = require_commonjs3();
+    var core_util_1 = require_commonjs4();
     var AzureNamedKeyCredential = class {
       /**
        * The value of the key to be used in authentication.
@@ -28269,7 +29918,7 @@ var require_azureSASCredential = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AzureSASCredential = void 0;
     exports2.isSASCredential = isSASCredential;
-    var core_util_1 = require_commonjs3();
+    var core_util_1 = require_commonjs4();
     var AzureSASCredential = class {
       /**
        * The value of the shared access signature to be used in authentication
@@ -28333,7 +29982,7 @@ var require_tokenCredential = __commonJS({
 });
 
 // ../../node_modules/@azure/core-auth/dist/commonjs/index.js
-var require_commonjs6 = __commonJS({
+var require_commonjs7 = __commonJS({
   "../../node_modules/@azure/core-auth/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -29351,7 +31000,7 @@ var require_deserializationPolicy = __commonJS({
     exports2.deserializationPolicyName = void 0;
     exports2.deserializationPolicy = deserializationPolicy;
     var interfaces_js_1 = require_interfaces();
-    var core_rest_pipeline_1 = require_commonjs5();
+    var core_rest_pipeline_1 = require_commonjs6();
     var serializer_js_1 = require_serializer();
     var operationHelpers_js_1 = require_operationHelpers();
     var defaultJsonContentTypes = ["application/json", "text/json"];
@@ -29710,13 +31359,13 @@ var require_serializationPolicy = __commonJS({
 });
 
 // ../../node_modules/@azure/core-client/dist/commonjs/pipeline.js
-var require_pipeline2 = __commonJS({
+var require_pipeline3 = __commonJS({
   "../../node_modules/@azure/core-client/dist/commonjs/pipeline.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createClientPipeline = createClientPipeline;
     var deserializationPolicy_js_1 = require_deserializationPolicy();
-    var core_rest_pipeline_1 = require_commonjs5();
+    var core_rest_pipeline_1 = require_commonjs6();
     var serializationPolicy_js_1 = require_serializationPolicy();
     function createClientPipeline(options = {}) {
       const pipeline = (0, core_rest_pipeline_1.createPipelineFromOptions)(options !== null && options !== void 0 ? options : {});
@@ -29741,7 +31390,7 @@ var require_httpClientCache = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.getCachedDefaultHttpClient = getCachedDefaultHttpClient;
-    var core_rest_pipeline_1 = require_commonjs5();
+    var core_rest_pipeline_1 = require_commonjs6();
     var cachedHttpClient;
     function getCachedDefaultHttpClient() {
       if (!cachedHttpClient) {
@@ -29753,7 +31402,7 @@ var require_httpClientCache = __commonJS({
 });
 
 // ../../node_modules/@azure/core-client/dist/commonjs/urlHelpers.js
-var require_urlHelpers = __commonJS({
+var require_urlHelpers2 = __commonJS({
   "../../node_modules/@azure/core-client/dist/commonjs/urlHelpers.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -29957,12 +31606,12 @@ var require_urlHelpers = __commonJS({
 });
 
 // ../../node_modules/@azure/core-client/dist/commonjs/log.js
-var require_log3 = __commonJS({
+var require_log4 = __commonJS({
   "../../node_modules/@azure/core-client/dist/commonjs/log.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logger = void 0;
-    var logger_1 = require_commonjs();
+    var logger_1 = require_commonjs2();
     exports2.logger = (0, logger_1.createClientLogger)("core-client");
   }
 });
@@ -29973,14 +31622,14 @@ var require_serviceClient = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ServiceClient = void 0;
-    var core_rest_pipeline_1 = require_commonjs5();
-    var pipeline_js_1 = require_pipeline2();
+    var core_rest_pipeline_1 = require_commonjs6();
+    var pipeline_js_1 = require_pipeline3();
     var utils_js_1 = require_utils3();
     var httpClientCache_js_1 = require_httpClientCache();
     var operationHelpers_js_1 = require_operationHelpers();
-    var urlHelpers_js_1 = require_urlHelpers();
+    var urlHelpers_js_1 = require_urlHelpers2();
     var interfaceHelpers_js_1 = require_interfaceHelpers();
-    var log_js_1 = require_log3();
+    var log_js_1 = require_log4();
     var ServiceClient = class {
       /**
        * The ServiceClient constructor
@@ -30118,7 +31767,7 @@ var require_authorizeRequestOnClaimChallenge = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.parseCAEChallenge = parseCAEChallenge;
     exports2.authorizeRequestOnClaimChallenge = authorizeRequestOnClaimChallenge;
-    var log_js_1 = require_log3();
+    var log_js_1 = require_log4();
     var base64_js_1 = require_base64();
     function parseCAEChallenge(challenges) {
       const bearerChallenges = `, ${challenges.trim()}`.split(", Bearer ").filter((x) => x);
@@ -30244,7 +31893,7 @@ var require_authorizeRequestOnTenantChallenge = __commonJS({
 });
 
 // ../../node_modules/@azure/core-client/dist/commonjs/index.js
-var require_commonjs7 = __commonJS({
+var require_commonjs8 = __commonJS({
   "../../node_modules/@azure/core-client/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -30260,7 +31909,7 @@ var require_commonjs7 = __commonJS({
     Object.defineProperty(exports2, "ServiceClient", { enumerable: true, get: function() {
       return serviceClient_js_1.ServiceClient;
     } });
-    var pipeline_js_1 = require_pipeline2();
+    var pipeline_js_1 = require_pipeline3();
     Object.defineProperty(exports2, "createClientPipeline", { enumerable: true, get: function() {
       return pipeline_js_1.createClientPipeline;
     } });
@@ -30305,7 +31954,7 @@ var require_util8 = __commonJS({
     exports2.toPipelineRequest = toPipelineRequest;
     exports2.toWebResourceLike = toWebResourceLike;
     exports2.toHttpHeadersLike = toHttpHeadersLike;
-    var core_rest_pipeline_1 = require_commonjs5();
+    var core_rest_pipeline_1 = require_commonjs6();
     var originalRequestSymbol = Symbol("Original PipelineRequest");
     var originalClientRequestSymbol = Symbol.for("@azure/core-client original request");
     function toPipelineRequest(webResource, options = {}) {
@@ -30331,7 +31980,8 @@ var require_util8 = __commonJS({
           onUploadProgress: webResource.onUploadProgress,
           proxySettings: webResource.proxySettings,
           streamResponseStatusCodes: webResource.streamResponseStatusCodes,
-          agent: webResource.agent
+          agent: webResource.agent,
+          requestOverrides: webResource.requestOverrides
         });
         if (options.originalRequest) {
           newRequest[originalClientRequestSymbol] = options.originalRequest;
@@ -30358,6 +32008,7 @@ var require_util8 = __commonJS({
         proxySettings: request.proxySettings,
         streamResponseStatusCodes: request.streamResponseStatusCodes,
         agent: request.agent,
+        requestOverrides: request.requestOverrides,
         clone() {
           throw new Error("Cannot clone a non-proxied WebResourceLike");
         },
@@ -30399,7 +32050,8 @@ var require_util8 = __commonJS({
               "onUploadProgress",
               "proxySettings",
               "streamResponseStatusCodes",
-              "agent"
+              "agent",
+              "requestOverrides"
             ];
             if (typeof prop === "string" && passThroughProps.includes(prop)) {
               request[prop] = value;
@@ -30548,7 +32200,7 @@ var require_response2 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.toCompatResponse = toCompatResponse;
     exports2.toPipelineResponse = toPipelineResponse;
-    var core_rest_pipeline_1 = require_commonjs5();
+    var core_rest_pipeline_1 = require_commonjs6();
     var util_js_1 = require_util8();
     var originalResponse = Symbol("Original FullOperationResponse");
     function toCompatResponse(response, options) {
@@ -30603,8 +32255,8 @@ var require_extendedClient = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ExtendedServiceClient = void 0;
     var disableKeepAlivePolicy_js_1 = require_disableKeepAlivePolicy();
-    var core_rest_pipeline_1 = require_commonjs5();
-    var core_client_1 = require_commonjs7();
+    var core_rest_pipeline_1 = require_commonjs6();
+    var core_client_1 = require_commonjs8();
     var response_js_1 = require_response2();
     var ExtendedServiceClient = class extends core_client_1.ServiceClient {
       constructor(options) {
@@ -30717,7 +32369,7 @@ var require_httpClientAdapter = __commonJS({
 });
 
 // ../../node_modules/@azure/core-http-compat/dist/commonjs/index.js
-var require_commonjs8 = __commonJS({
+var require_commonjs9 = __commonJS({
   "../../node_modules/@azure/core-http-compat/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -30761,7 +32413,7 @@ var require_fxp = __commonJS({
       }, o: (t2, e2) => Object.prototype.hasOwnProperty.call(t2, e2), r: (t2) => {
         "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(t2, Symbol.toStringTag, { value: "Module" }), Object.defineProperty(t2, "__esModule", { value: true });
       } }, e = {};
-      t.r(e), t.d(e, { XMLBuilder: () => gt, XMLParser: () => at, XMLValidator: () => Nt });
+      t.r(e), t.d(e, { XMLBuilder: () => mt, XMLParser: () => lt, XMLValidator: () => Et });
       const n = ":A-Za-z_\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD", i = new RegExp("^[" + n + "][" + n + "\\-.\\d\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*$");
       function r(t2, e2) {
         const n2 = [];
@@ -31062,7 +32714,8 @@ var require_fxp = __commonJS({
         throw new Error(`Invalid entity name ${t2}`);
       }
       const k = /^[-+]?0x[a-fA-F0-9]+$/, F = /^([\-\+])?(0*)([0-9]*(\.[0-9]*)?)$/, M = { hex: true, leadingZeros: true, decimalPoint: ".", eNotation: true };
-      function L(t2) {
+      const L = /^([-+])?(0*)(\d*(\.\d*)?[eE][-\+]?\d+)$/;
+      function B(t2) {
         return "function" == typeof t2 ? t2 : Array.isArray(t2) ? (e2) => {
           for (const n2 of t2) {
             if ("string" == typeof n2 && e2 === n2) return true;
@@ -31070,26 +32723,26 @@ var require_fxp = __commonJS({
           }
         } : () => false;
       }
-      class B {
+      class U {
         constructor(t2) {
-          this.options = t2, this.currentNode = null, this.tagsNodeStack = [], this.docTypeEntities = {}, this.lastEntities = { apos: { regex: /&(apos|#39|#x27);/g, val: "'" }, gt: { regex: /&(gt|#62|#x3E);/g, val: ">" }, lt: { regex: /&(lt|#60|#x3C);/g, val: "<" }, quot: { regex: /&(quot|#34|#x22);/g, val: '"' } }, this.ampEntity = { regex: /&(amp|#38|#x26);/g, val: "&" }, this.htmlEntities = { space: { regex: /&(nbsp|#160);/g, val: " " }, cent: { regex: /&(cent|#162);/g, val: "\xA2" }, pound: { regex: /&(pound|#163);/g, val: "\xA3" }, yen: { regex: /&(yen|#165);/g, val: "\xA5" }, euro: { regex: /&(euro|#8364);/g, val: "\u20AC" }, copyright: { regex: /&(copy|#169);/g, val: "\xA9" }, reg: { regex: /&(reg|#174);/g, val: "\xAE" }, inr: { regex: /&(inr|#8377);/g, val: "\u20B9" }, num_dec: { regex: /&#([0-9]{1,7});/g, val: (t3, e2) => String.fromCodePoint(Number.parseInt(e2, 10)) }, num_hex: { regex: /&#x([0-9a-fA-F]{1,6});/g, val: (t3, e2) => String.fromCodePoint(Number.parseInt(e2, 16)) } }, this.addExternalEntities = U, this.parseXml = Z, this.parseTextData = G, this.resolveNameSpace = X, this.buildAttributesMap = Y, this.isItStopNode = J, this.replaceEntitiesValue = W, this.readStopNodeData = Q, this.saveTextToParentTag = z, this.addChild = q, this.ignoreAttributesFn = L(this.options.ignoreAttributes);
+          this.options = t2, this.currentNode = null, this.tagsNodeStack = [], this.docTypeEntities = {}, this.lastEntities = { apos: { regex: /&(apos|#39|#x27);/g, val: "'" }, gt: { regex: /&(gt|#62|#x3E);/g, val: ">" }, lt: { regex: /&(lt|#60|#x3C);/g, val: "<" }, quot: { regex: /&(quot|#34|#x22);/g, val: '"' } }, this.ampEntity = { regex: /&(amp|#38|#x26);/g, val: "&" }, this.htmlEntities = { space: { regex: /&(nbsp|#160);/g, val: " " }, cent: { regex: /&(cent|#162);/g, val: "\xA2" }, pound: { regex: /&(pound|#163);/g, val: "\xA3" }, yen: { regex: /&(yen|#165);/g, val: "\xA5" }, euro: { regex: /&(euro|#8364);/g, val: "\u20AC" }, copyright: { regex: /&(copy|#169);/g, val: "\xA9" }, reg: { regex: /&(reg|#174);/g, val: "\xAE" }, inr: { regex: /&(inr|#8377);/g, val: "\u20B9" }, num_dec: { regex: /&#([0-9]{1,7});/g, val: (t3, e2) => String.fromCodePoint(Number.parseInt(e2, 10)) }, num_hex: { regex: /&#x([0-9a-fA-F]{1,6});/g, val: (t3, e2) => String.fromCodePoint(Number.parseInt(e2, 16)) } }, this.addExternalEntities = G, this.parseXml = Z, this.parseTextData = X, this.resolveNameSpace = R, this.buildAttributesMap = q, this.isItStopNode = H, this.replaceEntitiesValue = z, this.readStopNodeData = tt, this.saveTextToParentTag = J, this.addChild = W, this.ignoreAttributesFn = B(this.options.ignoreAttributes);
         }
       }
-      function U(t2) {
+      function G(t2) {
         const e2 = Object.keys(t2);
         for (let n2 = 0; n2 < e2.length; n2++) {
           const i2 = e2[n2];
           this.lastEntities[i2] = { regex: new RegExp("&" + i2 + ";", "g"), val: t2[i2] };
         }
       }
-      function G(t2, e2, n2, i2, r2, s2, o2) {
+      function X(t2, e2, n2, i2, r2, s2, o2) {
         if (void 0 !== t2 && (this.options.trimValues && !i2 && (t2 = t2.trim()), t2.length > 0)) {
           o2 || (t2 = this.replaceEntitiesValue(t2));
           const i3 = this.options.tagValueProcessor(e2, t2, n2, r2, s2);
-          return null == i3 ? t2 : typeof i3 != typeof t2 || i3 !== t2 ? i3 : this.options.trimValues || t2.trim() === t2 ? tt(t2, this.options.parseTagValue, this.options.numberParseOptions) : t2;
+          return null == i3 ? t2 : typeof i3 != typeof t2 || i3 !== t2 ? i3 : this.options.trimValues || t2.trim() === t2 ? et(t2, this.options.parseTagValue, this.options.numberParseOptions) : t2;
         }
       }
-      function X(t2) {
+      function R(t2) {
         if (this.options.removeNSPrefix) {
           const e2 = t2.split(":"), n2 = "/" === t2.charAt(0) ? "/" : "";
           if ("xmlns" === e2[0]) return "";
@@ -31097,10 +32750,10 @@ var require_fxp = __commonJS({
         }
         return t2;
       }
-      const R = new RegExp(`([^\\s=]+)\\s*(=\\s*(['"])([\\s\\S]*?)\\3)?`, "gm");
-      function Y(t2, e2, n2) {
+      const Y = new RegExp(`([^\\s=]+)\\s*(=\\s*(['"])([\\s\\S]*?)\\3)?`, "gm");
+      function q(t2, e2, n2) {
         if (true !== this.options.ignoreAttributes && "string" == typeof t2) {
-          const n3 = r(t2, R), i2 = n3.length, s2 = {};
+          const n3 = r(t2, Y), i2 = n3.length, s2 = {};
           for (let t3 = 0; t3 < i2; t3++) {
             const i3 = this.resolveNameSpace(n3[t3][1]);
             if (this.ignoreAttributesFn(i3, e2)) continue;
@@ -31108,7 +32761,7 @@ var require_fxp = __commonJS({
             if (i3.length) if (this.options.transformAttributeName && (o2 = this.options.transformAttributeName(o2)), "__proto__" === o2 && (o2 = "#__proto__"), void 0 !== r2) {
               this.options.trimValues && (r2 = r2.trim()), r2 = this.replaceEntitiesValue(r2);
               const t4 = this.options.attributeValueProcessor(i3, r2, e2);
-              s2[o2] = null == t4 ? r2 : typeof t4 != typeof r2 || t4 !== r2 ? t4 : tt(r2, this.options.parseAttributeValue, this.options.numberParseOptions);
+              s2[o2] = null == t4 ? r2 : typeof t4 != typeof r2 || t4 !== r2 ? t4 : et(r2, this.options.parseAttributeValue, this.options.numberParseOptions);
             } else this.options.allowBooleanAttributes && (s2[o2] = true);
           }
           if (!Object.keys(s2).length) return;
@@ -31124,7 +32777,7 @@ var require_fxp = __commonJS({
         const e2 = new T("!xml");
         let n2 = e2, i2 = "", r2 = "";
         for (let s2 = 0; s2 < t2.length; s2++) if ("<" === t2[s2]) if ("/" === t2[s2 + 1]) {
-          const e3 = H(t2, ">", s2, "Closing Tag is not closed.");
+          const e3 = K(t2, ">", s2, "Closing Tag is not closed.");
           let o2 = t2.substring(s2 + 2, e3).trim();
           if (this.options.removeNSPrefix) {
             const t3 = o2.indexOf(":");
@@ -31136,7 +32789,7 @@ var require_fxp = __commonJS({
           let l2 = 0;
           a2 && -1 !== this.options.unpairedTags.indexOf(a2) ? (l2 = r2.lastIndexOf(".", r2.lastIndexOf(".") - 1), this.tagsNodeStack.pop()) : l2 = r2.lastIndexOf("."), r2 = r2.substring(0, l2), n2 = this.tagsNodeStack.pop(), i2 = "", s2 = e3;
         } else if ("?" === t2[s2 + 1]) {
-          let e3 = K(t2, s2, false, "?>");
+          let e3 = Q(t2, s2, false, "?>");
           if (!e3) throw new Error("Pi Tag is not closed.");
           if (i2 = this.saveTextToParentTag(i2, n2, r2), this.options.ignoreDeclaration && "?xml" === e3.tagName || this.options.ignorePiTags) ;
           else {
@@ -31145,7 +32798,7 @@ var require_fxp = __commonJS({
           }
           s2 = e3.closeIndex + 1;
         } else if ("!--" === t2.substr(s2 + 1, 3)) {
-          const e3 = H(t2, "-->", s2 + 4, "Comment is not closed.");
+          const e3 = K(t2, "-->", s2 + 4, "Comment is not closed.");
           if (this.options.commentPropName) {
             const o2 = t2.substring(s2 + 4, e3 - 2);
             i2 = this.saveTextToParentTag(i2, n2, r2), n2.add(this.options.commentPropName, [{ [this.options.textNodeName]: o2 }]);
@@ -31155,12 +32808,12 @@ var require_fxp = __commonJS({
           const e3 = w(t2, s2);
           this.docTypeEntities = e3.entities, s2 = e3.i;
         } else if ("![" === t2.substr(s2 + 1, 2)) {
-          const e3 = H(t2, "]]>", s2, "CDATA is not closed.") - 2, o2 = t2.substring(s2 + 9, e3);
+          const e3 = K(t2, "]]>", s2, "CDATA is not closed.") - 2, o2 = t2.substring(s2 + 9, e3);
           i2 = this.saveTextToParentTag(i2, n2, r2);
           let a2 = this.parseTextData(o2, n2.tagname, r2, true, false, true, true);
           null == a2 && (a2 = ""), this.options.cdataPropName ? n2.add(this.options.cdataPropName, [{ [this.options.textNodeName]: o2 }]) : n2.add(this.options.textNodeName, a2), s2 = e3 + 2;
         } else {
-          let o2 = K(t2, s2, this.options.removeNSPrefix), a2 = o2.tagName;
+          let o2 = Q(t2, s2, this.options.removeNSPrefix), a2 = o2.tagName;
           const l2 = o2.rawTagName;
           let u2 = o2.tagExp, h2 = o2.attrExpPresent, d2 = o2.closeIndex;
           this.options.transformTagName && (a2 = this.options.transformTagName(a2)), n2 && i2 && "!xml" !== n2.tagname && (i2 = this.saveTextToParentTag(i2, n2, r2, false));
@@ -31193,12 +32846,12 @@ var require_fxp = __commonJS({
         else i2 += t2[s2];
         return e2.child;
       };
-      function q(t2, e2, n2, i2) {
+      function W(t2, e2, n2, i2) {
         this.options.captureMetaData || (i2 = void 0);
         const r2 = this.options.updateTag(e2.tagname, n2, e2[":@"]);
         false === r2 || ("string" == typeof r2 ? (e2.tagname = r2, t2.addChild(e2, i2)) : t2.addChild(e2, i2));
       }
-      const W = function(t2) {
+      const z = function(t2) {
         if (this.options.processEntities) {
           for (let e2 in this.docTypeEntities) {
             const n2 = this.docTypeEntities[e2];
@@ -31216,10 +32869,10 @@ var require_fxp = __commonJS({
         }
         return t2;
       };
-      function z(t2, e2, n2, i2) {
+      function J(t2, e2, n2, i2) {
         return t2 && (void 0 === i2 && (i2 = 0 === e2.child.length), void 0 !== (t2 = this.parseTextData(t2, e2.tagname, n2, false, !!e2[":@"] && 0 !== Object.keys(e2[":@"]).length, i2)) && "" !== t2 && e2.add(this.options.textNodeName, t2), t2 = ""), t2;
       }
-      function J(t2, e2, n2) {
+      function H(t2, e2, n2) {
         const i2 = "*." + n2;
         for (const n3 in t2) {
           const r2 = t2[n3];
@@ -31227,12 +32880,12 @@ var require_fxp = __commonJS({
         }
         return false;
       }
-      function H(t2, e2, n2, i2) {
+      function K(t2, e2, n2, i2) {
         const r2 = t2.indexOf(e2, n2);
         if (-1 === r2) throw new Error(i2);
         return r2 + e2.length - 1;
       }
-      function K(t2, e2, n2, i2 = ">") {
+      function Q(t2, e2, n2, i2 = ">") {
         const r2 = function(t3, e3, n3 = ">") {
           let i3, r3 = "";
           for (let s3 = e3; s3 < t3.length; s3++) {
@@ -31258,22 +32911,22 @@ var require_fxp = __commonJS({
         }
         return { tagName: l2, tagExp: s2, closeIndex: o2, attrExpPresent: u2, rawTagName: h2 };
       }
-      function Q(t2, e2, n2) {
+      function tt(t2, e2, n2) {
         const i2 = n2;
         let r2 = 1;
         for (; n2 < t2.length; n2++) if ("<" === t2[n2]) if ("/" === t2[n2 + 1]) {
-          const s2 = H(t2, ">", n2, `${e2} is not closed`);
+          const s2 = K(t2, ">", n2, `${e2} is not closed`);
           if (t2.substring(n2 + 2, s2).trim() === e2 && (r2--, 0 === r2)) return { tagContent: t2.substring(i2, n2), i: s2 };
           n2 = s2;
-        } else if ("?" === t2[n2 + 1]) n2 = H(t2, "?>", n2 + 1, "StopNode is not closed.");
-        else if ("!--" === t2.substr(n2 + 1, 3)) n2 = H(t2, "-->", n2 + 3, "StopNode is not closed.");
-        else if ("![" === t2.substr(n2 + 1, 2)) n2 = H(t2, "]]>", n2, "StopNode is not closed.") - 2;
+        } else if ("?" === t2[n2 + 1]) n2 = K(t2, "?>", n2 + 1, "StopNode is not closed.");
+        else if ("!--" === t2.substr(n2 + 1, 3)) n2 = K(t2, "-->", n2 + 3, "StopNode is not closed.");
+        else if ("![" === t2.substr(n2 + 1, 2)) n2 = K(t2, "]]>", n2, "StopNode is not closed.") - 2;
         else {
-          const i3 = K(t2, n2, ">");
+          const i3 = Q(t2, n2, ">");
           i3 && ((i3 && i3.tagName) === e2 && "/" !== i3.tagExp[i3.tagExp.length - 1] && r2++, n2 = i3.closeIndex);
         }
       }
-      function tt(t2, e2, n2) {
+      function et(t2, e2, n2) {
         if (e2 && "string" == typeof t2) {
           const e3 = t2.trim();
           return "true" === e3 || "false" !== e3 && function(t3, e4 = {}) {
@@ -31287,26 +32940,30 @@ var require_fxp = __commonJS({
               if (window && window.parseInt) return window.parseInt(t4, 16);
               throw new Error("parseInt, Number.parseInt, window.parseInt are not supported");
             }(n3);
-            if (-1 !== n3.search(/[eE]/)) {
-              const i3 = n3.match(/^([-\+])?(0*)([0-9]*(\.[0-9]*)?[eE][-\+]?[0-9]+)$/);
+            if (-1 !== n3.search(/.+[eE].+/)) return function(t4, e5, n4) {
+              if (!n4.eNotation) return t4;
+              const i3 = e5.match(L);
               if (i3) {
-                if (e4.leadingZeros) n3 = (i3[1] || "") + i3[3];
-                else if ("0" !== i3[2] || "." !== i3[3][0]) return t3;
-                return e4.eNotation ? Number(n3) : t3;
+                let r2 = i3[1] || "";
+                const s2 = -1 === i3[3].indexOf("e") ? "E" : "e", o2 = i3[2], a2 = r2 ? t4[o2.length + 1] === s2 : t4[o2.length] === s2;
+                return o2.length > 1 && a2 ? t4 : 1 !== o2.length || !i3[3].startsWith(`.${s2}`) && i3[3][0] !== s2 ? n4.leadingZeros && !a2 ? (e5 = (i3[1] || "") + i3[3], Number(e5)) : t4 : Number(e5);
               }
-              return t3;
-            }
+              return t4;
+            }(t3, n3, e4);
             {
               const r2 = F.exec(n3);
               if (r2) {
-                const s2 = r2[1], o2 = r2[2];
-                let a2 = (i2 = r2[3]) && -1 !== i2.indexOf(".") ? ("." === (i2 = i2.replace(/0+$/, "")) ? i2 = "0" : "." === i2[0] ? i2 = "0" + i2 : "." === i2[i2.length - 1] && (i2 = i2.substr(0, i2.length - 1)), i2) : i2;
-                if (!e4.leadingZeros && o2.length > 0 && s2 && "." !== n3[2]) return t3;
-                if (!e4.leadingZeros && o2.length > 0 && !s2 && "." !== n3[1]) return t3;
-                if (e4.leadingZeros && o2 === t3) return 0;
+                const s2 = r2[1] || "", o2 = r2[2];
+                let a2 = (i2 = r2[3]) && -1 !== i2.indexOf(".") ? ("." === (i2 = i2.replace(/0+$/, "")) ? i2 = "0" : "." === i2[0] ? i2 = "0" + i2 : "." === i2[i2.length - 1] && (i2 = i2.substring(0, i2.length - 1)), i2) : i2;
+                const l2 = s2 ? "." === t3[o2.length + 1] : "." === t3[o2.length];
+                if (!e4.leadingZeros && (o2.length > 1 || 1 === o2.length && !l2)) return t3;
                 {
-                  const i3 = Number(n3), r3 = "" + i3;
-                  return -1 !== r3.search(/[eE]/) ? e4.eNotation ? i3 : t3 : -1 !== n3.indexOf(".") ? "0" === r3 && "" === a2 || r3 === a2 || s2 && r3 === "-" + a2 ? i3 : t3 : o2 ? a2 === r3 || s2 + a2 === r3 ? i3 : t3 : n3 === r3 || n3 === s2 + r3 ? i3 : t3;
+                  const i3 = Number(n3), r3 = String(i3);
+                  if (0 === i3 || -0 === i3) return i3;
+                  if (-1 !== r3.search(/[eE]/)) return e4.eNotation ? i3 : t3;
+                  if (-1 !== n3.indexOf(".")) return "0" === r3 || r3 === a2 || r3 === `${s2}${a2}` ? i3 : t3;
+                  let l3 = o2 ? a2 : n3;
+                  return o2 ? l3 === r3 || s2 + l3 === r3 ? i3 : t3 : l3 === r3 || l3 === s2 + r3 ? i3 : t3;
                 }
               }
               return t3;
@@ -31316,36 +32973,36 @@ var require_fxp = __commonJS({
         }
         return void 0 !== t2 ? t2 : "";
       }
-      const et = T.getMetaDataSymbol();
-      function nt(t2, e2) {
-        return it(t2, e2);
+      const nt = T.getMetaDataSymbol();
+      function it(t2, e2) {
+        return rt(t2, e2);
       }
-      function it(t2, e2, n2) {
+      function rt(t2, e2, n2) {
         let i2;
         const r2 = {};
         for (let s2 = 0; s2 < t2.length; s2++) {
-          const o2 = t2[s2], a2 = rt(o2);
+          const o2 = t2[s2], a2 = st(o2);
           let l2 = "";
           if (l2 = void 0 === n2 ? a2 : n2 + "." + a2, a2 === e2.textNodeName) void 0 === i2 ? i2 = o2[a2] : i2 += "" + o2[a2];
           else {
             if (void 0 === a2) continue;
             if (o2[a2]) {
-              let t3 = it(o2[a2], e2, l2);
-              const n3 = ot(t3, e2);
-              void 0 !== o2[et] && (t3[et] = o2[et]), o2[":@"] ? st(t3, o2[":@"], l2, e2) : 1 !== Object.keys(t3).length || void 0 === t3[e2.textNodeName] || e2.alwaysCreateTextNode ? 0 === Object.keys(t3).length && (e2.alwaysCreateTextNode ? t3[e2.textNodeName] = "" : t3 = "") : t3 = t3[e2.textNodeName], void 0 !== r2[a2] && r2.hasOwnProperty(a2) ? (Array.isArray(r2[a2]) || (r2[a2] = [r2[a2]]), r2[a2].push(t3)) : e2.isArray(a2, l2, n3) ? r2[a2] = [t3] : r2[a2] = t3;
+              let t3 = rt(o2[a2], e2, l2);
+              const n3 = at(t3, e2);
+              void 0 !== o2[nt] && (t3[nt] = o2[nt]), o2[":@"] ? ot(t3, o2[":@"], l2, e2) : 1 !== Object.keys(t3).length || void 0 === t3[e2.textNodeName] || e2.alwaysCreateTextNode ? 0 === Object.keys(t3).length && (e2.alwaysCreateTextNode ? t3[e2.textNodeName] = "" : t3 = "") : t3 = t3[e2.textNodeName], void 0 !== r2[a2] && r2.hasOwnProperty(a2) ? (Array.isArray(r2[a2]) || (r2[a2] = [r2[a2]]), r2[a2].push(t3)) : e2.isArray(a2, l2, n3) ? r2[a2] = [t3] : r2[a2] = t3;
             }
           }
         }
         return "string" == typeof i2 ? i2.length > 0 && (r2[e2.textNodeName] = i2) : void 0 !== i2 && (r2[e2.textNodeName] = i2), r2;
       }
-      function rt(t2) {
+      function st(t2) {
         const e2 = Object.keys(t2);
         for (let t3 = 0; t3 < e2.length; t3++) {
           const n2 = e2[t3];
           if (":@" !== n2) return n2;
         }
       }
-      function st(t2, e2, n2, i2) {
+      function ot(t2, e2, n2, i2) {
         if (e2) {
           const r2 = Object.keys(e2), s2 = r2.length;
           for (let o2 = 0; o2 < s2; o2++) {
@@ -31354,11 +33011,11 @@ var require_fxp = __commonJS({
           }
         }
       }
-      function ot(t2, e2) {
+      function at(t2, e2) {
         const { textNodeName: n2 } = e2, i2 = Object.keys(t2).length;
         return 0 === i2 || !(1 !== i2 || !t2[n2] && "boolean" != typeof t2[n2] && 0 !== t2[n2]);
       }
-      class at {
+      class lt {
         constructor(t2) {
           this.externalEntities = {}, this.options = function(t3) {
             return Object.assign({}, v, t3);
@@ -31375,10 +33032,10 @@ var require_fxp = __commonJS({
             const n3 = a(t2, e2);
             if (true !== n3) throw Error(`${n3.err.msg}:${n3.err.line}:${n3.err.col}`);
           }
-          const n2 = new B(this.options);
+          const n2 = new U(this.options);
           n2.addExternalEntities(this.externalEntities);
           const i2 = n2.parseXml(t2);
-          return this.options.preserveOrder || void 0 === i2 ? i2 : nt(i2, this.options);
+          return this.options.preserveOrder || void 0 === i2 ? i2 : it(i2, this.options);
         }
         addEntity(t2, e2) {
           if (-1 !== e2.indexOf("&")) throw new Error("Entity value can't have '&'");
@@ -31390,19 +33047,19 @@ var require_fxp = __commonJS({
           return T.getMetaDataSymbol();
         }
       }
-      function lt(t2, e2) {
+      function ut(t2, e2) {
         let n2 = "";
-        return e2.format && e2.indentBy.length > 0 && (n2 = "\n"), ut(t2, e2, "", n2);
+        return e2.format && e2.indentBy.length > 0 && (n2 = "\n"), ht(t2, e2, "", n2);
       }
-      function ut(t2, e2, n2, i2) {
+      function ht(t2, e2, n2, i2) {
         let r2 = "", s2 = false;
         for (let o2 = 0; o2 < t2.length; o2++) {
-          const a2 = t2[o2], l2 = ht(a2);
+          const a2 = t2[o2], l2 = dt(a2);
           if (void 0 === l2) continue;
           let u2 = "";
           if (u2 = 0 === n2.length ? l2 : `${n2}.${l2}`, l2 === e2.textNodeName) {
             let t3 = a2[l2];
-            ct(u2, e2) || (t3 = e2.tagValueProcessor(l2, t3), t3 = ft(t3, e2)), s2 && (r2 += i2), r2 += t3, s2 = false;
+            ft(u2, e2) || (t3 = e2.tagValueProcessor(l2, t3), t3 = pt(t3, e2)), s2 && (r2 += i2), r2 += t3, s2 = false;
             continue;
           }
           if (l2 === e2.cdataPropName) {
@@ -31414,71 +33071,71 @@ var require_fxp = __commonJS({
             continue;
           }
           if ("?" === l2[0]) {
-            const t3 = dt(a2[":@"], e2), n3 = "?xml" === l2 ? "" : i2;
+            const t3 = ct(a2[":@"], e2), n3 = "?xml" === l2 ? "" : i2;
             let o3 = a2[l2][0][e2.textNodeName];
             o3 = 0 !== o3.length ? " " + o3 : "", r2 += n3 + `<${l2}${o3}${t3}?>`, s2 = true;
             continue;
           }
           let h2 = i2;
           "" !== h2 && (h2 += e2.indentBy);
-          const d2 = i2 + `<${l2}${dt(a2[":@"], e2)}`, c2 = ut(a2[l2], e2, u2, h2);
+          const d2 = i2 + `<${l2}${ct(a2[":@"], e2)}`, c2 = ht(a2[l2], e2, u2, h2);
           -1 !== e2.unpairedTags.indexOf(l2) ? e2.suppressUnpairedNode ? r2 += d2 + ">" : r2 += d2 + "/>" : c2 && 0 !== c2.length || !e2.suppressEmptyNode ? c2 && c2.endsWith(">") ? r2 += d2 + `>${c2}${i2}</${l2}>` : (r2 += d2 + ">", c2 && "" !== i2 && (c2.includes("/>") || c2.includes("</")) ? r2 += i2 + e2.indentBy + c2 + i2 : r2 += c2, r2 += `</${l2}>`) : r2 += d2 + "/>", s2 = true;
         }
         return r2;
       }
-      function ht(t2) {
+      function dt(t2) {
         const e2 = Object.keys(t2);
         for (let n2 = 0; n2 < e2.length; n2++) {
           const i2 = e2[n2];
           if (t2.hasOwnProperty(i2) && ":@" !== i2) return i2;
         }
       }
-      function dt(t2, e2) {
+      function ct(t2, e2) {
         let n2 = "";
         if (t2 && !e2.ignoreAttributes) for (let i2 in t2) {
           if (!t2.hasOwnProperty(i2)) continue;
           let r2 = e2.attributeValueProcessor(i2, t2[i2]);
-          r2 = ft(r2, e2), true === r2 && e2.suppressBooleanAttributes ? n2 += ` ${i2.substr(e2.attributeNamePrefix.length)}` : n2 += ` ${i2.substr(e2.attributeNamePrefix.length)}="${r2}"`;
+          r2 = pt(r2, e2), true === r2 && e2.suppressBooleanAttributes ? n2 += ` ${i2.substr(e2.attributeNamePrefix.length)}` : n2 += ` ${i2.substr(e2.attributeNamePrefix.length)}="${r2}"`;
         }
         return n2;
       }
-      function ct(t2, e2) {
+      function ft(t2, e2) {
         let n2 = (t2 = t2.substr(0, t2.length - e2.textNodeName.length - 1)).substr(t2.lastIndexOf(".") + 1);
         for (let i2 in e2.stopNodes) if (e2.stopNodes[i2] === t2 || e2.stopNodes[i2] === "*." + n2) return true;
         return false;
       }
-      function ft(t2, e2) {
+      function pt(t2, e2) {
         if (t2 && t2.length > 0 && e2.processEntities) for (let n2 = 0; n2 < e2.entities.length; n2++) {
           const i2 = e2.entities[n2];
           t2 = t2.replace(i2.regex, i2.val);
         }
         return t2;
       }
-      const pt = { attributeNamePrefix: "@_", attributesGroupName: false, textNodeName: "#text", ignoreAttributes: true, cdataPropName: false, format: false, indentBy: "  ", suppressEmptyNode: false, suppressUnpairedNode: true, suppressBooleanAttributes: true, tagValueProcessor: function(t2, e2) {
+      const gt = { attributeNamePrefix: "@_", attributesGroupName: false, textNodeName: "#text", ignoreAttributes: true, cdataPropName: false, format: false, indentBy: "  ", suppressEmptyNode: false, suppressUnpairedNode: true, suppressBooleanAttributes: true, tagValueProcessor: function(t2, e2) {
         return e2;
       }, attributeValueProcessor: function(t2, e2) {
         return e2;
       }, preserveOrder: false, commentPropName: false, unpairedTags: [], entities: [{ regex: new RegExp("&", "g"), val: "&amp;" }, { regex: new RegExp(">", "g"), val: "&gt;" }, { regex: new RegExp("<", "g"), val: "&lt;" }, { regex: new RegExp("'", "g"), val: "&apos;" }, { regex: new RegExp('"', "g"), val: "&quot;" }], processEntities: true, stopNodes: [], oneListGroup: false };
-      function gt(t2) {
-        this.options = Object.assign({}, pt, t2), true === this.options.ignoreAttributes || this.options.attributesGroupName ? this.isAttribute = function() {
+      function mt(t2) {
+        this.options = Object.assign({}, gt, t2), true === this.options.ignoreAttributes || this.options.attributesGroupName ? this.isAttribute = function() {
           return false;
-        } : (this.ignoreAttributesFn = L(this.options.ignoreAttributes), this.attrPrefixLen = this.options.attributeNamePrefix.length, this.isAttribute = bt), this.processTextOrObjNode = mt, this.options.format ? (this.indentate = xt, this.tagEndChar = ">\n", this.newLine = "\n") : (this.indentate = function() {
+        } : (this.ignoreAttributesFn = B(this.options.ignoreAttributes), this.attrPrefixLen = this.options.attributeNamePrefix.length, this.isAttribute = Nt), this.processTextOrObjNode = xt, this.options.format ? (this.indentate = bt, this.tagEndChar = ">\n", this.newLine = "\n") : (this.indentate = function() {
           return "";
         }, this.tagEndChar = ">", this.newLine = "");
       }
-      function mt(t2, e2, n2, i2) {
+      function xt(t2, e2, n2, i2) {
         const r2 = this.j2x(t2, n2 + 1, i2.concat(e2));
         return void 0 !== t2[this.options.textNodeName] && 1 === Object.keys(t2).length ? this.buildTextValNode(t2[this.options.textNodeName], e2, r2.attrStr, n2) : this.buildObjectNode(r2.val, e2, r2.attrStr, n2);
       }
-      function xt(t2) {
+      function bt(t2) {
         return this.options.indentBy.repeat(t2);
       }
-      function bt(t2) {
+      function Nt(t2) {
         return !(!t2.startsWith(this.options.attributeNamePrefix) || t2 === this.options.textNodeName) && t2.substr(this.attrPrefixLen);
       }
-      gt.prototype.build = function(t2) {
-        return this.options.preserveOrder ? lt(t2, this.options) : (Array.isArray(t2) && this.options.arrayNodeName && this.options.arrayNodeName.length > 1 && (t2 = { [this.options.arrayNodeName]: t2 }), this.j2x(t2, 0, []).val);
-      }, gt.prototype.j2x = function(t2, e2, n2) {
+      mt.prototype.build = function(t2) {
+        return this.options.preserveOrder ? ut(t2, this.options) : (Array.isArray(t2) && this.options.arrayNodeName && this.options.arrayNodeName.length > 1 && (t2 = { [this.options.arrayNodeName]: t2 }), this.j2x(t2, 0, []).val);
+      }, mt.prototype.j2x = function(t2, e2, n2) {
         let i2 = "", r2 = "";
         const s2 = n2.join(".");
         for (let o2 in t2) if (Object.prototype.hasOwnProperty.call(t2, o2)) if (void 0 === t2[o2]) this.isAttribute(o2) && (r2 += "");
@@ -31513,18 +33170,18 @@ var require_fxp = __commonJS({
           for (let r3 = 0; r3 < n3; r3++) i2 += this.buildAttrPairStr(e3[r3], "" + t2[o2][e3[r3]]);
         } else r2 += this.processTextOrObjNode(t2[o2], o2, e2, n2);
         return { attrStr: i2, val: r2 };
-      }, gt.prototype.buildAttrPairStr = function(t2, e2) {
+      }, mt.prototype.buildAttrPairStr = function(t2, e2) {
         return e2 = this.options.attributeValueProcessor(t2, "" + e2), e2 = this.replaceEntitiesValue(e2), this.options.suppressBooleanAttributes && "true" === e2 ? " " + t2 : " " + t2 + '="' + e2 + '"';
-      }, gt.prototype.buildObjectNode = function(t2, e2, n2, i2) {
+      }, mt.prototype.buildObjectNode = function(t2, e2, n2, i2) {
         if ("" === t2) return "?" === e2[0] ? this.indentate(i2) + "<" + e2 + n2 + "?" + this.tagEndChar : this.indentate(i2) + "<" + e2 + n2 + this.closeTag(e2) + this.tagEndChar;
         {
           let r2 = "</" + e2 + this.tagEndChar, s2 = "";
           return "?" === e2[0] && (s2 = "?", r2 = ""), !n2 && "" !== n2 || -1 !== t2.indexOf("<") ? false !== this.options.commentPropName && e2 === this.options.commentPropName && 0 === s2.length ? this.indentate(i2) + `<!--${t2}-->` + this.newLine : this.indentate(i2) + "<" + e2 + n2 + s2 + this.tagEndChar + t2 + this.indentate(i2) + r2 : this.indentate(i2) + "<" + e2 + n2 + s2 + ">" + t2 + r2;
         }
-      }, gt.prototype.closeTag = function(t2) {
+      }, mt.prototype.closeTag = function(t2) {
         let e2 = "";
         return -1 !== this.options.unpairedTags.indexOf(t2) ? this.options.suppressUnpairedNode || (e2 = "/") : e2 = this.options.suppressEmptyNode ? "/" : `></${t2}`, e2;
-      }, gt.prototype.buildTextValNode = function(t2, e2, n2, i2) {
+      }, mt.prototype.buildTextValNode = function(t2, e2, n2, i2) {
         if (false !== this.options.cdataPropName && e2 === this.options.cdataPropName) return this.indentate(i2) + `<![CDATA[${t2}]]>` + this.newLine;
         if (false !== this.options.commentPropName && e2 === this.options.commentPropName) return this.indentate(i2) + `<!--${t2}-->` + this.newLine;
         if ("?" === e2[0]) return this.indentate(i2) + "<" + e2 + n2 + "?" + this.tagEndChar;
@@ -31532,14 +33189,14 @@ var require_fxp = __commonJS({
           let r2 = this.options.tagValueProcessor(e2, t2);
           return r2 = this.replaceEntitiesValue(r2), "" === r2 ? this.indentate(i2) + "<" + e2 + n2 + this.closeTag(e2) + this.tagEndChar : this.indentate(i2) + "<" + e2 + n2 + ">" + r2 + "</" + e2 + this.tagEndChar;
         }
-      }, gt.prototype.replaceEntitiesValue = function(t2) {
+      }, mt.prototype.replaceEntitiesValue = function(t2) {
         if (t2 && t2.length > 0 && this.options.processEntities) for (let e2 = 0; e2 < this.options.entities.length; e2++) {
           const n2 = this.options.entities[e2];
           t2 = t2.replace(n2.regex, n2.val);
         }
         return t2;
       };
-      const Nt = { validate: a };
+      const Et = { validate: a };
       module2.exports = e;
     })();
   }
@@ -31613,7 +33270,7 @@ var require_xml = __commonJS({
 });
 
 // ../../node_modules/@azure/core-xml/dist/commonjs/index.js
-var require_commonjs9 = __commonJS({
+var require_commonjs10 = __commonJS({
   "../../node_modules/@azure/core-xml/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -31636,18 +33293,18 @@ var require_commonjs9 = __commonJS({
 });
 
 // ../../node_modules/@azure/core-lro/dist/commonjs/logger.js
-var require_logger = __commonJS({
+var require_logger2 = __commonJS({
   "../../node_modules/@azure/core-lro/dist/commonjs/logger.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logger = void 0;
-    var logger_1 = require_commonjs();
+    var logger_1 = require_commonjs2();
     exports2.logger = (0, logger_1.createClientLogger)("core-lro");
   }
 });
 
 // ../../node_modules/@azure/core-lro/dist/commonjs/poller/constants.js
-var require_constants8 = __commonJS({
+var require_constants9 = __commonJS({
   "../../node_modules/@azure/core-lro/dist/commonjs/poller/constants.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -31663,8 +33320,8 @@ var require_operation = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.pollOperation = exports2.initOperation = exports2.deserializeState = void 0;
-    var logger_js_1 = require_logger();
-    var constants_js_1 = require_constants8();
+    var logger_js_1 = require_logger2();
+    var constants_js_1 = require_constants9();
     function deserializeState(serializedState) {
       try {
         return JSON.parse(serializedState).state;
@@ -31831,7 +33488,7 @@ var require_operation2 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.pollHttpOperation = exports2.isOperationError = exports2.getResourceLocation = exports2.getOperationStatus = exports2.getOperationLocation = exports2.initHttpOperation = exports2.getStatusFromInitialResponse = exports2.getErrorFromResponse = exports2.parseRetryAfter = exports2.inferLroMode = void 0;
     var operation_js_1 = require_operation();
-    var logger_js_1 = require_logger();
+    var logger_js_1 = require_logger2();
     function getOperationLocationPollingUrl(inputs) {
       const { azureAsyncOperation, operationLocation } = inputs;
       return operationLocation !== null && operationLocation !== void 0 ? operationLocation : azureAsyncOperation;
@@ -32113,8 +33770,8 @@ var require_poller = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.buildCreatePoller = void 0;
     var operation_js_1 = require_operation();
-    var constants_js_1 = require_constants8();
-    var core_util_1 = require_commonjs3();
+    var constants_js_1 = require_constants9();
+    var core_util_1 = require_commonjs4();
     var createStateProxy = () => ({
       /**
        * The state at this point is created to be of type OperationState<TResult>.
@@ -32321,7 +33978,7 @@ var require_operation3 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GenericPollOperation = void 0;
     var operation_js_1 = require_operation2();
-    var logger_js_1 = require_logger();
+    var logger_js_1 = require_logger2();
     var createStateProxy = () => ({
       initState: (config) => ({ config, isStarted: true }),
       setCanceled: (state) => state.isCancelled = true,
@@ -32730,7 +34387,7 @@ var require_lroEngine = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LroEngine = void 0;
     var operation_js_1 = require_operation3();
-    var constants_js_1 = require_constants8();
+    var constants_js_1 = require_constants9();
     var poller_js_1 = require_poller3();
     var operation_js_2 = require_operation();
     var LroEngine = class extends poller_js_1.Poller {
@@ -32776,7 +34433,7 @@ var require_pollOperation = __commonJS({
 });
 
 // ../../node_modules/@azure/core-lro/dist/commonjs/index.js
-var require_commonjs10 = __commonJS({
+var require_commonjs11 = __commonJS({
   "../../node_modules/@azure/core-lro/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -32797,19 +34454,19 @@ var require_dist4 = __commonJS({
   "../../node_modules/@azure/storage-blob/dist/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    var coreRestPipeline = require_commonjs5();
+    var coreRestPipeline = require_commonjs6();
     var tslib = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var coreAuth = require_commonjs6();
-    var coreUtil = require_commonjs3();
-    var coreHttpCompat = require_commonjs8();
-    var coreClient = require_commonjs7();
-    var coreXml = require_commonjs9();
-    var logger$1 = require_commonjs();
-    var abortController = require_commonjs2();
+    var coreAuth = require_commonjs7();
+    var coreUtil = require_commonjs4();
+    var coreHttpCompat = require_commonjs9();
+    var coreClient = require_commonjs8();
+    var coreXml = require_commonjs10();
+    var logger$1 = require_commonjs2();
+    var abortController = require_commonjs3();
     var crypto2 = require("crypto");
-    var coreTracing = require_commonjs4();
+    var coreTracing = require_commonjs5();
     var stream = require("stream");
-    var coreLro = require_commonjs10();
+    var coreLro = require_commonjs11();
     var events = require("events");
     var fs = require("fs");
     var util = require("util");
@@ -60554,7 +62211,7 @@ var require_enum_object = __commonJS({
 });
 
 // ../../node_modules/@protobuf-ts/runtime/build/commonjs/index.js
-var require_commonjs11 = __commonJS({
+var require_commonjs12 = __commonJS({
   "../../node_modules/@protobuf-ts/runtime/build/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -60745,7 +62402,7 @@ var require_reflection_info2 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.readServiceOption = exports2.readMethodOption = exports2.readMethodOptions = exports2.normalizeMethodInfo = void 0;
-    var runtime_1 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
     function normalizeMethodInfo(method, service) {
       var _a, _b, _c;
       let m = method;
@@ -60854,7 +62511,7 @@ var require_rpc_options = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.mergeRpcOptions = void 0;
-    var runtime_1 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
     function mergeRpcOptions(defaults, options) {
       if (!options)
         return defaults;
@@ -60991,7 +62648,7 @@ var require_rpc_output_stream = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.RpcOutputStreamController = void 0;
     var deferred_1 = require_deferred();
-    var runtime_1 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
     var RpcOutputStreamController = class {
       constructor() {
         this._lis = {
@@ -61446,7 +63103,7 @@ var require_test_transport = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.TestTransport = void 0;
     var rpc_error_1 = require_rpc_error();
-    var runtime_1 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
     var rpc_output_stream_1 = require_rpc_output_stream();
     var rpc_options_1 = require_rpc_options();
     var unary_call_1 = require_unary_call();
@@ -61690,7 +63347,7 @@ var require_rpc_interceptor = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.stackDuplexStreamingInterceptors = exports2.stackClientStreamingInterceptors = exports2.stackServerStreamingInterceptors = exports2.stackUnaryInterceptors = exports2.stackIntercept = void 0;
-    var runtime_1 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
     function stackIntercept(kind, transport, method, options, input) {
       var _a, _b, _c, _d;
       if (kind == "unary") {
@@ -61814,7 +63471,7 @@ var require_server_call_context = __commonJS({
 });
 
 // ../../node_modules/@protobuf-ts/runtime-rpc/build/commonjs/index.js
-var require_commonjs12 = __commonJS({
+var require_commonjs13 = __commonJS({
   "../../node_modules/@protobuf-ts/runtime-rpc/build/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -61900,11 +63557,11 @@ var require_cachescope = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.CacheScope = void 0;
-    var runtime_1 = require_commonjs11();
-    var runtime_2 = require_commonjs11();
-    var runtime_3 = require_commonjs11();
-    var runtime_4 = require_commonjs11();
-    var runtime_5 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
+    var runtime_2 = require_commonjs12();
+    var runtime_3 = require_commonjs12();
+    var runtime_4 = require_commonjs12();
+    var runtime_5 = require_commonjs12();
     var CacheScope$Type = class extends runtime_5.MessageType {
       constructor() {
         super("github.actions.results.entities.v1.CacheScope", [
@@ -61976,11 +63633,11 @@ var require_cachemetadata = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.CacheMetadata = void 0;
-    var runtime_1 = require_commonjs11();
-    var runtime_2 = require_commonjs11();
-    var runtime_3 = require_commonjs11();
-    var runtime_4 = require_commonjs11();
-    var runtime_5 = require_commonjs11();
+    var runtime_1 = require_commonjs12();
+    var runtime_2 = require_commonjs12();
+    var runtime_3 = require_commonjs12();
+    var runtime_4 = require_commonjs12();
+    var runtime_5 = require_commonjs12();
     var cachescope_1 = require_cachescope();
     var CacheMetadata$Type = class extends runtime_5.MessageType {
       constructor() {
@@ -62047,12 +63704,12 @@ var require_cache2 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.CacheService = exports2.GetCacheEntryDownloadURLResponse = exports2.GetCacheEntryDownloadURLRequest = exports2.FinalizeCacheEntryUploadResponse = exports2.FinalizeCacheEntryUploadRequest = exports2.CreateCacheEntryResponse = exports2.CreateCacheEntryRequest = void 0;
-    var runtime_rpc_1 = require_commonjs12();
-    var runtime_1 = require_commonjs11();
-    var runtime_2 = require_commonjs11();
-    var runtime_3 = require_commonjs11();
-    var runtime_4 = require_commonjs11();
-    var runtime_5 = require_commonjs11();
+    var runtime_rpc_1 = require_commonjs13();
+    var runtime_1 = require_commonjs12();
+    var runtime_2 = require_commonjs12();
+    var runtime_3 = require_commonjs12();
+    var runtime_4 = require_commonjs12();
+    var runtime_5 = require_commonjs12();
     var cachemetadata_1 = require_cachemetadata();
     var CreateCacheEntryRequest$Type = class extends runtime_5.MessageType {
       constructor() {
@@ -87247,7 +88904,7 @@ ${ctx.indent}`;
 });
 
 // ../../node_modules/yaml/dist/log.js
-var require_log4 = __commonJS({
+var require_log5 = __commonJS({
   "../../node_modules/yaml/dist/log.js"(exports2) {
     "use strict";
     var node_process = require("node:process");
@@ -87329,7 +88986,7 @@ var require_merge = __commonJS({
 var require_addPairToJSMap = __commonJS({
   "../../node_modules/yaml/dist/nodes/addPairToJSMap.js"(exports2) {
     "use strict";
-    var log = require_log4();
+    var log = require_log5();
     var merge = require_merge();
     var stringify = require_stringify();
     var identity = require_identity();
@@ -92766,7 +94423,7 @@ var require_public_api = __commonJS({
     var composer = require_composer();
     var Document = require_Document();
     var errors = require_errors3();
-    var log = require_log4();
+    var log = require_log5();
     var identity = require_identity();
     var lineCounter = require_line_counter();
     var parser = require_parser();
@@ -94228,7 +95885,7 @@ var require_light = __commonJS({
 });
 
 // ../../node_modules/semver/internal/constants.js
-var require_constants9 = __commonJS({
+var require_constants10 = __commonJS({
   "../../node_modules/semver/internal/constants.js"(exports2, module2) {
     var SEMVER_SPEC_VERSION = "2.0.0";
     var MAX_LENGTH = 256;
@@ -94274,7 +95931,7 @@ var require_re = __commonJS({
       MAX_SAFE_COMPONENT_LENGTH,
       MAX_SAFE_BUILD_LENGTH,
       MAX_LENGTH
-    } = require_constants9();
+    } = require_constants10();
     var debug2 = require_debug2();
     exports2 = module2.exports = {};
     var re = exports2.re = [];
@@ -94397,7 +96054,7 @@ var require_identifiers = __commonJS({
 var require_semver2 = __commonJS({
   "../../node_modules/semver/classes/semver.js"(exports2, module2) {
     var debug2 = require_debug2();
-    var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants9();
+    var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants10();
     var { safeRe: re, safeSrc: src, t } = require_re();
     var parseOptions = require_parse_options();
     var { compareIdentifiers } = require_identifiers();
@@ -95203,7 +96860,7 @@ var require_range = __commonJS({
       tildeTrimReplace,
       caretTrimReplace
     } = require_re();
-    var { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = require_constants9();
+    var { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = require_constants10();
     var isNullSet = (c) => c.value === "<0.0.0-0";
     var isAny = (c) => c.value === "";
     var isSatisfiable = (comparators, options) => {
@@ -96001,7 +97658,7 @@ var require_subset = __commonJS({
 var require_semver3 = __commonJS({
   "../../node_modules/semver/index.js"(exports2, module2) {
     var internalRe = require_re();
-    var constants = require_constants9();
+    var constants = require_constants10();
     var SemVer = require_semver2();
     var identifiers = require_identifiers();
     var parse3 = require_parse2();
