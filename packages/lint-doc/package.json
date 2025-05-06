@@ -14,8 +14,8 @@
   "devDependencies": {
     "@tsconfig/node20": "20.1.5",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "22.15.3",
-    "esbuild": "0.25.3",
+    "@types/node": "22.15.13",
+    "esbuild": "0.25.4",
     "typescript": "5.8.3"
   }
 }
