@@ -10,7 +10,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/exec": "1.1.1",
-    "@actions/github": "6.0.0",
+    "@actions/github": "6.0.1",
     "@actions/glob": "0.5.0",
     "@github/dependency-submission-toolkit": "2.0.5",
     "packageurl-js": "2.0.1",
@@ -19,7 +19,7 @@
   "devDependencies": {
     "@tsconfig/node20": "20.1.5",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "22.15.13",
+    "@types/node": "22.15.17",
     "esbuild": "0.25.4",
     "typescript": "5.8.3"
   }
