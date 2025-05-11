@@ -188,8 +188,8 @@ export async function restoreOpamCaches() {
         ? [restoreOpamCache(), restoreCygwinCache()]
         : [restoreOpamCache()],
     );
-    let opamCacheHit = undefined;
-    let cygwinCacheHit = undefined;
+    let opamCacheHit: string | undefined;
+    let cygwinCacheHit: string | undefined;
     if (opamCache.status === "fulfilled") {
       opamCacheHit = opamCache.value;
     }
