@@ -20,14 +20,14 @@
     "@octokit/plugin-retry": "7.2.1",
     "cheerio": "1.0.0",
     "exponential-backoff": "3.1.2",
-    "semver": "7.7.1",
+    "semver": "7.7.2",
     "systeminformation": "5.25.11",
     "yaml": "2.7.1"
   },
   "devDependencies": {
     "@tsconfig/node20": "20.1.5",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "22.15.17",
+    "@types/node": "22.15.18",
     "@types/semver": "7.7.0",
     "esbuild": "0.25.4",
     "typescript": "5.8.3"
