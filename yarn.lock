@@ -645,7 +645,7 @@ __metadata:
     semver: "npm:7.7.2"
     systeminformation: "npm:5.25.11"
     typescript: "npm:5.8.3"
-    yaml: "npm:2.7.1"
+    yaml: "npm:2.8.0"
   languageName: unknown
   linkType: soft
 
@@ -1597,9 +1597,9 @@ __metadata:
   linkType: hard
 
 "strnum@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "strnum@npm:2.1.0"
-  checksum: 10c0/5e47f0effca692caf46f12436136964189d28aff5146e4be4e219b81a3ca82436d81b51c9d27735423d416c1be216190ca04b50720000a1ff50479c8420b68a7
+  version: 2.1.1
+  resolution: "strnum@npm:2.1.1"
+  checksum: 10c0/1f9bd1f9b4c68333f25c2b1f498ea529189f060cd50aa59f1876139c994d817056de3ce57c12c970f80568d75df2289725e218bd9e3cdf73cd1a876c9c102733
   languageName: node
   linkType: hard
 
@@ -1848,11 +1848,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:2.7.1":
-  version: 2.7.1
-  resolution: "yaml@npm:2.7.1"
+"yaml@npm:2.8.0":
+  version: 2.8.0
+  resolution: "yaml@npm:2.8.0"
   bin:
     yaml: bin.mjs
-  checksum: 10c0/ee2126398ab7d1fdde566b4013b68e36930b9e6d8e68b6db356875c99614c10d678b6f45597a145ff6d63814961221fc305bf9242af8bf7450177f8a68537590
+  checksum: 10c0/f6f7310cf7264a8107e72c1376f4de37389945d2fb4656f8060eca83f01d2d703f9d1b925dd8f39852a57034fafefde6225409ddd9f22aebfda16c6141b71858
   languageName: node
   linkType: hard
