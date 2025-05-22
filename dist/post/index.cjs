@@ -69675,7 +69675,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.25.11",
+      version: "5.26.0",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -75245,7 +75245,7 @@ var require_cpu = __commonJS({
       let avgFreq = 0;
       let cores = [];
       let speeds = [];
-      if (cpus && cpus.length && cpus[0].speed) {
+      if (cpus && cpus.length && cpus[0].hasOwnProperty("speed")) {
         for (let i in cpus) {
           speeds.push(cpus[i].speed > 100 ? (cpus[i].speed + 1) / 1e3 : cpus[i].speed / 10);
         }
@@ -75260,23 +75260,32 @@ var require_cpu = __commonJS({
         }
       }
       if (speeds && speeds.length) {
-        for (let i in speeds) {
-          avgFreq = avgFreq + speeds[i];
-          if (speeds[i] > maxFreq) {
-            maxFreq = speeds[i];
+        try {
+          for (let i in speeds) {
+            avgFreq = avgFreq + speeds[i];
+            if (speeds[i] > maxFreq) {
+              maxFreq = speeds[i];
+            }
+            if (speeds[i] < minFreq) {
+              minFreq = speeds[i];
+            }
+            cores.push(parseFloat(speeds[i].toFixed(2)));
           }
-          if (speeds[i] < minFreq) {
-            minFreq = speeds[i];
-          }
-          cores.push(parseFloat(speeds[i].toFixed(2)));
+          avgFreq = avgFreq / speeds.length;
+          return {
+            min: parseFloat(minFreq.toFixed(2)),
+            max: parseFloat(maxFreq.toFixed(2)),
+            avg: parseFloat(avgFreq.toFixed(2)),
+            cores
+          };
+        } catch (e) {
+          return {
+            min: 0,
+            max: 0,
+            avg: 0,
+            cores
+          };
         }
-        avgFreq = avgFreq / speeds.length;
-        return {
-          min: parseFloat(minFreq.toFixed(2)),
-          max: parseFloat(maxFreq.toFixed(2)),
-          avg: parseFloat(avgFreq.toFixed(2)),
-          cores
-        };
       } else {
         return {
           min: 0,
@@ -86939,7 +86948,11 @@ var require_lib2 = __commonJS({
             graphics.graphics(),
             network.networkInterfaces(),
             memory.memLayout(),
-            filesystem.diskLayout()
+            filesystem.diskLayout(),
+            audio.audio(),
+            bluetooth.bluetoothDevices(),
+            usb.usb(),
+            printer.printer()
           ]).then((res) => {
             data.system = res[0];
             data.bios = res[1];
@@ -86954,6 +86967,10 @@ var require_lib2 = __commonJS({
             data.net = res[10];
             data.memLayout = res[11];
             data.diskLayout = res[12];
+            data.audio = res[13];
+            data.bluetooth = res[14];
+            data.usb = res[15];
+            data.printer = res[16];
             if (callback) {
               callback(data);
             }

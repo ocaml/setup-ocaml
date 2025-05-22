@@ -572,7 +572,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.5"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.18"
+    "@types/node": "npm:22.15.21"
     esbuild: "npm:0.25.4"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -588,7 +588,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.18"
+    "@types/node": "npm:22.15.21"
     esbuild: "npm:0.25.4"
     typescript: "npm:5.8.3"
   languageName: unknown
@@ -602,7 +602,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.18"
+    "@types/node": "npm:22.15.21"
     esbuild: "npm:0.25.4"
     typescript: "npm:5.8.3"
   languageName: unknown
@@ -616,7 +616,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.18"
+    "@types/node": "npm:22.15.21"
     esbuild: "npm:0.25.4"
     typescript: "npm:5.8.3"
   languageName: unknown
@@ -634,16 +634,16 @@ __metadata:
     "@actions/http-client": "npm:2.2.3"
     "@actions/io": "npm:1.1.3"
     "@actions/tool-cache": "npm:2.0.2"
-    "@octokit/plugin-retry": "npm:7.2.1"
+    "@octokit/plugin-retry": "npm:8.0.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.18"
+    "@types/node": "npm:22.15.21"
     "@types/semver": "npm:7.7.0"
     cheerio: "npm:1.0.0"
     esbuild: "npm:0.25.4"
     exponential-backoff: "npm:3.1.2"
     semver: "npm:7.7.2"
-    systeminformation: "npm:5.25.11"
+    systeminformation: "npm:5.26.0"
     typescript: "npm:5.8.3"
     yaml: "npm:2.8.0"
   languageName: unknown
@@ -735,16 +735,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-retry@npm:7.2.1":
-  version: 7.2.1
-  resolution: "@octokit/plugin-retry@npm:7.2.1"
+"@octokit/plugin-retry@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@octokit/plugin-retry@npm:8.0.1"
   dependencies:
-    "@octokit/request-error": "npm:^6.1.8"
+    "@octokit/request-error": "npm:^7.0.0"
     "@octokit/types": "npm:^14.0.0"
     bottleneck: "npm:^2.15.3"
   peerDependencies:
-    "@octokit/core": ">=6"
-  checksum: 10c0/0cac8aa32bfe9612cbaba36f51382c69c882ef7927e1deb4b166fe664959887e952205adbf8b9ff461e0128ac3e1bd807ca58e38041a55ddb3214397584f0406
+    "@octokit/core": ">=7"
+  checksum: 10c0/dd99d1b8731fa35fdc9d220a53c7fd8c5c2f6c42be009c117c849a76f0719ae0d741034e7081091fac9d9250243d0f65668bf78237c1916da9a4c97beb800528
   languageName: node
   linkType: hard
 
@@ -759,12 +759,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/request-error@npm:^6.1.1, @octokit/request-error@npm:^6.1.8":
+"@octokit/request-error@npm:^6.1.1":
   version: 6.1.8
   resolution: "@octokit/request-error@npm:6.1.8"
   dependencies:
     "@octokit/types": "npm:^14.0.0"
   checksum: 10c0/02aa5bfebb5b1b9e152558b4a6f4f7dcb149b41538778ffe0fce3395fd0da5c0862311a78e94723435667581b2a58a7cefa458cf7aa19ae2948ae419276f7ee1
+  languageName: node
+  linkType: hard
+
+"@octokit/request-error@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@octokit/request-error@npm:7.0.0"
+  dependencies:
+    "@octokit/types": "npm:^14.0.0"
+  checksum: 10c0/e52bdd832a0187d66b20da5716c374d028f63d824908a9e16cad462754324083839b11cf6956e1d23f6112d3c77f17334ebbd80f49d56840b2b03ed9abef8cb0
   languageName: node
   linkType: hard
 
@@ -879,12 +888,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.15.18":
-  version: 22.15.18
-  resolution: "@types/node@npm:22.15.18"
+"@types/node@npm:22.15.21":
+  version: 22.15.21
+  resolution: "@types/node@npm:22.15.21"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/e23178c568e2dc6b93b6aa3b8dfb45f9556e527918c947fe7406a4c92d2184c7396558912400c3b1b8d0fa952ec63819aca2b8e4d3545455fc6f1e9623e09ca6
+  checksum: 10c0/f092bbccda2131c2b2c8f720338080aa0ef1d928f5f1062c03954a4f7dafa7ee3ed29bc3e51bd4e2584473b3d943c637a2b39ad7174898970818270187cf10c1
   languageName: node
   linkType: hard
 
@@ -1603,12 +1612,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.25.11":
-  version: 5.25.11
-  resolution: "systeminformation@npm:5.25.11"
+"systeminformation@npm:5.26.0":
+  version: 5.26.0
+  resolution: "systeminformation@npm:5.26.0"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/c4d3ed2836dec306d017df66dded9bc0fea40bd5a277e29e9800f6272992cb084e08b8d2a9159ffdc823e75338c2dc9202b697d86504098fb063c1d8830d34d7
+  checksum: 10c0/3366c52864cd0bced23da15213baf1c9f8df36eee03ba05e7ce48894056b56bedb4cc42eb31b79264c79820de3f12dfea0d2870b7eec2ec8afa80a42430c9cef
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
