@@ -69675,7 +69675,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.26.0",
+      version: "5.26.2",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -72247,7 +72247,7 @@ var require_util10 = __commonJS({
             time: Date.now() - t
           });
         }).setTimeout(timeout, () => {
-          request.close();
+          request.destroy();
           resolve({
             url,
             statusCode: 408,
@@ -76173,40 +76173,33 @@ var require_memory = __commonJS({
     var _openbsd = _platform === "openbsd";
     var _netbsd = _platform === "netbsd";
     var _sunos = _platform === "sunos";
-    var OSX_RAM_manufacturers = {
-      "0x014F": "Transcend Information",
-      "0x2C00": "Micron Technology Inc.",
-      "0x802C": "Micron Technology Inc.",
-      "0x80AD": "Hynix Semiconductor Inc.",
-      "0x80CE": "Samsung Electronics Inc.",
-      "0xAD00": "Hynix Semiconductor Inc.",
-      "0xCE00": "Samsung Electronics Inc.",
-      "0x02FE": "Elpida",
-      "0x5105": "Qimonda AG i. In.",
-      "0x8551": "Qimonda AG i. In.",
-      "0x859B": "Crucial",
-      "0x04CD": "G-Skill"
-    };
-    var LINUX_RAM_manufacturers = {
-      "017A": "Apacer",
+    var RAM_manufacturers = {
+      "00CE": "Samsung Electronics Inc",
+      "014F": "Transcend Information",
+      "017A": "Apacer Technology Inc",
       "0198": "HyperX",
       "029E": "Corsair",
+      "02FE": "Elpida",
       "04CB": "A-DATA",
-      "04CD": "G-Skill",
+      "04CD": "G-Skill International Enterprise",
       "059B": "Crucial",
-      "00CE": "Samsung",
       "1315": "Crucial",
-      "014F": "Transcend Information",
       "2C00": "Micron Technology Inc.",
+      "5105": "Qimonda AG i. In.",
       "802C": "Micron Technology Inc.",
       "80AD": "Hynix Semiconductor Inc.",
       "80CE": "Samsung Electronics Inc.",
+      "8551": "Qimonda AG i. In.",
+      "859B": "Crucial",
       "AD00": "Hynix Semiconductor Inc.",
       "CE00": "Samsung Electronics Inc.",
-      "02FE": "Elpida",
-      "5105": "Qimonda AG i. In.",
-      "8551": "Qimonda AG i. In.",
-      "859B": "Crucial"
+      "SAMSUNG": "Samsung Electronics Inc.",
+      "HYNIX": "Hynix Semiconductor Inc.",
+      "G-SKILL": "G-Skill International Enterprise",
+      "TRANSCEND": "Transcend Information",
+      "APACER": "Apacer Technology Inc",
+      "MICRON": "Micron Technology Inc.",
+      "QIMONDA": "Qimonda AG i. In."
     };
     function mem(callback) {
       return new Promise((resolve) => {
@@ -76392,16 +76385,10 @@ var require_memory = __commonJS({
     }
     exports2.mem = mem;
     function memLayout(callback) {
-      function getManufacturerDarwin(manId) {
-        if ({}.hasOwnProperty.call(OSX_RAM_manufacturers, manId)) {
-          return OSX_RAM_manufacturers[manId];
-        }
-        return manId;
-      }
-      function getManufacturerLinux(manId) {
+      function getManufacturer(manId) {
         const manIdSearch = manId.replace("0x", "").toUpperCase();
-        if (manIdSearch.length === 4 && {}.hasOwnProperty.call(LINUX_RAM_manufacturers, manIdSearch)) {
-          return LINUX_RAM_manufacturers[manIdSearch];
+        if (manIdSearch.length >= 4 && {}.hasOwnProperty.call(RAM_manufacturers, manIdSearch)) {
+          return RAM_manufacturers[manIdSearch];
         }
         return manId;
       }
@@ -76431,7 +76418,7 @@ var require_memory = __commonJS({
                       ecc: dataWidth && totalWidth ? totalWidth > dataWidth : false,
                       clockSpeed: util.getValue(lines, "Configured Clock Speed:") ? parseInt(util.getValue(lines, "Configured Clock Speed:"), 10) : util.getValue(lines, "Speed:") ? parseInt(util.getValue(lines, "Speed:"), 10) : null,
                       formFactor: util.getValue(lines, "Form Factor:"),
-                      manufacturer: getManufacturerLinux(util.getValue(lines, "Manufacturer:")),
+                      manufacturer: getManufacturer(util.getValue(lines, "Manufacturer:")),
                       partNum: util.getValue(lines, "Part Number:"),
                       serialNum: util.getValue(lines, "Serial Number:"),
                       voltageConfigured: parseFloat(util.getValue(lines, "Configured Voltage:")) || null,
@@ -76537,7 +76524,7 @@ var require_memory = __commonJS({
                       ecc: eccStatus ? eccStatus === "enabled" : null,
                       clockSpeed: parseInt(util.getValue(lines, "          Speed:"), 10),
                       formFactor: "",
-                      manufacturer: getManufacturerDarwin(util.getValue(lines, "          Manufacturer:")),
+                      manufacturer: getManufacturer(util.getValue(lines, "          Manufacturer:")),
                       partNum: util.getValue(lines, "          Part Number:"),
                       serialNum: util.getValue(lines, "          Serial Number:"),
                       voltageConfigured: null,
@@ -76575,7 +76562,7 @@ var require_memory = __commonJS({
                     ecc: false,
                     clockSpeed: null,
                     formFactor: "SOC",
-                    manufacturer: getManufacturerDarwin(manufacturerId),
+                    manufacturer: getManufacturer(manufacturerId),
                     partNum: "",
                     serialNum: "",
                     voltageConfigured: null,
@@ -76620,7 +76607,7 @@ var require_memory = __commonJS({
                         ecc: dataWidth && totalWidth ? totalWidth > dataWidth : false,
                         clockSpeed: parseInt(util.getValue(lines, "ConfiguredClockSpeed", ":"), 10) || parseInt(util.getValue(lines, "Speed", ":"), 10) || 0,
                         formFactor: FormFactors[parseInt(util.getValue(lines, "FormFactor", ":"), 10) || 0],
-                        manufacturer: util.getValue(lines, "Manufacturer", ":"),
+                        manufacturer: getManufacturer(util.getValue(lines, "Manufacturer", ":")),
                         partNum: util.getValue(lines, "PartNumber", ":"),
                         serialNum: util.getValue(lines, "SerialNumber", ":"),
                         voltageConfigured: (parseInt(util.getValue(lines, "ConfiguredVoltage", ":"), 10) || 0) / 1e3,
@@ -77342,7 +77329,8 @@ var require_graphics = __commonJS({
             options.stdio = ["pipe", "pipe", "ignore"];
           }
           try {
-            const res = execSync(cmd, options).toString();
+            const sanitized = util.sanitizeShellString(cmd);
+            const res = execSync(sanitized, options).toString();
             return res;
           } catch (e) {
             util.noop();
