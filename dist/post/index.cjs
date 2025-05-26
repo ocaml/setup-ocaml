@@ -69675,7 +69675,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.26.2",
+      version: "5.27.1",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -74823,7 +74823,22 @@ var require_cpu = __commonJS({
       69: "LGA1211",
       70: "LGA2422",
       71: "LGA5773",
-      72: "BGA5773"
+      72: "BGA5773",
+      73: "AM5",
+      74: "SP5",
+      75: "SP6",
+      76: "BGA883",
+      77: "BGA1190",
+      78: "BGA4129",
+      79: "LGA4710",
+      80: "LGA7529",
+      81: "BGA1964",
+      82: "BGA1792",
+      83: "BGA2049",
+      84: "BGA2551",
+      85: "LGA1851",
+      86: "BGA2114",
+      87: "BGA2833"
     };
     var socketTypesByName = {
       "LGA1150": "i7-5775C i3-4340 i3-4170 G3250 i3-4160T i3-4160 E3-1231 G3258 G3240 i7-4790S i7-4790K i7-4790 i5-4690K i5-4690 i5-4590T i5-4590S i5-4590 i5-4460 i3-4360 i3-4150 G1820 G3420 G3220 i7-4771 i5-4440 i3-4330 i3-4130T i3-4130 E3-1230 i7-4770S i7-4770K i7-4770 i5-4670K i5-4670 i5-4570T i5-4570S i5-4570 i5-4430",
@@ -76175,13 +76190,13 @@ var require_memory = __commonJS({
     var _sunos = _platform === "sunos";
     var RAM_manufacturers = {
       "00CE": "Samsung Electronics Inc",
-      "014F": "Transcend Information",
-      "017A": "Apacer Technology Inc",
+      "014F": "Transcend Information Inc.",
+      "017A": "Apacer Technology Inc.",
       "0198": "HyperX",
       "029E": "Corsair",
       "02FE": "Elpida",
       "04CB": "A-DATA",
-      "04CD": "G-Skill International Enterprise",
+      "04CD": "G.Skill International Enterprise",
       "059B": "Crucial",
       "1315": "Crucial",
       "2C00": "Micron Technology Inc.",
@@ -76196,6 +76211,7 @@ var require_memory = __commonJS({
       "SAMSUNG": "Samsung Electronics Inc.",
       "HYNIX": "Hynix Semiconductor Inc.",
       "G-SKILL": "G-Skill International Enterprise",
+      "G.SKILL": "G-Skill International Enterprise",
       "TRANSCEND": "Transcend Information",
       "APACER": "Apacer Technology Inc",
       "MICRON": "Micron Technology Inc.",
@@ -76216,6 +76232,7 @@ var require_memory = __commonJS({
             cached: 0,
             slab: 0,
             buffcache: 0,
+            reclaimable: 0,
             swaptotal: 0,
             swapused: 0,
             swapfree: 0,
@@ -76251,6 +76268,8 @@ var require_memory = __commonJS({
                   result2.writeback = result2.writeback ? result2.writeback * 1024 : 0;
                   result2.dirty = parseInt(util.getValue(lines, "dirty"), 10);
                   result2.dirty = result2.dirty ? result2.dirty * 1024 : 0;
+                  result2.reclaimable = parseInt(util.getValue(lines, "sreclaimable"), 10);
+                  result2.reclaimable = result2.reclaimable ? result2.reclaimable * 1024 : 0;
                 }
                 if (callback) {
                   callback(result2);
@@ -76311,10 +76330,11 @@ var require_memory = __commonJS({
               util.noop();
             }
             try {
-              exec3('vm_stat 2>/dev/null | grep "Pages active"', function(error2, stdout) {
+              exec3('vm_stat 2>/dev/null | egrep "Pages active|Pages inactive"', function(error2, stdout) {
                 if (!error2) {
                   let lines = stdout.toString().split("\n");
-                  result2.active = parseInt(lines[0].split(":")[1], 10) * pageSize;
+                  result2.active = (parseInt(util.getValue(lines, "Pages active"), 10) || 0) * pageSize;
+                  result2.reclaimable = (parseInt(util.getValue(lines, "Pages inactive"), 10) || 0) * pageSize;
                   result2.buffcache = result2.used - result2.active;
                   result2.available = result2.free + result2.buffcache;
                 }
@@ -78553,7 +78573,7 @@ var require_filesystem = __commonJS({
         process.nextTick(() => {
           let data = [];
           if (_linux) {
-            exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,TRAN,SERIAL,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            const procLsblk1 = exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,TRAN,SERIAL,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
               if (!error2) {
                 let lines = blkStdoutToObject(stdout).split("\n");
                 data = parseBlk(lines);
@@ -78564,7 +78584,7 @@ var require_filesystem = __commonJS({
                 }
                 resolve(data);
               } else {
-                exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
+                const procLsblk2 = exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
                   if (!error3) {
                     let lines = blkStdoutToObject(stdout2).split("\n");
                     data = parseBlk(lines);
@@ -78575,16 +78595,34 @@ var require_filesystem = __commonJS({
                   }
                   resolve(data);
                 });
+                procLsblk2.on("error", function() {
+                  if (callback) {
+                    callback(data);
+                  }
+                  resolve(data);
+                });
               }
+            });
+            procLsblk1.on("error", function() {
+              if (callback) {
+                callback(data);
+              }
+              resolve(data);
             });
           }
           if (_darwin) {
-            exec3("diskutil info -all", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            const procDskutil = exec3("diskutil info -all", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
               if (!error2) {
                 let lines = stdout.toString().split("\n");
                 data = parseDevices(lines);
                 data = matchDevicesMac(data);
               }
+              if (callback) {
+                callback(data);
+              }
+              resolve(data);
+            });
+            procDskutil.on("error", function() {
               if (callback) {
                 callback(data);
               }
@@ -78714,7 +78752,7 @@ var require_filesystem = __commonJS({
           let wx = 0;
           if (_fs_speed && !_fs_speed.ms || _fs_speed && _fs_speed.ms && Date.now() - _fs_speed.ms >= 500) {
             if (_linux) {
-              exec3("lsblk -r 2>/dev/null | grep /", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+              const procLsblk = exec3("lsblk -r 2>/dev/null | grep /", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
                 if (!error2) {
                   let lines = stdout.toString().split("\n");
                   let fs_filter = [];
@@ -78727,7 +78765,7 @@ var require_filesystem = __commonJS({
                     }
                   });
                   let output = fs_filter.join("|");
-                  exec3('cat /proc/diskstats | egrep "' + output + '"', { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
+                  const procCat = exec3('cat /proc/diskstats | egrep "' + output + '"', { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
                     if (!error3) {
                       let lines2 = stdout2.toString().split("\n");
                       lines2.forEach(function(line) {
@@ -78745,6 +78783,12 @@ var require_filesystem = __commonJS({
                     }
                     resolve(result2);
                   });
+                  procCat.on("error", function() {
+                    if (callback) {
+                      callback(result2);
+                    }
+                    resolve(result2);
+                  });
                 } else {
                   if (callback) {
                     callback(result2);
@@ -78752,9 +78796,15 @@ var require_filesystem = __commonJS({
                   resolve(result2);
                 }
               });
+              procLsblk.on("error", function() {
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              });
             }
             if (_darwin) {
-              exec3('ioreg -c IOBlockStorageDriver -k Statistics -r -w0 | sed -n "/IOBlockStorageDriver/,/Statistics/p" | grep "Statistics" | tr -cd "01234567890,\n"', { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+              const procIoreg = exec3('ioreg -c IOBlockStorageDriver -k Statistics -r -w0 | sed -n "/IOBlockStorageDriver/,/Statistics/p" | grep "Statistics" | tr -cd "01234567890,\n"', { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
                 if (!error2) {
                   let lines = stdout.toString().split("\n");
                   lines.forEach(function(line) {
@@ -78767,6 +78817,12 @@ var require_filesystem = __commonJS({
                   });
                   result2 = calcFsSpeed(rx, wx);
                 }
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              });
+              procIoreg.on("error", function() {
                 if (callback) {
                   callback(result2);
                 }
@@ -81525,7 +81581,7 @@ var require_wifi = __commonJS({
         wifiObj = wifiObj.SPAirPortDataType[0].spairport_airport_interfaces[0].spairport_airport_other_local_wireless_networks;
         wifiObj.forEach(function(wifiItem) {
           let security = [];
-          const sm = wifiItem.spairport_security_mode;
+          const sm = wifiItem.spairport_security_mode || "";
           if (sm === "spairport_security_mode_wep") {
             security.push("WEP");
           } else if (sm === "spairport_security_mode_wpa2_personal") {
@@ -81778,7 +81834,7 @@ var require_wifi = __commonJS({
                 const channel = parseInt(("" + airportWifiObj.spairport_network_channel).split(" ")[0]) || 0;
                 const signalLevel = airportWifiObj.spairport_signal_noise || null;
                 let security = [];
-                const sm = airportWifiObj.spairport_security_mode;
+                const sm = airportWifiObj.spairport_security_mode || "";
                 if (sm === "spairport_security_mode_wep") {
                   security.push("WEP");
                 } else if (sm === "spairport_security_mode_wpa2_personal") {
