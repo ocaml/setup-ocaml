@@ -17,5 +17,5 @@
     "@biomejs/biome": "2.0.0-beta.6",
     "turbo": "2.5.4"
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.9.2"
 }
