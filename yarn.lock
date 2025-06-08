@@ -366,21 +366,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bufbuild/protobuf@npm:2.5.1, @bufbuild/protobuf@npm:^2.4.0":
-  version: 2.5.1
-  resolution: "@bufbuild/protobuf@npm:2.5.1"
-  checksum: 10c0/dd3044160c6ed27db3d26999b6cf7c47178cd1d31abf156ca5902d3a3670b811a8018d3d4a3154dbc30d6a9f29402d16189e53a51dd437a8c59e6e56fc079b74
+"@bufbuild/protobuf@npm:2.5.2, @bufbuild/protobuf@npm:^2.4.0":
+  version: 2.5.2
+  resolution: "@bufbuild/protobuf@npm:2.5.2"
+  checksum: 10c0/30f0ede04b5318eda502759044329f44af27e0bebd9853d7d9baf5bcb4f4b17f813eb8904d98718d991bd56d33565ed18f8c9c65067626c3d4e55a4e039fe9b6
   languageName: node
   linkType: hard
 
 "@bufbuild/protoplugin@npm:^2.4.0":
-  version: 2.5.1
-  resolution: "@bufbuild/protoplugin@npm:2.5.1"
+  version: 2.5.2
+  resolution: "@bufbuild/protoplugin@npm:2.5.2"
   dependencies:
-    "@bufbuild/protobuf": "npm:2.5.1"
+    "@bufbuild/protobuf": "npm:2.5.2"
     "@typescript/vfs": "npm:^1.5.2"
     typescript: "npm:5.4.5"
-  checksum: 10c0/21a2da963a1b5c1eca451e567690fe3f274dbb9e8b2a85726807daac9aded3b5c2b81d671ad5c38d5505d7b3ef358ac01aae9fc40f0f63e53a6632b8831aee32
+  checksum: 10c0/16b3985d99c444354f33a38fe24fbab2772963966b1e26c19a79efe9c46cfa10811063080d12328bc0ac3b8bfdc8eae595e7d78da833f60a80ea069a358bc428
   languageName: node
   linkType: hard
 
@@ -590,7 +590,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.5"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.29"
+    "@types/node": "npm:22.15.30"
     esbuild: "npm:0.25.5"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.0"
@@ -606,7 +606,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.29"
+    "@types/node": "npm:22.15.30"
     esbuild: "npm:0.25.5"
     typescript: "npm:5.8.3"
   languageName: unknown
@@ -620,7 +620,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.29"
+    "@types/node": "npm:22.15.30"
     esbuild: "npm:0.25.5"
     typescript: "npm:5.8.3"
   languageName: unknown
@@ -634,7 +634,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.29"
+    "@types/node": "npm:22.15.30"
     esbuild: "npm:0.25.5"
     typescript: "npm:5.8.3"
   languageName: unknown
@@ -655,7 +655,7 @@ __metadata:
     "@octokit/plugin-retry": "npm:8.0.1"
     "@tsconfig/node20": "npm:20.1.5"
     "@tsconfig/strictest": "npm:2.0.5"
-    "@types/node": "npm:22.15.29"
+    "@types/node": "npm:22.15.30"
     "@types/semver": "npm:7.7.0"
     cheerio: "npm:1.0.0"
     esbuild: "npm:0.25.5"
@@ -897,12 +897,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.15.29":
-  version: 22.15.29
-  resolution: "@types/node@npm:22.15.29"
+"@types/node@npm:22.15.30":
+  version: 22.15.30
+  resolution: "@types/node@npm:22.15.30"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/602cc88c6150780cd9b5b44604754e0ce13983ae876a538861d6ecfb1511dff289e5576fffd26c841cde2142418d4bb76e2a72a382b81c04557ccb17cff29e1d
+  checksum: 10c0/ca330ac0e7fd502686d6df115fcc606aba46fd334220f749bbba2f639accdadcb23f7900603ceccdc8240be736739cad5c0b87c0fa92c9255a4dff245f07d664
   languageName: node
   linkType: hard
 
@@ -1324,13 +1324,13 @@ __metadata:
   linkType: hard
 
 "fast-xml-parser@npm:^5.0.7":
-  version: 5.2.3
-  resolution: "fast-xml-parser@npm:5.2.3"
+  version: 5.2.5
+  resolution: "fast-xml-parser@npm:5.2.5"
   dependencies:
     strnum: "npm:^2.1.0"
   bin:
     fxparser: src/cli/cli.js
-  checksum: 10c0/fa48e1e6f56ab8968ac009c7b82bb48a903a070c0899a90e4a58ea0110d7b005711e0ada2a35d0c9bfadc0c3b57e2178a0a63d49ca6142838d4b26869cbf4a1f
+  checksum: 10c0/d1057d2e790c327ccfc42b872b91786a4912a152d44f9507bf053f800102dfb07ece3da0a86b33ff6a0caa5a5cad86da3326744f6ae5efb0c6c571d754fe48cd
   languageName: node
   linkType: hard
 

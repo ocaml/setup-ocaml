@@ -32688,8 +32688,8 @@ var require_fxp = __commonJS({
         for (; e2 < t2.length && !/\s/.test(t2[e2]); ) n2 += t2[e2], e2++;
         if (!$(n2)) throw new Error(`Invalid element name: "${n2}"`);
         let i2 = "";
-        if ("E" === t2[e2 = P(t2, e2)] && C(t2, "MPTY", e2)) e2 += 6;
-        else if ("A" === t2[e2] && C(t2, "NY", e2)) e2 += 4;
+        if ("E" === t2[e2 = P(t2, e2)] && C(t2, "MPTY", e2)) e2 += 4;
+        else if ("A" === t2[e2] && C(t2, "NY", e2)) e2 += 2;
         else {
           if ("(" !== t2[e2]) throw new Error(`Invalid Element Expression, found "${t2[e2]}"`);
           for (e2++; e2 < t2.length && ")" !== t2[e2]; ) i2 += t2[e2], e2++;
