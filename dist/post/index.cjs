@@ -23630,9 +23630,22 @@ var require_logger = __commonJS({
       clientLogger.log = (...args) => {
         debug_js_1.default.log(...args);
       };
+      function contextSetLogLevel(level) {
+        if (level && !isTypeSpecRuntimeLogLevel(level)) {
+          throw new Error(`Unknown log level '${level}'. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(",")}`);
+        }
+        logLevel = level;
+        const enabledNamespaces = [];
+        for (const logger of registeredLoggers) {
+          if (shouldEnable(logger)) {
+            enabledNamespaces.push(logger.namespace);
+          }
+        }
+        debug_js_1.default.enable(enabledNamespaces.join(","));
+      }
       if (logLevelFromEnv) {
         if (isTypeSpecRuntimeLogLevel(logLevelFromEnv)) {
-          setLogLevel(logLevelFromEnv);
+          contextSetLogLevel(logLevelFromEnv);
         } else {
           console.error(`${options.logLevelEnvVarName} set to unknown log level '${logLevelFromEnv}'; logging is not enabled. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(", ")}.`);
         }
@@ -23652,33 +23665,23 @@ var require_logger = __commonJS({
         registeredLoggers.add(logger);
         return logger;
       }
+      function contextGetLogLevel() {
+        return logLevel;
+      }
+      function contextCreateClientLogger(namespace) {
+        const clientRootLogger = clientLogger.extend(namespace);
+        patchLogMethod(clientLogger, clientRootLogger);
+        return {
+          error: createLogger(clientRootLogger, "error"),
+          warning: createLogger(clientRootLogger, "warning"),
+          info: createLogger(clientRootLogger, "info"),
+          verbose: createLogger(clientRootLogger, "verbose")
+        };
+      }
       return {
-        setLogLevel(level) {
-          if (level && !isTypeSpecRuntimeLogLevel(level)) {
-            throw new Error(`Unknown log level '${level}'. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(",")}`);
-          }
-          logLevel = level;
-          const enabledNamespaces = [];
-          for (const logger of registeredLoggers) {
-            if (shouldEnable(logger)) {
-              enabledNamespaces.push(logger.namespace);
-            }
-          }
-          debug_js_1.default.enable(enabledNamespaces.join(","));
-        },
-        getLogLevel() {
-          return logLevel;
-        },
-        createClientLogger(namespace) {
-          const clientRootLogger = clientLogger.extend(namespace);
-          patchLogMethod(clientLogger, clientRootLogger);
-          return {
-            error: createLogger(clientRootLogger, "error"),
-            warning: createLogger(clientRootLogger, "warning"),
-            info: createLogger(clientRootLogger, "info"),
-            verbose: createLogger(clientRootLogger, "verbose")
-          };
-        },
+        setLogLevel: contextSetLogLevel,
+        getLogLevel: contextGetLogLevel,
+        createClientLogger: contextCreateClientLogger,
         logger: clientLogger
       };
     }
@@ -23849,6 +23852,7 @@ var require_pipelineRequest = __commonJS({
         this.allowInsecureConnection = (_f = options.allowInsecureConnection) !== null && _f !== void 0 ? _f : false;
         this.enableBrowserStreams = (_g = options.enableBrowserStreams) !== null && _g !== void 0 ? _g : false;
         this.requestOverrides = options.requestOverrides;
+        this.authSchemes = options.authSchemes;
       }
     };
     function createPipelineRequest(options) {
@@ -24720,7 +24724,7 @@ var require_constants7 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "0.2.2";
+    exports2.SDK_VERSION = "0.2.3";
     exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
   }
 });
@@ -28075,7 +28079,7 @@ var require_constants8 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "1.20.0";
+    exports2.SDK_VERSION = "1.21.0";
     exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
   }
 });
@@ -28883,15 +28887,7 @@ var require_restError3 = __commonJS({
     exports2.RestError = void 0;
     exports2.isRestError = isRestError;
     var ts_http_runtime_1 = require_commonjs();
-    var RestError = class extends Error {
-      constructor(message, options = {}) {
-        super(message);
-        return new ts_http_runtime_1.RestError(message, options);
-      }
-    };
-    exports2.RestError = RestError;
-    RestError.REQUEST_SEND_ERROR = "REQUEST_SEND_ERROR";
-    RestError.PARSE_ERROR = "PARSE_ERROR";
+    exports2.RestError = ts_http_runtime_1.RestError;
     function isRestError(e) {
       return (0, ts_http_runtime_1.isRestError)(e);
     }
