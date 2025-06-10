@@ -588,7 +588,7 @@ __metadata:
     "@actions/github": "npm:6.0.1"
     "@actions/glob": "npm:0.5.0"
     "@github/dependency-submission-toolkit": "npm:2.0.5"
-    "@tsconfig/node20": "npm:20.1.5"
+    "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:24.0.0"
     esbuild: "npm:0.25.5"
@@ -604,7 +604,7 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
-    "@tsconfig/node20": "npm:20.1.5"
+    "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:24.0.0"
     esbuild: "npm:0.25.5"
@@ -618,7 +618,7 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
-    "@tsconfig/node20": "npm:20.1.5"
+    "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:24.0.0"
     esbuild: "npm:0.25.5"
@@ -632,7 +632,7 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.11.1"
     "@actions/exec": "npm:1.1.1"
-    "@tsconfig/node20": "npm:20.1.5"
+    "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:24.0.0"
     esbuild: "npm:0.25.5"
@@ -653,7 +653,7 @@ __metadata:
     "@actions/io": "npm:1.1.3"
     "@actions/tool-cache": "npm:2.0.2"
     "@octokit/plugin-retry": "npm:8.0.1"
-    "@tsconfig/node20": "npm:20.1.5"
+    "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:24.0.0"
     "@types/semver": "npm:7.7.0"
@@ -883,10 +883,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node20@npm:20.1.5":
-  version: 20.1.5
-  resolution: "@tsconfig/node20@npm:20.1.5"
-  checksum: 10c0/aec70cc8a573d49ee65878d0b6929e23a83d990fe451fc4d288bda7b37607afd8841ef59c1fa239c698bd4d087e2a7815d1719b796294b32a356c26dc52c3dd2
+"@tsconfig/node24@npm:24.0.1":
+  version: 24.0.1
+  resolution: "@tsconfig/node24@npm:24.0.1"
+  checksum: 10c0/18e2ad5946bc6ddc9fbe37c4537439245da16eb8a5888641a1cdbc412a465ee321b5fa7c0ffc489c929d65c8bd0698ece9e8f3c52ae2596433ad0e866857bc83
   languageName: node
   linkType: hard
 
