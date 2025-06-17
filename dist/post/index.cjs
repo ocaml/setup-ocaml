@@ -69671,7 +69671,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.1",
+      version: "5.27.3",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -73351,6 +73351,8 @@ var require_osinfo = __commonJS({
               result2.codename = result2.release.startsWith("13.") ? "Ventura" : result2.codename;
               result2.codename = result2.release.startsWith("14.") ? "Sonoma" : result2.codename;
               result2.codename = result2.release.startsWith("15.") ? "Sequoia" : result2.codename;
+              result2.codename = result2.release.startsWith("16.") ? "Tahoe" : result2.codename;
+              result2.codename = result2.release.startsWith("26.") ? "Tahoe" : result2.codename;
               result2.uefi = true;
               result2.codepage = util.getCodepage();
               if (callback) {
@@ -82199,7 +82201,7 @@ var require_processes = __commonJS({
                         });
                       } else {
                         ps = lines.filter(function(e) {
-                          return e.toLowerCase().indexOf(" " + srv2.toLowerCase() + ":") !== -1 || e.toLowerCase().indexOf("/" + srv2.toLowerCase()) !== -1;
+                          return e.toLowerCase().indexOf(" " + srv2.toLowerCase() + ":") !== -1 || e.toLowerCase().indexOf("(" + srv2.toLowerCase() + " ") !== -1 || e.toLowerCase().indexOf("(" + srv2.toLowerCase() + ")") !== -1 || e.toLowerCase().indexOf(" " + srv2.toLowerCase().replace(/[0-9.]/g, "") + ":") !== -1 || e.toLowerCase().indexOf("/" + srv2.toLowerCase()) !== -1;
                         });
                       }
                       const pids = [];
