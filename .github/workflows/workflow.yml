@@ -12,38 +12,28 @@ permissions: read-all
 jobs:
   hygiene:
     name: Hygiene
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout tree
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
       - name: Set-up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           check-latest: true
           node-version-file: .nvmrc
-
       - run: corepack enable
-
       - run: yarn install --immutable
-
       - if: always()
         run: yarn lint
-
       - if: always()
         run: yarn typecheck
-
       - name: Ensure dist directory is up-to-date
         if: always()
         run: yarn build && git diff --exit-code --ignore-cr-at-eol
 
   test:
     name: Test
-
     needs: hygiene
-
     strategy:
       fail-fast: false
       matrix:
@@ -63,17 +53,30 @@ jobs:
           - os: ubuntu-24.04
             ocaml-compiler: "5.3"
             allow-prerelease-opam: true
-
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout tree
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ./
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
+      - run: opam install ssl
 
+  test-container:
+    name: Test on a container in a GitHub runner
+    needs: hygiene
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Install dependencies
+        run: pacman -Sy --noconfirm make gcc patch tar ca-certificates git rsync curl sudo bash nano coreutils xz ncurses diffutils unzip bubblewrap
+      - name: Set-up OCaml
+        uses: ./
+        with:
+          ocaml-compiler: "5.3"
       - run: opam install ssl
