@@ -1,3 +1,4 @@
+import * as fs from "node:fs/promises";
 import { exec, getExecOutput } from "@actions/exec";
 import { PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
 
@@ -31,8 +32,21 @@ async function retrieveInstallableOptionalDependencies(
   }
 }
 
+async function skipPackageManagement() {
+  // Skip package management if running in a self-hosted environment or in a
+  // github-hosted Docker container.
+  let isContainerRunner = false;
+  try {
+    await fs.access("/.dockerenv", fs.constants.R_OK);
+    isContainerRunner = true;
+  } catch {
+    isContainerRunner = false;
+  }
+  return RUNNER_ENVIRONMENT === "self-hosted" || isContainerRunner;
+}
+
 export async function installUnixSystemPackages() {
-  if (RUNNER_ENVIRONMENT === "self-hosted") {
+  if (await skipPackageManagement()) {
     return;
   }
   switch (PLATFORM) {
@@ -63,7 +77,7 @@ export async function installUnixSystemPackages() {
 }
 
 export async function updateUnixPackageIndexFiles() {
-  if (RUNNER_ENVIRONMENT === "self-hosted") {
+  if (await skipPackageManagement()) {
     return;
   }
   switch (PLATFORM) {
