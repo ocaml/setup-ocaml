@@ -61973,13 +61973,15 @@ var require_message_type = __commonJS({
     var binary_writer_1 = require_binary_writer();
     var binary_reader_1 = require_binary_reader();
     var baseDescriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf({}));
+    var messageTypeDescriptor = baseDescriptors[message_type_contract_1.MESSAGE_TYPE] = {};
     var MessageType = class {
       constructor(name, fields, options) {
         this.defaultCheckDepth = 16;
         this.typeName = name;
         this.fields = fields.map(reflection_info_1.normalizeFieldInfo);
         this.options = options !== null && options !== void 0 ? options : {};
-        this.messagePrototype = Object.create(null, Object.assign(Object.assign({}, baseDescriptors), { [message_type_contract_1.MESSAGE_TYPE]: { value: this } }));
+        messageTypeDescriptor.value = this;
+        this.messagePrototype = Object.create(null, baseDescriptors);
         this.refTypeCheck = new reflection_type_check_1.ReflectionTypeCheck(this);
         this.refJsonReader = new reflection_json_reader_1.ReflectionJsonReader(this);
         this.refJsonWriter = new reflection_json_writer_1.ReflectionJsonWriter(this);
@@ -69671,7 +69673,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.3",
+      version: "5.27.6",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -72317,773 +72319,6 @@ var require_util10 = __commonJS({
   }
 });
 
-// ../../node_modules/systeminformation/lib/system.js
-var require_system = __commonJS({
-  "../../node_modules/systeminformation/lib/system.js"(exports2) {
-    "use strict";
-    var fs = require("fs");
-    var os2 = require("os");
-    var util = require_util10();
-    var exec3 = require("child_process").exec;
-    var execSync = require("child_process").execSync;
-    var execPromise = util.promisify(require("child_process").exec);
-    var _platform = process.platform;
-    var _linux = _platform === "linux" || _platform === "android";
-    var _darwin = _platform === "darwin";
-    var _windows = _platform === "win32";
-    var _freebsd = _platform === "freebsd";
-    var _openbsd = _platform === "openbsd";
-    var _netbsd = _platform === "netbsd";
-    var _sunos = _platform === "sunos";
-    function system2(callback) {
-      return new Promise((resolve) => {
-        process.nextTick(() => {
-          let result2 = {
-            manufacturer: "",
-            model: "Computer",
-            version: "",
-            serial: "-",
-            uuid: "-",
-            sku: "-",
-            virtual: false
-          };
-          if (_linux || _freebsd || _openbsd || _netbsd) {
-            exec3("export LC_ALL=C; dmidecode -t system 2>/dev/null; unset LC_ALL", function(error2, stdout) {
-              let lines = stdout.toString().split("\n");
-              result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer"));
-              result2.model = cleanDefaults(util.getValue(lines, "product name"));
-              result2.version = cleanDefaults(util.getValue(lines, "version"));
-              result2.serial = cleanDefaults(util.getValue(lines, "serial number"));
-              result2.uuid = cleanDefaults(util.getValue(lines, "uuid")).toLowerCase();
-              result2.sku = cleanDefaults(util.getValue(lines, "sku number"));
-              const cmd = `echo -n "product_name: "; cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null; echo;
-            echo -n "product_serial: "; cat /sys/devices/virtual/dmi/id/product_serial 2>/dev/null; echo;
-            echo -n "product_uuid: "; cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null; echo;
-            echo -n "product_version: "; cat /sys/devices/virtual/dmi/id/product_version 2>/dev/null; echo;
-            echo -n "sys_vendor: "; cat /sys/devices/virtual/dmi/id/sys_vendor 2>/dev/null; echo;`;
-              try {
-                lines = execSync(cmd, util.execOptsLinux).toString().split("\n");
-                result2.manufacturer = cleanDefaults(result2.manufacturer === "" ? util.getValue(lines, "sys_vendor") : result2.manufacturer);
-                result2.model = cleanDefaults(result2.model === "" ? util.getValue(lines, "product_name") : result2.model);
-                result2.version = cleanDefaults(result2.version === "" ? util.getValue(lines, "product_version") : result2.version);
-                result2.serial = cleanDefaults(result2.serial === "" ? util.getValue(lines, "product_serial") : result2.serial);
-                result2.uuid = cleanDefaults(result2.uuid === "" ? util.getValue(lines, "product_uuid").toLowerCase() : result2.uuid);
-              } catch (e) {
-                util.noop();
-              }
-              if (!result2.serial) {
-                result2.serial = "-";
-              }
-              if (!result2.manufacturer) {
-                result2.manufacturer = "";
-              }
-              if (!result2.model) {
-                result2.model = "Computer";
-              }
-              if (!result2.version) {
-                result2.version = "";
-              }
-              if (!result2.sku) {
-                result2.sku = "-";
-              }
-              if (result2.model.toLowerCase() === "virtualbox" || result2.model.toLowerCase() === "kvm" || result2.model.toLowerCase() === "virtual machine" || result2.model.toLowerCase() === "bochs" || result2.model.toLowerCase().startsWith("vmware") || result2.model.toLowerCase().startsWith("droplet")) {
-                result2.virtual = true;
-                switch (result2.model.toLowerCase()) {
-                  case "virtualbox":
-                    result2.virtualHost = "VirtualBox";
-                    break;
-                  case "vmware":
-                    result2.virtualHost = "VMware";
-                    break;
-                  case "kvm":
-                    result2.virtualHost = "KVM";
-                    break;
-                  case "bochs":
-                    result2.virtualHost = "bochs";
-                    break;
-                }
-              }
-              if (result2.manufacturer.toLowerCase().startsWith("vmware") || result2.manufacturer.toLowerCase() === "xen") {
-                result2.virtual = true;
-                switch (result2.manufacturer.toLowerCase()) {
-                  case "vmware":
-                    result2.virtualHost = "VMware";
-                    break;
-                  case "xen":
-                    result2.virtualHost = "Xen";
-                    break;
-                }
-              }
-              if (!result2.virtual) {
-                try {
-                  const disksById = execSync("ls -1 /dev/disk/by-id/ 2>/dev/null", util.execOptsLinux).toString();
-                  if (disksById.indexOf("_QEMU_") >= 0) {
-                    result2.virtual = true;
-                    result2.virtualHost = "QEMU";
-                  }
-                  if (disksById.indexOf("_VBOX_") >= 0) {
-                    result2.virtual = true;
-                    result2.virtualHost = "VirtualBox";
-                  }
-                } catch (e) {
-                  util.noop();
-                }
-              }
-              if (!result2.virtual && (os2.release().toLowerCase().indexOf("microsoft") >= 0 || os2.release().toLowerCase().endsWith("wsl2"))) {
-                const kernelVersion = parseFloat(os2.release().toLowerCase());
-                result2.virtual = true;
-                result2.manufacturer = "Microsoft";
-                result2.model = "WSL";
-                result2.version = kernelVersion < 4.19 ? "1" : "2";
-              }
-              if ((_freebsd || _openbsd || _netbsd) && !result2.virtualHost) {
-                try {
-                  const procInfo = execSync("dmidecode -t 4", util.execOptsLinux);
-                  const procLines = procInfo.toString().split("\n");
-                  const procManufacturer = util.getValue(procLines, "manufacturer", ":", true);
-                  switch (procManufacturer.toLowerCase()) {
-                    case "virtualbox":
-                      result2.virtualHost = "VirtualBox";
-                      break;
-                    case "vmware":
-                      result2.virtualHost = "VMware";
-                      break;
-                    case "kvm":
-                      result2.virtualHost = "KVM";
-                      break;
-                    case "bochs":
-                      result2.virtualHost = "bochs";
-                      break;
-                  }
-                } catch (e) {
-                  util.noop();
-                }
-              }
-              if (fs.existsSync("/.dockerenv") || fs.existsSync("/.dockerinit")) {
-                result2.model = "Docker Container";
-              }
-              try {
-                const stdout2 = execSync('dmesg 2>/dev/null | grep -iE "virtual|hypervisor" | grep -iE "vmware|qemu|kvm|xen" | grep -viE "Nested Virtualization|/virtual/"');
-                let lines2 = stdout2.toString().split("\n");
-                if (lines2.length > 0) {
-                  if (result2.model === "Computer") {
-                    result2.model = "Virtual machine";
-                  }
-                  result2.virtual = true;
-                  if (stdout2.toString().toLowerCase().indexOf("vmware") >= 0 && !result2.virtualHost) {
-                    result2.virtualHost = "VMware";
-                  }
-                  if (stdout2.toString().toLowerCase().indexOf("qemu") >= 0 && !result2.virtualHost) {
-                    result2.virtualHost = "QEMU";
-                  }
-                  if (stdout2.toString().toLowerCase().indexOf("xen") >= 0 && !result2.virtualHost) {
-                    result2.virtualHost = "Xen";
-                  }
-                  if (stdout2.toString().toLowerCase().indexOf("kvm") >= 0 && !result2.virtualHost) {
-                    result2.virtualHost = "KVM";
-                  }
-                }
-              } catch (e) {
-                util.noop();
-              }
-              if (result2.manufacturer === "" && result2.model === "Computer" && result2.version === "") {
-                fs.readFile("/proc/cpuinfo", function(error3, stdout2) {
-                  if (!error3) {
-                    let lines2 = stdout2.toString().split("\n");
-                    result2.model = util.getValue(lines2, "hardware", ":", true).toUpperCase();
-                    result2.version = util.getValue(lines2, "revision", ":", true).toLowerCase();
-                    result2.serial = util.getValue(lines2, "serial", ":", true);
-                    const model = util.getValue(lines2, "model:", ":", true);
-                    if (util.isRaspberry(lines2)) {
-                      const rPIRevision = util.decodePiCpuinfo(lines2);
-                      result2.model = rPIRevision.model;
-                      result2.version = rPIRevision.revisionCode;
-                      result2.manufacturer = "Raspberry Pi Foundation";
-                      result2.raspberry = {
-                        manufacturer: rPIRevision.manufacturer,
-                        processor: rPIRevision.processor,
-                        type: rPIRevision.type,
-                        revision: rPIRevision.revision
-                      };
-                    }
-                  }
-                  if (callback) {
-                    callback(result2);
-                  }
-                  resolve(result2);
-                });
-              } else {
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              }
-            });
-          }
-          if (_darwin) {
-            exec3("ioreg -c IOPlatformExpertDevice -d 2", function(error2, stdout) {
-              if (!error2) {
-                let lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
-                const model = util.getAppleModel(util.getValue(lines, "model", "=", true));
-                result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
-                result2.model = model.key;
-                result2.type = macOsChassisType(model.version);
-                result2.version = model.version;
-                result2.serial = util.getValue(lines, "ioplatformserialnumber", "=", true);
-                result2.uuid = util.getValue(lines, "ioplatformuuid", "=", true).toLowerCase();
-                result2.sku = util.getValue(lines, "board-id", "=", true) || util.getValue(lines, "target-sub-type", "=", true);
-              }
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            });
-          }
-          if (_sunos) {
-            if (callback) {
-              callback(result2);
-            }
-            resolve(result2);
-          }
-          if (_windows) {
-            try {
-              util.powerShell("Get-CimInstance Win32_ComputerSystemProduct | select Name,Vendor,Version,IdentifyingNumber,UUID | fl").then((stdout, error2) => {
-                if (!error2) {
-                  let lines = stdout.split("\r\n");
-                  result2.manufacturer = util.getValue(lines, "vendor", ":");
-                  result2.model = util.getValue(lines, "name", ":");
-                  result2.version = util.getValue(lines, "version", ":");
-                  result2.serial = util.getValue(lines, "identifyingnumber", ":");
-                  result2.uuid = util.getValue(lines, "uuid", ":").toLowerCase();
-                  const model = result2.model.toLowerCase();
-                  if (model === "virtualbox" || model === "kvm" || model === "virtual machine" || model === "bochs" || model.startsWith("vmware") || model.startsWith("qemu") || model.startsWith("parallels")) {
-                    result2.virtual = true;
-                    if (model.startsWith("virtualbox")) {
-                      result2.virtualHost = "VirtualBox";
-                    }
-                    if (model.startsWith("vmware")) {
-                      result2.virtualHost = "VMware";
-                    }
-                    if (model.startsWith("kvm")) {
-                      result2.virtualHost = "KVM";
-                    }
-                    if (model.startsWith("bochs")) {
-                      result2.virtualHost = "bochs";
-                    }
-                    if (model.startsWith("qemu")) {
-                      result2.virtualHost = "KVM";
-                    }
-                    if (model.startsWith("parallels")) {
-                      result2.virtualHost = "Parallels";
-                    }
-                  }
-                  const manufacturer = result2.manufacturer.toLowerCase();
-                  if (manufacturer.startsWith("vmware") || manufacturer.startsWith("qemu") || manufacturer === "xen" || manufacturer.startsWith("parallels")) {
-                    result2.virtual = true;
-                    if (manufacturer.startsWith("vmware")) {
-                      result2.virtualHost = "VMware";
-                    }
-                    if (manufacturer.startsWith("xen")) {
-                      result2.virtualHost = "Xen";
-                    }
-                    if (manufacturer.startsWith("qemu")) {
-                      result2.virtualHost = "KVM";
-                    }
-                    if (manufacturer.startsWith("parallels")) {
-                      result2.virtualHost = "Parallels";
-                    }
-                  }
-                  util.powerShell('Get-CimInstance MS_Systeminformation -Namespace "root/wmi" | select systemsku | fl ').then((stdout2, error3) => {
-                    if (!error3) {
-                      let lines2 = stdout2.split("\r\n");
-                      result2.sku = util.getValue(lines2, "systemsku", ":");
-                    }
-                    if (!result2.virtual) {
-                      util.powerShell("Get-CimInstance Win32_bios | select Version, SerialNumber, SMBIOSBIOSVersion").then((stdout3, error4) => {
-                        if (!error4) {
-                          let lines2 = stdout3.toString();
-                          if (lines2.indexOf("VRTUAL") >= 0 || lines2.indexOf("A M I ") >= 0 || lines2.indexOf("VirtualBox") >= 0 || lines2.indexOf("VMWare") >= 0 || lines2.indexOf("Xen") >= 0 || lines2.indexOf("Parallels") >= 0) {
-                            result2.virtual = true;
-                            if (lines2.indexOf("VirtualBox") >= 0 && !result2.virtualHost) {
-                              result2.virtualHost = "VirtualBox";
-                            }
-                            if (lines2.indexOf("VMware") >= 0 && !result2.virtualHost) {
-                              result2.virtualHost = "VMware";
-                            }
-                            if (lines2.indexOf("Xen") >= 0 && !result2.virtualHost) {
-                              result2.virtualHost = "Xen";
-                            }
-                            if (lines2.indexOf("VRTUAL") >= 0 && !result2.virtualHost) {
-                              result2.virtualHost = "Hyper-V";
-                            }
-                            if (lines2.indexOf("A M I") >= 0 && !result2.virtualHost) {
-                              result2.virtualHost = "Virtual PC";
-                            }
-                            if (lines2.indexOf("Parallels") >= 0 && !result2.virtualHost) {
-                              result2.virtualHost = "Parallels";
-                            }
-                          }
-                          if (callback) {
-                            callback(result2);
-                          }
-                          resolve(result2);
-                        } else {
-                          if (callback) {
-                            callback(result2);
-                          }
-                          resolve(result2);
-                        }
-                      });
-                    } else {
-                      if (callback) {
-                        callback(result2);
-                      }
-                      resolve(result2);
-                    }
-                  });
-                } else {
-                  if (callback) {
-                    callback(result2);
-                  }
-                  resolve(result2);
-                }
-              });
-            } catch (e) {
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            }
-          }
-        });
-      });
-    }
-    exports2.system = system2;
-    function cleanDefaults(s) {
-      const cmpStr = s.toLowerCase();
-      if (cmpStr.indexOf("o.e.m.") === -1 && cmpStr.indexOf("default string") === -1 && cmpStr !== "default") {
-        return s || "";
-      }
-      return "";
-    }
-    function bios(callback) {
-      return new Promise((resolve) => {
-        process.nextTick(() => {
-          let result2 = {
-            vendor: "",
-            version: "",
-            releaseDate: "",
-            revision: ""
-          };
-          let cmd = "";
-          if (_linux || _freebsd || _openbsd || _netbsd) {
-            if (process.arch === "arm") {
-              cmd = "cat /proc/cpuinfo | grep Serial";
-            } else {
-              cmd = "export LC_ALL=C; dmidecode -t bios 2>/dev/null; unset LC_ALL";
-            }
-            exec3(cmd, function(error2, stdout) {
-              let lines = stdout.toString().split("\n");
-              result2.vendor = util.getValue(lines, "Vendor");
-              result2.version = util.getValue(lines, "Version");
-              let datetime = util.getValue(lines, "Release Date");
-              result2.releaseDate = util.parseDateTime(datetime).date;
-              result2.revision = util.getValue(lines, "BIOS Revision");
-              result2.serial = util.getValue(lines, "SerialNumber");
-              let language = util.getValue(lines, "Currently Installed Language").split("|")[0];
-              if (language) {
-                result2.language = language;
-              }
-              if (lines.length && stdout.toString().indexOf("Characteristics:") >= 0) {
-                const features = [];
-                lines.forEach((line) => {
-                  if (line.indexOf(" is supported") >= 0) {
-                    const feature = line.split(" is supported")[0].trim();
-                    features.push(feature);
-                  }
-                });
-                result2.features = features;
-              }
-              const cmd2 = `echo -n "bios_date: "; cat /sys/devices/virtual/dmi/id/bios_date 2>/dev/null; echo;
-            echo -n "bios_vendor: "; cat /sys/devices/virtual/dmi/id/bios_vendor 2>/dev/null; echo;
-            echo -n "bios_version: "; cat /sys/devices/virtual/dmi/id/bios_version 2>/dev/null; echo;`;
-              try {
-                lines = execSync(cmd2, util.execOptsLinux).toString().split("\n");
-                result2.vendor = !result2.vendor ? util.getValue(lines, "bios_vendor") : result2.vendor;
-                result2.version = !result2.version ? util.getValue(lines, "bios_version") : result2.version;
-                datetime = util.getValue(lines, "bios_date");
-                result2.releaseDate = !result2.releaseDate ? util.parseDateTime(datetime).date : result2.releaseDate;
-              } catch (e) {
-                util.noop();
-              }
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            });
-          }
-          if (_darwin) {
-            result2.vendor = "Apple Inc.";
-            exec3(
-              "system_profiler SPHardwareDataType -json",
-              function(error2, stdout) {
-                try {
-                  const hardwareData = JSON.parse(stdout.toString());
-                  if (hardwareData && hardwareData.SPHardwareDataType && hardwareData.SPHardwareDataType.length) {
-                    let bootRomVersion = hardwareData.SPHardwareDataType[0].boot_rom_version;
-                    bootRomVersion = bootRomVersion ? bootRomVersion.split("(")[0].trim() : null;
-                    result2.version = bootRomVersion;
-                  }
-                } catch (e) {
-                  util.noop();
-                }
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              }
-            );
-          }
-          if (_sunos) {
-            result2.vendor = "Sun Microsystems";
-            if (callback) {
-              callback(result2);
-            }
-            resolve(result2);
-          }
-          if (_windows) {
-            try {
-              util.powerShell('Get-CimInstance Win32_bios | select Description,Version,Manufacturer,@{n="ReleaseDate";e={$_.ReleaseDate.ToString("yyyy-MM-dd")}},BuildNumber,SerialNumber,SMBIOSBIOSVersion | fl').then((stdout, error2) => {
-                if (!error2) {
-                  let lines = stdout.toString().split("\r\n");
-                  const description = util.getValue(lines, "description", ":");
-                  const version = util.getValue(lines, "SMBIOSBIOSVersion", ":");
-                  if (description.indexOf(" Version ") !== -1) {
-                    result2.vendor = description.split(" Version ")[0].trim();
-                    result2.version = description.split(" Version ")[1].trim();
-                  } else if (description.indexOf(" Ver: ") !== -1) {
-                    result2.vendor = util.getValue(lines, "manufacturer", ":");
-                    result2.version = description.split(" Ver: ")[1].trim();
-                  } else {
-                    result2.vendor = util.getValue(lines, "manufacturer", ":");
-                    result2.version = version || util.getValue(lines, "version", ":");
-                  }
-                  result2.releaseDate = util.getValue(lines, "releasedate", ":");
-                  result2.revision = util.getValue(lines, "buildnumber", ":");
-                  result2.serial = cleanDefaults(util.getValue(lines, "serialnumber", ":"));
-                }
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              });
-            } catch (e) {
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            }
-          }
-        });
-      });
-    }
-    exports2.bios = bios;
-    function baseboard(callback) {
-      return new Promise((resolve) => {
-        process.nextTick(() => {
-          let result2 = {
-            manufacturer: "",
-            model: "",
-            version: "",
-            serial: "-",
-            assetTag: "-",
-            memMax: null,
-            memSlots: null
-          };
-          let cmd = "";
-          if (_linux || _freebsd || _openbsd || _netbsd) {
-            if (process.arch === "arm") {
-              cmd = "cat /proc/cpuinfo | grep Serial";
-            } else {
-              cmd = "export LC_ALL=C; dmidecode -t 2 2>/dev/null; unset LC_ALL";
-            }
-            const workload = [];
-            workload.push(execPromise(cmd));
-            workload.push(execPromise("export LC_ALL=C; dmidecode -t memory 2>/dev/null"));
-            util.promiseAll(
-              workload
-            ).then((data) => {
-              let lines = data.results[0] ? data.results[0].toString().split("\n") : [""];
-              result2.manufacturer = cleanDefaults(util.getValue(lines, "Manufacturer"));
-              result2.model = cleanDefaults(util.getValue(lines, "Product Name"));
-              result2.version = cleanDefaults(util.getValue(lines, "Version"));
-              result2.serial = cleanDefaults(util.getValue(lines, "Serial Number"));
-              result2.assetTag = cleanDefaults(util.getValue(lines, "Asset Tag"));
-              const cmd2 = `echo -n "board_asset_tag: "; cat /sys/devices/virtual/dmi/id/board_asset_tag 2>/dev/null; echo;
-            echo -n "board_name: "; cat /sys/devices/virtual/dmi/id/board_name 2>/dev/null; echo;
-            echo -n "board_serial: "; cat /sys/devices/virtual/dmi/id/board_serial 2>/dev/null; echo;
-            echo -n "board_vendor: "; cat /sys/devices/virtual/dmi/id/board_vendor 2>/dev/null; echo;
-            echo -n "board_version: "; cat /sys/devices/virtual/dmi/id/board_version 2>/dev/null; echo;`;
-              try {
-                lines = execSync(cmd2, util.execOptsLinux).toString().split("\n");
-                result2.manufacturer = cleanDefaults(!result2.manufacturer ? util.getValue(lines, "board_vendor") : result2.manufacturer);
-                result2.model = cleanDefaults(!result2.model ? util.getValue(lines, "board_name") : result2.model);
-                result2.version = cleanDefaults(!result2.version ? util.getValue(lines, "board_version") : result2.version);
-                result2.serial = cleanDefaults(!result2.serial ? util.getValue(lines, "board_serial") : result2.serial);
-                result2.assetTag = cleanDefaults(!result2.assetTag ? util.getValue(lines, "board_asset_tag") : result2.assetTag);
-              } catch (e) {
-                util.noop();
-              }
-              lines = data.results[1] ? data.results[1].toString().split("\n") : [""];
-              result2.memMax = util.toInt(util.getValue(lines, "Maximum Capacity")) * 1024 * 1024 * 1024 || null;
-              result2.memSlots = util.toInt(util.getValue(lines, "Number Of Devices")) || null;
-              if (util.isRaspberry()) {
-                const rpi = util.decodePiCpuinfo();
-                result2.manufacturer = rpi.manufacturer;
-                result2.model = "Raspberry Pi";
-                result2.serial = rpi.serial;
-                result2.version = rpi.type + " - " + rpi.revision;
-                result2.memMax = os2.totalmem();
-                result2.memSlots = 0;
-              }
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            });
-          }
-          if (_darwin) {
-            const workload = [];
-            workload.push(execPromise("ioreg -c IOPlatformExpertDevice -d 2"));
-            workload.push(execPromise("system_profiler SPMemoryDataType"));
-            util.promiseAll(
-              workload
-            ).then((data) => {
-              let lines = data.results[0] ? data.results[0].toString().replace(/[<>"]/g, "").split("\n") : [""];
-              result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
-              result2.model = util.getValue(lines, "model", "=", true);
-              result2.version = util.getValue(lines, "version", "=", true);
-              result2.serial = util.getValue(lines, "ioplatformserialnumber", "=", true);
-              result2.assetTag = util.getValue(lines, "board-id", "=", true);
-              let devices = data.results[1] ? data.results[1].toString().split("        BANK ") : [""];
-              if (devices.length === 1) {
-                devices = data.results[1] ? data.results[1].toString().split("        DIMM") : [""];
-              }
-              devices.shift();
-              result2.memSlots = devices.length;
-              if (os2.arch() === "arm64") {
-                result2.memSlots = 0;
-                result2.memMax = os2.totalmem();
-              }
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            });
-          }
-          if (_sunos) {
-            if (callback) {
-              callback(result2);
-            }
-            resolve(result2);
-          }
-          if (_windows) {
-            try {
-              const workload = [];
-              const win10plus = parseInt(os2.release()) >= 10;
-              const maxCapacityAttribute = win10plus ? "MaxCapacityEx" : "MaxCapacity";
-              workload.push(util.powerShell("Get-CimInstance Win32_baseboard | select Model,Manufacturer,Product,Version,SerialNumber,PartNumber,SKU | fl"));
-              workload.push(util.powerShell(`Get-CimInstance Win32_physicalmemoryarray | select ${maxCapacityAttribute}, MemoryDevices | fl`));
-              util.promiseAll(
-                workload
-              ).then((data) => {
-                let lines = data.results[0] ? data.results[0].toString().split("\r\n") : [""];
-                result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer", ":"));
-                result2.model = cleanDefaults(util.getValue(lines, "model", ":"));
-                if (!result2.model) {
-                  result2.model = cleanDefaults(util.getValue(lines, "product", ":"));
-                }
-                result2.version = cleanDefaults(util.getValue(lines, "version", ":"));
-                result2.serial = cleanDefaults(util.getValue(lines, "serialnumber", ":"));
-                result2.assetTag = cleanDefaults(util.getValue(lines, "partnumber", ":"));
-                if (!result2.assetTag) {
-                  result2.assetTag = cleanDefaults(util.getValue(lines, "sku", ":"));
-                }
-                lines = data.results[1] ? data.results[1].toString().split("\r\n") : [""];
-                result2.memMax = util.toInt(util.getValue(lines, maxCapacityAttribute, ":")) * (win10plus ? 1024 : 1) || null;
-                result2.memSlots = util.toInt(util.getValue(lines, "MemoryDevices", ":")) || null;
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              });
-            } catch (e) {
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            }
-          }
-        });
-      });
-    }
-    exports2.baseboard = baseboard;
-    function macOsChassisType(model) {
-      model = model.toLowerCase();
-      if (model.indexOf("macbookair") >= 0 || model.indexOf("macbook air") >= 0) {
-        return "Notebook";
-      }
-      if (model.indexOf("macbookpro") >= 0 || model.indexOf("macbook pro") >= 0) {
-        return "Notebook";
-      }
-      if (model.indexOf("macbook") >= 0) {
-        return "Notebook";
-      }
-      if (model.indexOf("macmini") >= 0 || model.indexOf("mac mini") >= 0) {
-        return "Desktop";
-      }
-      if (model.indexOf("imac") >= 0) {
-        return "Desktop";
-      }
-      if (model.indexOf("macstudio") >= 0 || model.indexOf("mac studio") >= 0) {
-        return "Desktop";
-      }
-      if (model.indexOf("macpro") >= 0 || model.indexOf("mac pro") >= 0) {
-        return "Tower";
-      }
-      return "Other";
-    }
-    function chassis(callback) {
-      const chassisTypes = [
-        "Other",
-        "Unknown",
-        "Desktop",
-        "Low Profile Desktop",
-        "Pizza Box",
-        "Mini Tower",
-        "Tower",
-        "Portable",
-        "Laptop",
-        "Notebook",
-        "Hand Held",
-        "Docking Station",
-        "All in One",
-        "Sub Notebook",
-        "Space-Saving",
-        "Lunch Box",
-        "Main System Chassis",
-        "Expansion Chassis",
-        "SubChassis",
-        "Bus Expansion Chassis",
-        "Peripheral Chassis",
-        "Storage Chassis",
-        "Rack Mount Chassis",
-        "Sealed-Case PC",
-        "Multi-System Chassis",
-        "Compact PCI",
-        "Advanced TCA",
-        "Blade",
-        "Blade Enclosure",
-        "Tablet",
-        "Convertible",
-        "Detachable",
-        "IoT Gateway ",
-        "Embedded PC",
-        "Mini PC",
-        "Stick PC"
-      ];
-      return new Promise((resolve) => {
-        process.nextTick(() => {
-          let result2 = {
-            manufacturer: "",
-            model: "",
-            type: "",
-            version: "",
-            serial: "-",
-            assetTag: "-",
-            sku: ""
-          };
-          if (_linux || _freebsd || _openbsd || _netbsd) {
-            const cmd = `echo -n "chassis_asset_tag: "; cat /sys/devices/virtual/dmi/id/chassis_asset_tag 2>/dev/null; echo;
-            echo -n "chassis_serial: "; cat /sys/devices/virtual/dmi/id/chassis_serial 2>/dev/null; echo;
-            echo -n "chassis_type: "; cat /sys/devices/virtual/dmi/id/chassis_type 2>/dev/null; echo;
-            echo -n "chassis_vendor: "; cat /sys/devices/virtual/dmi/id/chassis_vendor 2>/dev/null; echo;
-            echo -n "chassis_version: "; cat /sys/devices/virtual/dmi/id/chassis_version 2>/dev/null; echo;`;
-            exec3(cmd, function(error2, stdout) {
-              let lines = stdout.toString().split("\n");
-              result2.manufacturer = cleanDefaults(util.getValue(lines, "chassis_vendor"));
-              const ctype = parseInt(util.getValue(lines, "chassis_type").replace(/\D/g, ""));
-              result2.type = cleanDefaults(ctype && !isNaN(ctype) && ctype < chassisTypes.length ? chassisTypes[ctype - 1] : "");
-              result2.version = cleanDefaults(util.getValue(lines, "chassis_version"));
-              result2.serial = cleanDefaults(util.getValue(lines, "chassis_serial"));
-              result2.assetTag = cleanDefaults(util.getValue(lines, "chassis_asset_tag"));
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            });
-          }
-          if (_darwin) {
-            exec3("ioreg -c IOPlatformExpertDevice -d 2", function(error2, stdout) {
-              if (!error2) {
-                let lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
-                const model = util.getAppleModel(util.getValue(lines, "model", "=", true));
-                result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
-                result2.model = model.key;
-                result2.type = macOsChassisType(model.model);
-                result2.version = model.version;
-                result2.serial = util.getValue(lines, "ioplatformserialnumber", "=", true);
-                result2.assetTag = util.getValue(lines, "board-id", "=", true) || util.getValue(lines, "target-type", "=", true);
-                result2.sku = util.getValue(lines, "target-sub-type", "=", true);
-              }
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            });
-          }
-          if (_sunos) {
-            if (callback) {
-              callback(result2);
-            }
-            resolve(result2);
-          }
-          if (_windows) {
-            try {
-              util.powerShell("Get-CimInstance Win32_SystemEnclosure | select Model,Manufacturer,ChassisTypes,Version,SerialNumber,PartNumber,SKU,SMBIOSAssetTag | fl").then((stdout, error2) => {
-                if (!error2) {
-                  let lines = stdout.toString().split("\r\n");
-                  result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer", ":"));
-                  result2.model = cleanDefaults(util.getValue(lines, "model", ":"));
-                  const ctype = parseInt(util.getValue(lines, "ChassisTypes", ":").replace(/\D/g, ""));
-                  result2.type = ctype && !isNaN(ctype) && ctype < chassisTypes.length ? chassisTypes[ctype - 1] : "";
-                  result2.version = cleanDefaults(util.getValue(lines, "version", ":"));
-                  result2.serial = cleanDefaults(util.getValue(lines, "serialnumber", ":"));
-                  result2.assetTag = cleanDefaults(util.getValue(lines, "partnumber", ":"));
-                  if (!result2.assetTag) {
-                    result2.assetTag = cleanDefaults(util.getValue(lines, "SMBIOSAssetTag", ":"));
-                  }
-                  result2.sku = cleanDefaults(util.getValue(lines, "sku", ":"));
-                }
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              });
-            } catch (e) {
-              if (callback) {
-                callback(result2);
-              }
-              resolve(result2);
-            }
-          }
-        });
-      });
-    }
-    exports2.chassis = chassis;
-  }
-});
-
 // ../../node_modules/systeminformation/lib/osinfo.js
 var require_osinfo = __commonJS({
   "../../node_modules/systeminformation/lib/osinfo.js"(exports2) {
@@ -74244,8 +73479,8 @@ echo -n "hardware: "; cat /sys/class/dmi/id/product_uuid 2> /dev/null; echo;`;
           if (_freebsd || _openbsd || _netbsd) {
             exec3("sysctl -i kern.hostid kern.hostuuid", function(error2, stdout) {
               const lines = stdout.toString().split("\n");
-              result2.os = util.getValue(lines, "kern.hostid", ":").toLowerCase();
-              result2.hardware = util.getValue(lines, "kern.hostuuid", ":").toLowerCase();
+              result2.hardware = util.getValue(lines, "kern.hostid", ":").toLowerCase();
+              result2.os = util.getValue(lines, "kern.hostuuid", ":").toLowerCase();
               if (result2.os.indexOf("unknown") >= 0) {
                 result2.os = "";
               }
@@ -74280,6 +73515,790 @@ echo -n "hardware: "; cat /sys/class/dmi/id/product_uuid 2> /dev/null; echo;`;
       });
     }
     exports2.uuid = uuid;
+  }
+});
+
+// ../../node_modules/systeminformation/lib/system.js
+var require_system = __commonJS({
+  "../../node_modules/systeminformation/lib/system.js"(exports2) {
+    "use strict";
+    var fs = require("fs");
+    var os2 = require("os");
+    var util = require_util10();
+    var { uuid } = require_osinfo();
+    var exec3 = require("child_process").exec;
+    var execSync = require("child_process").execSync;
+    var execPromise = util.promisify(require("child_process").exec);
+    var _platform = process.platform;
+    var _linux = _platform === "linux" || _platform === "android";
+    var _darwin = _platform === "darwin";
+    var _windows = _platform === "win32";
+    var _freebsd = _platform === "freebsd";
+    var _openbsd = _platform === "openbsd";
+    var _netbsd = _platform === "netbsd";
+    var _sunos = _platform === "sunos";
+    function system2(callback) {
+      return new Promise((resolve) => {
+        process.nextTick(() => {
+          let result2 = {
+            manufacturer: "",
+            model: "Computer",
+            version: "",
+            serial: "-",
+            uuid: "-",
+            sku: "-",
+            virtual: false
+          };
+          if (_linux || _freebsd || _openbsd || _netbsd) {
+            exec3("export LC_ALL=C; dmidecode -t system 2>/dev/null; unset LC_ALL", function(error2, stdout) {
+              let lines = stdout.toString().split("\n");
+              result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer"));
+              result2.model = cleanDefaults(util.getValue(lines, "product name"));
+              result2.version = cleanDefaults(util.getValue(lines, "version"));
+              result2.serial = cleanDefaults(util.getValue(lines, "serial number"));
+              result2.uuid = cleanDefaults(util.getValue(lines, "uuid")).toLowerCase();
+              result2.sku = cleanDefaults(util.getValue(lines, "sku number"));
+              const cmd = `echo -n "product_name: "; cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null; echo;
+            echo -n "product_serial: "; cat /sys/devices/virtual/dmi/id/product_serial 2>/dev/null; echo;
+            echo -n "product_uuid: "; cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null; echo;
+            echo -n "product_version: "; cat /sys/devices/virtual/dmi/id/product_version 2>/dev/null; echo;
+            echo -n "sys_vendor: "; cat /sys/devices/virtual/dmi/id/sys_vendor 2>/dev/null; echo;`;
+              try {
+                lines = execSync(cmd, util.execOptsLinux).toString().split("\n");
+                result2.manufacturer = cleanDefaults(result2.manufacturer === "" ? util.getValue(lines, "sys_vendor") : result2.manufacturer);
+                result2.model = cleanDefaults(result2.model === "" ? util.getValue(lines, "product_name") : result2.model);
+                result2.version = cleanDefaults(result2.version === "" ? util.getValue(lines, "product_version") : result2.version);
+                result2.serial = cleanDefaults(result2.serial === "" ? util.getValue(lines, "product_serial") : result2.serial);
+                result2.uuid = cleanDefaults(result2.uuid === "" ? util.getValue(lines, "product_uuid").toLowerCase() : result2.uuid);
+              } catch (e) {
+                util.noop();
+              }
+              if (!result2.serial) {
+                result2.serial = "-";
+              }
+              if (!result2.manufacturer) {
+                result2.manufacturer = "";
+              }
+              if (!result2.model) {
+                result2.model = "Computer";
+              }
+              if (!result2.version) {
+                result2.version = "";
+              }
+              if (!result2.sku) {
+                result2.sku = "-";
+              }
+              if (result2.model.toLowerCase() === "virtualbox" || result2.model.toLowerCase() === "kvm" || result2.model.toLowerCase() === "virtual machine" || result2.model.toLowerCase() === "bochs" || result2.model.toLowerCase().startsWith("vmware") || result2.model.toLowerCase().startsWith("droplet")) {
+                result2.virtual = true;
+                switch (result2.model.toLowerCase()) {
+                  case "virtualbox":
+                    result2.virtualHost = "VirtualBox";
+                    break;
+                  case "vmware":
+                    result2.virtualHost = "VMware";
+                    break;
+                  case "kvm":
+                    result2.virtualHost = "KVM";
+                    break;
+                  case "bochs":
+                    result2.virtualHost = "bochs";
+                    break;
+                }
+              }
+              if (result2.manufacturer.toLowerCase().startsWith("vmware") || result2.manufacturer.toLowerCase() === "xen") {
+                result2.virtual = true;
+                switch (result2.manufacturer.toLowerCase()) {
+                  case "vmware":
+                    result2.virtualHost = "VMware";
+                    break;
+                  case "xen":
+                    result2.virtualHost = "Xen";
+                    break;
+                }
+              }
+              if (!result2.virtual) {
+                try {
+                  const disksById = execSync("ls -1 /dev/disk/by-id/ 2>/dev/null; pciconf -lv  2>/dev/null", util.execOptsLinux).toString();
+                  if (disksById.indexOf("_QEMU_") >= 0 || disksById.indexOf("QEMU ") >= 0) {
+                    result2.virtual = true;
+                    result2.virtualHost = "QEMU";
+                  }
+                  if (disksById.indexOf("_VBOX_") >= 0) {
+                    result2.virtual = true;
+                    result2.virtualHost = "VirtualBox";
+                  }
+                } catch (e) {
+                  util.noop();
+                }
+              }
+              if (_freebsd || _openbsd || _netbsd) {
+                try {
+                  const lines2 = execSync("sysctl -i kern.hostuuid kern.hostid hw.model", util.execOptsLinux).toString().split("\n");
+                  if (!result2.uuid) {
+                    result2.uuid = util.getValue(lines2, "kern.hostuuid", ":").toLowerCase();
+                  }
+                  if (!result2.serial || result2.serial === "-") {
+                    result2.serial = util.getValue(lines2, "kern.hostid", ":").toLowerCase();
+                  }
+                  if (!result2.model || result2.model === "Computer") {
+                    result2.model = util.getValue(lines2, "hw.model", ":").trim();
+                  }
+                } catch (e) {
+                  util.noop();
+                }
+              }
+              if (!result2.virtual && (os2.release().toLowerCase().indexOf("microsoft") >= 0 || os2.release().toLowerCase().endsWith("wsl2"))) {
+                const kernelVersion = parseFloat(os2.release().toLowerCase());
+                result2.virtual = true;
+                result2.manufacturer = "Microsoft";
+                result2.model = "WSL";
+                result2.version = kernelVersion < 4.19 ? "1" : "2";
+              }
+              if ((_freebsd || _openbsd || _netbsd) && !result2.virtualHost) {
+                try {
+                  const procInfo = execSync("dmidecode -t 4", util.execOptsLinux);
+                  const procLines = procInfo.toString().split("\n");
+                  const procManufacturer = util.getValue(procLines, "manufacturer", ":", true);
+                  switch (procManufacturer.toLowerCase()) {
+                    case "virtualbox":
+                      result2.virtualHost = "VirtualBox";
+                      break;
+                    case "vmware":
+                      result2.virtualHost = "VMware";
+                      break;
+                    case "kvm":
+                      result2.virtualHost = "KVM";
+                      break;
+                    case "bochs":
+                      result2.virtualHost = "bochs";
+                      break;
+                  }
+                } catch (e) {
+                  util.noop();
+                }
+              }
+              if (fs.existsSync("/.dockerenv") || fs.existsSync("/.dockerinit")) {
+                result2.model = "Docker Container";
+              }
+              try {
+                const stdout2 = execSync('dmesg 2>/dev/null | grep -iE "virtual|hypervisor" | grep -iE "vmware|qemu|kvm|xen" | grep -viE "Nested Virtualization|/virtual/"');
+                let lines2 = stdout2.toString().split("\n");
+                if (lines2.length > 0) {
+                  if (result2.model === "Computer") {
+                    result2.model = "Virtual machine";
+                  }
+                  result2.virtual = true;
+                  if (stdout2.toString().toLowerCase().indexOf("vmware") >= 0 && !result2.virtualHost) {
+                    result2.virtualHost = "VMware";
+                  }
+                  if (stdout2.toString().toLowerCase().indexOf("qemu") >= 0 && !result2.virtualHost) {
+                    result2.virtualHost = "QEMU";
+                  }
+                  if (stdout2.toString().toLowerCase().indexOf("xen") >= 0 && !result2.virtualHost) {
+                    result2.virtualHost = "Xen";
+                  }
+                  if (stdout2.toString().toLowerCase().indexOf("kvm") >= 0 && !result2.virtualHost) {
+                    result2.virtualHost = "KVM";
+                  }
+                }
+              } catch (e) {
+                util.noop();
+              }
+              if (result2.manufacturer === "" && result2.model === "Computer" && result2.version === "") {
+                fs.readFile("/proc/cpuinfo", function(error3, stdout2) {
+                  if (!error3) {
+                    let lines2 = stdout2.toString().split("\n");
+                    result2.model = util.getValue(lines2, "hardware", ":", true).toUpperCase();
+                    result2.version = util.getValue(lines2, "revision", ":", true).toLowerCase();
+                    result2.serial = util.getValue(lines2, "serial", ":", true);
+                    const model = util.getValue(lines2, "model:", ":", true);
+                    if (util.isRaspberry(lines2)) {
+                      const rPIRevision = util.decodePiCpuinfo(lines2);
+                      result2.model = rPIRevision.model;
+                      result2.version = rPIRevision.revisionCode;
+                      result2.manufacturer = "Raspberry Pi Foundation";
+                      result2.raspberry = {
+                        manufacturer: rPIRevision.manufacturer,
+                        processor: rPIRevision.processor,
+                        type: rPIRevision.type,
+                        revision: rPIRevision.revision
+                      };
+                    }
+                  }
+                  if (callback) {
+                    callback(result2);
+                  }
+                  resolve(result2);
+                });
+              } else {
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              }
+            });
+          }
+          if (_darwin) {
+            exec3("ioreg -c IOPlatformExpertDevice -d 2", function(error2, stdout) {
+              if (!error2) {
+                let lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
+                const model = util.getAppleModel(util.getValue(lines, "model", "=", true));
+                result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
+                result2.model = model.key;
+                result2.type = macOsChassisType(model.version);
+                result2.version = model.version;
+                result2.serial = util.getValue(lines, "ioplatformserialnumber", "=", true);
+                result2.uuid = util.getValue(lines, "ioplatformuuid", "=", true).toLowerCase();
+                result2.sku = util.getValue(lines, "board-id", "=", true) || util.getValue(lines, "target-sub-type", "=", true);
+              }
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
+          }
+          if (_sunos) {
+            if (callback) {
+              callback(result2);
+            }
+            resolve(result2);
+          }
+          if (_windows) {
+            try {
+              util.powerShell("Get-CimInstance Win32_ComputerSystemProduct | select Name,Vendor,Version,IdentifyingNumber,UUID | fl").then((stdout, error2) => {
+                if (!error2) {
+                  let lines = stdout.split("\r\n");
+                  result2.manufacturer = util.getValue(lines, "vendor", ":");
+                  result2.model = util.getValue(lines, "name", ":");
+                  result2.version = util.getValue(lines, "version", ":");
+                  result2.serial = util.getValue(lines, "identifyingnumber", ":");
+                  result2.uuid = util.getValue(lines, "uuid", ":").toLowerCase();
+                  const model = result2.model.toLowerCase();
+                  if (model === "virtualbox" || model === "kvm" || model === "virtual machine" || model === "bochs" || model.startsWith("vmware") || model.startsWith("qemu") || model.startsWith("parallels")) {
+                    result2.virtual = true;
+                    if (model.startsWith("virtualbox")) {
+                      result2.virtualHost = "VirtualBox";
+                    }
+                    if (model.startsWith("vmware")) {
+                      result2.virtualHost = "VMware";
+                    }
+                    if (model.startsWith("kvm")) {
+                      result2.virtualHost = "KVM";
+                    }
+                    if (model.startsWith("bochs")) {
+                      result2.virtualHost = "bochs";
+                    }
+                    if (model.startsWith("qemu")) {
+                      result2.virtualHost = "KVM";
+                    }
+                    if (model.startsWith("parallels")) {
+                      result2.virtualHost = "Parallels";
+                    }
+                  }
+                  const manufacturer = result2.manufacturer.toLowerCase();
+                  if (manufacturer.startsWith("vmware") || manufacturer.startsWith("qemu") || manufacturer === "xen" || manufacturer.startsWith("parallels")) {
+                    result2.virtual = true;
+                    if (manufacturer.startsWith("vmware")) {
+                      result2.virtualHost = "VMware";
+                    }
+                    if (manufacturer.startsWith("xen")) {
+                      result2.virtualHost = "Xen";
+                    }
+                    if (manufacturer.startsWith("qemu")) {
+                      result2.virtualHost = "KVM";
+                    }
+                    if (manufacturer.startsWith("parallels")) {
+                      result2.virtualHost = "Parallels";
+                    }
+                  }
+                  util.powerShell('Get-CimInstance MS_Systeminformation -Namespace "root/wmi" | select systemsku | fl ').then((stdout2, error3) => {
+                    if (!error3) {
+                      let lines2 = stdout2.split("\r\n");
+                      result2.sku = util.getValue(lines2, "systemsku", ":");
+                    }
+                    if (!result2.virtual) {
+                      util.powerShell("Get-CimInstance Win32_bios | select Version, SerialNumber, SMBIOSBIOSVersion").then((stdout3, error4) => {
+                        if (!error4) {
+                          let lines2 = stdout3.toString();
+                          if (lines2.indexOf("VRTUAL") >= 0 || lines2.indexOf("A M I ") >= 0 || lines2.indexOf("VirtualBox") >= 0 || lines2.indexOf("VMWare") >= 0 || lines2.indexOf("Xen") >= 0 || lines2.indexOf("Parallels") >= 0) {
+                            result2.virtual = true;
+                            if (lines2.indexOf("VirtualBox") >= 0 && !result2.virtualHost) {
+                              result2.virtualHost = "VirtualBox";
+                            }
+                            if (lines2.indexOf("VMware") >= 0 && !result2.virtualHost) {
+                              result2.virtualHost = "VMware";
+                            }
+                            if (lines2.indexOf("Xen") >= 0 && !result2.virtualHost) {
+                              result2.virtualHost = "Xen";
+                            }
+                            if (lines2.indexOf("VRTUAL") >= 0 && !result2.virtualHost) {
+                              result2.virtualHost = "Hyper-V";
+                            }
+                            if (lines2.indexOf("A M I") >= 0 && !result2.virtualHost) {
+                              result2.virtualHost = "Virtual PC";
+                            }
+                            if (lines2.indexOf("Parallels") >= 0 && !result2.virtualHost) {
+                              result2.virtualHost = "Parallels";
+                            }
+                          }
+                          if (callback) {
+                            callback(result2);
+                          }
+                          resolve(result2);
+                        } else {
+                          if (callback) {
+                            callback(result2);
+                          }
+                          resolve(result2);
+                        }
+                      });
+                    } else {
+                      if (callback) {
+                        callback(result2);
+                      }
+                      resolve(result2);
+                    }
+                  });
+                } else {
+                  if (callback) {
+                    callback(result2);
+                  }
+                  resolve(result2);
+                }
+              });
+            } catch (e) {
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            }
+          }
+        });
+      });
+    }
+    exports2.system = system2;
+    function cleanDefaults(s) {
+      const cmpStr = s.toLowerCase();
+      if (cmpStr.indexOf("o.e.m.") === -1 && cmpStr.indexOf("default string") === -1 && cmpStr !== "default") {
+        return s || "";
+      }
+      return "";
+    }
+    function bios(callback) {
+      return new Promise((resolve) => {
+        process.nextTick(() => {
+          let result2 = {
+            vendor: "",
+            version: "",
+            releaseDate: "",
+            revision: ""
+          };
+          let cmd = "";
+          if (_linux || _freebsd || _openbsd || _netbsd) {
+            if (process.arch === "arm") {
+              cmd = "cat /proc/cpuinfo | grep Serial";
+            } else {
+              cmd = "export LC_ALL=C; dmidecode -t bios 2>/dev/null; unset LC_ALL";
+            }
+            exec3(cmd, function(error2, stdout) {
+              let lines = stdout.toString().split("\n");
+              result2.vendor = util.getValue(lines, "Vendor");
+              result2.version = util.getValue(lines, "Version");
+              let datetime = util.getValue(lines, "Release Date");
+              result2.releaseDate = util.parseDateTime(datetime).date;
+              result2.revision = util.getValue(lines, "BIOS Revision");
+              result2.serial = util.getValue(lines, "SerialNumber");
+              let language = util.getValue(lines, "Currently Installed Language").split("|")[0];
+              if (language) {
+                result2.language = language;
+              }
+              if (lines.length && stdout.toString().indexOf("Characteristics:") >= 0) {
+                const features = [];
+                lines.forEach((line) => {
+                  if (line.indexOf(" is supported") >= 0) {
+                    const feature = line.split(" is supported")[0].trim();
+                    features.push(feature);
+                  }
+                });
+                result2.features = features;
+              }
+              const cmd2 = `echo -n "bios_date: "; cat /sys/devices/virtual/dmi/id/bios_date 2>/dev/null; echo;
+            echo -n "bios_vendor: "; cat /sys/devices/virtual/dmi/id/bios_vendor 2>/dev/null; echo;
+            echo -n "bios_version: "; cat /sys/devices/virtual/dmi/id/bios_version 2>/dev/null; echo;`;
+              try {
+                lines = execSync(cmd2, util.execOptsLinux).toString().split("\n");
+                result2.vendor = !result2.vendor ? util.getValue(lines, "bios_vendor") : result2.vendor;
+                result2.version = !result2.version ? util.getValue(lines, "bios_version") : result2.version;
+                datetime = util.getValue(lines, "bios_date");
+                result2.releaseDate = !result2.releaseDate ? util.parseDateTime(datetime).date : result2.releaseDate;
+              } catch (e) {
+                util.noop();
+              }
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
+          }
+          if (_darwin) {
+            result2.vendor = "Apple Inc.";
+            exec3(
+              "system_profiler SPHardwareDataType -json",
+              function(error2, stdout) {
+                try {
+                  const hardwareData = JSON.parse(stdout.toString());
+                  if (hardwareData && hardwareData.SPHardwareDataType && hardwareData.SPHardwareDataType.length) {
+                    let bootRomVersion = hardwareData.SPHardwareDataType[0].boot_rom_version;
+                    bootRomVersion = bootRomVersion ? bootRomVersion.split("(")[0].trim() : null;
+                    result2.version = bootRomVersion;
+                  }
+                } catch (e) {
+                  util.noop();
+                }
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              }
+            );
+          }
+          if (_sunos) {
+            result2.vendor = "Sun Microsystems";
+            if (callback) {
+              callback(result2);
+            }
+            resolve(result2);
+          }
+          if (_windows) {
+            try {
+              util.powerShell('Get-CimInstance Win32_bios | select Description,Version,Manufacturer,@{n="ReleaseDate";e={$_.ReleaseDate.ToString("yyyy-MM-dd")}},BuildNumber,SerialNumber,SMBIOSBIOSVersion | fl').then((stdout, error2) => {
+                if (!error2) {
+                  let lines = stdout.toString().split("\r\n");
+                  const description = util.getValue(lines, "description", ":");
+                  const version = util.getValue(lines, "SMBIOSBIOSVersion", ":");
+                  if (description.indexOf(" Version ") !== -1) {
+                    result2.vendor = description.split(" Version ")[0].trim();
+                    result2.version = description.split(" Version ")[1].trim();
+                  } else if (description.indexOf(" Ver: ") !== -1) {
+                    result2.vendor = util.getValue(lines, "manufacturer", ":");
+                    result2.version = description.split(" Ver: ")[1].trim();
+                  } else {
+                    result2.vendor = util.getValue(lines, "manufacturer", ":");
+                    result2.version = version || util.getValue(lines, "version", ":");
+                  }
+                  result2.releaseDate = util.getValue(lines, "releasedate", ":");
+                  result2.revision = util.getValue(lines, "buildnumber", ":");
+                  result2.serial = cleanDefaults(util.getValue(lines, "serialnumber", ":"));
+                }
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              });
+            } catch (e) {
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            }
+          }
+        });
+      });
+    }
+    exports2.bios = bios;
+    function baseboard(callback) {
+      return new Promise((resolve) => {
+        process.nextTick(() => {
+          let result2 = {
+            manufacturer: "",
+            model: "",
+            version: "",
+            serial: "-",
+            assetTag: "-",
+            memMax: null,
+            memSlots: null
+          };
+          let cmd = "";
+          if (_linux || _freebsd || _openbsd || _netbsd) {
+            if (process.arch === "arm") {
+              cmd = "cat /proc/cpuinfo | grep Serial";
+            } else {
+              cmd = "export LC_ALL=C; dmidecode -t 2 2>/dev/null; unset LC_ALL";
+            }
+            const workload = [];
+            workload.push(execPromise(cmd));
+            workload.push(execPromise("export LC_ALL=C; dmidecode -t memory 2>/dev/null"));
+            util.promiseAll(
+              workload
+            ).then((data) => {
+              let lines = data.results[0] ? data.results[0].toString().split("\n") : [""];
+              result2.manufacturer = cleanDefaults(util.getValue(lines, "Manufacturer"));
+              result2.model = cleanDefaults(util.getValue(lines, "Product Name"));
+              result2.version = cleanDefaults(util.getValue(lines, "Version"));
+              result2.serial = cleanDefaults(util.getValue(lines, "Serial Number"));
+              result2.assetTag = cleanDefaults(util.getValue(lines, "Asset Tag"));
+              const cmd2 = `echo -n "board_asset_tag: "; cat /sys/devices/virtual/dmi/id/board_asset_tag 2>/dev/null; echo;
+            echo -n "board_name: "; cat /sys/devices/virtual/dmi/id/board_name 2>/dev/null; echo;
+            echo -n "board_serial: "; cat /sys/devices/virtual/dmi/id/board_serial 2>/dev/null; echo;
+            echo -n "board_vendor: "; cat /sys/devices/virtual/dmi/id/board_vendor 2>/dev/null; echo;
+            echo -n "board_version: "; cat /sys/devices/virtual/dmi/id/board_version 2>/dev/null; echo;`;
+              try {
+                lines = execSync(cmd2, util.execOptsLinux).toString().split("\n");
+                result2.manufacturer = cleanDefaults(!result2.manufacturer ? util.getValue(lines, "board_vendor") : result2.manufacturer);
+                result2.model = cleanDefaults(!result2.model ? util.getValue(lines, "board_name") : result2.model);
+                result2.version = cleanDefaults(!result2.version ? util.getValue(lines, "board_version") : result2.version);
+                result2.serial = cleanDefaults(!result2.serial ? util.getValue(lines, "board_serial") : result2.serial);
+                result2.assetTag = cleanDefaults(!result2.assetTag ? util.getValue(lines, "board_asset_tag") : result2.assetTag);
+              } catch (e) {
+                util.noop();
+              }
+              lines = data.results[1] ? data.results[1].toString().split("\n") : [""];
+              result2.memMax = util.toInt(util.getValue(lines, "Maximum Capacity")) * 1024 * 1024 * 1024 || null;
+              result2.memSlots = util.toInt(util.getValue(lines, "Number Of Devices")) || null;
+              if (util.isRaspberry()) {
+                const rpi = util.decodePiCpuinfo();
+                result2.manufacturer = rpi.manufacturer;
+                result2.model = "Raspberry Pi";
+                result2.serial = rpi.serial;
+                result2.version = rpi.type + " - " + rpi.revision;
+                result2.memMax = os2.totalmem();
+                result2.memSlots = 0;
+              }
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
+          }
+          if (_darwin) {
+            const workload = [];
+            workload.push(execPromise("ioreg -c IOPlatformExpertDevice -d 2"));
+            workload.push(execPromise("system_profiler SPMemoryDataType"));
+            util.promiseAll(
+              workload
+            ).then((data) => {
+              let lines = data.results[0] ? data.results[0].toString().replace(/[<>"]/g, "").split("\n") : [""];
+              result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
+              result2.model = util.getValue(lines, "model", "=", true);
+              result2.version = util.getValue(lines, "version", "=", true);
+              result2.serial = util.getValue(lines, "ioplatformserialnumber", "=", true);
+              result2.assetTag = util.getValue(lines, "board-id", "=", true);
+              let devices = data.results[1] ? data.results[1].toString().split("        BANK ") : [""];
+              if (devices.length === 1) {
+                devices = data.results[1] ? data.results[1].toString().split("        DIMM") : [""];
+              }
+              devices.shift();
+              result2.memSlots = devices.length;
+              if (os2.arch() === "arm64") {
+                result2.memSlots = 0;
+                result2.memMax = os2.totalmem();
+              }
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
+          }
+          if (_sunos) {
+            if (callback) {
+              callback(result2);
+            }
+            resolve(result2);
+          }
+          if (_windows) {
+            try {
+              const workload = [];
+              const win10plus = parseInt(os2.release()) >= 10;
+              const maxCapacityAttribute = win10plus ? "MaxCapacityEx" : "MaxCapacity";
+              workload.push(util.powerShell("Get-CimInstance Win32_baseboard | select Model,Manufacturer,Product,Version,SerialNumber,PartNumber,SKU | fl"));
+              workload.push(util.powerShell(`Get-CimInstance Win32_physicalmemoryarray | select ${maxCapacityAttribute}, MemoryDevices | fl`));
+              util.promiseAll(
+                workload
+              ).then((data) => {
+                let lines = data.results[0] ? data.results[0].toString().split("\r\n") : [""];
+                result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer", ":"));
+                result2.model = cleanDefaults(util.getValue(lines, "model", ":"));
+                if (!result2.model) {
+                  result2.model = cleanDefaults(util.getValue(lines, "product", ":"));
+                }
+                result2.version = cleanDefaults(util.getValue(lines, "version", ":"));
+                result2.serial = cleanDefaults(util.getValue(lines, "serialnumber", ":"));
+                result2.assetTag = cleanDefaults(util.getValue(lines, "partnumber", ":"));
+                if (!result2.assetTag) {
+                  result2.assetTag = cleanDefaults(util.getValue(lines, "sku", ":"));
+                }
+                lines = data.results[1] ? data.results[1].toString().split("\r\n") : [""];
+                result2.memMax = util.toInt(util.getValue(lines, maxCapacityAttribute, ":")) * (win10plus ? 1024 : 1) || null;
+                result2.memSlots = util.toInt(util.getValue(lines, "MemoryDevices", ":")) || null;
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              });
+            } catch (e) {
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            }
+          }
+        });
+      });
+    }
+    exports2.baseboard = baseboard;
+    function macOsChassisType(model) {
+      model = model.toLowerCase();
+      if (model.indexOf("macbookair") >= 0 || model.indexOf("macbook air") >= 0) {
+        return "Notebook";
+      }
+      if (model.indexOf("macbookpro") >= 0 || model.indexOf("macbook pro") >= 0) {
+        return "Notebook";
+      }
+      if (model.indexOf("macbook") >= 0) {
+        return "Notebook";
+      }
+      if (model.indexOf("macmini") >= 0 || model.indexOf("mac mini") >= 0) {
+        return "Desktop";
+      }
+      if (model.indexOf("imac") >= 0) {
+        return "Desktop";
+      }
+      if (model.indexOf("macstudio") >= 0 || model.indexOf("mac studio") >= 0) {
+        return "Desktop";
+      }
+      if (model.indexOf("macpro") >= 0 || model.indexOf("mac pro") >= 0) {
+        return "Tower";
+      }
+      return "Other";
+    }
+    function chassis(callback) {
+      const chassisTypes = [
+        "Other",
+        "Unknown",
+        "Desktop",
+        "Low Profile Desktop",
+        "Pizza Box",
+        "Mini Tower",
+        "Tower",
+        "Portable",
+        "Laptop",
+        "Notebook",
+        "Hand Held",
+        "Docking Station",
+        "All in One",
+        "Sub Notebook",
+        "Space-Saving",
+        "Lunch Box",
+        "Main System Chassis",
+        "Expansion Chassis",
+        "SubChassis",
+        "Bus Expansion Chassis",
+        "Peripheral Chassis",
+        "Storage Chassis",
+        "Rack Mount Chassis",
+        "Sealed-Case PC",
+        "Multi-System Chassis",
+        "Compact PCI",
+        "Advanced TCA",
+        "Blade",
+        "Blade Enclosure",
+        "Tablet",
+        "Convertible",
+        "Detachable",
+        "IoT Gateway ",
+        "Embedded PC",
+        "Mini PC",
+        "Stick PC"
+      ];
+      return new Promise((resolve) => {
+        process.nextTick(() => {
+          let result2 = {
+            manufacturer: "",
+            model: "",
+            type: "",
+            version: "",
+            serial: "-",
+            assetTag: "-",
+            sku: ""
+          };
+          if (_linux || _freebsd || _openbsd || _netbsd) {
+            const cmd = `echo -n "chassis_asset_tag: "; cat /sys/devices/virtual/dmi/id/chassis_asset_tag 2>/dev/null; echo;
+            echo -n "chassis_serial: "; cat /sys/devices/virtual/dmi/id/chassis_serial 2>/dev/null; echo;
+            echo -n "chassis_type: "; cat /sys/devices/virtual/dmi/id/chassis_type 2>/dev/null; echo;
+            echo -n "chassis_vendor: "; cat /sys/devices/virtual/dmi/id/chassis_vendor 2>/dev/null; echo;
+            echo -n "chassis_version: "; cat /sys/devices/virtual/dmi/id/chassis_version 2>/dev/null; echo;`;
+            exec3(cmd, function(error2, stdout) {
+              let lines = stdout.toString().split("\n");
+              result2.manufacturer = cleanDefaults(util.getValue(lines, "chassis_vendor"));
+              const ctype = parseInt(util.getValue(lines, "chassis_type").replace(/\D/g, ""));
+              result2.type = cleanDefaults(ctype && !isNaN(ctype) && ctype < chassisTypes.length ? chassisTypes[ctype - 1] : "");
+              result2.version = cleanDefaults(util.getValue(lines, "chassis_version"));
+              result2.serial = cleanDefaults(util.getValue(lines, "chassis_serial"));
+              result2.assetTag = cleanDefaults(util.getValue(lines, "chassis_asset_tag"));
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
+          }
+          if (_darwin) {
+            exec3("ioreg -c IOPlatformExpertDevice -d 2", function(error2, stdout) {
+              if (!error2) {
+                let lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
+                const model = util.getAppleModel(util.getValue(lines, "model", "=", true));
+                result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
+                result2.model = model.key;
+                result2.type = macOsChassisType(model.model);
+                result2.version = model.version;
+                result2.serial = util.getValue(lines, "ioplatformserialnumber", "=", true);
+                result2.assetTag = util.getValue(lines, "board-id", "=", true) || util.getValue(lines, "target-type", "=", true);
+                result2.sku = util.getValue(lines, "target-sub-type", "=", true);
+              }
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
+          }
+          if (_sunos) {
+            if (callback) {
+              callback(result2);
+            }
+            resolve(result2);
+          }
+          if (_windows) {
+            try {
+              util.powerShell("Get-CimInstance Win32_SystemEnclosure | select Model,Manufacturer,ChassisTypes,Version,SerialNumber,PartNumber,SKU,SMBIOSAssetTag | fl").then((stdout, error2) => {
+                if (!error2) {
+                  let lines = stdout.toString().split("\r\n");
+                  result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer", ":"));
+                  result2.model = cleanDefaults(util.getValue(lines, "model", ":"));
+                  const ctype = parseInt(util.getValue(lines, "ChassisTypes", ":").replace(/\D/g, ""));
+                  result2.type = ctype && !isNaN(ctype) && ctype < chassisTypes.length ? chassisTypes[ctype - 1] : "";
+                  result2.version = cleanDefaults(util.getValue(lines, "version", ":"));
+                  result2.serial = cleanDefaults(util.getValue(lines, "serialnumber", ":"));
+                  result2.assetTag = cleanDefaults(util.getValue(lines, "partnumber", ":"));
+                  if (!result2.assetTag) {
+                    result2.assetTag = cleanDefaults(util.getValue(lines, "SMBIOSAssetTag", ":"));
+                  }
+                  result2.sku = cleanDefaults(util.getValue(lines, "sku", ":"));
+                }
+                if (callback) {
+                  callback(result2);
+                }
+                resolve(result2);
+              });
+            } catch (e) {
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            }
+          }
+        });
+      });
+    }
+    exports2.chassis = chassis;
   }
 });
 

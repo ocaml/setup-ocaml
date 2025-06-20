@@ -661,7 +661,7 @@ __metadata:
     esbuild: "npm:0.25.5"
     exponential-backoff: "npm:3.1.2"
     semver: "npm:7.7.2"
-    systeminformation: "npm:5.27.3"
+    systeminformation: "npm:5.27.6"
     typescript: "npm:5.8.3"
     yaml: "npm:2.8.0"
   languageName: unknown
@@ -842,44 +842,44 @@ __metadata:
   linkType: hard
 
 "@protobuf-ts/plugin@npm:^2.9.4":
-  version: 2.11.0
-  resolution: "@protobuf-ts/plugin@npm:2.11.0"
+  version: 2.11.1
+  resolution: "@protobuf-ts/plugin@npm:2.11.1"
   dependencies:
     "@bufbuild/protobuf": "npm:^2.4.0"
     "@bufbuild/protoplugin": "npm:^2.4.0"
-    "@protobuf-ts/protoc": "npm:^2.11.0"
-    "@protobuf-ts/runtime": "npm:^2.11.0"
-    "@protobuf-ts/runtime-rpc": "npm:^2.11.0"
+    "@protobuf-ts/protoc": "npm:^2.11.1"
+    "@protobuf-ts/runtime": "npm:^2.11.1"
+    "@protobuf-ts/runtime-rpc": "npm:^2.11.1"
     typescript: "npm:^3.9"
   bin:
     protoc-gen-dump: bin/protoc-gen-dump
     protoc-gen-ts: bin/protoc-gen-ts
-  checksum: 10c0/2274ee66cc2e7bdab0de4f6372de98674edebc77e8755f9e439b3c1db7d4af5a5afa8b1e4f406d0a90e37e38bc8e7e6121c389ef46d48010b0e61cd46f36e2c6
+  checksum: 10c0/32e1c89b7f02fefa6d14b477c0ce12319b4d96d33744ad7faadf5cd5ee415c7ac376b9ca74cd12b9fbb98b210ef8cb0d88bf95e0709e85994c12589e6af72013
   languageName: node
   linkType: hard
 
-"@protobuf-ts/protoc@npm:^2.11.0":
-  version: 2.11.0
-  resolution: "@protobuf-ts/protoc@npm:2.11.0"
+"@protobuf-ts/protoc@npm:^2.11.1":
+  version: 2.11.1
+  resolution: "@protobuf-ts/protoc@npm:2.11.1"
   bin:
     protoc: protoc.js
-  checksum: 10c0/0195ce398f94bfebbd17a0aaa279a721d19a6ce6acf5028a482c430b2dd2fe210b948b163acbe41bb6f2f082e791bd32db6aa0c09627b3809cefd803cc62934d
+  checksum: 10c0/6a3cbcaeede068c94b48273271426192f438328e13019aafebb88e1153efac38b3ad358603751d7ac8b1d2cbef5ff515eaf960796dcce9daafbe2013255bdb0e
   languageName: node
   linkType: hard
 
-"@protobuf-ts/runtime-rpc@npm:^2.11.0":
-  version: 2.11.0
-  resolution: "@protobuf-ts/runtime-rpc@npm:2.11.0"
+"@protobuf-ts/runtime-rpc@npm:^2.11.1":
+  version: 2.11.1
+  resolution: "@protobuf-ts/runtime-rpc@npm:2.11.1"
   dependencies:
-    "@protobuf-ts/runtime": "npm:^2.11.0"
-  checksum: 10c0/9e9d5651bb1d0513717e4ec7f26f34c4490b69ed024fa91ef51f7ff7027522b3ce37bb89aa7e7608adb49cecb4f9fa5af9160398d56cdbb5d54d55b71ae9f1e3
+    "@protobuf-ts/runtime": "npm:^2.11.1"
+  checksum: 10c0/20337ea721a619a93c3888fbbe768c8334a8ed67a759a33aefb2a5c587fff690ca8fcb8dc97f9b7590012d9f4c43a6b9020f72dd2fc57f004c26eeca93a51982
   languageName: node
   linkType: hard
 
-"@protobuf-ts/runtime@npm:^2.11.0":
-  version: 2.11.0
-  resolution: "@protobuf-ts/runtime@npm:2.11.0"
-  checksum: 10c0/522ce07ff0adc19c31332b54c9056e8865f3bd5788a59ddd936b947cb19a25fdeaa4acbb4493ce52f7c78b2e5d400e6fe6239b10e996e9fffc466ee5be3a3d95
+"@protobuf-ts/runtime@npm:^2.11.1":
+  version: 2.11.1
+  resolution: "@protobuf-ts/runtime@npm:2.11.1"
+  checksum: 10c0/6071c0373251e915cebb449fb7bf3254e946534edf4c4eb6e89933989a3ab5dcb148ed82cc0ea844bbc2f4346d0dc76f852c2b5f900a6bdaa35e5fb2cb4666f9
   languageName: node
   linkType: hard
 
@@ -1632,12 +1632,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.27.3":
-  version: 5.27.3
-  resolution: "systeminformation@npm:5.27.3"
+"systeminformation@npm:5.27.6":
+  version: 5.27.6
+  resolution: "systeminformation@npm:5.27.6"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/fad45d3ba28d3976dee6da482e554ed2c2d65d6ef0be4505171c7cc3c3449ea4b19f2669275ddf7fc60f538ad6adb189e8efbd7b93044958dfb680a42e563b2a
+  checksum: 10c0/978b2d152dcb70a9914a8cb9005bb82aaec187269bc95125e3f82f604b5ede8ddf1bcddec02b478c03a9d400b1dad2f513b3a957044d61640b7daf2bec94acd8
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
