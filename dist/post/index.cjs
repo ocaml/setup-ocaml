@@ -69673,7 +69673,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.6",
+      version: "5.27.7",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -72338,11 +72338,17 @@ var require_osinfo = __commonJS({
     var _sunos = _platform === "sunos";
     function time() {
       let t = (/* @__PURE__ */ new Date()).toString().split(" ");
+      let timezoneName = "";
+      try {
+        timezoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      } catch {
+        timezoneName = t.length >= 7 ? t.slice(6).join(" ").replace(/\(/g, "").replace(/\)/g, "") : "";
+      }
       const result2 = {
         current: Date.now(),
         uptime: os2.uptime(),
         timezone: t.length >= 7 ? t[5] : "",
-        timezoneName: Intl ? Intl.DateTimeFormat().resolvedOptions().timeZone : t.length >= 7 ? t.slice(6).join(" ").replace(/\(/g, "").replace(/\)/g, "") : ""
+        timezoneName
       };
       if (_darwin || _linux) {
         try {
