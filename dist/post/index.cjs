@@ -26035,7 +26035,7 @@ var require_dist = __commonJS({
       // In order to properly update the socket pool, we need to call `getName()` on
       // the core `https.Agent` if it is a secureEndpoint.
       getName(options) {
-        const secureEndpoint = typeof options.secureEndpoint === "boolean" ? options.secureEndpoint : this.isSecureEndpoint(options);
+        const secureEndpoint = this.isSecureEndpoint(options);
         if (secureEndpoint) {
           return https_1.Agent.prototype.getName.call(this, options);
         }
