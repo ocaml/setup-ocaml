@@ -24724,7 +24724,7 @@ var require_constants7 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "0.2.3";
+    exports2.SDK_VERSION = "0.3.0";
     exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
   }
 });
@@ -28079,7 +28079,7 @@ var require_constants8 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "1.21.0";
+    exports2.SDK_VERSION = "1.22.0";
     exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
   }
 });
@@ -66355,11 +66355,26 @@ var require_dist_node8 = __commonJS({
     var import_request = require_dist_node5();
     var import_graphql = require_dist_node6();
     var import_auth_token = require_dist_node7();
-    var VERSION2 = "5.2.1";
+    var VERSION2 = "5.2.2";
     var noop = () => {
     };
     var consoleWarn = console.warn.bind(console);
     var consoleError = console.error.bind(console);
+    function createLogger(logger = {}) {
+      if (typeof logger.debug !== "function") {
+        logger.debug = noop;
+      }
+      if (typeof logger.info !== "function") {
+        logger.info = noop;
+      }
+      if (typeof logger.warn !== "function") {
+        logger.warn = consoleWarn;
+      }
+      if (typeof logger.error !== "function") {
+        logger.error = consoleError;
+      }
+      return logger;
+    }
     var userAgentTrail = `octokit-core.js/${VERSION2} ${(0, import_universal_user_agent.getUserAgent)()}`;
     var Octokit = class {
       static {
@@ -66433,15 +66448,7 @@ var require_dist_node8 = __commonJS({
         }
         this.request = import_request.request.defaults(requestDefaults);
         this.graphql = (0, import_graphql.withCustomRequest)(this.request).defaults(requestDefaults);
-        this.log = Object.assign(
-          {
-            debug: noop,
-            info: noop,
-            warn: consoleWarn,
-            error: consoleError
-          },
-          options.log
-        );
+        this.log = createLogger(options.log);
         this.hook = hook;
         if (!options.authStrategy) {
           if (!options.auth) {
