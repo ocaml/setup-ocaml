@@ -57,14 +57,12 @@ export async function setupCygwin() {
     }
     const packages = [
       "curl",
-      "diffutils",
       "m4",
       "make",
       "mingw64-i686-gcc-core",
       "mingw64-i686-gcc-g++",
       "mingw64-x86_64-gcc-core",
       "mingw64-x86_64-gcc-g++",
-      "patch",
       "perl",
       "rsync",
       "unzip",
