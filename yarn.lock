@@ -664,7 +664,7 @@ __metadata:
     "@tsconfig/strictest": "npm:2.0.5"
     "@types/node": "npm:24.0.15"
     "@types/semver": "npm:7.7.0"
-    cheerio: "npm:1.1.0"
+    cheerio: "npm:1.1.1"
     esbuild: "npm:0.25.8"
     exponential-backoff: "npm:3.1.2"
     semver: "npm:7.7.2"
@@ -1034,22 +1034,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:1.1.0":
-  version: 1.1.0
-  resolution: "cheerio@npm:1.1.0"
+"cheerio@npm:1.1.1":
+  version: 1.1.1
+  resolution: "cheerio@npm:1.1.1"
   dependencies:
     cheerio-select: "npm:^2.1.0"
     dom-serializer: "npm:^2.0.0"
     domhandler: "npm:^5.0.3"
     domutils: "npm:^3.2.2"
-    encoding-sniffer: "npm:^0.2.0"
+    encoding-sniffer: "npm:^0.2.1"
     htmlparser2: "npm:^10.0.0"
     parse5: "npm:^7.3.0"
     parse5-htmlparser2-tree-adapter: "npm:^7.1.0"
     parse5-parser-stream: "npm:^7.1.2"
-    undici: "npm:^7.10.0"
+    undici: "npm:^7.11.0"
     whatwg-mimetype: "npm:^4.0.0"
-  checksum: 10c0/f7b940a89e1fe77bf6b4fe3b993f17b02a358942cc0b9d3b55ea235a0bc322829dbc47151763ef9986fd237494c00380909af759e46582c72470a10643b85abd
+  checksum: 10c0/1f54b83d30aa77162879d7bd5c94223dcfec091842af22fe969bd107025dc1d90b5956044c814e61e66380895601e24462c5549344e8f2332be0feabfd0356ea
   languageName: node
   linkType: hard
 
@@ -1164,7 +1164,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"encoding-sniffer@npm:^0.2.0":
+"encoding-sniffer@npm:^0.2.1":
   version: 0.2.1
   resolution: "encoding-sniffer@npm:0.2.1"
   dependencies:
@@ -1828,7 +1828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^7.10.0":
+"undici@npm:^7.11.0":
   version: 7.12.0
   resolution: "undici@npm:7.12.0"
   checksum: 10c0/27aada7bd8d2588f146a2ba554f2f6b7593f9c2d14bf3797bbc7b74825d9bee38eb3ab61e2d0ee01bb827a9ac8017eb2991cb4f06d9ed9971c8a142d8306fbab
