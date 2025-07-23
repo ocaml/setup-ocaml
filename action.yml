@@ -36,7 +36,7 @@ inputs:
   cache-prefix:
     description: The prefix of the cache keys.
     required: false
-    default: v3
+    default: v1
   github-token:
     description: DO NOT SET THIS.
     required: false
