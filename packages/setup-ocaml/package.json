@@ -30,6 +30,6 @@
     "@types/node": "24.1.0",
     "@types/semver": "7.7.0",
     "esbuild": "0.25.8",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   }
 }
