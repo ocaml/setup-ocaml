@@ -62857,7 +62857,7 @@ var require_package = __commonJS({
   "../../node_modules/@actions/cache/package.json"(exports2, module2) {
     module2.exports = {
       name: "@actions/cache",
-      version: "4.0.3",
+      version: "4.0.5",
       preview: true,
       description: "Actions cache lib",
       keywords: [
@@ -62897,17 +62897,18 @@ var require_package = __commonJS({
         "@actions/core": "^1.11.1",
         "@actions/exec": "^1.0.1",
         "@actions/glob": "^0.1.0",
+        "@protobuf-ts/runtime-rpc": "^2.11.1",
         "@actions/http-client": "^2.1.1",
         "@actions/io": "^1.0.1",
         "@azure/abort-controller": "^1.1.0",
         "@azure/ms-rest-js": "^2.6.0",
         "@azure/storage-blob": "^12.13.0",
-        "@protobuf-ts/plugin": "^2.9.4",
         semver: "^6.3.1"
       },
       devDependencies: {
         "@types/node": "^22.13.9",
         "@types/semver": "^6.0.0",
+        "@protobuf-ts/plugin": "^2.9.4",
         typescript: "^5.2.2"
       }
     };
@@ -68620,6 +68621,7 @@ var require_cache4 = __commonJS({
     var config_1 = require_config();
     var tar_1 = require_tar();
     var constants_1 = require_constants6();
+    var http_client_1 = require_lib();
     var ValidationError = class _ValidationError extends Error {
       constructor(message) {
         super(message);
@@ -68651,7 +68653,14 @@ var require_cache4 = __commonJS({
       }
     }
     function isFeatureAvailable2() {
-      return !!process.env["ACTIONS_CACHE_URL"];
+      const cacheServiceVersion = (0, config_1.getCacheServiceVersion)();
+      switch (cacheServiceVersion) {
+        case "v2":
+          return !!process.env["ACTIONS_RESULTS_URL"];
+        case "v1":
+        default:
+          return !!process.env["ACTIONS_CACHE_URL"];
+      }
     }
     exports2.isFeatureAvailable = isFeatureAvailable2;
     function restoreCache2(paths, primaryKey, restoreKeys, options, enableCrossOsArchive = false) {
@@ -68711,7 +68720,11 @@ var require_cache4 = __commonJS({
           if (typedError.name === ValidationError.name) {
             throw error2;
           } else {
-            core5.warning(`Failed to restore: ${error2.message}`);
+            if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+              core5.error(`Failed to restore: ${error2.message}`);
+            } else {
+              core5.warning(`Failed to restore: ${error2.message}`);
+            }
           }
         } finally {
           try {
@@ -68750,7 +68763,12 @@ var require_cache4 = __commonJS({
             core5.debug(`Cache not found for version ${request.version} of keys: ${keys.join(", ")}`);
             return void 0;
           }
-          core5.info(`Cache hit for: ${request.key}`);
+          const isRestoreKeyMatch = request.key !== response.matchedKey;
+          if (isRestoreKeyMatch) {
+            core5.info(`Cache hit for restore-key: ${response.matchedKey}`);
+          } else {
+            core5.info(`Cache hit for: ${response.matchedKey}`);
+          }
           if (options === null || options === void 0 ? void 0 : options.lookupOnly) {
             core5.info("Lookup only - skipping download");
             return response.matchedKey;
@@ -68772,7 +68790,11 @@ var require_cache4 = __commonJS({
           if (typedError.name === ValidationError.name) {
             throw error2;
           } else {
-            core5.warning(`Failed to restore: ${error2.message}`);
+            if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+              core5.error(`Failed to restore: ${error2.message}`);
+            } else {
+              core5.warning(`Failed to restore: ${error2.message}`);
+            }
           }
         } finally {
           try {
@@ -68849,7 +68871,11 @@ var require_cache4 = __commonJS({
           } else if (typedError.name === ReserveCacheError.name) {
             core5.info(`Failed to save: ${typedError.message}`);
           } else {
-            core5.warning(`Failed to save: ${typedError.message}`);
+            if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+              core5.error(`Failed to save: ${typedError.message}`);
+            } else {
+              core5.warning(`Failed to save: ${typedError.message}`);
+            }
           }
         } finally {
           try {
@@ -68924,7 +68950,11 @@ var require_cache4 = __commonJS({
           } else if (typedError.name === ReserveCacheError.name) {
             core5.info(`Failed to save: ${typedError.message}`);
           } else {
-            core5.warning(`Failed to save: ${typedError.message}`);
+            if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+              core5.error(`Failed to save: ${typedError.message}`);
+            } else {
+              core5.warning(`Failed to save: ${typedError.message}`);
+            }
           }
         } finally {
           try {
@@ -92479,7 +92509,7 @@ ${indent}`) + "'";
     }
     function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
       const { blockQuote, commentString, lineWidth } = ctx.options;
-      if (!blockQuote || /\n[\t ]+$/.test(value) || /^\s*$/.test(value)) {
+      if (!blockQuote || /\n[\t ]+$/.test(value)) {
         return quotedString(value, ctx);
       }
       const indent = ctx.indent || (ctx.forceBlockIndent || containsDocumentMarker(value) ? "  " : "");
