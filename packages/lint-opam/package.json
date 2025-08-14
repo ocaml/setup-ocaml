@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "esbuild --bundle --format=cjs --outfile=../../lint-opam/dist/index.cjs --platform=node --target=node20 src/index.ts",
+    "build": "esbuild --bundle --format=cjs --outfile=../../lint-opam/dist/index.cjs --platform=node --target=node24 src/index.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
