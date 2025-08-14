@@ -4,8 +4,8 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build:main": "esbuild --bundle --format=cjs --outfile=../../dist/index.cjs --platform=node --target=node20  src/index.ts",
-    "build:post": "esbuild --bundle --format=cjs --outfile=../../dist/post/index.cjs --platform=node --target=node20 src/post.ts",
+    "build:main": "esbuild --bundle --format=cjs --outfile=../../dist/index.cjs --platform=node --target=node24  src/index.ts",
+    "build:post": "esbuild --bundle --format=cjs --outfile=../../dist/post/index.cjs --platform=node --target=node24 src/post.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
