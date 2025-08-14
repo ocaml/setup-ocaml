@@ -45,12 +45,20 @@ async function skipPackageManagement() {
   return RUNNER_ENVIRONMENT === "self-hosted" || isContainerRunner;
 }
 
+async function disableManDbAutoUpdate() {
+  await exec("sudo", ["debconf-communicate"], {
+    input: Buffer.from("set man-db/auto-update false"),
+  });
+  await exec("sudo", ["dpkg-reconfigure", "man-db"]);
+}
+
 export async function installUnixSystemPackages() {
   if (await skipPackageManagement()) {
     return;
   }
   switch (PLATFORM) {
     case "linux": {
+      await disableManDbAutoUpdate();
       const optionalDependencies =
         await retrieveInstallableOptionalDependencies([
           "darcs",
