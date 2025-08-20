@@ -15,11 +15,21 @@
       "project": "recommended"
     },
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "useImportExtensions": {
+          "fix": "safe",
+          "level": "error",
+          "options": {
+            "forceJsExtensions": true
+          }
+        }
+      }
     }
   },
   "formatter": {
     "enabled": true,
+    "formatWithErrors": true,
     "useEditorconfig": true
   },
   "assist": {
