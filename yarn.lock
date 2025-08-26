@@ -255,8 +255,8 @@ __metadata:
   linkType: hard
 
 "@azure/storage-blob@npm:^12.13.0":
-  version: 12.28.0
-  resolution: "@azure/storage-blob@npm:12.28.0"
+  version: 12.29.0
+  resolution: "@azure/storage-blob@npm:12.29.0"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.9.0"
@@ -269,16 +269,16 @@ __metadata:
     "@azure/core-util": "npm:^1.11.0"
     "@azure/core-xml": "npm:^1.4.5"
     "@azure/logger": "npm:^1.1.4"
-    "@azure/storage-common": "npm:^12.0.0-beta.2"
+    "@azure/storage-common": "npm:^12.1.0"
     events: "npm:^3.0.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/a97f43193da9c5fbb58492156ad6dd3f0c9f1bf2fdf72cbc5a1fdfe16a586b0a4bb7bfaa7e24de63d689927c2a606d4ca65332594e0f2278c55d48f7c90d1a54
+  checksum: 10c0/9e05101dc277c12d26351c97384df9add7bd9567ad998b9b66434464a4dede83cc4eeec280dc812f42d475192def24b4d5ed2ba15ecfb2bb6a697fe37ca34828
   languageName: node
   linkType: hard
 
-"@azure/storage-common@npm:^12.0.0-beta.2":
-  version: 12.0.1
-  resolution: "@azure/storage-common@npm:12.0.1"
+"@azure/storage-common@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "@azure/storage-common@npm:12.1.0"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.9.0"
@@ -289,7 +289,7 @@ __metadata:
     "@azure/logger": "npm:^1.1.4"
     events: "npm:^3.3.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/4f08134b8bdcda45d69107eb3897877b1689db445cd92d6c00f1dcb9490287b00cacd316fda5009f8a78d939643fe5422a9e33a809d72a2d38d8bc2c24f6d8ec
+  checksum: 10c0/2702ec0b1faab3453e1307f25b44121ca902c7b31ca51ff5face81703598d135b8cd5266964e85a031ebcfa10e4c38333d04562f98a8b80e5df95728d3bf4dfa
   languageName: node
   linkType: hard
 
@@ -1752,9 +1752,9 @@ __metadata:
   linkType: hard
 
 "undici@npm:^7.12.0":
-  version: 7.14.0
-  resolution: "undici@npm:7.14.0"
-  checksum: 10c0/4beab6a5bfb89add9e90195aee6bc993708afbabad33bff7da791b5334a6e26a591c29938822d2fb8f69ae0ad8d580d64e03247b11157af9f820d5bd9f8f16e7
+  version: 7.15.0
+  resolution: "undici@npm:7.15.0"
+  checksum: 10c0/2c526bf157771c11e3ce297b2173cbde67b057db33263d3923529f40f57159a5ed8dab5134766091ed8aba529ddf023becb5e04292e23924f14d9b6fa79dcd4e
   languageName: node
   linkType: hard
 
