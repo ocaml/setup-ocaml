@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
@@ -66,7 +66,7 @@ Consult the [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packa
 ```yml
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v4
+    uses: actions/checkout@v5
 
   - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v3
@@ -93,7 +93,7 @@ runs-on: ubuntu-latest
 
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v4
+    uses: actions/checkout@v5
 
   - name: Retrieve new lists of system packages
     run: apt-get update
