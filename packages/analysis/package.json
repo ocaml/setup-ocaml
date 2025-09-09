@@ -14,12 +14,12 @@
     "@actions/glob": "0.5.0",
     "@github/dependency-submission-toolkit": "2.0.5",
     "packageurl-js": "2.0.1",
-    "strip-ansi": "7.1.0"
+    "strip-ansi": "7.1.2"
   },
   "devDependencies": {
     "@tsconfig/node24": "24.0.1",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "24.3.0",
+    "@types/node": "24.3.1",
     "esbuild": "0.25.9",
     "typescript": "5.9.2"
   }
