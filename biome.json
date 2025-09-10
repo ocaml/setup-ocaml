@@ -24,6 +24,9 @@
             "forceJsExtensions": true
           }
         }
+      },
+      "nursery": {
+        "noImportCycles": "error"
       }
     }
   },
