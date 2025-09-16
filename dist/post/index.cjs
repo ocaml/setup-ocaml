@@ -23491,9 +23491,9 @@ var require_log = __commonJS({
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
     var node_os_1 = require("node:os");
     var node_util_1 = tslib_1.__importDefault(require("node:util"));
-    var process4 = tslib_1.__importStar(require("node:process"));
+    var node_process_1 = tslib_1.__importDefault(require("node:process"));
     function log(message, ...args) {
-      process4.stderr.write(`${node_util_1.default.format(message, ...args)}${node_os_1.EOL}`);
+      node_process_1.default.stderr.write(`${node_util_1.default.format(message, ...args)}${node_os_1.EOL}`);
     }
   }
 });
@@ -23524,13 +23524,12 @@ var require_debug = __commonJS({
       enabledString = namespaces;
       enabledNamespaces = [];
       skippedNamespaces = [];
-      const wildcard = /\*/g;
-      const namespaceList = namespaces.split(",").map((ns) => ns.trim().replace(wildcard, ".*?"));
+      const namespaceList = namespaces.split(",").map((ns) => ns.trim());
       for (const ns of namespaceList) {
         if (ns.startsWith("-")) {
-          skippedNamespaces.push(new RegExp(`^${ns.substr(1)}$`));
+          skippedNamespaces.push(ns.substring(1));
         } else {
-          enabledNamespaces.push(new RegExp(`^${ns}$`));
+          enabledNamespaces.push(ns);
         }
       }
       for (const instance of debuggers) {
@@ -23542,16 +23541,85 @@ var require_debug = __commonJS({
         return true;
       }
       for (const skipped of skippedNamespaces) {
-        if (skipped.test(namespace)) {
+        if (namespaceMatches(namespace, skipped)) {
           return false;
         }
       }
       for (const enabledNamespace of enabledNamespaces) {
-        if (enabledNamespace.test(namespace)) {
+        if (namespaceMatches(namespace, enabledNamespace)) {
           return true;
         }
       }
       return false;
+    }
+    function namespaceMatches(namespace, patternToMatch) {
+      if (patternToMatch.indexOf("*") === -1) {
+        return namespace === patternToMatch;
+      }
+      let pattern = patternToMatch;
+      if (patternToMatch.indexOf("**") !== -1) {
+        const patternParts = [];
+        let lastCharacter = "";
+        for (const character of patternToMatch) {
+          if (character === "*" && lastCharacter === "*") {
+            continue;
+          } else {
+            lastCharacter = character;
+            patternParts.push(character);
+          }
+        }
+        pattern = patternParts.join("");
+      }
+      let namespaceIndex = 0;
+      let patternIndex = 0;
+      const patternLength = pattern.length;
+      const namespaceLength = namespace.length;
+      let lastWildcard = -1;
+      let lastWildcardNamespace = -1;
+      while (namespaceIndex < namespaceLength && patternIndex < patternLength) {
+        if (pattern[patternIndex] === "*") {
+          lastWildcard = patternIndex;
+          patternIndex++;
+          if (patternIndex === patternLength) {
+            return true;
+          }
+          while (namespace[namespaceIndex] !== pattern[patternIndex]) {
+            namespaceIndex++;
+            if (namespaceIndex === namespaceLength) {
+              return false;
+            }
+          }
+          lastWildcardNamespace = namespaceIndex;
+          namespaceIndex++;
+          patternIndex++;
+          continue;
+        } else if (pattern[patternIndex] === namespace[namespaceIndex]) {
+          patternIndex++;
+          namespaceIndex++;
+        } else if (lastWildcard >= 0) {
+          patternIndex = lastWildcard + 1;
+          namespaceIndex = lastWildcardNamespace + 1;
+          if (namespaceIndex === namespaceLength) {
+            return false;
+          }
+          while (namespace[namespaceIndex] !== pattern[patternIndex]) {
+            namespaceIndex++;
+            if (namespaceIndex === namespaceLength) {
+              return false;
+            }
+          }
+          lastWildcardNamespace = namespaceIndex;
+          namespaceIndex++;
+          patternIndex++;
+          continue;
+        } else {
+          return false;
+        }
+      }
+      const namespaceDone = namespaceIndex === namespace.length;
+      const patternDone = patternIndex === pattern.length;
+      const trailingWildCard = patternIndex === pattern.length - 1 && pattern[patternIndex] === "*";
+      return namespaceDone && (patternDone || trailingWildCard);
     }
     function disable() {
       const result2 = enabledString || "";
@@ -23717,6 +23785,7 @@ var require_httpHeaders = __commonJS({
       }
     }
     var HttpHeadersImpl = class {
+      _headersMap;
       constructor(rawHeaders) {
         this._headersMap = /* @__PURE__ */ new Map();
         if (rawHeaders) {
@@ -23740,8 +23809,7 @@ var require_httpHeaders = __commonJS({
        * @param name - The name of the header. This value is case-insensitive.
        */
       get(name) {
-        var _a;
-        return (_a = this._headersMap.get(normalizeName(name))) === null || _a === void 0 ? void 0 : _a.value;
+        return this._headersMap.get(normalizeName(name))?.value;
       }
       /**
        * Get whether or not this header collection contains a header entry for the provided header name.
@@ -23812,11 +23880,10 @@ var require_oauth2Flows = __commonJS({
 var require_uuidUtils = __commonJS({
   "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/uuidUtils.js"(exports2) {
     "use strict";
-    var _a;
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.randomUUID = randomUUID;
     var node_crypto_1 = require("node:crypto");
-    var uuidFunction = typeof ((_a = globalThis === null || globalThis === void 0 ? void 0 : globalThis.crypto) === null || _a === void 0 ? void 0 : _a.randomUUID) === "function" ? globalThis.crypto.randomUUID.bind(globalThis.crypto) : node_crypto_1.randomUUID;
+    var uuidFunction = typeof globalThis?.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID.bind(globalThis.crypto) : node_crypto_1.randomUUID;
     function randomUUID() {
       return uuidFunction();
     }
@@ -23832,25 +23899,43 @@ var require_pipelineRequest = __commonJS({
     var httpHeaders_js_1 = require_httpHeaders();
     var uuidUtils_js_1 = require_uuidUtils();
     var PipelineRequestImpl = class {
+      url;
+      method;
+      headers;
+      timeout;
+      withCredentials;
+      body;
+      multipartBody;
+      formData;
+      streamResponseStatusCodes;
+      enableBrowserStreams;
+      proxySettings;
+      disableKeepAlive;
+      abortSignal;
+      requestId;
+      allowInsecureConnection;
+      onUploadProgress;
+      onDownloadProgress;
+      requestOverrides;
+      authSchemes;
       constructor(options) {
-        var _a, _b, _c, _d, _e, _f, _g;
         this.url = options.url;
         this.body = options.body;
-        this.headers = (_a = options.headers) !== null && _a !== void 0 ? _a : (0, httpHeaders_js_1.createHttpHeaders)();
-        this.method = (_b = options.method) !== null && _b !== void 0 ? _b : "GET";
-        this.timeout = (_c = options.timeout) !== null && _c !== void 0 ? _c : 0;
+        this.headers = options.headers ?? (0, httpHeaders_js_1.createHttpHeaders)();
+        this.method = options.method ?? "GET";
+        this.timeout = options.timeout ?? 0;
         this.multipartBody = options.multipartBody;
         this.formData = options.formData;
-        this.disableKeepAlive = (_d = options.disableKeepAlive) !== null && _d !== void 0 ? _d : false;
+        this.disableKeepAlive = options.disableKeepAlive ?? false;
         this.proxySettings = options.proxySettings;
         this.streamResponseStatusCodes = options.streamResponseStatusCodes;
-        this.withCredentials = (_e = options.withCredentials) !== null && _e !== void 0 ? _e : false;
+        this.withCredentials = options.withCredentials ?? false;
         this.abortSignal = options.abortSignal;
         this.onUploadProgress = options.onUploadProgress;
         this.onDownloadProgress = options.onDownloadProgress;
         this.requestId = options.requestId || (0, uuidUtils_js_1.randomUUID)();
-        this.allowInsecureConnection = (_f = options.allowInsecureConnection) !== null && _f !== void 0 ? _f : false;
-        this.enableBrowserStreams = (_g = options.enableBrowserStreams) !== null && _g !== void 0 ? _g : false;
+        this.allowInsecureConnection = options.allowInsecureConnection ?? false;
+        this.enableBrowserStreams = options.enableBrowserStreams ?? false;
         this.requestOverrides = options.requestOverrides;
         this.authSchemes = options.authSchemes;
       }
@@ -23869,10 +23954,10 @@ var require_pipeline = __commonJS({
     exports2.createEmptyPipeline = createEmptyPipeline;
     var ValidPhaseNames = /* @__PURE__ */ new Set(["Deserialize", "Serialize", "Retry", "Sign"]);
     var HttpPipeline = class _HttpPipeline {
+      _policies = [];
+      _orderedPolicies;
       constructor(policies) {
-        var _a;
-        this._policies = [];
-        this._policies = (_a = policies === null || policies === void 0 ? void 0 : policies.slice(0)) !== null && _a !== void 0 ? _a : [];
+        this._policies = policies?.slice(0) ?? [];
         this._orderedPolicies = void 0;
       }
       addPolicy(policy, options = {}) {
@@ -24141,6 +24226,8 @@ var require_sanitizer = __commonJS({
     ];
     var defaultAllowedQueryParameters = ["api-version"];
     var Sanitizer = class {
+      allowedHeaderNames;
+      allowedQueryParameters;
       constructor({ additionalAllowedHeaderNames: allowedHeaderNames = [], additionalAllowedQueryParameters: allowedQueryParameters = [] } = {}) {
         allowedHeaderNames = defaultAllowedHeaderNames.concat(allowedHeaderNames);
         allowedQueryParameters = defaultAllowedQueryParameters.concat(allowedQueryParameters);
@@ -24156,7 +24243,11 @@ var require_sanitizer = __commonJS({
         const seen = /* @__PURE__ */ new Set();
         return JSON.stringify(obj, (key, value) => {
           if (value instanceof Error) {
-            return Object.assign(Object.assign({}, value), { name: value.name, message: value.message });
+            return {
+              ...value,
+              name: value.name,
+              message: value.message
+            };
           }
           if (key === "headers") {
             return this.sanitizeHeaders(value);
@@ -24241,6 +24332,39 @@ var require_restError = __commonJS({
     var sanitizer_js_1 = require_sanitizer();
     var errorSanitizer = new sanitizer_js_1.Sanitizer();
     var RestError = class _RestError extends Error {
+      /**
+       * Something went wrong when making the request.
+       * This means the actual request failed for some reason,
+       * such as a DNS issue or the connection being lost.
+       */
+      static REQUEST_SEND_ERROR = "REQUEST_SEND_ERROR";
+      /**
+       * This means that parsing the response from the server failed.
+       * It may have been malformed.
+       */
+      static PARSE_ERROR = "PARSE_ERROR";
+      /**
+       * The code of the error itself (use statics on RestError if possible.)
+       */
+      code;
+      /**
+       * The HTTP status code of the request (if applicable.)
+       */
+      statusCode;
+      /**
+       * The request that was made.
+       * This property is non-enumerable.
+       */
+      request;
+      /**
+       * The response received (if any.)
+       * This property is non-enumerable.
+       */
+      response;
+      /**
+       * Bonus property set by the throw site.
+       */
+      details;
       constructor(message, options = {}) {
         super(message);
         this.name = "RestError";
@@ -24248,10 +24372,18 @@ var require_restError = __commonJS({
         this.statusCode = options.statusCode;
         Object.defineProperty(this, "request", { value: options.request, enumerable: false });
         Object.defineProperty(this, "response", { value: options.response, enumerable: false });
+        const agent = this.request?.agent ? {
+          maxFreeSockets: this.request.agent.maxFreeSockets,
+          maxSockets: this.request.agent.maxSockets
+        } : void 0;
         Object.defineProperty(this, inspect_js_1.custom, {
           value: () => {
             return `RestError: ${this.message} 
- ${errorSanitizer.sanitize(Object.assign(Object.assign({}, this), { request: this.request, response: this.response }))}`;
+ ${errorSanitizer.sanitize({
+              ...this,
+              request: { ...this.request, agent },
+              response: this.response
+            })}`;
           },
           enumerable: false
         });
@@ -24259,8 +24391,6 @@ var require_restError = __commonJS({
       }
     };
     exports2.RestError = RestError;
-    RestError.REQUEST_SEND_ERROR = "REQUEST_SEND_ERROR";
-    RestError.PARSE_ERROR = "PARSE_ERROR";
     function isRestError(e) {
       if (e instanceof RestError) {
         return true;
@@ -24305,9 +24435,9 @@ var require_nodeHttpClient = __commonJS({
     exports2.getBodyLength = getBodyLength;
     exports2.createNodeHttpClient = createNodeHttpClient;
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var http = tslib_1.__importStar(require("node:http"));
-    var https = tslib_1.__importStar(require("node:https"));
-    var zlib = tslib_1.__importStar(require("node:zlib"));
+    var node_http_1 = tslib_1.__importDefault(require("node:http"));
+    var node_https_1 = tslib_1.__importDefault(require("node:https"));
+    var node_zlib_1 = tslib_1.__importDefault(require("node:zlib"));
     var node_stream_1 = require("node:stream");
     var AbortError_js_1 = require_AbortError();
     var httpHeaders_js_1 = require_httpHeaders();
@@ -24338,6 +24468,8 @@ var require_nodeHttpClient = __commonJS({
       return body && typeof body.byteLength === "number";
     }
     var ReportTransform = class extends node_stream_1.Transform {
+      loadedBytes = 0;
+      progressCallback;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
       _transform(chunk, _encoding, callback) {
         this.push(chunk);
@@ -24351,20 +24483,17 @@ var require_nodeHttpClient = __commonJS({
       }
       constructor(progressCallback) {
         super();
-        this.loadedBytes = 0;
         this.progressCallback = progressCallback;
       }
     };
     var NodeHttpClient = class {
-      constructor() {
-        this.cachedHttpsAgents = /* @__PURE__ */ new WeakMap();
-      }
+      cachedHttpAgent;
+      cachedHttpsAgents = /* @__PURE__ */ new WeakMap();
       /**
        * Makes a request over an underlying transport layer and returns the response.
        * @param request - The request to be made.
        */
       async sendRequest(request) {
-        var _a, _b, _c;
         const abortController = new AbortController();
         let abortListener;
         if (request.abortSignal) {
@@ -24387,7 +24516,7 @@ var require_nodeHttpClient = __commonJS({
           }, request.timeout);
         }
         const acceptEncoding = request.headers.get("Accept-Encoding");
-        const shouldDecompress = (acceptEncoding === null || acceptEncoding === void 0 ? void 0 : acceptEncoding.includes("gzip")) || (acceptEncoding === null || acceptEncoding === void 0 ? void 0 : acceptEncoding.includes("deflate"));
+        const shouldDecompress = acceptEncoding?.includes("gzip") || acceptEncoding?.includes("deflate");
         let body = typeof request.body === "function" ? request.body() : request.body;
         if (body && !request.headers.has("Content-Length")) {
           const bodyLength = getBodyLength(body);
@@ -24415,7 +24544,7 @@ var require_nodeHttpClient = __commonJS({
             clearTimeout(timeoutId);
           }
           const headers = getResponseHeaders(res);
-          const status = (_a = res.statusCode) !== null && _a !== void 0 ? _a : 0;
+          const status = res.statusCode ?? 0;
           const response = {
             status,
             headers,
@@ -24437,7 +24566,7 @@ var require_nodeHttpClient = __commonJS({
           }
           if (
             // Value of POSITIVE_INFINITY in streamResponseStatusCodes is considered as any status code
-            ((_b = request.streamResponseStatusCodes) === null || _b === void 0 ? void 0 : _b.has(Number.POSITIVE_INFINITY)) || ((_c = request.streamResponseStatusCodes) === null || _c === void 0 ? void 0 : _c.has(response.status))
+            request.streamResponseStatusCodes?.has(Number.POSITIVE_INFINITY) || request.streamResponseStatusCodes?.has(response.status)
           ) {
             response.readableStreamBody = responseStream;
           } else {
@@ -24455,9 +24584,8 @@ var require_nodeHttpClient = __commonJS({
               downloadStreamDone = isStreamComplete(responseStream);
             }
             Promise.all([uploadStreamDone, downloadStreamDone]).then(() => {
-              var _a2;
               if (abortListener) {
-                (_a2 = request.abortSignal) === null || _a2 === void 0 ? void 0 : _a2.removeEventListener("abort", abortListener);
+                request.abortSignal?.removeEventListener("abort", abortListener);
               }
             }).catch((e) => {
               log_js_1.logger.warning("Error when cleaning up abortListener on httpRequest", e);
@@ -24466,19 +24594,25 @@ var require_nodeHttpClient = __commonJS({
         }
       }
       makeRequest(request, abortController, body) {
-        var _a;
         const url = new URL(request.url);
         const isInsecure = url.protocol !== "https:";
         if (isInsecure && !request.allowInsecureConnection) {
           throw new Error(`Cannot connect to ${request.url} while allowInsecureConnection is false.`);
         }
-        const agent = (_a = request.agent) !== null && _a !== void 0 ? _a : this.getOrCreateAgent(request, isInsecure);
-        const options = Object.assign({ agent, hostname: url.hostname, path: `${url.pathname}${url.search}`, port: url.port, method: request.method, headers: request.headers.toJSON({ preserveCase: true }) }, request.requestOverrides);
+        const agent = request.agent ?? this.getOrCreateAgent(request, isInsecure);
+        const options = {
+          agent,
+          hostname: url.hostname,
+          path: `${url.pathname}${url.search}`,
+          port: url.port,
+          method: request.method,
+          headers: request.headers.toJSON({ preserveCase: true }),
+          ...request.requestOverrides
+        };
         return new Promise((resolve, reject) => {
-          const req = isInsecure ? http.request(options, resolve) : https.request(options, resolve);
+          const req = isInsecure ? node_http_1.default.request(options, resolve) : node_https_1.default.request(options, resolve);
           req.once("error", (err) => {
-            var _a2;
-            reject(new restError_js_1.RestError(err.message, { code: (_a2 = err.code) !== null && _a2 !== void 0 ? _a2 : restError_js_1.RestError.REQUEST_SEND_ERROR, request }));
+            reject(new restError_js_1.RestError(err.message, { code: err.code ?? restError_js_1.RestError.REQUEST_SEND_ERROR, request }));
           });
           abortController.signal.addEventListener("abort", () => {
             const abortError = new AbortError_js_1.AbortError("The operation was aborted. Rejecting from abort signal callback while making request.");
@@ -24502,30 +24636,31 @@ var require_nodeHttpClient = __commonJS({
         });
       }
       getOrCreateAgent(request, isInsecure) {
-        var _a;
         const disableKeepAlive = request.disableKeepAlive;
         if (isInsecure) {
           if (disableKeepAlive) {
-            return http.globalAgent;
+            return node_http_1.default.globalAgent;
           }
           if (!this.cachedHttpAgent) {
-            this.cachedHttpAgent = new http.Agent({ keepAlive: true });
+            this.cachedHttpAgent = new node_http_1.default.Agent({ keepAlive: true });
           }
           return this.cachedHttpAgent;
         } else {
           if (disableKeepAlive && !request.tlsSettings) {
-            return https.globalAgent;
+            return node_https_1.default.globalAgent;
           }
-          const tlsSettings = (_a = request.tlsSettings) !== null && _a !== void 0 ? _a : DEFAULT_TLS_SETTINGS;
+          const tlsSettings = request.tlsSettings ?? DEFAULT_TLS_SETTINGS;
           let agent = this.cachedHttpsAgents.get(tlsSettings);
           if (agent && agent.options.keepAlive === !disableKeepAlive) {
             return agent;
           }
           log_js_1.logger.info("No cached TLS Agent exist, creating a new Agent");
-          agent = new https.Agent(Object.assign({
+          agent = new node_https_1.default.Agent({
             // keepAlive is true if disableKeepAlive is false.
-            keepAlive: !disableKeepAlive
-          }, tlsSettings));
+            keepAlive: !disableKeepAlive,
+            // Since we are spreading, if no tslSettings were provided, nothing is added to the agent options.
+            ...tlsSettings
+          });
           this.cachedHttpsAgents.set(tlsSettings, agent);
           return agent;
         }
@@ -24548,11 +24683,11 @@ var require_nodeHttpClient = __commonJS({
     function getDecodedResponseStream(stream, headers) {
       const contentEncoding = headers.get("Content-Encoding");
       if (contentEncoding === "gzip") {
-        const unzip = zlib.createGunzip();
+        const unzip = node_zlib_1.default.createGunzip();
         stream.pipe(unzip);
         return unzip;
       } else if (contentEncoding === "deflate") {
-        const inflate = zlib.createInflate();
+        const inflate = node_zlib_1.default.createInflate();
         stream.pipe(inflate);
         return inflate;
       }
@@ -24572,7 +24707,7 @@ var require_nodeHttpClient = __commonJS({
           resolve(Buffer.concat(buffer).toString("utf8"));
         });
         stream.on("error", (e) => {
-          if (e && (e === null || e === void 0 ? void 0 : e.name) === "AbortError") {
+          if (e && e?.name === "AbortError") {
             reject(e);
           } else {
             reject(new restError_js_1.RestError(`Error reading response as text: ${e.message}`, {
@@ -24627,8 +24762,7 @@ var require_logPolicy = __commonJS({
     var sanitizer_js_1 = require_sanitizer();
     exports2.logPolicyName = "logPolicy";
     function logPolicy(options = {}) {
-      var _a;
-      const logger = (_a = options.logger) !== null && _a !== void 0 ? _a : log_js_1.logger.info;
+      const logger = options.logger ?? log_js_1.logger.info;
       const sanitizer = new sanitizer_js_1.Sanitizer({
         additionalAllowedHeaderNames: options.additionalAllowedHeaderNames,
         additionalAllowedQueryParameters: options.additionalAllowedQueryParameters
@@ -24697,14 +24831,14 @@ var require_userAgentPlatform = __commonJS({
     exports2.getHeaderName = getHeaderName;
     exports2.setPlatformSpecificData = setPlatformSpecificData;
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var os2 = tslib_1.__importStar(require("node:os"));
-    var process4 = tslib_1.__importStar(require("node:process"));
+    var node_os_1 = tslib_1.__importDefault(require("node:os"));
+    var node_process_1 = tslib_1.__importDefault(require("node:process"));
     function getHeaderName() {
       return "User-Agent";
     }
     async function setPlatformSpecificData(map) {
-      if (process4 && process4.versions) {
-        const versions = process4.versions;
+      if (node_process_1.default && node_process_1.default.versions) {
+        const versions = node_process_1.default.versions;
         if (versions.bun) {
           map.set("Bun", versions.bun);
         } else if (versions.deno) {
@@ -24713,7 +24847,7 @@ var require_userAgentPlatform = __commonJS({
           map.set("Node", versions.node);
         }
       }
-      map.set("OS", `(${os2.arch()}-${os2.type()}-${os2.release()})`);
+      map.set("OS", `(${node_os_1.default.arch()}-${node_os_1.default.type()}-${node_os_1.default.release()})`);
     }
   }
 });
@@ -24724,7 +24858,7 @@ var require_constants7 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "0.3.0";
+    exports2.SDK_VERSION = "0.3.1";
     exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
   }
 });
@@ -24852,10 +24986,10 @@ var require_helpers = __commonJS({
         let timer = void 0;
         let onAborted = void 0;
         const rejectOnAbort = () => {
-          return reject(new AbortError_js_1.AbortError((options === null || options === void 0 ? void 0 : options.abortErrorMsg) ? options === null || options === void 0 ? void 0 : options.abortErrorMsg : StandardAbortMessage));
+          return reject(new AbortError_js_1.AbortError(options?.abortErrorMsg ? options?.abortErrorMsg : StandardAbortMessage));
         };
         const removeListeners = () => {
-          if ((options === null || options === void 0 ? void 0 : options.abortSignal) && onAborted) {
+          if (options?.abortSignal && onAborted) {
             options.abortSignal.removeEventListener("abort", onAborted);
           }
         };
@@ -24866,14 +25000,14 @@ var require_helpers = __commonJS({
           removeListeners();
           return rejectOnAbort();
         };
-        if ((options === null || options === void 0 ? void 0 : options.abortSignal) && options.abortSignal.aborted) {
+        if (options?.abortSignal && options.abortSignal.aborted) {
           return rejectOnAbort();
         }
         timer = setTimeout(() => {
           removeListeners();
           resolve(value);
         }, delayInMs);
-        if (options === null || options === void 0 ? void 0 : options.abortSignal) {
+        if (options?.abortSignal) {
           options.abortSignal.addEventListener("abort", onAborted);
         }
       });
@@ -24917,7 +25051,7 @@ var require_throttlingRetryStrategy = __commonJS({
         const date = Date.parse(retryAfterHeader);
         const diff = date - Date.now();
         return Number.isFinite(diff) ? Math.max(0, diff) : void 0;
-      } catch (_a) {
+      } catch {
         return void 0;
       }
     }
@@ -24954,9 +25088,8 @@ var require_exponentialRetryStrategy = __commonJS({
     var DEFAULT_CLIENT_RETRY_INTERVAL = 1e3;
     var DEFAULT_CLIENT_MAX_RETRY_INTERVAL = 1e3 * 64;
     function exponentialRetryStrategy(options = {}) {
-      var _a, _b;
-      const retryInterval = (_a = options.retryDelayInMs) !== null && _a !== void 0 ? _a : DEFAULT_CLIENT_RETRY_INTERVAL;
-      const maxRetryInterval = (_b = options.maxRetryDelayInMs) !== null && _b !== void 0 ? _b : DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
+      const retryInterval = options.retryDelayInMs ?? DEFAULT_CLIENT_RETRY_INTERVAL;
+      const maxRetryInterval = options.maxRetryDelayInMs ?? DEFAULT_CLIENT_MAX_RETRY_INTERVAL;
       return {
         name: "exponentialRetryStrategy",
         retry({ retryCount, response, responseError }) {
@@ -25007,7 +25140,6 @@ var require_retryPolicy = __commonJS({
       return {
         name: retryPolicyName,
         async sendRequest(request, next) {
-          var _a, _b;
           let response;
           let responseError;
           let retryCount = -1;
@@ -25027,12 +25159,12 @@ var require_retryPolicy = __commonJS({
               }
               response = responseError.response;
             }
-            if ((_a = request.abortSignal) === null || _a === void 0 ? void 0 : _a.aborted) {
+            if (request.abortSignal?.aborted) {
               logger.error(`Retry ${retryCount}: Request aborted.`);
               const abortError = new AbortError_js_1.AbortError();
               throw abortError;
             }
-            if (retryCount >= ((_b = options.maxRetries) !== null && _b !== void 0 ? _b : constants_js_1.DEFAULT_RETRY_POLICY_COUNT)) {
+            if (retryCount >= (options.maxRetries ?? constants_js_1.DEFAULT_RETRY_POLICY_COUNT)) {
               logger.info(`Retry ${retryCount}: Maximum retries reached. Returning the last received response, or throwing the last received error.`);
               if (responseError) {
                 throw responseError;
@@ -25099,11 +25231,10 @@ var require_defaultRetryPolicy = __commonJS({
     var constants_js_1 = require_constants7();
     exports2.defaultRetryPolicyName = "defaultRetryPolicy";
     function defaultRetryPolicy(options = {}) {
-      var _a;
       return {
         name: exports2.defaultRetryPolicyName,
         sendRequest: (0, retryPolicy_js_1.retryPolicy)([(0, throttlingRetryStrategy_js_1.throttlingRetryStrategy)(), (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(options)], {
-          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+          maxRetries: options.maxRetries ?? constants_js_1.DEFAULT_RETRY_POLICY_COUNT
         }).sendRequest
       };
     }
@@ -25114,19 +25245,15 @@ var require_defaultRetryPolicy = __commonJS({
 var require_checkEnvironment = __commonJS({
   "../../node_modules/@typespec/ts-http-runtime/dist/commonjs/util/checkEnvironment.js"(exports2) {
     "use strict";
-    var _a;
-    var _b;
-    var _c;
-    var _d;
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.isReactNative = exports2.isNodeRuntime = exports2.isNodeLike = exports2.isBun = exports2.isDeno = exports2.isWebWorker = exports2.isBrowser = void 0;
     exports2.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
-    exports2.isWebWorker = typeof self === "object" && typeof (self === null || self === void 0 ? void 0 : self.importScripts) === "function" && (((_a = self.constructor) === null || _a === void 0 ? void 0 : _a.name) === "DedicatedWorkerGlobalScope" || ((_b = self.constructor) === null || _b === void 0 ? void 0 : _b.name) === "ServiceWorkerGlobalScope" || ((_c = self.constructor) === null || _c === void 0 ? void 0 : _c.name) === "SharedWorkerGlobalScope");
+    exports2.isWebWorker = typeof self === "object" && typeof self?.importScripts === "function" && (self.constructor?.name === "DedicatedWorkerGlobalScope" || self.constructor?.name === "ServiceWorkerGlobalScope" || self.constructor?.name === "SharedWorkerGlobalScope");
     exports2.isDeno = typeof Deno !== "undefined" && typeof Deno.version !== "undefined" && typeof Deno.version.deno !== "undefined";
     exports2.isBun = typeof Bun !== "undefined" && typeof Bun.version !== "undefined";
-    exports2.isNodeLike = typeof globalThis.process !== "undefined" && Boolean(globalThis.process.version) && Boolean((_d = globalThis.process.versions) === null || _d === void 0 ? void 0 : _d.node);
+    exports2.isNodeLike = typeof globalThis.process !== "undefined" && Boolean(globalThis.process.version) && Boolean(globalThis.process.versions?.node);
     exports2.isNodeRuntime = exports2.isNodeLike && !exports2.isBun && !exports2.isDeno;
-    exports2.isReactNative = typeof navigator !== "undefined" && (navigator === null || navigator === void 0 ? void 0 : navigator.product) === "ReactNative";
+    exports2.isReactNative = typeof navigator !== "undefined" && navigator?.product === "ReactNative";
   }
 });
 
@@ -25142,10 +25269,9 @@ var require_formDataPolicy = __commonJS({
     var httpHeaders_js_1 = require_httpHeaders();
     exports2.formDataPolicyName = "formDataPolicy";
     function formDataToFormDataMap(formData) {
-      var _a;
       const formDataMap = {};
       for (const [key, value] of formData.entries()) {
-        (_a = formDataMap[key]) !== null && _a !== void 0 ? _a : formDataMap[key] = [];
+        formDataMap[key] ??= [];
         formDataMap[key].push(value);
       }
       return formDataMap;
@@ -25189,7 +25315,7 @@ var require_formDataPolicy = __commonJS({
       if (contentType && !contentType.startsWith("multipart/form-data")) {
         return;
       }
-      request.headers.set("Content-Type", contentType !== null && contentType !== void 0 ? contentType : "multipart/form-data");
+      request.headers.set("Content-Type", contentType ?? "multipart/form-data");
       const parts = [];
       for (const [fieldName, values] of Object.entries(formData)) {
         for (const value of Array.isArray(values) ? values : [values]) {
@@ -26511,7 +26637,7 @@ var require_proxyPolicy = __commonJS({
         return false;
       }
       const host = new URL(uri).hostname;
-      if (bypassedMap === null || bypassedMap === void 0 ? void 0 : bypassedMap.has(host)) {
+      if (bypassedMap?.has(host)) {
         return bypassedMap.get(host);
       }
       let isBypassedFlag = false;
@@ -26530,7 +26656,7 @@ var require_proxyPolicy = __commonJS({
           }
         }
       }
-      bypassedMap === null || bypassedMap === void 0 ? void 0 : bypassedMap.set(host, isBypassedFlag);
+      bypassedMap?.set(host, isBypassedFlag);
       return isBypassedFlag;
     }
     function loadNoProxy() {
@@ -26565,7 +26691,7 @@ var require_proxyPolicy = __commonJS({
       let parsedProxyUrl;
       try {
         parsedProxyUrl = new URL(settings.host);
-      } catch (_a) {
+      } catch {
         throw new Error(`Expecting a valid host string in proxy settings, but found "${settings.host}".`);
       }
       parsedProxyUrl.port = String(settings.port);
@@ -26608,8 +26734,7 @@ var require_proxyPolicy = __commonJS({
       return {
         name: exports2.proxyPolicyName,
         async sendRequest(request, next) {
-          var _a;
-          if (!request.proxySettings && defaultProxy && !isBypassed(request.url, (_a = options === null || options === void 0 ? void 0 : options.customNoProxyList) !== null && _a !== void 0 ? _a : exports2.globalNoProxyList, (options === null || options === void 0 ? void 0 : options.customNoProxyList) ? void 0 : globalBypassedMap)) {
+          if (!request.proxySettings && defaultProxy && !isBypassed(request.url, options?.customNoProxyList ?? exports2.globalNoProxyList, options?.customNoProxyList ? void 0 : globalBypassedMap)) {
             setProxyAgentOnRequest(request, cachedAgents, defaultProxy);
           } else if (request.proxySettings) {
             setProxyAgentOnRequest(request, cachedAgents, getUrlFromProxySettings(request.proxySettings));
@@ -26699,24 +26824,21 @@ var require_concat = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.concat = concat;
-    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
     var stream_1 = require("stream");
     var typeGuards_js_1 = require_typeGuards();
-    function streamAsyncIterator() {
-      return tslib_1.__asyncGenerator(this, arguments, function* streamAsyncIterator_1() {
-        const reader = this.getReader();
-        try {
-          while (true) {
-            const { done, value } = yield tslib_1.__await(reader.read());
-            if (done) {
-              return yield tslib_1.__await(void 0);
-            }
-            yield yield tslib_1.__await(value);
+    async function* streamAsyncIterator() {
+      const reader = this.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            return;
           }
-        } finally {
-          reader.releaseLock();
+          yield value;
         }
-      });
+      } finally {
+        reader.releaseLock();
+      }
     }
     function makeAsyncIterable(webStream) {
       if (!webStream[Symbol.asyncIterator]) {
@@ -26746,28 +26868,12 @@ var require_concat = __commonJS({
     async function concat(sources) {
       return function() {
         const streams = sources.map((x) => typeof x === "function" ? x() : x).map(toStream);
-        return stream_1.Readable.from((function() {
-          return tslib_1.__asyncGenerator(this, arguments, function* () {
-            var _a, e_1, _b, _c;
-            for (const stream of streams) {
-              try {
-                for (var _d = true, stream_2 = (e_1 = void 0, tslib_1.__asyncValues(stream)), stream_2_1; stream_2_1 = yield tslib_1.__await(stream_2.next()), _a = stream_2_1.done, !_a; _d = true) {
-                  _c = stream_2_1.value;
-                  _d = false;
-                  const chunk = _c;
-                  yield yield tslib_1.__await(chunk);
-                }
-              } catch (e_1_1) {
-                e_1 = { error: e_1_1 };
-              } finally {
-                try {
-                  if (!_d && !_a && (_b = stream_2.return)) yield tslib_1.__await(_b.call(stream_2));
-                } finally {
-                  if (e_1) throw e_1.error;
-                }
-              }
+        return stream_1.Readable.from((async function* () {
+          for (const stream of streams) {
+            for await (const chunk of stream) {
+              yield chunk;
             }
-          });
+          }
         })());
       };
     }
@@ -26851,7 +26957,6 @@ var require_multipartPolicy = __commonJS({
       return {
         name: exports2.multipartPolicyName,
         async sendRequest(request, next) {
-          var _a;
           if (!request.multipartBody) {
             return next(request);
           }
@@ -26859,7 +26964,7 @@ var require_multipartPolicy = __commonJS({
             throw new Error("multipartBody and regular body cannot be set at the same time");
           }
           let boundary = request.multipartBody.boundary;
-          const contentTypeHeader = (_a = request.headers.get("Content-Type")) !== null && _a !== void 0 ? _a : "multipart/mixed";
+          const contentTypeHeader = request.headers.get("Content-Type") ?? "multipart/mixed";
           const parsedHeader = contentTypeHeader.match(/^(multipart\/[^ ;]+)(?:; *boundary=(.+))?$/);
           if (!parsedHeader) {
             throw new Error(`Got multipart request body, but content-type header was not multipart: ${contentTypeHeader}`);
@@ -26868,7 +26973,7 @@ var require_multipartPolicy = __commonJS({
           if (parsedBoundary && boundary && parsedBoundary !== boundary) {
             throw new Error(`Multipart boundary was specified as ${parsedBoundary} in the header, but got ${boundary} in the request body`);
           }
-          boundary !== null && boundary !== void 0 ? boundary : boundary = parsedBoundary;
+          boundary ??= parsedBoundary;
           if (boundary) {
             assertValidBoundary(boundary);
           } else {
@@ -26994,7 +27099,7 @@ var require_checkInsecureConnection = __commonJS({
     function emitInsecureConnectionWarning() {
       const warning = "Sending token over insecure transport. Assume any token issued is compromised.";
       log_js_1.logger.warning(warning);
-      if (typeof (process === null || process === void 0 ? void 0 : process.emitWarning) === "function" && !insecureConnectionWarningEmmitted) {
+      if (typeof process?.emitWarning === "function" && !insecureConnectionWarningEmmitted) {
         insecureConnectionWarningEmmitted = true;
         process.emitWarning(warning);
       }
@@ -27024,9 +27129,8 @@ var require_apiKeyAuthenticationPolicy = __commonJS({
       return {
         name: exports2.apiKeyAuthenticationPolicyName,
         async sendRequest(request, next) {
-          var _a, _b;
           (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
-          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "apiKey");
+          const scheme = (request.authSchemes ?? options.authSchemes)?.find((x) => x.kind === "apiKey");
           if (!scheme) {
             return next(request);
           }
@@ -27055,9 +27159,8 @@ var require_basicAuthenticationPolicy = __commonJS({
       return {
         name: exports2.basicAuthenticationPolicyName,
         async sendRequest(request, next) {
-          var _a, _b;
           (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
-          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "http" && x.scheme === "basic");
+          const scheme = (request.authSchemes ?? options.authSchemes)?.find((x) => x.kind === "http" && x.scheme === "basic");
           if (!scheme) {
             return next(request);
           }
@@ -27084,9 +27187,8 @@ var require_bearerAuthenticationPolicy = __commonJS({
       return {
         name: exports2.bearerAuthenticationPolicyName,
         async sendRequest(request, next) {
-          var _a, _b;
           (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
-          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "http" && x.scheme === "bearer");
+          const scheme = (request.authSchemes ?? options.authSchemes)?.find((x) => x.kind === "http" && x.scheme === "bearer");
           if (!scheme) {
             return next(request);
           }
@@ -27114,9 +27216,8 @@ var require_oauth2AuthenticationPolicy = __commonJS({
       return {
         name: exports2.oauth2AuthenticationPolicyName,
         async sendRequest(request, next) {
-          var _a, _b;
           (0, checkInsecureConnection_js_1.ensureSecureConnection)(request, options);
-          const scheme = (_b = (_a = request.authSchemes) !== null && _a !== void 0 ? _a : options.authSchemes) === null || _b === void 0 ? void 0 : _b.find((x) => x.kind === "oauth2");
+          const scheme = (request.authSchemes ?? options.authSchemes)?.find((x) => x.kind === "oauth2");
           if (!scheme) {
             return next(request);
           }
@@ -27223,7 +27324,6 @@ var require_multipart2 = __commonJS({
       return JSON.stringify(value);
     }
     function getContentDisposition(descriptor) {
-      var _a;
       const contentDispositionHeader = getHeaderValue(descriptor, "content-disposition");
       if (contentDispositionHeader) {
         return contentDispositionHeader;
@@ -27231,7 +27331,7 @@ var require_multipart2 = __commonJS({
       if (descriptor.dispositionType === void 0 && descriptor.name === void 0 && descriptor.filename === void 0) {
         return void 0;
       }
-      const dispositionType = (_a = descriptor.dispositionType) !== null && _a !== void 0 ? _a : "form-data";
+      const dispositionType = descriptor.dispositionType ?? "form-data";
       let disposition = dispositionType;
       if (descriptor.name) {
         disposition += `; name=${escapeDispositionField(descriptor.name)}`;
@@ -27266,10 +27366,9 @@ var require_multipart2 = __commonJS({
       throw new restError_js_1.RestError(`Unsupported body/content-type combination: ${body}, ${contentType}`);
     }
     function buildBodyPart(descriptor) {
-      var _a;
       const contentType = getPartContentType(descriptor);
       const contentDisposition = getContentDisposition(descriptor);
-      const headers = (0, httpHeaders_js_1.createHttpHeaders)((_a = descriptor.headers) !== null && _a !== void 0 ? _a : {});
+      const headers = (0, httpHeaders_js_1.createHttpHeaders)(descriptor.headers ?? {});
       if (contentType) {
         headers.set("content-type", contentType);
       }
@@ -27301,17 +27400,16 @@ var require_sendRequest = __commonJS({
     var typeGuards_js_1 = require_typeGuards();
     var multipart_js_1 = require_multipart2();
     async function sendRequest(method, url, pipeline, options = {}, customHttpClient) {
-      var _a;
-      const httpClient = customHttpClient !== null && customHttpClient !== void 0 ? customHttpClient : (0, clientHelpers_js_1.getCachedDefaultHttpsClient)();
+      const httpClient = customHttpClient ?? (0, clientHelpers_js_1.getCachedDefaultHttpsClient)();
       const request = buildPipelineRequest(method, url, options);
       try {
         const response = await pipeline.sendRequest(httpClient, request);
         const headers = response.headers.toJSON();
-        const stream = (_a = response.readableStreamBody) !== null && _a !== void 0 ? _a : response.browserStreamBody;
+        const stream = response.readableStreamBody ?? response.browserStreamBody;
         const parsedBody = options.responseAsStream || stream !== void 0 ? void 0 : getResponseBody(response);
-        const body = stream !== null && stream !== void 0 ? stream : parsedBody;
-        if (options === null || options === void 0 ? void 0 : options.onResponse) {
-          options.onResponse(Object.assign(Object.assign({}, response), { request, rawHeaders: headers, parsedBody }));
+        const body = stream ?? parsedBody;
+        if (options?.onResponse) {
+          options.onResponse({ ...response, request, rawHeaders: headers, parsedBody });
         }
         return {
           request,
@@ -27323,14 +27421,13 @@ var require_sendRequest = __commonJS({
         if ((0, restError_js_1.isRestError)(e) && e.response && options.onResponse) {
           const { response } = e;
           const rawHeaders = response.headers.toJSON();
-          options === null || options === void 0 ? void 0 : options.onResponse(Object.assign(Object.assign({}, response), { request, rawHeaders }), e);
+          options?.onResponse({ ...response, request, rawHeaders }, e);
         }
         throw e;
       }
     }
     function getRequestContentType(options = {}) {
-      var _a, _b, _c;
-      return (_c = (_a = options.contentType) !== null && _a !== void 0 ? _a : (_b = options.headers) === null || _b === void 0 ? void 0 : _b["content-type"]) !== null && _c !== void 0 ? _c : getContentType(options.body);
+      return options.contentType ?? options.headers?.["content-type"] ?? getContentType(options.body);
     }
     function getContentType(body) {
       if (ArrayBuffer.isView(body)) {
@@ -27347,13 +27444,16 @@ var require_sendRequest = __commonJS({
       return "application/json";
     }
     function buildPipelineRequest(method, url, options = {}) {
-      var _a, _b, _c;
       const requestContentType = getRequestContentType(options);
       const { body, multipartBody } = getRequestBody(options.body, requestContentType);
       const hasContent = body !== void 0 || multipartBody !== void 0;
-      const headers = (0, httpHeaders_js_1.createHttpHeaders)(Object.assign(Object.assign(Object.assign({}, options.headers ? options.headers : {}), { accept: (_c = (_a = options.accept) !== null && _a !== void 0 ? _a : (_b = options.headers) === null || _b === void 0 ? void 0 : _b.accept) !== null && _c !== void 0 ? _c : "application/json" }), hasContent && requestContentType && {
-        "content-type": requestContentType
-      }));
+      const headers = (0, httpHeaders_js_1.createHttpHeaders)({
+        ...options.headers ? options.headers : {},
+        accept: options.accept ?? options.headers?.accept ?? "application/json",
+        ...hasContent && requestContentType && {
+          "content-type": requestContentType
+        }
+      });
       return (0, pipelineRequest_js_1.createPipelineRequest)({
         url,
         method,
@@ -27401,10 +27501,9 @@ var require_sendRequest = __commonJS({
       }
     }
     function getResponseBody(response) {
-      var _a, _b;
-      const contentType = (_a = response.headers.get("content-type")) !== null && _a !== void 0 ? _a : "";
+      const contentType = response.headers.get("content-type") ?? "";
       const firstType = contentType.split(";")[0];
-      const bodyToParse = (_b = response.bodyAsText) !== null && _b !== void 0 ? _b : "";
+      const bodyToParse = response.bodyAsText ?? "";
       if (firstType === "text/plain") {
         return String(bodyToParse);
       }
@@ -27418,9 +27517,8 @@ var require_sendRequest = __commonJS({
       }
     }
     function createParseError(response, err) {
-      var _a;
       const msg = `Error "${err}" occurred while parsing the response body - ${response.bodyAsText}.`;
-      const errCode = (_a = err.code) !== null && _a !== void 0 ? _a : restError_js_1.RestError.PARSE_ERROR;
+      const errCode = err.code ?? restError_js_1.RestError.PARSE_ERROR;
       return new restError_js_1.RestError(msg, {
         code: errCode,
         statusCode: response.status,
@@ -27483,7 +27581,6 @@ var require_urlHelpers = __commonJS({
       return `${allowReserved ? key : encodeURIComponent(key)}=${value}`;
     }
     function appendQueryParams(url, options = {}) {
-      var _a, _b, _c, _d;
       if (!options.queryParameters) {
         return url;
       }
@@ -27497,22 +27594,22 @@ var require_urlHelpers = __commonJS({
         }
         const hasMetadata = isQueryParameterWithOptions(param);
         const rawValue = hasMetadata ? param.value : param;
-        const explode = hasMetadata ? (_a = param.explode) !== null && _a !== void 0 ? _a : false : false;
+        const explode = hasMetadata ? param.explode ?? false : false;
         const style = hasMetadata && param.style ? param.style : "form";
         if (explode) {
           if (Array.isArray(rawValue)) {
             for (const item of rawValue) {
-              paramStrings.push(getQueryParamValue(key, (_b = options.skipUrlEncoding) !== null && _b !== void 0 ? _b : false, style, item));
+              paramStrings.push(getQueryParamValue(key, options.skipUrlEncoding ?? false, style, item));
             }
           } else if (typeof rawValue === "object") {
             for (const [actualKey, value] of Object.entries(rawValue)) {
-              paramStrings.push(getQueryParamValue(actualKey, (_c = options.skipUrlEncoding) !== null && _c !== void 0 ? _c : false, style, value));
+              paramStrings.push(getQueryParamValue(actualKey, options.skipUrlEncoding ?? false, style, value));
             }
           } else {
             throw new Error("explode can only be set to true for objects and arrays");
           }
         } else {
-          paramStrings.push(getQueryParamValue(key, (_d = options.skipUrlEncoding) !== null && _d !== void 0 ? _d : false, style, rawValue));
+          paramStrings.push(getQueryParamValue(key, options.skipUrlEncoding ?? false, style, rawValue));
         }
       }
       if (parsedUrl.search !== "") {
@@ -27522,7 +27619,6 @@ var require_urlHelpers = __commonJS({
       return parsedUrl.toString();
     }
     function buildBaseUrl(endpoint, options) {
-      var _a;
       if (!options.pathParameters) {
         return endpoint;
       }
@@ -27538,14 +27634,13 @@ var require_urlHelpers = __commonJS({
         if (!options.skipUrlEncoding) {
           value = encodeURIComponent(param);
         }
-        endpoint = (_a = replaceAll(endpoint, `{${key}}`, value)) !== null && _a !== void 0 ? _a : "";
+        endpoint = replaceAll(endpoint, `{${key}}`, value) ?? "";
       }
       return endpoint;
     }
     function buildRoutePath(routePath, pathParameters, options = {}) {
-      var _a;
       for (const pathParam of pathParameters) {
-        const allowReserved = typeof pathParam === "object" && ((_a = pathParam.allowReserved) !== null && _a !== void 0 ? _a : false);
+        const allowReserved = typeof pathParam === "object" && (pathParam.allowReserved ?? false);
         let value = typeof pathParam === "object" ? pathParam.value : pathParam;
         if (!options.skipUrlEncoding && !allowReserved) {
           value = encodeURIComponent(value);
@@ -27571,9 +27666,8 @@ var require_getClient = __commonJS({
     var urlHelpers_js_1 = require_urlHelpers();
     var checkEnvironment_js_1 = require_checkEnvironment();
     function getClient(endpoint, clientOptions = {}) {
-      var _a, _b, _c;
-      const pipeline = (_a = clientOptions.pipeline) !== null && _a !== void 0 ? _a : (0, clientHelpers_js_1.createDefaultPipeline)(clientOptions);
-      if ((_b = clientOptions.additionalPolicies) === null || _b === void 0 ? void 0 : _b.length) {
+      const pipeline = clientOptions.pipeline ?? (0, clientHelpers_js_1.createDefaultPipeline)(clientOptions);
+      if (clientOptions.additionalPolicies?.length) {
         for (const { policy, position } of clientOptions.additionalPolicies) {
           const afterPhase = position === "perRetry" ? "Sign" : void 0;
           pipeline.addPolicy(policy, {
@@ -27582,9 +27676,9 @@ var require_getClient = __commonJS({
         }
       }
       const { allowInsecureConnection, httpClient } = clientOptions;
-      const endpointUrl = (_c = clientOptions.endpoint) !== null && _c !== void 0 ? _c : endpoint;
+      const endpointUrl = clientOptions.endpoint ?? endpoint;
       const client = (path3, ...args) => {
-        const getUrl = (requestOptions) => (0, urlHelpers_js_1.buildRequestUrl)(endpointUrl, path3, args, Object.assign({ allowInsecureConnection }, requestOptions));
+        const getUrl = (requestOptions) => (0, urlHelpers_js_1.buildRequestUrl)(endpointUrl, path3, args, { allowInsecureConnection, ...requestOptions });
         return {
           get: (requestOptions = {}) => {
             return buildOperation("GET", getUrl(requestOptions), pipeline, requestOptions, allowInsecureConnection, httpClient);
@@ -27619,22 +27713,21 @@ var require_getClient = __commonJS({
       };
     }
     function buildOperation(method, url, pipeline, options, allowInsecureConnection, httpClient) {
-      var _a;
-      allowInsecureConnection = (_a = options.allowInsecureConnection) !== null && _a !== void 0 ? _a : allowInsecureConnection;
+      allowInsecureConnection = options.allowInsecureConnection ?? allowInsecureConnection;
       return {
         then: function(onFulfilled, onrejected) {
-          return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, Object.assign(Object.assign({}, options), { allowInsecureConnection }), httpClient).then(onFulfilled, onrejected);
+          return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, { ...options, allowInsecureConnection }, httpClient).then(onFulfilled, onrejected);
         },
         async asBrowserStream() {
           if (checkEnvironment_js_1.isNodeLike) {
             throw new Error("`asBrowserStream` is supported only in the browser environment. Use `asNodeStream` instead to obtain the response body stream. If you require a Web stream of the response in Node, consider using `Readable.toWeb` on the result of `asNodeStream`.");
           } else {
-            return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, Object.assign(Object.assign({}, options), { allowInsecureConnection, responseAsStream: true }), httpClient);
+            return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, { ...options, allowInsecureConnection, responseAsStream: true }, httpClient);
           }
         },
         async asNodeStream() {
           if (checkEnvironment_js_1.isNodeLike) {
-            return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, Object.assign(Object.assign({}, options), { allowInsecureConnection, responseAsStream: true }), httpClient);
+            return (0, sendRequest_js_1.sendRequest)(method, url, pipeline, { ...options, allowInsecureConnection, responseAsStream: true }, httpClient);
           } else {
             throw new Error("`isNodeStream` is not supported in the browser environment. Use `asBrowserStream` to obtain the response body stream.");
           }
@@ -27651,15 +27744,14 @@ var require_operationOptionHelpers = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.operationOptionsToRequestParameters = operationOptionsToRequestParameters;
     function operationOptionsToRequestParameters(options) {
-      var _a, _b, _c, _d, _e, _f;
       return {
-        allowInsecureConnection: (_a = options.requestOptions) === null || _a === void 0 ? void 0 : _a.allowInsecureConnection,
-        timeout: (_b = options.requestOptions) === null || _b === void 0 ? void 0 : _b.timeout,
-        skipUrlEncoding: (_c = options.requestOptions) === null || _c === void 0 ? void 0 : _c.skipUrlEncoding,
+        allowInsecureConnection: options.requestOptions?.allowInsecureConnection,
+        timeout: options.requestOptions?.timeout,
+        skipUrlEncoding: options.requestOptions?.skipUrlEncoding,
         abortSignal: options.abortSignal,
-        onUploadProgress: (_d = options.requestOptions) === null || _d === void 0 ? void 0 : _d.onUploadProgress,
-        onDownloadProgress: (_e = options.requestOptions) === null || _e === void 0 ? void 0 : _e.onDownloadProgress,
-        headers: Object.assign({}, (_f = options.requestOptions) === null || _f === void 0 ? void 0 : _f.headers),
+        onUploadProgress: options.requestOptions?.onUploadProgress,
+        onDownloadProgress: options.requestOptions?.onDownloadProgress,
+        headers: { ...options.requestOptions?.headers },
         onResponse: options.onResponse
       };
     }
@@ -27675,23 +27767,21 @@ var require_restError2 = __commonJS({
     var restError_js_1 = require_restError();
     var httpHeaders_js_1 = require_httpHeaders();
     function createRestError(messageOrResponse, response) {
-      var _a, _b, _c;
       const resp = typeof messageOrResponse === "string" ? response : messageOrResponse;
-      const internalError = (_b = (_a = resp.body) === null || _a === void 0 ? void 0 : _a.error) !== null && _b !== void 0 ? _b : resp.body;
-      const message = typeof messageOrResponse === "string" ? messageOrResponse : (_c = internalError === null || internalError === void 0 ? void 0 : internalError.message) !== null && _c !== void 0 ? _c : `Unexpected status code: ${resp.status}`;
+      const internalError = resp.body?.error ?? resp.body;
+      const message = typeof messageOrResponse === "string" ? messageOrResponse : internalError?.message ?? `Unexpected status code: ${resp.status}`;
       return new restError_js_1.RestError(message, {
         statusCode: statusCodeToNumber(resp.status),
-        code: internalError === null || internalError === void 0 ? void 0 : internalError.code,
+        code: internalError?.code,
         request: resp.request,
         response: toPipelineResponse(resp)
       });
     }
     function toPipelineResponse(response) {
-      var _a;
       return {
         headers: (0, httpHeaders_js_1.createHttpHeaders)(response.headers),
         request: response.request,
-        status: (_a = statusCodeToNumber(response.status)) !== null && _a !== void 0 ? _a : -1
+        status: statusCodeToNumber(response.status) ?? -1
       };
     }
     function statusCodeToNumber(statusCode) {
@@ -27848,11 +27938,13 @@ var require_exponentialRetryPolicy = __commonJS({
     var constants_js_1 = require_constants7();
     exports2.exponentialRetryPolicyName = "exponentialRetryPolicy";
     function exponentialRetryPolicy(options = {}) {
-      var _a;
       return (0, retryPolicy_js_1.retryPolicy)([
-        (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(Object.assign(Object.assign({}, options), { ignoreSystemErrors: true }))
+        (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)({
+          ...options,
+          ignoreSystemErrors: true
+        })
       ], {
-        maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+        maxRetries: options.maxRetries ?? constants_js_1.DEFAULT_RETRY_POLICY_COUNT
       });
     }
   }
@@ -27870,13 +27962,15 @@ var require_systemErrorRetryPolicy = __commonJS({
     var constants_js_1 = require_constants7();
     exports2.systemErrorRetryPolicyName = "systemErrorRetryPolicy";
     function systemErrorRetryPolicy(options = {}) {
-      var _a;
       return {
         name: exports2.systemErrorRetryPolicyName,
         sendRequest: (0, retryPolicy_js_1.retryPolicy)([
-          (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)(Object.assign(Object.assign({}, options), { ignoreHttpStatusCodes: true }))
+          (0, exponentialRetryStrategy_js_1.exponentialRetryStrategy)({
+            ...options,
+            ignoreHttpStatusCodes: true
+          })
         ], {
-          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+          maxRetries: options.maxRetries ?? constants_js_1.DEFAULT_RETRY_POLICY_COUNT
         }).sendRequest
       };
     }
@@ -27895,11 +27989,10 @@ var require_throttlingRetryPolicy = __commonJS({
     var constants_js_1 = require_constants7();
     exports2.throttlingRetryPolicyName = "throttlingRetryPolicy";
     function throttlingRetryPolicy(options = {}) {
-      var _a;
       return {
         name: exports2.throttlingRetryPolicyName,
         sendRequest: (0, retryPolicy_js_1.retryPolicy)([(0, throttlingRetryStrategy_js_1.throttlingRetryStrategy)()], {
-          maxRetries: (_a = options.maxRetries) !== null && _a !== void 0 ? _a : constants_js_1.DEFAULT_RETRY_POLICY_COUNT
+          maxRetries: options.maxRetries ?? constants_js_1.DEFAULT_RETRY_POLICY_COUNT
         }).sendRequest
       };
     }
@@ -28024,7 +28117,10 @@ var require_logPolicy2 = __commonJS({
     var policies_1 = require_internal2();
     exports2.logPolicyName = policies_1.logPolicyName;
     function logPolicy(options = {}) {
-      return (0, policies_1.logPolicy)(Object.assign({ logger: log_js_1.logger.info }, options));
+      return (0, policies_1.logPolicy)({
+        logger: log_js_1.logger.info,
+        ...options
+      });
     }
   }
 });
@@ -28052,14 +28148,14 @@ var require_userAgentPlatform2 = __commonJS({
     exports2.getHeaderName = getHeaderName;
     exports2.setPlatformSpecificData = setPlatformSpecificData;
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
-    var os2 = tslib_1.__importStar(require("node:os"));
-    var process4 = tslib_1.__importStar(require("node:process"));
+    var node_os_1 = tslib_1.__importDefault(require("node:os"));
+    var node_process_1 = tslib_1.__importDefault(require("node:process"));
     function getHeaderName() {
       return "User-Agent";
     }
     async function setPlatformSpecificData(map) {
-      if (process4 && process4.versions) {
-        const versions = process4.versions;
+      if (node_process_1.default && node_process_1.default.versions) {
+        const versions = node_process_1.default.versions;
         if (versions.bun) {
           map.set("Bun", versions.bun);
         } else if (versions.deno) {
@@ -28068,7 +28164,7 @@ var require_userAgentPlatform2 = __commonJS({
           map.set("Node", versions.node);
         }
       }
-      map.set("OS", `(${os2.arch()}-${os2.type()}-${os2.release()})`);
+      map.set("OS", `(${node_os_1.default.arch()}-${node_os_1.default.type()}-${node_os_1.default.release()})`);
     }
   }
 });
@@ -28079,7 +28175,7 @@ var require_constants8 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_RETRY_POLICY_COUNT = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "1.22.0";
+    exports2.SDK_VERSION = "1.22.1";
     exports2.DEFAULT_RETRY_POLICY_COUNT = 3;
   }
 });
@@ -28234,17 +28330,16 @@ var require_aborterUtils = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.cancelablePromiseRace = cancelablePromiseRace;
     async function cancelablePromiseRace(abortablePromiseBuilders, options) {
-      var _a, _b;
       const aborter = new AbortController();
       function abortHandler() {
         aborter.abort();
       }
-      (_a = options === null || options === void 0 ? void 0 : options.abortSignal) === null || _a === void 0 ? void 0 : _a.addEventListener("abort", abortHandler);
+      options?.abortSignal?.addEventListener("abort", abortHandler);
       try {
         return await Promise.race(abortablePromiseBuilders.map((p) => p({ abortSignal: aborter.signal })));
       } finally {
         aborter.abort();
-        (_b = options === null || options === void 0 ? void 0 : options.abortSignal) === null || _b === void 0 ? void 0 : _b.removeEventListener("abort", abortHandler);
+        options?.abortSignal?.removeEventListener("abort", abortHandler);
       }
     }
   }
@@ -28287,20 +28382,20 @@ var require_createAbortablePromise = __commonJS({
     exports2.createAbortablePromise = createAbortablePromise;
     var abort_controller_1 = require_commonjs3();
     function createAbortablePromise(buildPromise, options) {
-      const { cleanupBeforeAbort, abortSignal, abortErrorMsg } = options !== null && options !== void 0 ? options : {};
+      const { cleanupBeforeAbort, abortSignal, abortErrorMsg } = options ?? {};
       return new Promise((resolve, reject) => {
         function rejectOnAbort() {
-          reject(new abort_controller_1.AbortError(abortErrorMsg !== null && abortErrorMsg !== void 0 ? abortErrorMsg : "The operation was aborted."));
+          reject(new abort_controller_1.AbortError(abortErrorMsg ?? "The operation was aborted."));
         }
         function removeListeners() {
-          abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.removeEventListener("abort", onAbort);
+          abortSignal?.removeEventListener("abort", onAbort);
         }
         function onAbort() {
-          cleanupBeforeAbort === null || cleanupBeforeAbort === void 0 ? void 0 : cleanupBeforeAbort();
+          cleanupBeforeAbort?.();
           removeListeners();
           rejectOnAbort();
         }
-        if (abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.aborted) {
+        if (abortSignal?.aborted) {
           return rejectOnAbort();
         }
         try {
@@ -28314,7 +28409,7 @@ var require_createAbortablePromise = __commonJS({
         } catch (err) {
           reject(err);
         }
-        abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.addEventListener("abort", onAbort);
+        abortSignal?.addEventListener("abort", onAbort);
       });
     }
   }
@@ -28332,13 +28427,13 @@ var require_delay2 = __commonJS({
     var StandardAbortMessage = "The delay was aborted.";
     function delay(timeInMs, options) {
       let token;
-      const { abortSignal, abortErrorMsg } = options !== null && options !== void 0 ? options : {};
+      const { abortSignal, abortErrorMsg } = options ?? {};
       return (0, createAbortablePromise_js_1.createAbortablePromise)((resolve) => {
         token = setTimeout(resolve, timeInMs);
       }, {
         cleanupBeforeAbort: () => clearTimeout(token),
         abortSignal,
-        abortErrorMsg: abortErrorMsg !== null && abortErrorMsg !== void 0 ? abortErrorMsg : StandardAbortMessage
+        abortErrorMsg: abortErrorMsg ?? StandardAbortMessage
       });
     }
     function calculateRetryDelay(retryAttempt, config) {
@@ -28525,19 +28620,36 @@ var require_file2 = __commonJS({
       }
     }
     function createFileFromStream(stream, name, options = {}) {
-      var _a, _b, _c, _d;
-      return Object.assign(Object.assign({}, unimplementedMethods), { type: (_a = options.type) !== null && _a !== void 0 ? _a : "", lastModified: (_b = options.lastModified) !== null && _b !== void 0 ? _b : (/* @__PURE__ */ new Date()).getTime(), webkitRelativePath: (_c = options.webkitRelativePath) !== null && _c !== void 0 ? _c : "", size: (_d = options.size) !== null && _d !== void 0 ? _d : -1, name, stream: () => {
-        const s = stream();
-        if (isNodeReadableStream(s)) {
-          throw new Error("Not supported: a Node stream was provided as input to createFileFromStream.");
-        }
-        return s;
-      }, [rawContent]: stream });
+      return {
+        ...unimplementedMethods,
+        type: options.type ?? "",
+        lastModified: options.lastModified ?? (/* @__PURE__ */ new Date()).getTime(),
+        webkitRelativePath: options.webkitRelativePath ?? "",
+        size: options.size ?? -1,
+        name,
+        stream: () => {
+          const s = stream();
+          if (isNodeReadableStream(s)) {
+            throw new Error("Not supported: a Node stream was provided as input to createFileFromStream.");
+          }
+          return s;
+        },
+        [rawContent]: stream
+      };
     }
     function createFile(content, name, options = {}) {
-      var _a, _b, _c;
       if (core_util_1.isNodeLike) {
-        return Object.assign(Object.assign({}, unimplementedMethods), { type: (_a = options.type) !== null && _a !== void 0 ? _a : "", lastModified: (_b = options.lastModified) !== null && _b !== void 0 ? _b : (/* @__PURE__ */ new Date()).getTime(), webkitRelativePath: (_c = options.webkitRelativePath) !== null && _c !== void 0 ? _c : "", size: content.byteLength, name, arrayBuffer: async () => content.buffer, stream: () => new Blob([content]).stream(), [rawContent]: () => content });
+        return {
+          ...unimplementedMethods,
+          type: options.type ?? "",
+          lastModified: options.lastModified ?? (/* @__PURE__ */ new Date()).getTime(),
+          webkitRelativePath: options.webkitRelativePath ?? "",
+          size: content.byteLength,
+          name,
+          arrayBuffer: async () => content.buffer,
+          stream: () => new Blob([content]).stream(),
+          [rawContent]: () => content
+        };
       } else {
         return new File([content], name, options);
       }
@@ -28712,6 +28824,7 @@ var require_tracingContext = __commonJS({
       return context3;
     }
     var TracingContextImpl = class _TracingContextImpl {
+      _contextMap;
       constructor(initialContext) {
         this._contextMap = initialContext instanceof _TracingContextImpl ? new Map(initialContext._contextMap) : /* @__PURE__ */ new Map();
       }
@@ -28813,8 +28926,12 @@ var require_tracingClient = __commonJS({
     function createTracingClient(options) {
       const { namespace, packageName, packageVersion } = options;
       function startSpan(name, operationOptions, spanOptions) {
-        var _a;
-        const startSpanResult = (0, instrumenter_js_1.getInstrumenter)().startSpan(name, Object.assign(Object.assign({}, spanOptions), { packageName, packageVersion, tracingContext: (_a = operationOptions === null || operationOptions === void 0 ? void 0 : operationOptions.tracingOptions) === null || _a === void 0 ? void 0 : _a.tracingContext }));
+        const startSpanResult = (0, instrumenter_js_1.getInstrumenter)().startSpan(name, {
+          ...spanOptions,
+          packageName,
+          packageVersion,
+          tracingContext: operationOptions?.tracingOptions?.tracingContext
+        });
         let tracingContext = startSpanResult.tracingContext;
         const span = startSpanResult.span;
         if (!tracingContext.getValue(tracingContext_js_1.knownContextKeys.namespace)) {
@@ -28822,7 +28939,7 @@ var require_tracingClient = __commonJS({
         }
         span.setAttribute("az.namespace", tracingContext.getValue(tracingContext_js_1.knownContextKeys.namespace));
         const updatedOptions = Object.assign({}, operationOptions, {
-          tracingOptions: Object.assign(Object.assign({}, operationOptions === null || operationOptions === void 0 ? void 0 : operationOptions.tracingOptions), { tracingContext })
+          tracingOptions: { ...operationOptions?.tracingOptions, tracingContext }
         });
         return {
           span,
@@ -28918,7 +29035,6 @@ var require_tracingPolicy = __commonJS({
       return {
         name: exports2.tracingPolicyName,
         async sendRequest(request, next) {
-          var _a;
           if (!tracingClient) {
             return next(request);
           }
@@ -28932,7 +29048,7 @@ var require_tracingPolicy = __commonJS({
           if (userAgent) {
             spanAttributes["http.user_agent"] = userAgent;
           }
-          const { span, tracingContext } = (_a = tryCreateSpan(tracingClient, request, spanAttributes)) !== null && _a !== void 0 ? _a : {};
+          const { span, tracingContext } = tryCreateSpan(tracingClient, request, spanAttributes) ?? {};
           if (!span || !tracingContext) {
             return next(request);
           }
@@ -29065,7 +29181,7 @@ var require_wrapAbortSignalLikePolicy = __commonJS({
           try {
             return await next(request);
           } finally {
-            cleanup === null || cleanup === void 0 ? void 0 : cleanup();
+            cleanup?.();
           }
         }
       };
@@ -29095,7 +29211,6 @@ var require_createPipelineFromOptions2 = __commonJS({
     var tracingPolicy_js_1 = require_tracingPolicy();
     var wrapAbortSignalLikePolicy_js_1 = require_wrapAbortSignalLikePolicy();
     function createPipelineFromOptions(options) {
-      var _a;
       const pipeline = (0, pipeline_js_1.createEmptyPipeline)();
       if (core_util_1.isNodeLike) {
         if (options.agent) {
@@ -29110,10 +29225,10 @@ var require_createPipelineFromOptions2 = __commonJS({
       pipeline.addPolicy((0, wrapAbortSignalLikePolicy_js_1.wrapAbortSignalLikePolicy)());
       pipeline.addPolicy((0, formDataPolicy_js_1.formDataPolicy)(), { beforePolicies: [multipartPolicy_js_1.multipartPolicyName] });
       pipeline.addPolicy((0, userAgentPolicy_js_1.userAgentPolicy)(options.userAgentOptions));
-      pipeline.addPolicy((0, setClientRequestIdPolicy_js_1.setClientRequestIdPolicy)((_a = options.telemetryOptions) === null || _a === void 0 ? void 0 : _a.clientRequestIdHeaderName));
+      pipeline.addPolicy((0, setClientRequestIdPolicy_js_1.setClientRequestIdPolicy)(options.telemetryOptions?.clientRequestIdHeaderName));
       pipeline.addPolicy((0, multipartPolicy_js_1.multipartPolicy)(), { afterPhase: "Deserialize" });
       pipeline.addPolicy((0, defaultRetryPolicy_js_1.defaultRetryPolicy)(options.retryOptions), { phase: "Retry" });
-      pipeline.addPolicy((0, tracingPolicy_js_1.tracingPolicy)(Object.assign(Object.assign({}, options.userAgentOptions), options.loggingOptions)), {
+      pipeline.addPolicy((0, tracingPolicy_js_1.tracingPolicy)({ ...options.userAgentOptions, ...options.loggingOptions }), {
         afterPhase: "Retry"
       });
       if (core_util_1.isNodeLike) {
@@ -29142,7 +29257,7 @@ var require_defaultHttpClient2 = __commonJS({
             request.abortSignal = abortSignal;
             return await client.sendRequest(request);
           } finally {
-            cleanup === null || cleanup === void 0 ? void 0 : cleanup();
+            cleanup?.();
           }
         }
       };
@@ -29232,7 +29347,10 @@ var require_retryPolicy2 = __commonJS({
     var policies_1 = require_internal2();
     var retryPolicyLogger = (0, logger_1.createClientLogger)("core-rest-pipeline retryPolicy");
     function retryPolicy(strategies, options = { maxRetries: constants_js_1.DEFAULT_RETRY_POLICY_COUNT }) {
-      return (0, policies_1.retryPolicy)(strategies, Object.assign({ logger: retryPolicyLogger }, options));
+      return (0, policies_1.retryPolicy)(strategies, {
+        logger: retryPolicyLogger,
+        ...options
+      });
     }
   }
 });
@@ -29258,7 +29376,7 @@ var require_tokenCycler = __commonJS({
         if (Date.now() < refreshTimeout) {
           try {
             return await getAccessToken();
-          } catch (_a) {
+          } catch {
             return null;
           }
         } else {
@@ -29280,7 +29398,10 @@ var require_tokenCycler = __commonJS({
       let refreshWorker = null;
       let token = null;
       let tenantId;
-      const options = Object.assign(Object.assign({}, exports2.DEFAULT_CYCLER_OPTIONS), tokenCyclerOptions);
+      const options = {
+        ...exports2.DEFAULT_CYCLER_OPTIONS,
+        ...tokenCyclerOptions
+      };
       const cycler = {
         /**
          * Produces true if a refresh job is currently in progress.
@@ -29293,14 +29414,13 @@ var require_tokenCycler = __commonJS({
          * window and not already refreshing)
          */
         get shouldRefresh() {
-          var _a;
           if (cycler.isRefreshing) {
             return false;
           }
-          if ((token === null || token === void 0 ? void 0 : token.refreshAfterTimestamp) && token.refreshAfterTimestamp < Date.now()) {
+          if (token?.refreshAfterTimestamp && token.refreshAfterTimestamp < Date.now()) {
             return true;
           }
-          return ((_a = token === null || token === void 0 ? void 0 : token.expiresOnTimestamp) !== null && _a !== void 0 ? _a : 0) - options.refreshWindowInMs < Date.now();
+          return (token?.expiresOnTimestamp ?? 0) - options.refreshWindowInMs < Date.now();
         },
         /**
          * Produces true if the cycler MUST refresh (null or nearly-expired
@@ -29311,14 +29431,13 @@ var require_tokenCycler = __commonJS({
         }
       };
       function refresh(scopes, getTokenOptions) {
-        var _a;
         if (!cycler.isRefreshing) {
           const tryGetAccessToken = () => credential.getToken(scopes, getTokenOptions);
           refreshWorker = beginRefresh(
             tryGetAccessToken,
             options.retryIntervalInMs,
             // If we don't have a token, then we should timeout immediately
-            (_a = token === null || token === void 0 ? void 0 : token.expiresOnTimestamp) !== null && _a !== void 0 ? _a : Date.now()
+            token?.expiresOnTimestamp ?? Date.now()
           ).then((_token) => {
             refreshWorker = null;
             token = _token;
@@ -29391,7 +29510,6 @@ var require_bearerTokenAuthenticationPolicy = __commonJS({
       return response.status === 401 && response.headers.has("WWW-Authenticate");
     }
     async function authorizeRequestOnCaeChallenge(onChallengeOptions, caeClaims) {
-      var _a;
       const { scopes } = onChallengeOptions;
       const accessToken = await onChallengeOptions.getAccessToken(scopes, {
         enableCae: true,
@@ -29400,16 +29518,15 @@ var require_bearerTokenAuthenticationPolicy = __commonJS({
       if (!accessToken) {
         return false;
       }
-      onChallengeOptions.request.headers.set("Authorization", `${(_a = accessToken.tokenType) !== null && _a !== void 0 ? _a : "Bearer"} ${accessToken.token}`);
+      onChallengeOptions.request.headers.set("Authorization", `${accessToken.tokenType ?? "Bearer"} ${accessToken.token}`);
       return true;
     }
     function bearerTokenAuthenticationPolicy(options) {
-      var _a, _b, _c;
       const { credential, scopes, challengeCallbacks } = options;
       const logger = options.logger || log_js_1.logger;
       const callbacks = {
-        authorizeRequest: (_b = (_a = challengeCallbacks === null || challengeCallbacks === void 0 ? void 0 : challengeCallbacks.authorizeRequest) === null || _a === void 0 ? void 0 : _a.bind(challengeCallbacks)) !== null && _b !== void 0 ? _b : defaultAuthorizeRequest,
-        authorizeRequestOnChallenge: (_c = challengeCallbacks === null || challengeCallbacks === void 0 ? void 0 : challengeCallbacks.authorizeRequestOnChallenge) === null || _c === void 0 ? void 0 : _c.bind(challengeCallbacks)
+        authorizeRequest: challengeCallbacks?.authorizeRequest?.bind(challengeCallbacks) ?? defaultAuthorizeRequest,
+        authorizeRequestOnChallenge: challengeCallbacks?.authorizeRequestOnChallenge?.bind(challengeCallbacks)
       };
       const getAccessToken = credential ? (0, tokenCycler_js_1.createTokenCycler)(
         credential
@@ -29525,12 +29642,11 @@ var require_bearerTokenAuthenticationPolicy = __commonJS({
       return parsedChallenges;
     }
     function getCaeChallengeClaims(challenges) {
-      var _a;
       if (!challenges) {
         return;
       }
       const parsedChallenges = parseChallenges(challenges);
-      return (_a = parsedChallenges.find((x) => x.scheme === "Bearer" && x.params.claims && x.params.error === "insufficient_claims")) === null || _a === void 0 ? void 0 : _a.params.claims;
+      return parsedChallenges.find((x) => x.scheme === "Bearer" && x.params.claims && x.params.error === "insufficient_claims")?.params.claims;
     }
   }
 });
@@ -29572,13 +29688,12 @@ var require_auxiliaryAuthenticationHeaderPolicy = __commonJS({
     exports2.auxiliaryAuthenticationHeaderPolicyName = "auxiliaryAuthenticationHeaderPolicy";
     var AUTHORIZATION_AUXILIARY_HEADER = "x-ms-authorization-auxiliary";
     async function sendAuthorizeRequest(options) {
-      var _a, _b;
       const { scopes, getAccessToken, request } = options;
       const getTokenOptions = {
         abortSignal: request.abortSignal,
         tracingOptions: request.tracingOptions
       };
-      return (_b = (_a = await getAccessToken(scopes, getTokenOptions)) === null || _a === void 0 ? void 0 : _a.token) !== null && _b !== void 0 ? _b : "";
+      return (await getAccessToken(scopes, getTokenOptions))?.token ?? "";
     }
     function auxiliaryAuthenticationHeaderPolicy(options) {
       const { credentials, scopes } = options;
@@ -29801,6 +29916,7 @@ var require_azureKeyCredential = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AzureKeyCredential = void 0;
     var AzureKeyCredential = class {
+      _key;
       /**
        * The value of the key to be used in authentication
        */
@@ -29857,6 +29973,8 @@ var require_azureNamedKeyCredential = __commonJS({
     exports2.isNamedKeyCredential = isNamedKeyCredential;
     var core_util_1 = require_commonjs4();
     var AzureNamedKeyCredential = class {
+      _key;
+      _name;
       /**
        * The value of the key to be used in authentication.
        */
@@ -29916,6 +30034,7 @@ var require_azureSASCredential = __commonJS({
     exports2.isSASCredential = isSASCredential;
     var core_util_1 = require_commonjs4();
     var AzureSASCredential = class {
+      _signature;
       /**
        * The value of the shared access signature to be used in authentication
        */
@@ -30082,7 +30201,7 @@ var require_utils3 = __commonJS({
     exports2.isValidUuid = isValidUuid;
     exports2.flattenResponse = flattenResponse;
     function isPrimitiveBody(value, mapperTypeName) {
-      return mapperTypeName !== "Composite" && mapperTypeName !== "Dictionary" && (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || (mapperTypeName === null || mapperTypeName === void 0 ? void 0 : mapperTypeName.match(/^(Date|DateTime|DateTimeRfc1123|UnixTime|ByteArray|Base64Url)$/i)) !== null || value === void 0 || value === null);
+      return mapperTypeName !== "Composite" && mapperTypeName !== "Dictionary" && (typeof value === "string" || typeof value === "number" || typeof value === "boolean" || mapperTypeName?.match(/^(Date|DateTime|DateTimeRfc1123|UnixTime|ByteArray|Base64Url)$/i) !== null || value === void 0 || value === null);
     }
     var validateISODuration = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
     function isDuration(value) {
@@ -30093,32 +30212,44 @@ var require_utils3 = __commonJS({
       return validUuidRegex.test(uuid);
     }
     function handleNullableResponseAndWrappableBody(responseObject) {
-      const combinedHeadersAndBody = Object.assign(Object.assign({}, responseObject.headers), responseObject.body);
+      const combinedHeadersAndBody = {
+        ...responseObject.headers,
+        ...responseObject.body
+      };
       if (responseObject.hasNullableType && Object.getOwnPropertyNames(combinedHeadersAndBody).length === 0) {
         return responseObject.shouldWrapBody ? { body: null } : null;
       } else {
-        return responseObject.shouldWrapBody ? Object.assign(Object.assign({}, responseObject.headers), { body: responseObject.body }) : combinedHeadersAndBody;
+        return responseObject.shouldWrapBody ? {
+          ...responseObject.headers,
+          body: responseObject.body
+        } : combinedHeadersAndBody;
       }
     }
     function flattenResponse(fullResponse, responseSpec) {
-      var _a, _b;
       const parsedHeaders = fullResponse.parsedHeaders;
       if (fullResponse.request.method === "HEAD") {
-        return Object.assign(Object.assign({}, parsedHeaders), { body: fullResponse.parsedBody });
+        return {
+          ...parsedHeaders,
+          body: fullResponse.parsedBody
+        };
       }
       const bodyMapper = responseSpec && responseSpec.bodyMapper;
-      const isNullable = Boolean(bodyMapper === null || bodyMapper === void 0 ? void 0 : bodyMapper.nullable);
-      const expectedBodyTypeName = bodyMapper === null || bodyMapper === void 0 ? void 0 : bodyMapper.type.name;
+      const isNullable = Boolean(bodyMapper?.nullable);
+      const expectedBodyTypeName = bodyMapper?.type.name;
       if (expectedBodyTypeName === "Stream") {
-        return Object.assign(Object.assign({}, parsedHeaders), { blobBody: fullResponse.blobBody, readableStreamBody: fullResponse.readableStreamBody });
+        return {
+          ...parsedHeaders,
+          blobBody: fullResponse.blobBody,
+          readableStreamBody: fullResponse.readableStreamBody
+        };
       }
       const modelProperties = expectedBodyTypeName === "Composite" && bodyMapper.type.modelProperties || {};
       const isPageableResponse = Object.keys(modelProperties).some((k) => modelProperties[k].serializedName === "");
       if (expectedBodyTypeName === "Sequence" || isPageableResponse) {
-        const arrayResponse = (_a = fullResponse.parsedBody) !== null && _a !== void 0 ? _a : [];
+        const arrayResponse = fullResponse.parsedBody ?? [];
         for (const key of Object.keys(modelProperties)) {
           if (modelProperties[key].serializedName) {
-            arrayResponse[key] = (_b = fullResponse.parsedBody) === null || _b === void 0 ? void 0 : _b[key];
+            arrayResponse[key] = fullResponse.parsedBody?.[key];
           }
         }
         if (parsedHeaders) {
@@ -30150,6 +30281,8 @@ var require_serializer = __commonJS({
     var interfaces_js_1 = require_interfaces();
     var utils_js_1 = require_utils3();
     var SerializerImpl = class {
+      modelMappers;
+      isXML;
       constructor(modelMappers = {}, isXML = false) {
         this.modelMappers = modelMappers;
         this.isXML = isXML;
@@ -30215,12 +30348,11 @@ var require_serializer = __commonJS({
        * @returns A valid serialized Javascript object
        */
       serialize(mapper, object, objectName, options = { xml: {} }) {
-        var _a, _b, _c;
         const updatedOptions = {
           xml: {
-            rootName: (_a = options.xml.rootName) !== null && _a !== void 0 ? _a : "",
-            includeRoot: (_b = options.xml.includeRoot) !== null && _b !== void 0 ? _b : false,
-            xmlCharKey: (_c = options.xml.xmlCharKey) !== null && _c !== void 0 ? _c : interfaces_js_1.XML_CHARKEY
+            rootName: options.xml.rootName ?? "",
+            includeRoot: options.xml.includeRoot ?? false,
+            xmlCharKey: options.xml.xmlCharKey ?? interfaces_js_1.XML_CHARKEY
           }
         };
         let payload = {};
@@ -30284,14 +30416,13 @@ var require_serializer = __commonJS({
        * @returns A valid deserialized Javascript object
        */
       deserialize(mapper, responseBody, objectName, options = { xml: {} }) {
-        var _a, _b, _c, _d;
         const updatedOptions = {
           xml: {
-            rootName: (_a = options.xml.rootName) !== null && _a !== void 0 ? _a : "",
-            includeRoot: (_b = options.xml.includeRoot) !== null && _b !== void 0 ? _b : false,
-            xmlCharKey: (_c = options.xml.xmlCharKey) !== null && _c !== void 0 ? _c : interfaces_js_1.XML_CHARKEY
+            rootName: options.xml.rootName ?? "",
+            includeRoot: options.xml.includeRoot ?? false,
+            xmlCharKey: options.xml.xmlCharKey ?? interfaces_js_1.XML_CHARKEY
           },
-          ignoreUnknownProperties: (_d = options.ignoreUnknownProperties) !== null && _d !== void 0 ? _d : false
+          ignoreUnknownProperties: options.ignoreUnknownProperties ?? false
         };
         if (responseBody === void 0 || responseBody === null) {
           if (this.isXML && mapper.type.name === "Sequence" && !mapper.xmlIsWrapped) {
@@ -30507,7 +30638,6 @@ var require_serializer = __commonJS({
       return value;
     }
     function serializeSequenceType(serializer, mapper, object, objectName, isXml, options) {
-      var _a;
       if (!Array.isArray(object)) {
         throw new Error(`${objectName} must be of type Array.`);
       }
@@ -30516,7 +30646,7 @@ var require_serializer = __commonJS({
         throw new Error(`element" metadata for an Array must be defined in the mapper and it must of type "object" in ${objectName}.`);
       }
       if (elementType.type.name === "Composite" && elementType.type.className) {
-        elementType = (_a = serializer.modelMappers[elementType.type.className]) !== null && _a !== void 0 ? _a : elementType;
+        elementType = serializer.modelMappers[elementType.type.className] ?? elementType;
       }
       const tempArray = [];
       for (let i = 0; i < object.length; i++) {
@@ -30524,7 +30654,7 @@ var require_serializer = __commonJS({
         if (isXml && elementType.xmlNamespace) {
           const xmlnsKey = elementType.xmlNamespacePrefix ? `xmlns:${elementType.xmlNamespacePrefix}` : "xmlns";
           if (elementType.type.name === "Composite") {
-            tempArray[i] = Object.assign({}, serializedValue);
+            tempArray[i] = { ...serializedValue };
             tempArray[i][interfaces_js_1.XML_ATTRKEY] = { [xmlnsKey]: elementType.xmlNamespace };
           } else {
             tempArray[i] = {};
@@ -30562,7 +30692,7 @@ var require_serializer = __commonJS({
       const additionalProperties = mapper.type.additionalProperties;
       if (!additionalProperties && mapper.type.className) {
         const modelMapper = resolveReferencedMapper(serializer, mapper, objectName);
-        return modelMapper === null || modelMapper === void 0 ? void 0 : modelMapper.type.additionalProperties;
+        return modelMapper?.type.additionalProperties;
       }
       return additionalProperties;
     }
@@ -30580,7 +30710,7 @@ var require_serializer = __commonJS({
         if (!modelMapper) {
           throw new Error(`mapper() cannot be null or undefined for model "${mapper.type.className}".`);
         }
-        modelProps = modelMapper === null || modelMapper === void 0 ? void 0 : modelMapper.type.modelProperties;
+        modelProps = modelMapper?.type.modelProperties;
         if (!modelProps) {
           throw new Error(`modelProperties cannot be null or undefined in the mapper "${JSON.stringify(modelMapper)}" of type "${mapper.type.className}" for object "${objectName}".`);
         }
@@ -30621,7 +30751,10 @@ var require_serializer = __commonJS({
           if (parentObject !== void 0 && parentObject !== null) {
             if (isXml && mapper.xmlNamespace) {
               const xmlnsKey = mapper.xmlNamespacePrefix ? `xmlns:${mapper.xmlNamespacePrefix}` : "xmlns";
-              parentObject[interfaces_js_1.XML_ATTRKEY] = Object.assign(Object.assign({}, parentObject[interfaces_js_1.XML_ATTRKEY]), { [xmlnsKey]: mapper.xmlNamespace });
+              parentObject[interfaces_js_1.XML_ATTRKEY] = {
+                ...parentObject[interfaces_js_1.XML_ATTRKEY],
+                [xmlnsKey]: mapper.xmlNamespace
+              };
             }
             const propertyObjectName = propertyMapper.serializedName !== "" ? objectName + "." + propertyMapper.serializedName : objectName;
             let toSerialize = object[key];
@@ -30667,7 +30800,7 @@ var require_serializer = __commonJS({
         if (serializedValue[interfaces_js_1.XML_ATTRKEY]) {
           return serializedValue;
         } else {
-          const result3 = Object.assign({}, serializedValue);
+          const result3 = { ...serializedValue };
           result3[interfaces_js_1.XML_ATTRKEY] = xmlNamespace;
           return result3;
         }
@@ -30681,8 +30814,7 @@ var require_serializer = __commonJS({
       return [interfaces_js_1.XML_ATTRKEY, options.xml.xmlCharKey].includes(propertyName);
     }
     function deserializeCompositeType(serializer, mapper, responseBody, objectName, options) {
-      var _a, _b;
-      const xmlCharKey = (_a = options.xml.xmlCharKey) !== null && _a !== void 0 ? _a : interfaces_js_1.XML_CHARKEY;
+      const xmlCharKey = options.xml.xmlCharKey ?? interfaces_js_1.XML_CHARKEY;
       if (getPolymorphicDiscriminatorRecursively(serializer, mapper)) {
         mapper = getPolymorphicMapper(serializer, mapper, responseBody, "serializedName");
       }
@@ -30721,7 +30853,7 @@ var require_serializer = __commonJS({
             const propertyName = xmlElementName || xmlName || serializedName;
             if (propertyMapper.xmlIsWrapped) {
               const wrapped = responseBody[xmlName];
-              const elementList = (_b = wrapped === null || wrapped === void 0 ? void 0 : wrapped[xmlElementName]) !== null && _b !== void 0 ? _b : [];
+              const elementList = wrapped?.[xmlElementName] ?? [];
               instance[key] = serializer.deserialize(propertyMapper, elementList, propertyObjectName, options);
               handledPropertyNames.push(xmlName);
             } else {
@@ -30804,7 +30936,6 @@ var require_serializer = __commonJS({
       return responseBody;
     }
     function deserializeSequenceType(serializer, mapper, responseBody, objectName, options) {
-      var _a;
       let element = mapper.type.element;
       if (!element || typeof element !== "object") {
         throw new Error(`element" metadata for an Array must be defined in the mapper and it must of type "object" in ${objectName}`);
@@ -30814,7 +30945,7 @@ var require_serializer = __commonJS({
           responseBody = [responseBody];
         }
         if (element.type.name === "Composite" && element.type.className) {
-          element = (_a = serializer.modelMappers[element.type.className]) !== null && _a !== void 0 ? _a : element;
+          element = serializer.modelMappers[element.type.className] ?? element;
         }
         const tempArray = [];
         for (let i = 0; i < responseBody.length; i++) {
@@ -30842,7 +30973,6 @@ var require_serializer = __commonJS({
       return void 0;
     }
     function getPolymorphicMapper(serializer, mapper, object, polymorphicPropertyName) {
-      var _a;
       const polymorphicDiscriminator = getPolymorphicDiscriminatorRecursively(serializer, mapper);
       if (polymorphicDiscriminator) {
         let discriminatorName = polymorphicDiscriminator[polymorphicPropertyName];
@@ -30851,7 +30981,7 @@ var require_serializer = __commonJS({
             discriminatorName = discriminatorName.replace(/\\/gi, "");
           }
           const discriminatorValue = object[discriminatorName];
-          const typeName = (_a = mapper.type.uberParent) !== null && _a !== void 0 ? _a : mapper.type.className;
+          const typeName = mapper.type.uberParent ?? mapper.type.className;
           if (typeof discriminatorValue === "string" && typeName) {
             const polymorphicMapper = getIndexDiscriminator(serializer.modelMappers.discriminators, discriminatorValue, typeName);
             if (polymorphicMapper) {
@@ -31003,16 +31133,15 @@ var require_deserializationPolicy = __commonJS({
     var defaultXmlContentTypes = ["application/xml", "application/atom+xml"];
     exports2.deserializationPolicyName = "deserializationPolicy";
     function deserializationPolicy(options = {}) {
-      var _a, _b, _c, _d, _e, _f, _g;
-      const jsonContentTypes = (_b = (_a = options.expectedContentTypes) === null || _a === void 0 ? void 0 : _a.json) !== null && _b !== void 0 ? _b : defaultJsonContentTypes;
-      const xmlContentTypes = (_d = (_c = options.expectedContentTypes) === null || _c === void 0 ? void 0 : _c.xml) !== null && _d !== void 0 ? _d : defaultXmlContentTypes;
+      const jsonContentTypes = options.expectedContentTypes?.json ?? defaultJsonContentTypes;
+      const xmlContentTypes = options.expectedContentTypes?.xml ?? defaultXmlContentTypes;
       const parseXML = options.parseXML;
       const serializerOptions = options.serializerOptions;
       const updatedOptions = {
         xml: {
-          rootName: (_e = serializerOptions === null || serializerOptions === void 0 ? void 0 : serializerOptions.xml.rootName) !== null && _e !== void 0 ? _e : "",
-          includeRoot: (_f = serializerOptions === null || serializerOptions === void 0 ? void 0 : serializerOptions.xml.includeRoot) !== null && _f !== void 0 ? _f : false,
-          xmlCharKey: (_g = serializerOptions === null || serializerOptions === void 0 ? void 0 : serializerOptions.xml.xmlCharKey) !== null && _g !== void 0 ? _g : interfaces_js_1.XML_CHARKEY
+          rootName: serializerOptions?.xml.rootName ?? "",
+          includeRoot: serializerOptions?.xml.includeRoot ?? false,
+          xmlCharKey: serializerOptions?.xml.xmlCharKey ?? interfaces_js_1.XML_CHARKEY
         }
       };
       return {
@@ -31027,12 +31156,12 @@ var require_deserializationPolicy = __commonJS({
       let result2;
       const request = parsedResponse.request;
       const operationInfo = (0, operationHelpers_js_1.getOperationRequestInfo)(request);
-      const operationSpec = operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.operationSpec;
+      const operationSpec = operationInfo?.operationSpec;
       if (operationSpec) {
-        if (!(operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.operationResponseGetter)) {
+        if (!operationInfo?.operationResponseGetter) {
           result2 = operationSpec.responses[parsedResponse.status];
         } else {
-          result2 = operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.operationResponseGetter(operationSpec, parsedResponse);
+          result2 = operationInfo?.operationResponseGetter(operationSpec, parsedResponse);
         }
       }
       return result2;
@@ -31040,7 +31169,7 @@ var require_deserializationPolicy = __commonJS({
     function shouldDeserializeResponse(parsedResponse) {
       const request = parsedResponse.request;
       const operationInfo = (0, operationHelpers_js_1.getOperationRequestInfo)(request);
-      const shouldDeserialize = operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.shouldDeserialize;
+      const shouldDeserialize = operationInfo?.shouldDeserialize;
       let result2;
       if (shouldDeserialize === void 0) {
         result2 = true;
@@ -31057,7 +31186,7 @@ var require_deserializationPolicy = __commonJS({
         return parsedResponse;
       }
       const operationInfo = (0, operationHelpers_js_1.getOperationRequestInfo)(parsedResponse.request);
-      const operationSpec = operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.operationSpec;
+      const operationSpec = operationInfo?.operationSpec;
       if (!operationSpec || !operationSpec.responses) {
         return parsedResponse;
       }
@@ -31098,7 +31227,6 @@ var require_deserializationPolicy = __commonJS({
       return expectedStatusCodes.length === 0 || expectedStatusCodes.length === 1 && expectedStatusCodes[0] === "default";
     }
     function handleErrorResponse(parsedResponse, operationSpec, responseSpec, options) {
-      var _a, _b, _c, _d, _e;
       const isSuccessByStatus = 200 <= parsedResponse.status && parsedResponse.status < 300;
       const isExpectedStatusCode = isOperationSpecEmpty(operationSpec) ? isSuccessByStatus : !!responseSpec;
       if (isExpectedStatusCode) {
@@ -31110,18 +31238,18 @@ var require_deserializationPolicy = __commonJS({
           return { error: null, shouldReturnResponse: false };
         }
       }
-      const errorResponseSpec = responseSpec !== null && responseSpec !== void 0 ? responseSpec : operationSpec.responses.default;
-      const initialErrorMessage = ((_a = parsedResponse.request.streamResponseStatusCodes) === null || _a === void 0 ? void 0 : _a.has(parsedResponse.status)) ? `Unexpected status code: ${parsedResponse.status}` : parsedResponse.bodyAsText;
+      const errorResponseSpec = responseSpec ?? operationSpec.responses.default;
+      const initialErrorMessage = parsedResponse.request.streamResponseStatusCodes?.has(parsedResponse.status) ? `Unexpected status code: ${parsedResponse.status}` : parsedResponse.bodyAsText;
       const error2 = new core_rest_pipeline_1.RestError(initialErrorMessage, {
         statusCode: parsedResponse.status,
         request: parsedResponse.request,
         response: parsedResponse
       });
-      if (!errorResponseSpec && !(((_c = (_b = parsedResponse.parsedBody) === null || _b === void 0 ? void 0 : _b.error) === null || _c === void 0 ? void 0 : _c.code) && ((_e = (_d = parsedResponse.parsedBody) === null || _d === void 0 ? void 0 : _d.error) === null || _e === void 0 ? void 0 : _e.message))) {
+      if (!errorResponseSpec && !(parsedResponse.parsedBody?.error?.code && parsedResponse.parsedBody?.error?.message)) {
         throw error2;
       }
-      const defaultBodyMapper = errorResponseSpec === null || errorResponseSpec === void 0 ? void 0 : errorResponseSpec.bodyMapper;
-      const defaultHeadersMapper = errorResponseSpec === null || errorResponseSpec === void 0 ? void 0 : errorResponseSpec.headersMapper;
+      const defaultBodyMapper = errorResponseSpec?.bodyMapper;
+      const defaultHeadersMapper = errorResponseSpec?.headersMapper;
       try {
         if (parsedResponse.parsedBody) {
           const parsedBody = parsedResponse.parsedBody;
@@ -31155,8 +31283,7 @@ var require_deserializationPolicy = __commonJS({
       return { error: error2, shouldReturnResponse: false };
     }
     async function parse3(jsonContentTypes, xmlContentTypes, operationResponse, opts, parseXML) {
-      var _a;
-      if (!((_a = operationResponse.request.streamResponseStatusCodes) === null || _a === void 0 ? void 0 : _a.has(operationResponse.status)) && operationResponse.bodyAsText) {
+      if (!operationResponse.request.streamResponseStatusCodes?.has(operationResponse.status) && operationResponse.bodyAsText) {
         const text = operationResponse.bodyAsText;
         const contentType = operationResponse.headers.get("Content-Type") || "";
         const contentComponents = !contentType ? [] : contentType.split(";").map((component) => component.toLowerCase());
@@ -31242,8 +31369,8 @@ var require_serializationPolicy = __commonJS({
         name: exports2.serializationPolicyName,
         async sendRequest(request, next) {
           const operationInfo = (0, operationHelpers_js_1.getOperationRequestInfo)(request);
-          const operationSpec = operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.operationSpec;
-          const operationArguments = operationInfo === null || operationInfo === void 0 ? void 0 : operationInfo.operationArguments;
+          const operationSpec = operationInfo?.operationSpec;
+          const operationArguments = operationInfo?.operationArguments;
           if (operationSpec && operationArguments) {
             serializeHeaders(request, operationArguments, operationSpec);
             serializeRequestBody(request, operationArguments, operationSpec, stringifyXML);
@@ -31253,7 +31380,6 @@ var require_serializationPolicy = __commonJS({
       };
     }
     function serializeHeaders(request, operationArguments, operationSpec) {
-      var _a, _b;
       if (operationSpec.headerParameters) {
         for (const headerParameter of operationSpec.headerParameters) {
           let headerValue = (0, operationHelpers_js_1.getOperationArgumentValueFromParameter)(operationArguments, headerParameter);
@@ -31270,7 +31396,7 @@ var require_serializationPolicy = __commonJS({
           }
         }
       }
-      const customHeaders = (_b = (_a = operationArguments.options) === null || _a === void 0 ? void 0 : _a.requestOptions) === null || _b === void 0 ? void 0 : _b.customHeaders;
+      const customHeaders = operationArguments.options?.requestOptions?.customHeaders;
       if (customHeaders) {
         for (const customHeaderName of Object.keys(customHeaders)) {
           request.headers.set(customHeaderName, customHeaders[customHeaderName]);
@@ -31280,13 +31406,12 @@ var require_serializationPolicy = __commonJS({
     function serializeRequestBody(request, operationArguments, operationSpec, stringifyXML = function() {
       throw new Error("XML serialization unsupported!");
     }) {
-      var _a, _b, _c, _d, _e;
-      const serializerOptions = (_a = operationArguments.options) === null || _a === void 0 ? void 0 : _a.serializerOptions;
+      const serializerOptions = operationArguments.options?.serializerOptions;
       const updatedOptions = {
         xml: {
-          rootName: (_b = serializerOptions === null || serializerOptions === void 0 ? void 0 : serializerOptions.xml.rootName) !== null && _b !== void 0 ? _b : "",
-          includeRoot: (_c = serializerOptions === null || serializerOptions === void 0 ? void 0 : serializerOptions.xml.includeRoot) !== null && _c !== void 0 ? _c : false,
-          xmlCharKey: (_d = serializerOptions === null || serializerOptions === void 0 ? void 0 : serializerOptions.xml.xmlCharKey) !== null && _d !== void 0 ? _d : interfaces_js_1.XML_CHARKEY
+          rootName: serializerOptions?.xml.rootName ?? "",
+          includeRoot: serializerOptions?.xml.includeRoot ?? false,
+          xmlCharKey: serializerOptions?.xml.xmlCharKey ?? interfaces_js_1.XML_CHARKEY
         }
       };
       const xmlCharKey = updatedOptions.xml.xmlCharKey;
@@ -31311,7 +31436,7 @@ var require_serializationPolicy = __commonJS({
                   xmlCharKey
                 });
               }
-            } else if (typeName === serializer_js_1.MapperTypeNames.String && (((_e = operationSpec.contentType) === null || _e === void 0 ? void 0 : _e.match("text/plain")) || operationSpec.mediaType === "text")) {
+            } else if (typeName === serializer_js_1.MapperTypeNames.String && (operationSpec.contentType?.match("text/plain") || operationSpec.mediaType === "text")) {
               return;
             } else if (!isStream) {
               request.body = JSON.stringify(request.body);
@@ -31364,7 +31489,7 @@ var require_pipeline3 = __commonJS({
     var core_rest_pipeline_1 = require_commonjs6();
     var serializationPolicy_js_1 = require_serializationPolicy();
     function createClientPipeline(options = {}) {
-      const pipeline = (0, core_rest_pipeline_1.createPipelineFromOptions)(options !== null && options !== void 0 ? options : {});
+      const pipeline = (0, core_rest_pipeline_1.createPipelineFromOptions)(options ?? {});
       if (options.credentialOptions) {
         pipeline.addPolicy((0, core_rest_pipeline_1.bearerTokenAuthenticationPolicy)({
           credential: options.credentialOptions.credential,
@@ -31441,9 +31566,8 @@ var require_urlHelpers2 = __commonJS({
       return result2;
     }
     function calculateUrlReplacements(operationSpec, operationArguments, fallbackObject) {
-      var _a;
       const result2 = /* @__PURE__ */ new Map();
-      if ((_a = operationSpec.urlParameters) === null || _a === void 0 ? void 0 : _a.length) {
+      if (operationSpec.urlParameters?.length) {
         for (const urlParameter of operationSpec.urlParameters) {
           let urlParameterValue = (0, operationHelpers_js_1.getOperationArgumentValueFromParameter)(operationArguments, urlParameter, fallbackObject);
           const parameterPathString = (0, interfaceHelpers_js_1.getPathStringFromParameter)(urlParameter);
@@ -31486,10 +31610,9 @@ var require_urlHelpers2 = __commonJS({
       return parsedUrl.toString();
     }
     function calculateQueryParameters(operationSpec, operationArguments, fallbackObject) {
-      var _a;
       const result2 = /* @__PURE__ */ new Map();
       const sequenceParams = /* @__PURE__ */ new Set();
-      if ((_a = operationSpec.queryParameters) === null || _a === void 0 ? void 0 : _a.length) {
+      if (operationSpec.queryParameters?.length) {
         for (const queryParameter of operationSpec.queryParameters) {
           if (queryParameter.mapper.type.name === "Sequence" && queryParameter.mapper.serializedName) {
             sequenceParams.add(queryParameter.mapper.serializedName);
@@ -31628,20 +31751,41 @@ var require_serviceClient = __commonJS({
     var log_js_1 = require_log4();
     var ServiceClient = class {
       /**
+       * If specified, this is the base URI that requests will be made against for this ServiceClient.
+       * If it is not specified, then all OperationSpecs must contain a baseUrl property.
+       */
+      _endpoint;
+      /**
+       * The default request content type for the service.
+       * Used if no requestContentType is present on an OperationSpec.
+       */
+      _requestContentType;
+      /**
+       * Set to true if the request is sent over HTTP instead of HTTPS
+       */
+      _allowInsecureConnection;
+      /**
+       * The HTTP client that will be used to send requests.
+       */
+      _httpClient;
+      /**
+       * The pipeline used by this client to make requests
+       */
+      pipeline;
+      /**
        * The ServiceClient constructor
        * @param options - The service client options that govern the behavior of the client.
        */
       constructor(options = {}) {
-        var _a, _b;
         this._requestContentType = options.requestContentType;
-        this._endpoint = (_a = options.endpoint) !== null && _a !== void 0 ? _a : options.baseUri;
+        this._endpoint = options.endpoint ?? options.baseUri;
         if (options.baseUri) {
           log_js_1.logger.warning("The baseUri option for SDK Clients has been deprecated, please use endpoint instead.");
         }
         this._allowInsecureConnection = options.allowInsecureConnection;
         this._httpClient = options.httpClient || (0, httpClientCache_js_1.getCachedDefaultHttpClient)();
         this.pipeline = options.pipeline || createDefaultPipeline(options);
-        if ((_b = options.additionalPolicies) === null || _b === void 0 ? void 0 : _b.length) {
+        if (options.additionalPolicies?.length) {
           for (const { policy, position } of options.additionalPolicies) {
             const afterPhase = position === "perRetry" ? "Sign" : void 0;
             this.pipeline.addPolicy(policy, {
@@ -31715,16 +31859,16 @@ var require_serviceClient = __commonJS({
         try {
           const rawResponse = await this.sendRequest(request);
           const flatResponse = (0, utils_js_1.flattenResponse)(rawResponse, operationSpec.responses[rawResponse.status]);
-          if (options === null || options === void 0 ? void 0 : options.onResponse) {
+          if (options?.onResponse) {
             options.onResponse(rawResponse, flatResponse);
           }
           return flatResponse;
         } catch (error2) {
-          if (typeof error2 === "object" && (error2 === null || error2 === void 0 ? void 0 : error2.response)) {
+          if (typeof error2 === "object" && error2?.response) {
             const rawResponse = error2.response;
             const flatResponse = (0, utils_js_1.flattenResponse)(rawResponse, operationSpec.responses[error2.statusCode] || operationSpec.responses["default"]);
             error2.details = flatResponse;
-            if (options === null || options === void 0 ? void 0 : options.onResponse) {
+            if (options?.onResponse) {
               options.onResponse(rawResponse, flatResponse, error2);
             }
           }
@@ -31736,7 +31880,10 @@ var require_serviceClient = __commonJS({
     function createDefaultPipeline(options) {
       const credentialScopes = getCredentialScopes(options);
       const credentialOptions = options.credential && credentialScopes ? { credentialScopes, credential: options.credential } : void 0;
-      return (0, pipeline_js_1.createClientPipeline)(Object.assign(Object.assign({}, options), { credentialOptions }));
+      return (0, pipeline_js_1.createClientPipeline)({
+        ...options,
+        credentialOptions
+      });
     }
     function getCredentialScopes(options) {
       if (options.credentialScopes) {
@@ -31770,11 +31917,10 @@ var require_authorizeRequestOnClaimChallenge = __commonJS({
       return bearerChallenges.map((challenge) => {
         const challengeParts = `${challenge.trim()}, `.split('", ').filter((x) => x);
         const keyValuePairs = challengeParts.map((keyValue) => (([key, value]) => ({ [key]: value }))(keyValue.trim().split('="')));
-        return keyValuePairs.reduce((a, b) => Object.assign(Object.assign({}, a), b), {});
+        return keyValuePairs.reduce((a, b) => ({ ...a, ...b }), {});
       });
     }
     async function authorizeRequestOnClaimChallenge(onChallengeOptions) {
-      var _a;
       const { scopes, response } = onChallengeOptions;
       const logger = onChallengeOptions.logger || log_js_1.logger;
       const challenge = response.headers.get("WWW-Authenticate");
@@ -31794,7 +31940,7 @@ var require_authorizeRequestOnClaimChallenge = __commonJS({
       if (!accessToken) {
         return false;
       }
-      onChallengeOptions.request.headers.set("Authorization", `${(_a = accessToken.tokenType) !== null && _a !== void 0 ? _a : "Bearer"} ${accessToken.token}`);
+      onChallengeOptions.request.headers.set("Authorization", `${accessToken.tokenType ?? "Bearer"} ${accessToken.token}`);
       return true;
     }
   }
@@ -31822,7 +31968,6 @@ var require_authorizeRequestOnTenantChallenge = __commonJS({
       return /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(text);
     }
     var authorizeRequestOnTenantChallenge = async (challengeOptions) => {
-      var _a;
       const requestOptions = requestToOptions(challengeOptions.request);
       const challenge = getChallenge(challengeOptions.response);
       if (challenge) {
@@ -31832,11 +31977,14 @@ var require_authorizeRequestOnTenantChallenge = __commonJS({
         if (!tenantId) {
           return false;
         }
-        const accessToken = await challengeOptions.getAccessToken(challengeScopes, Object.assign(Object.assign({}, requestOptions), { tenantId }));
+        const accessToken = await challengeOptions.getAccessToken(challengeScopes, {
+          ...requestOptions,
+          tenantId
+        });
         if (!accessToken) {
           return false;
         }
-        challengeOptions.request.headers.set(Constants.HeaderConstants.AUTHORIZATION, `${(_a = accessToken.tokenType) !== null && _a !== void 0 ? _a : "Bearer"} ${accessToken.token}`);
+        challengeOptions.request.headers.set(Constants.HeaderConstants.AUTHORIZATION, `${accessToken.tokenType ?? "Bearer"} ${accessToken.token}`);
         return true;
       }
       return false;
@@ -31874,7 +32022,7 @@ var require_authorizeRequestOnTenantChallenge = __commonJS({
       const bearerChallenge = challenge.slice("Bearer ".length);
       const challengeParts = `${bearerChallenge.trim()} `.split(" ").filter((x) => x);
       const keyValuePairs = challengeParts.map((keyValue) => (([key, value]) => ({ [key]: value }))(keyValue.trim().split("=")));
-      return keyValuePairs.reduce((a, b) => Object.assign(Object.assign({}, a), b), {});
+      return keyValuePairs.reduce((a, b) => ({ ...a, ...b }), {});
     }
     function requestToOptions(request) {
       return {
@@ -31986,8 +32134,7 @@ var require_util8 = __commonJS({
       }
     }
     function toWebResourceLike(request, options) {
-      var _a;
-      const originalRequest = (_a = options === null || options === void 0 ? void 0 : options.originalRequest) !== null && _a !== void 0 ? _a : request;
+      const originalRequest = options?.originalRequest ?? request;
       const webResource = {
         url: request.url,
         method: request.method,
@@ -32014,7 +32161,7 @@ var require_util8 = __commonJS({
         validateRequestProperties() {
         }
       };
-      if (options === null || options === void 0 ? void 0 : options.createProxy) {
+      if (options?.createProxy) {
         return new Proxy(webResource, {
           get(target, prop, receiver) {
             if (prop === originalRequestSymbol) {
@@ -32066,6 +32213,7 @@ var require_util8 = __commonJS({
       return headerName.toLowerCase();
     }
     var HttpHeaders = class _HttpHeaders {
+      _headersMap;
       constructor(rawHeaders) {
         this._headersMap = {};
         if (rawHeaders) {
@@ -32202,7 +32350,7 @@ var require_response2 = __commonJS({
     function toCompatResponse(response, options) {
       let request = (0, util_js_1.toWebResourceLike)(response.request);
       let headers = (0, util_js_1.toHttpHeadersLike)(response.headers);
-      if (options === null || options === void 0 ? void 0 : options.createProxy) {
+      if (options?.createProxy) {
         return new Proxy(response, {
           get(target, prop, receiver) {
             if (prop === "headers") {
@@ -32224,10 +32372,11 @@ var require_response2 = __commonJS({
           }
         });
       } else {
-        return Object.assign(Object.assign({}, response), {
+        return {
+          ...response,
           request,
           headers
-        });
+        };
       }
     }
     function toPipelineResponse(compatResponse) {
@@ -32238,7 +32387,11 @@ var require_response2 = __commonJS({
         response.headers = headers;
         return response;
       } else {
-        return Object.assign(Object.assign({}, compatResponse), { headers, request: (0, util_js_1.toPipelineRequest)(compatResponse.request) });
+        return {
+          ...compatResponse,
+          headers,
+          request: (0, util_js_1.toPipelineRequest)(compatResponse.request)
+        };
       }
     }
   }
@@ -32256,12 +32409,11 @@ var require_extendedClient = __commonJS({
     var response_js_1 = require_response2();
     var ExtendedServiceClient = class extends core_client_1.ServiceClient {
       constructor(options) {
-        var _a, _b;
         super(options);
-        if (((_a = options.keepAliveOptions) === null || _a === void 0 ? void 0 : _a.enable) === false && !(0, disableKeepAlivePolicy_js_1.pipelineContainsDisableKeepAlivePolicy)(this.pipeline)) {
+        if (options.keepAliveOptions?.enable === false && !(0, disableKeepAlivePolicy_js_1.pipelineContainsDisableKeepAlivePolicy)(this.pipeline)) {
           this.pipeline.addPolicy((0, disableKeepAlivePolicy_js_1.createDisableKeepAlivePolicy)());
         }
-        if (((_b = options.redirectOptions) === null || _b === void 0 ? void 0 : _b.handleRedirects) === false) {
+        if (options.redirectOptions?.handleRedirects === false) {
           this.pipeline.removePolicy({
             name: core_rest_pipeline_1.redirectPolicyName
           });
@@ -32275,8 +32427,7 @@ var require_extendedClient = __commonJS({
        * @returns
        */
       async sendOperationRequest(operationArguments, operationSpec) {
-        var _a;
-        const userProvidedCallBack = (_a = operationArguments === null || operationArguments === void 0 ? void 0 : operationArguments.options) === null || _a === void 0 ? void 0 : _a.onResponse;
+        const userProvidedCallBack = operationArguments?.options?.onResponse;
         let lastResponse;
         function onResponse(rawResponse, flatResponse, error2) {
           lastResponse = rawResponse;
@@ -32284,7 +32435,10 @@ var require_extendedClient = __commonJS({
             userProvidedCallBack(rawResponse, flatResponse, error2);
           }
         }
-        operationArguments.options = Object.assign(Object.assign({}, operationArguments.options), { onResponse });
+        operationArguments.options = {
+          ...operationArguments.options,
+          onResponse
+        };
         const result2 = await super.sendOperationRequest(operationArguments, operationSpec);
         if (lastResponse) {
           Object.defineProperty(result2, "_response", {
@@ -73777,7 +73931,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.8",
+      version: "5.27.9",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",

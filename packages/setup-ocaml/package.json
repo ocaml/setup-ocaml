@@ -21,13 +21,13 @@
     "cheerio": "1.1.2",
     "exponential-backoff": "3.1.2",
     "semver": "7.7.2",
-    "systeminformation": "5.27.8",
+    "systeminformation": "5.27.9",
     "yaml": "2.8.1"
   },
   "devDependencies": {
     "@tsconfig/node24": "24.0.1",
     "@tsconfig/strictest": "2.0.5",
-    "@types/node": "24.3.1",
+    "@types/node": "24.5.0",
     "@types/semver": "7.7.1",
     "esbuild": "0.25.9",
     "typescript": "5.9.2"
