@@ -73931,7 +73931,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.9",
+      version: "5.27.10",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -74475,7 +74475,7 @@ var require_util10 = __commonJS({
         return new Promise((resolve) => {
           process.nextTick(() => {
             try {
-              const child = spawn(_powerShell, ["-NoProfile", "-NoLogo", "-InputFormat", "Text", "-NoExit", "-ExecutionPolicy", "Unrestricted", "-Command", "-"], {
+              const child = spawn(_powerShell, ["-NoProfile", "-NoLogo", "-InputFormat", "Text", "-ExecutionPolicy", "Unrestricted", "-Command", cmd], {
                 stdio: "pipe",
                 windowsHide: true,
                 maxBuffer: 1024 * 2e4,
@@ -74503,14 +74503,6 @@ var require_util10 = __commonJS({
                   child.kill();
                   resolve(result2);
                 });
-                try {
-                  child.stdin.write(_psToUTF8 + cmd + os2.EOL);
-                  child.stdin.write("exit" + os2.EOL);
-                  child.stdin.end();
-                } catch (e) {
-                  child.kill();
-                  resolve(result2);
-                }
               } else {
                 resolve(result2);
               }
