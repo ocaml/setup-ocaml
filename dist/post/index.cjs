@@ -33489,8 +33489,8 @@ var require_constants9 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PathStylePorts = exports2.BlobDoesNotUseCustomerSpecifiedEncryption = exports2.BlobUsesCustomerSpecifiedEncryptionMsg = exports2.StorageBlobLoggingAllowedQueryParameters = exports2.StorageBlobLoggingAllowedHeaderNames = exports2.DevelopmentConnectionString = exports2.EncryptionAlgorithmAES25 = exports2.HTTP_VERSION_1_1 = exports2.HTTP_LINE_ENDING = exports2.BATCH_MAX_PAYLOAD_IN_BYTES = exports2.BATCH_MAX_REQUEST = exports2.SIZE_1_MB = exports2.ETagAny = exports2.ETagNone = exports2.HeaderConstants = exports2.HTTPURLConnection = exports2.URLConstants = exports2.StorageOAuthScopes = exports2.REQUEST_TIMEOUT = exports2.DEFAULT_MAX_DOWNLOAD_RETRY_REQUESTS = exports2.DEFAULT_BLOB_DOWNLOAD_BLOCK_BYTES = exports2.DEFAULT_BLOCK_BUFFER_SIZE_BYTES = exports2.BLOCK_BLOB_MAX_BLOCKS = exports2.BLOCK_BLOB_MAX_STAGE_BLOCK_BYTES = exports2.BLOCK_BLOB_MAX_UPLOAD_BLOB_BYTES = exports2.SERVICE_VERSION = exports2.SDK_VERSION = void 0;
-    exports2.SDK_VERSION = "12.29.0";
-    exports2.SERVICE_VERSION = "2025-11-05";
+    exports2.SDK_VERSION = "12.28.0";
+    exports2.SERVICE_VERSION = "2025-07-05";
     exports2.BLOCK_BLOB_MAX_UPLOAD_BLOB_BYTES = 256 * 1024 * 1024;
     exports2.BLOCK_BLOB_MAX_STAGE_BLOCK_BYTES = 4e3 * 1024 * 1024;
     exports2.BLOCK_BLOB_MAX_BLOCKS = 5e4;
@@ -34415,19 +34415,6 @@ var require_StorageRetryPolicy = __commonJS({
           if (statusCode === 503 || statusCode === 500) {
             log_js_1.logger.info(`RetryPolicy: Will retry for status code ${statusCode}.`);
             return true;
-          }
-        }
-        if (response) {
-          if (response?.status >= 400) {
-            const copySourceError = response.headers.get(constants_js_1.HeaderConstants.X_MS_CopySourceErrorCode);
-            if (copySourceError !== void 0) {
-              switch (copySourceError) {
-                case "InternalError":
-                case "OperationTimedOut":
-                case "ServerBusy":
-                  return true;
-              }
-            }
           }
         }
         if (err?.code === "PARSE_ERROR" && err?.message.startsWith(`Error "Error: Unclosed root tag`)) {
@@ -37068,19 +37055,6 @@ var require_StorageRetryPolicy2 = __commonJS({
             return true;
           }
         }
-        if (response) {
-          if (response?.status >= 400) {
-            const copySourceError = response.headers.get(constants_js_1.HeaderConstants.X_MS_CopySourceErrorCode);
-            if (copySourceError !== void 0) {
-              switch (copySourceError) {
-                case "InternalError":
-                case "OperationTimedOut":
-                case "ServerBusy":
-                  return true;
-              }
-            }
-          }
-        }
         if (err?.code === "PARSE_ERROR" && err?.message.startsWith(`Error "Error: Unclosed root tag`)) {
           log_js_1.logger.info("RetryPolicy: Incomplete XML response likely due to service timeout, will retry.");
           return true;
@@ -37280,19 +37254,6 @@ var require_StorageRetryPolicyV2 = __commonJS({
             return true;
           }
         }
-        if (response) {
-          if (response?.status >= 400) {
-            const copySourceError = response.headers.get(constants_js_1.HeaderConstants.X_MS_CopySourceErrorCode);
-            if (copySourceError !== void 0) {
-              switch (copySourceError) {
-                case "InternalError":
-                case "OperationTimedOut":
-                case "ServerBusy":
-                  return true;
-              }
-            }
-          }
-        }
         return false;
       }
       function calculateDelay(isPrimaryRetry, attempt) {
@@ -37461,35 +37422,6 @@ ${key}:${decodeURIComponent(lowercaseQueries[key])}`;
   }
 });
 
-// ../../node_modules/@azure/storage-common/dist/commonjs/policies/StorageRequestFailureDetailsParserPolicy.js
-var require_StorageRequestFailureDetailsParserPolicy = __commonJS({
-  "../../node_modules/@azure/storage-common/dist/commonjs/policies/StorageRequestFailureDetailsParserPolicy.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.storageRequestFailureDetailsParserPolicyName = void 0;
-    exports2.storageRequestFailureDetailsParserPolicy = storageRequestFailureDetailsParserPolicy;
-    exports2.storageRequestFailureDetailsParserPolicyName = "storageRequestFailureDetailsParserPolicy";
-    function storageRequestFailureDetailsParserPolicy() {
-      return {
-        name: exports2.storageRequestFailureDetailsParserPolicyName,
-        async sendRequest(request, next) {
-          try {
-            const response = await next(request);
-            return response;
-          } catch (err) {
-            if (typeof err === "object" && err !== null && err.response && err.response.parsedBody) {
-              if (err.response.parsedBody.code === "InvalidHeaderValue" && err.response.parsedBody.HeaderName === "x-ms-version") {
-                err.message = "The provided service version is not enabled on this storage account. Please see https://learn.microsoft.com/rest/api/storageservices/versioning-for-the-azure-storage-services for additional information.\n";
-              }
-            }
-            throw err;
-          }
-        }
-      };
-    }
-  }
-});
-
 // ../../node_modules/@azure/storage-common/dist/commonjs/index.js
 var require_commonjs11 = __commonJS({
   "../../node_modules/@azure/storage-common/dist/commonjs/index.js"(exports2) {
@@ -37522,7 +37454,6 @@ var require_commonjs11 = __commonJS({
     tslib_1.__exportStar(require_StorageSharedKeyCredentialPolicy2(), exports2);
     tslib_1.__exportStar(require_StorageSharedKeyCredentialPolicyV2(), exports2);
     tslib_1.__exportStar(require_StorageRetryPolicyFactory2(), exports2);
-    tslib_1.__exportStar(require_StorageRequestFailureDetailsParserPolicy(), exports2);
   }
 });
 
@@ -37625,19 +37556,6 @@ var require_StorageRetryPolicyV22 = __commonJS({
           if (statusCode === 503 || statusCode === 500) {
             log_js_1.logger.info(`RetryPolicy: Will retry for status code ${statusCode}.`);
             return true;
-          }
-        }
-        if (response) {
-          if (response?.status >= 400) {
-            const copySourceError = response.headers.get(constants_js_1.HeaderConstants.X_MS_CopySourceErrorCode);
-            if (copySourceError !== void 0) {
-              switch (copySourceError) {
-                case "InternalError":
-                case "OperationTimedOut":
-                case "ServerBusy":
-                  return true;
-              }
-            }
           }
         }
         return false;
@@ -38048,7 +37966,6 @@ var require_Pipeline = __commonJS({
         corePipeline.removePolicy({ name: core_rest_pipeline_1.decompressResponsePolicyName });
         corePipeline.addPolicy((0, StorageCorrectContentLengthPolicy_js_1.storageCorrectContentLengthPolicy)());
         corePipeline.addPolicy((0, StorageRetryPolicyV2_js_1.storageRetryPolicy)(restOptions.retryOptions), { phase: "Retry" });
-        corePipeline.addPolicy((0, storage_common_1.storageRequestFailureDetailsParserPolicy)());
         corePipeline.addPolicy((0, StorageBrowserPolicyV2_js_1.storageBrowserPolicy)());
         const downlevelResults = processDownlevelPipeline(pipeline);
         if (downlevelResults) {
@@ -38594,27 +38511,6 @@ var require_mappers = __commonJS({
           message: {
             serializedName: "Message",
             xmlName: "Message",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "CopySourceStatusCode",
-            xmlName: "CopySourceStatusCode",
-            type: {
-              name: "Number"
-            }
-          },
-          copySourceErrorCode: {
-            serializedName: "CopySourceErrorCode",
-            xmlName: "CopySourceErrorCode",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceErrorMessage: {
-            serializedName: "CopySourceErrorMessage",
-            xmlName: "CopySourceErrorMessage",
             type: {
               name: "String"
             }
@@ -43952,20 +43848,6 @@ var require_mappers = __commonJS({
             type: {
               name: "String"
             }
-          },
-          copySourceErrorCode: {
-            serializedName: "x-ms-copy-source-error-code",
-            xmlName: "x-ms-copy-source-error-code",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "x-ms-copy-source-status-code",
-            xmlName: "x-ms-copy-source-status-code",
-            type: {
-              name: "Number"
-            }
           }
         }
       }
@@ -44082,20 +43964,6 @@ var require_mappers = __commonJS({
             xmlName: "x-ms-error-code",
             type: {
               name: "String"
-            }
-          },
-          copySourceErrorCode: {
-            serializedName: "x-ms-copy-source-error-code",
-            xmlName: "x-ms-copy-source-error-code",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "x-ms-copy-source-status-code",
-            xmlName: "x-ms-copy-source-status-code",
-            type: {
-              name: "Number"
             }
           }
         }
@@ -45123,20 +44991,6 @@ var require_mappers = __commonJS({
             type: {
               name: "String"
             }
-          },
-          copySourceErrorCode: {
-            serializedName: "x-ms-copy-source-error-code",
-            xmlName: "x-ms-copy-source-error-code",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "x-ms-copy-source-status-code",
-            xmlName: "x-ms-copy-source-status-code",
-            type: {
-              name: "Number"
-            }
           }
         }
       }
@@ -45898,20 +45752,6 @@ var require_mappers = __commonJS({
             type: {
               name: "String"
             }
-          },
-          copySourceErrorCode: {
-            serializedName: "x-ms-copy-source-error-code",
-            xmlName: "x-ms-copy-source-error-code",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "x-ms-copy-source-status-code",
-            xmlName: "x-ms-copy-source-status-code",
-            type: {
-              name: "Number"
-            }
           }
         }
       }
@@ -46204,20 +46044,6 @@ var require_mappers = __commonJS({
             type: {
               name: "String"
             }
-          },
-          copySourceErrorCode: {
-            serializedName: "x-ms-copy-source-error-code",
-            xmlName: "x-ms-copy-source-error-code",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "x-ms-copy-source-status-code",
-            xmlName: "x-ms-copy-source-status-code",
-            type: {
-              name: "Number"
-            }
           }
         }
       }
@@ -46407,20 +46233,6 @@ var require_mappers = __commonJS({
             xmlName: "x-ms-error-code",
             type: {
               name: "String"
-            }
-          },
-          copySourceErrorCode: {
-            serializedName: "x-ms-copy-source-error-code",
-            xmlName: "x-ms-copy-source-error-code",
-            type: {
-              name: "String"
-            }
-          },
-          copySourceStatusCode: {
-            serializedName: "x-ms-copy-source-status-code",
-            xmlName: "x-ms-copy-source-status-code",
-            type: {
-              name: "Number"
             }
           }
         }
@@ -46718,7 +46530,7 @@ var require_parameters = __commonJS({
     exports2.version = {
       parameterPath: "version",
       mapper: {
-        defaultValue: "2025-11-05",
+        defaultValue: "2025-07-05",
         isConstant: true,
         serializedName: "x-ms-version",
         type: {
@@ -51438,7 +51250,7 @@ var require_storageClient = __commonJS({
         const defaults = {
           requestContentType: "application/json; charset=utf-8"
         };
-        const packageDetails = `azsdk-js-azure-storage-blob/12.29.0`;
+        const packageDetails = `azsdk-js-azure-storage-blob/12.28.0`;
         const userAgentPrefix = options.userAgentOptions && options.userAgentOptions.userAgentPrefix ? `${options.userAgentOptions.userAgentPrefix} ${packageDetails}` : `${packageDetails}`;
         const optionsWithDefaults = {
           ...defaults,
@@ -51450,7 +51262,7 @@ var require_storageClient = __commonJS({
         };
         super(optionsWithDefaults);
         this.url = url;
-        this.version = options.version || "2025-11-05";
+        this.version = options.version || "2025-07-05";
         this.service = new index_js_1.ServiceImpl(this);
         this.container = new index_js_1.ContainerImpl(this);
         this.blob = new index_js_1.BlobImpl(this);
@@ -63199,7 +63011,7 @@ var require_package = __commonJS({
   "../../node_modules/@actions/cache/package.json"(exports2, module2) {
     module2.exports = {
       name: "@actions/cache",
-      version: "4.0.5",
+      version: "4.1.0",
       preview: true,
       description: "Actions cache lib",
       keywords: [
@@ -68008,11 +67820,18 @@ var require_cache3 = __commonJS({
             kind: "scalar",
             T: 9
             /*ScalarType.STRING*/
+          },
+          {
+            no: 3,
+            name: "message",
+            kind: "scalar",
+            T: 9
+            /*ScalarType.STRING*/
           }
         ]);
       }
       create(value) {
-        const message = { ok: false, signedUploadUrl: "" };
+        const message = { ok: false, signedUploadUrl: "", message: "" };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== void 0)
           (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -68031,6 +67850,10 @@ var require_cache3 = __commonJS({
             2:
               message.signedUploadUrl = reader.string();
               break;
+            case /* string message */
+            3:
+              message.message = reader.string();
+              break;
             default:
               let u = options.readUnknownField;
               if (u === "throw")
@@ -68047,6 +67870,8 @@ var require_cache3 = __commonJS({
           writer.tag(1, runtime_1.WireType.Varint).bool(message.ok);
         if (message.signedUploadUrl !== "")
           writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.signedUploadUrl);
+        if (message.message !== "")
+          writer.tag(3, runtime_1.WireType.LengthDelimited).string(message.message);
         let u = options.writeUnknownFields;
         if (u !== false)
           (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -68152,11 +67977,18 @@ var require_cache3 = __commonJS({
             kind: "scalar",
             T: 3
             /*ScalarType.INT64*/
+          },
+          {
+            no: 3,
+            name: "message",
+            kind: "scalar",
+            T: 9
+            /*ScalarType.STRING*/
           }
         ]);
       }
       create(value) {
-        const message = { ok: false, entryId: "0" };
+        const message = { ok: false, entryId: "0", message: "" };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== void 0)
           (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -68175,6 +68007,10 @@ var require_cache3 = __commonJS({
             2:
               message.entryId = reader.int64().toString();
               break;
+            case /* string message */
+            3:
+              message.message = reader.string();
+              break;
             default:
               let u = options.readUnknownField;
               if (u === "throw")
@@ -68191,6 +68027,8 @@ var require_cache3 = __commonJS({
           writer.tag(1, runtime_1.WireType.Varint).bool(message.ok);
         if (message.entryId !== "0")
           writer.tag(2, runtime_1.WireType.Varint).int64(message.entryId);
+        if (message.message !== "")
+          writer.tag(3, runtime_1.WireType.LengthDelimited).string(message.message);
         let u = options.writeUnknownFields;
         if (u !== false)
           (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -68954,7 +68792,7 @@ var require_cache4 = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.saveCache = exports2.restoreCache = exports2.isFeatureAvailable = exports2.ReserveCacheError = exports2.ValidationError = void 0;
+    exports2.saveCache = exports2.restoreCache = exports2.isFeatureAvailable = exports2.FinalizeCacheError = exports2.ReserveCacheError = exports2.ValidationError = void 0;
     var core5 = __importStar2(require_core());
     var path3 = __importStar2(require("path"));
     var utils = __importStar2(require_cacheUtils());
@@ -68962,7 +68800,6 @@ var require_cache4 = __commonJS({
     var cacheTwirpClient = __importStar2(require_cacheTwirpClient());
     var config_1 = require_config();
     var tar_1 = require_tar();
-    var constants_1 = require_constants6();
     var http_client_1 = require_lib();
     var ValidationError = class _ValidationError extends Error {
       constructor(message) {
@@ -68980,6 +68817,14 @@ var require_cache4 = __commonJS({
       }
     };
     exports2.ReserveCacheError = ReserveCacheError;
+    var FinalizeCacheError = class _FinalizeCacheError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "FinalizeCacheError";
+        Object.setPrototypeOf(this, _FinalizeCacheError.prototype);
+      }
+    };
+    exports2.FinalizeCacheError = FinalizeCacheError;
     function checkPaths(paths) {
       if (!paths || paths.length === 0) {
         throw new ValidationError(`Path Validation Error: At least one directory or file path is required`);
@@ -69251,9 +69096,6 @@ var require_cache4 = __commonJS({
           }
           const archiveFileSize = utils.getArchiveFileSizeInBytes(archivePath);
           core5.debug(`File Size: ${archiveFileSize}`);
-          if (archiveFileSize > constants_1.CacheFileSizeLimit && !(0, config_1.isGhes)()) {
-            throw new Error(`Cache size of ~${Math.round(archiveFileSize / (1024 * 1024))} MB (${archiveFileSize} B) is over the 10GB limit, not saving cache.`);
-          }
           options.archiveSizeBytes = archiveFileSize;
           core5.debug("Reserving Cache");
           const version = utils.getCacheVersion(paths, compressionMethod, enableCrossOsArchive);
@@ -69265,7 +69107,10 @@ var require_cache4 = __commonJS({
           try {
             const response = yield twirpClient.CreateCacheEntry(request);
             if (!response.ok) {
-              throw new Error("Response was not ok");
+              if (response.message) {
+                core5.warning(`Cache reservation failed: ${response.message}`);
+              }
+              throw new Error(response.message || "Response was not ok");
             }
             signedUploadUrl = response.signedUploadUrl;
           } catch (error2) {
@@ -69282,6 +69127,9 @@ var require_cache4 = __commonJS({
           const finalizeResponse = yield twirpClient.FinalizeCacheEntryUpload(finalizeRequest);
           core5.debug(`FinalizeCacheEntryUploadResponse: ${finalizeResponse.ok}`);
           if (!finalizeResponse.ok) {
+            if (finalizeResponse.message) {
+              throw new FinalizeCacheError(finalizeResponse.message);
+            }
             throw new Error(`Unable to finalize cache with key ${key}, another job may be finalizing this cache.`);
           }
           cacheId = parseInt(finalizeResponse.entryId);
@@ -69291,6 +69139,8 @@ var require_cache4 = __commonJS({
             throw error2;
           } else if (typedError.name === ReserveCacheError.name) {
             core5.info(`Failed to save: ${typedError.message}`);
+          } else if (typedError.name === FinalizeCacheError.name) {
+            core5.warning(typedError.message);
           } else {
             if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
               core5.error(`Failed to save: ${typedError.message}`);

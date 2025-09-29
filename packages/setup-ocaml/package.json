@@ -9,7 +9,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@actions/cache": "4.0.5",
+    "@actions/cache": "4.1.0",
     "@actions/core": "1.11.1",
     "@actions/exec": "1.1.1",
     "@actions/github": "6.0.1",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@tsconfig/node24": "24.0.1",
-    "@tsconfig/strictest": "2.0.5",
+    "@tsconfig/strictest": "2.0.6",
     "@types/node": "24.5.2",
     "@types/semver": "7.7.1",
     "esbuild": "0.25.10",
