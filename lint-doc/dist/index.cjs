@@ -19817,6 +19817,7 @@ var process2 = __toESM(require("node:process"), 1);
 var import_exec = __toESM(require_exec(), 1);
 async function lintOdoc() {
   const exitCode = await (0, import_exec.exec)("opam", ["exec", "--", "dune", "build", "@doc"], {
+    // @ts-expect-error: process.env may contain undefined values
     env: {
       ...process2.env,
       PATH: process2.env.PATH ?? "",

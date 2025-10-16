@@ -73816,7 +73816,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.10",
+      version: "5.27.11",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -73895,7 +73895,7 @@ var require_package2 = __commonJS({
       ],
       repository: {
         type: "git",
-        url: "https://github.com/sebhildebrandt/systeminformation.git"
+        url: "git+https://github.com/sebhildebrandt/systeminformation.git"
       },
       funding: {
         type: "Buy me a coffee",
@@ -74860,7 +74860,7 @@ var require_util10 = __commonJS({
         "16": "Internal use only",
         "17": "5",
         "18": "CM5",
-        "19": "500",
+        "19": "500/500+",
         "1a": "CM5 Lite"
       };
       const revisionCode = getValue(lines, "revision", ":", true);
@@ -75885,7 +75885,7 @@ var require_util10 = __commonJS({
           key: "Mac14,13",
           name: "Mac Studio",
           size: "",
-          processor: "",
+          processor: "M2 Max",
           year: "2023",
           additional: ""
         },
@@ -75893,15 +75893,31 @@ var require_util10 = __commonJS({
           key: "Mac14,14",
           name: "Mac Studio",
           size: "",
-          processor: "",
+          processor: "M2 Ultra",
           year: "2023",
+          additional: ""
+        },
+        {
+          key: "Mac15,14",
+          name: "Mac Studio",
+          size: "",
+          processor: "M3 Ultra",
+          year: "2025",
+          additional: ""
+        },
+        {
+          key: "Mac16,9",
+          name: "Mac Studio",
+          size: "",
+          processor: "M4 Max",
+          year: "2025",
           additional: ""
         },
         {
           key: "Mac13,1",
           name: "Mac Studio",
           size: "",
-          processor: "",
+          processor: "M1 Max",
           year: "2022",
           additional: ""
         },
@@ -75909,7 +75925,7 @@ var require_util10 = __commonJS({
           key: "Mac13,2",
           name: "Mac Studio",
           size: "",
-          processor: "",
+          processor: "M1 Ultra",
           year: "2022",
           additional: ""
         },
@@ -100249,6 +100265,9 @@ var require_identifiers = __commonJS({
     "use strict";
     var numeric = /^[0-9]+$/;
     var compareIdentifiers = (a, b) => {
+      if (typeof a === "number" && typeof b === "number") {
+        return a === b ? 0 : a < b ? -1 : 1;
+      }
       const anum = numeric.test(a);
       const bnum = numeric.test(b);
       if (anum && bnum) {
@@ -100355,7 +100374,25 @@ var require_semver2 = __commonJS({
         if (!(other instanceof _SemVer)) {
           other = new _SemVer(other, this.options);
         }
-        return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
+        if (this.major < other.major) {
+          return -1;
+        }
+        if (this.major > other.major) {
+          return 1;
+        }
+        if (this.minor < other.minor) {
+          return -1;
+        }
+        if (this.minor > other.minor) {
+          return 1;
+        }
+        if (this.patch < other.patch) {
+          return -1;
+        }
+        if (this.patch > other.patch) {
+          return 1;
+        }
+        return 0;
       }
       comparePre(other) {
         if (!(other instanceof _SemVer)) {
@@ -101116,6 +101153,7 @@ var require_range = __commonJS({
       return result2;
     };
     var parseComparator = (comp, options) => {
+      comp = comp.replace(re[t.BUILD], "");
       debug2("comp", comp, options);
       comp = replaceCarets(comp, options);
       debug2("caret", comp);
