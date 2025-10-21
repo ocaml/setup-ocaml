@@ -255,8 +255,8 @@ __metadata:
   linkType: hard
 
 "@azure/storage-blob@npm:^12.13.0":
-  version: 12.28.0
-  resolution: "@azure/storage-blob@npm:12.28.0"
+  version: 12.29.1
+  resolution: "@azure/storage-blob@npm:12.29.1"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.9.0"
@@ -269,16 +269,16 @@ __metadata:
     "@azure/core-util": "npm:^1.11.0"
     "@azure/core-xml": "npm:^1.4.5"
     "@azure/logger": "npm:^1.1.4"
-    "@azure/storage-common": "npm:^12.0.0-beta.2"
+    "@azure/storage-common": "npm:^12.1.1"
     events: "npm:^3.0.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/a97f43193da9c5fbb58492156ad6dd3f0c9f1bf2fdf72cbc5a1fdfe16a586b0a4bb7bfaa7e24de63d689927c2a606d4ca65332594e0f2278c55d48f7c90d1a54
+  checksum: 10c0/01173ca8a05d27dcf44f7eb5f30cc74d591de07c808cfe031917b1e905dc659165c9fd981113e778bbe52a4e8ed16269d3f9cf0bb006007c79ef3b5a8257aa8a
   languageName: node
   linkType: hard
 
-"@azure/storage-common@npm:^12.0.0-beta.2":
-  version: 12.0.1
-  resolution: "@azure/storage-common@npm:12.0.1"
+"@azure/storage-common@npm:^12.1.1":
+  version: 12.1.1
+  resolution: "@azure/storage-common@npm:12.1.1"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.9.0"
@@ -289,7 +289,7 @@ __metadata:
     "@azure/logger": "npm:^1.1.4"
     events: "npm:^3.3.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/4f08134b8bdcda45d69107eb3897877b1689db445cd92d6c00f1dcb9490287b00cacd316fda5009f8a78d939643fe5422a9e33a809d72a2d38d8bc2c24f6d8ec
+  checksum: 10c0/6ccbdd95305592876b65cc76d114c076ad3b8289d2df1f5ccff6cb29283b572c560eb1e1b12a19158d26675df4ef58e51bd5890e44e59c3e45e2276fee6498b0
   languageName: node
   linkType: hard
 
@@ -597,7 +597,7 @@ __metadata:
     "@github/dependency-submission-toolkit": "npm:2.0.5"
     "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.6"
-    "@types/node": "npm:24.8.0"
+    "@types/node": "npm:24.9.1"
     esbuild: "npm:0.25.11"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.1.2"
@@ -613,7 +613,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.6"
-    "@types/node": "npm:24.8.0"
+    "@types/node": "npm:24.9.1"
     esbuild: "npm:0.25.11"
     typescript: "npm:5.9.3"
   languageName: unknown
@@ -627,7 +627,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.6"
-    "@types/node": "npm:24.8.0"
+    "@types/node": "npm:24.9.1"
     esbuild: "npm:0.25.11"
     typescript: "npm:5.9.3"
   languageName: unknown
@@ -641,7 +641,7 @@ __metadata:
     "@actions/exec": "npm:1.1.1"
     "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.6"
-    "@types/node": "npm:24.8.0"
+    "@types/node": "npm:24.9.1"
     esbuild: "npm:0.25.11"
     typescript: "npm:5.9.3"
   languageName: unknown
@@ -662,7 +662,7 @@ __metadata:
     "@octokit/plugin-retry": "npm:8.0.2"
     "@tsconfig/node24": "npm:24.0.1"
     "@tsconfig/strictest": "npm:2.0.6"
-    "@types/node": "npm:24.8.0"
+    "@types/node": "npm:24.9.1"
     "@types/semver": "npm:7.7.1"
     cheerio: "npm:1.1.2"
     esbuild: "npm:0.25.11"
@@ -849,11 +849,11 @@ __metadata:
   linkType: hard
 
 "@octokit/types@npm:^15.0.0":
-  version: 15.0.0
-  resolution: "@octokit/types@npm:15.0.0"
+  version: 15.0.1
+  resolution: "@octokit/types@npm:15.0.1"
   dependencies:
     "@octokit/openapi-types": "npm:^26.0.0"
-  checksum: 10c0/49c233d83bdd8fecaa985c84bda78eee0ab41b12c0501fe6835c9ff91f09edc01b28ab7b89cd17218726d76d0b563565f72c0cb25082248fd3f07a01a9534187
+  checksum: 10c0/f1f8d8a988c6295d669461082936a4e27d5a021ff870ebb93b8afa8f227f6eb0fb520f98631af31fc56dea0cb84e15df65e736f408cde321693154e4432c575d
   languageName: node
   linkType: hard
 
@@ -894,12 +894,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:24.8.0":
-  version: 24.8.0
-  resolution: "@types/node@npm:24.8.0"
+"@types/node@npm:24.9.1":
+  version: 24.9.1
+  resolution: "@types/node@npm:24.9.1"
   dependencies:
-    undici-types: "npm:~7.14.0"
-  checksum: 10c0/6ba1a268dec49b46c3301193394bfe6203a8d44453e32d6666e5daa35d2b5251425e7ac81444edae4c7f5bd12feed3324eba338c52b5630b258ff0e5040cd646
+    undici-types: "npm:~7.16.0"
+  checksum: 10c0/c52f8168080ef9a7c3dc23d8ac6061fab5371aad89231a0f6f4c075869bc3de7e89b075b1f3e3171d9e5143d0dda1807c3dab8e32eac6d68f02e7480e7e78576
   languageName: node
   linkType: hard
 
@@ -1775,10 +1775,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.14.0":
-  version: 7.14.0
-  resolution: "undici-types@npm:7.14.0"
-  checksum: 10c0/e7f3214b45d788f03c51ceb33817be99c65dae203863aa9386b3ccc47201a245a7955fc721fb581da9c888b6ebad59fa3f53405214afec04c455a479908f0f14
+"undici-types@npm:~7.16.0":
+  version: 7.16.0
+  resolution: "undici-types@npm:7.16.0"
+  checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
   languageName: node
   linkType: hard
 
