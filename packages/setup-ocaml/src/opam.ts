@@ -20,7 +20,7 @@ import {
 } from "./unix.js";
 
 export const latestOpamRelease = (async () => {
-  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.5.0";
+  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.6.0";
   const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
