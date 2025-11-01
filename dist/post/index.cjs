@@ -216,9 +216,9 @@ var require_file_command = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/http-client/lib/proxy.js
+// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/proxy.js
 var require_proxy = __commonJS({
-  "../../node_modules/@actions/http-client/lib/proxy.js"(exports2) {
+  "../../node_modules/@actions/core/node_modules/@actions/http-client/lib/proxy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkBypass = exports2.getProxyUrl = void 0;
@@ -17292,9 +17292,9 @@ var require_undici = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/http-client/lib/index.js
+// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/index.js
 var require_lib = __commonJS({
-  "../../node_modules/@actions/http-client/lib/index.js"(exports2) {
+  "../../node_modules/@actions/core/node_modules/@actions/http-client/lib/index.js"(exports2) {
     "use strict";
     var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -17911,9 +17911,9 @@ var require_lib = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/http-client/lib/auth.js
+// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/auth.js
 var require_auth = __commonJS({
-  "../../node_modules/@actions/http-client/lib/auth.js"(exports2) {
+  "../../node_modules/@actions/core/node_modules/@actions/http-client/lib/auth.js"(exports2) {
     "use strict";
     var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
@@ -18456,9 +18456,9 @@ var require_path_utils = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/io/lib/io-util.js
+// ../../node_modules/@actions/exec/node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
-  "../../node_modules/@actions/io/lib/io-util.js"(exports2) {
+  "../../node_modules/@actions/exec/node_modules/@actions/io/lib/io-util.js"(exports2) {
     "use strict";
     var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -18629,9 +18629,9 @@ var require_io_util = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/io/lib/io.js
+// ../../node_modules/@actions/exec/node_modules/@actions/io/lib/io.js
 var require_io = __commonJS({
-  "../../node_modules/@actions/io/lib/io.js"(exports2) {
+  "../../node_modules/@actions/exec/node_modules/@actions/io/lib/io.js"(exports2) {
     "use strict";
     var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -21515,6 +21515,427 @@ var require_glob = __commonJS({
   }
 });
 
+// ../../node_modules/@actions/cache/node_modules/@actions/io/lib/io-util.js
+var require_io_util2 = __commonJS({
+  "../../node_modules/@actions/cache/node_modules/@actions/io/lib/io-util.js"(exports2) {
+    "use strict";
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      Object.defineProperty(o, k2, { enumerable: true, get: function() {
+        return m[k];
+      } });
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result2 = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding2(result2, mod, k);
+      }
+      __setModuleDefault2(result2, mod);
+      return result2;
+    };
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result2) {
+          result2.done ? resolve(result2.value) : adopt(result2.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    var _a;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getCmdPath = exports2.tryGetExecutablePath = exports2.isRooted = exports2.isDirectory = exports2.exists = exports2.READONLY = exports2.UV_FS_O_EXLOCK = exports2.IS_WINDOWS = exports2.unlink = exports2.symlink = exports2.stat = exports2.rmdir = exports2.rm = exports2.rename = exports2.readlink = exports2.readdir = exports2.open = exports2.mkdir = exports2.lstat = exports2.copyFile = exports2.chmod = void 0;
+    var fs = __importStar2(require("fs"));
+    var path3 = __importStar2(require("path"));
+    _a = fs.promises, exports2.chmod = _a.chmod, exports2.copyFile = _a.copyFile, exports2.lstat = _a.lstat, exports2.mkdir = _a.mkdir, exports2.open = _a.open, exports2.readdir = _a.readdir, exports2.readlink = _a.readlink, exports2.rename = _a.rename, exports2.rm = _a.rm, exports2.rmdir = _a.rmdir, exports2.stat = _a.stat, exports2.symlink = _a.symlink, exports2.unlink = _a.unlink;
+    exports2.IS_WINDOWS = process.platform === "win32";
+    exports2.UV_FS_O_EXLOCK = 268435456;
+    exports2.READONLY = fs.constants.O_RDONLY;
+    function exists(fsPath) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        try {
+          yield exports2.stat(fsPath);
+        } catch (err) {
+          if (err.code === "ENOENT") {
+            return false;
+          }
+          throw err;
+        }
+        return true;
+      });
+    }
+    exports2.exists = exists;
+    function isDirectory(fsPath, useStat = false) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const stats = useStat ? yield exports2.stat(fsPath) : yield exports2.lstat(fsPath);
+        return stats.isDirectory();
+      });
+    }
+    exports2.isDirectory = isDirectory;
+    function isRooted(p) {
+      p = normalizeSeparators(p);
+      if (!p) {
+        throw new Error('isRooted() parameter "p" cannot be empty');
+      }
+      if (exports2.IS_WINDOWS) {
+        return p.startsWith("\\") || /^[A-Z]:/i.test(p);
+      }
+      return p.startsWith("/");
+    }
+    exports2.isRooted = isRooted;
+    function tryGetExecutablePath(filePath, extensions) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        let stats = void 0;
+        try {
+          stats = yield exports2.stat(filePath);
+        } catch (err) {
+          if (err.code !== "ENOENT") {
+            console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
+          }
+        }
+        if (stats && stats.isFile()) {
+          if (exports2.IS_WINDOWS) {
+            const upperExt = path3.extname(filePath).toUpperCase();
+            if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
+              return filePath;
+            }
+          } else {
+            if (isUnixExecutable(stats)) {
+              return filePath;
+            }
+          }
+        }
+        const originalFilePath = filePath;
+        for (const extension of extensions) {
+          filePath = originalFilePath + extension;
+          stats = void 0;
+          try {
+            stats = yield exports2.stat(filePath);
+          } catch (err) {
+            if (err.code !== "ENOENT") {
+              console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
+            }
+          }
+          if (stats && stats.isFile()) {
+            if (exports2.IS_WINDOWS) {
+              try {
+                const directory = path3.dirname(filePath);
+                const upperName = path3.basename(filePath).toUpperCase();
+                for (const actualName of yield exports2.readdir(directory)) {
+                  if (upperName === actualName.toUpperCase()) {
+                    filePath = path3.join(directory, actualName);
+                    break;
+                  }
+                }
+              } catch (err) {
+                console.log(`Unexpected error attempting to determine the actual case of the file '${filePath}': ${err}`);
+              }
+              return filePath;
+            } else {
+              if (isUnixExecutable(stats)) {
+                return filePath;
+              }
+            }
+          }
+        }
+        return "";
+      });
+    }
+    exports2.tryGetExecutablePath = tryGetExecutablePath;
+    function normalizeSeparators(p) {
+      p = p || "";
+      if (exports2.IS_WINDOWS) {
+        p = p.replace(/\//g, "\\");
+        return p.replace(/\\\\+/g, "\\");
+      }
+      return p.replace(/\/\/+/g, "/");
+    }
+    function isUnixExecutable(stats) {
+      return (stats.mode & 1) > 0 || (stats.mode & 8) > 0 && stats.gid === process.getgid() || (stats.mode & 64) > 0 && stats.uid === process.getuid();
+    }
+    function getCmdPath() {
+      var _a2;
+      return (_a2 = process.env["COMSPEC"]) !== null && _a2 !== void 0 ? _a2 : `cmd.exe`;
+    }
+    exports2.getCmdPath = getCmdPath;
+  }
+});
+
+// ../../node_modules/@actions/cache/node_modules/@actions/io/lib/io.js
+var require_io2 = __commonJS({
+  "../../node_modules/@actions/cache/node_modules/@actions/io/lib/io.js"(exports2) {
+    "use strict";
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      Object.defineProperty(o, k2, { enumerable: true, get: function() {
+        return m[k];
+      } });
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result2 = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding2(result2, mod, k);
+      }
+      __setModuleDefault2(result2, mod);
+      return result2;
+    };
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result2) {
+          result2.done ? resolve(result2.value) : adopt(result2.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.findInPath = exports2.which = exports2.mkdirP = exports2.rmRF = exports2.mv = exports2.cp = void 0;
+    var assert_1 = require("assert");
+    var path3 = __importStar2(require("path"));
+    var ioUtil = __importStar2(require_io_util2());
+    function cp(source, dest, options = {}) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const { force, recursive, copySourceDirectory } = readCopyOptions(options);
+        const destStat = (yield ioUtil.exists(dest)) ? yield ioUtil.stat(dest) : null;
+        if (destStat && destStat.isFile() && !force) {
+          return;
+        }
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path3.join(dest, path3.basename(source)) : dest;
+        if (!(yield ioUtil.exists(source))) {
+          throw new Error(`no such file or directory: ${source}`);
+        }
+        const sourceStat = yield ioUtil.stat(source);
+        if (sourceStat.isDirectory()) {
+          if (!recursive) {
+            throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
+          } else {
+            yield cpDirRecursive(source, newDest, 0, force);
+          }
+        } else {
+          if (path3.relative(source, newDest) === "") {
+            throw new Error(`'${newDest}' and '${source}' are the same file`);
+          }
+          yield copyFile(source, newDest, force);
+        }
+      });
+    }
+    exports2.cp = cp;
+    function mv(source, dest, options = {}) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        if (yield ioUtil.exists(dest)) {
+          let destExists = true;
+          if (yield ioUtil.isDirectory(dest)) {
+            dest = path3.join(dest, path3.basename(source));
+            destExists = yield ioUtil.exists(dest);
+          }
+          if (destExists) {
+            if (options.force == null || options.force) {
+              yield rmRF(dest);
+            } else {
+              throw new Error("Destination already exists");
+            }
+          }
+        }
+        yield mkdirP(path3.dirname(dest));
+        yield ioUtil.rename(source, dest);
+      });
+    }
+    exports2.mv = mv;
+    function rmRF(inputPath) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        if (ioUtil.IS_WINDOWS) {
+          if (/[*"<>|]/.test(inputPath)) {
+            throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
+          }
+        }
+        try {
+          yield ioUtil.rm(inputPath, {
+            force: true,
+            maxRetries: 3,
+            recursive: true,
+            retryDelay: 300
+          });
+        } catch (err) {
+          throw new Error(`File was unable to be removed ${err}`);
+        }
+      });
+    }
+    exports2.rmRF = rmRF;
+    function mkdirP(fsPath) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        assert_1.ok(fsPath, "a path argument must be provided");
+        yield ioUtil.mkdir(fsPath, { recursive: true });
+      });
+    }
+    exports2.mkdirP = mkdirP;
+    function which(tool, check) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        if (!tool) {
+          throw new Error("parameter 'tool' is required");
+        }
+        if (check) {
+          const result2 = yield which(tool, false);
+          if (!result2) {
+            if (ioUtil.IS_WINDOWS) {
+              throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
+            } else {
+              throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
+            }
+          }
+          return result2;
+        }
+        const matches = yield findInPath(tool);
+        if (matches && matches.length > 0) {
+          return matches[0];
+        }
+        return "";
+      });
+    }
+    exports2.which = which;
+    function findInPath(tool) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        if (!tool) {
+          throw new Error("parameter 'tool' is required");
+        }
+        const extensions = [];
+        if (ioUtil.IS_WINDOWS && process.env["PATHEXT"]) {
+          for (const extension of process.env["PATHEXT"].split(path3.delimiter)) {
+            if (extension) {
+              extensions.push(extension);
+            }
+          }
+        }
+        if (ioUtil.isRooted(tool)) {
+          const filePath = yield ioUtil.tryGetExecutablePath(tool, extensions);
+          if (filePath) {
+            return [filePath];
+          }
+          return [];
+        }
+        if (tool.includes(path3.sep)) {
+          return [];
+        }
+        const directories = [];
+        if (process.env.PATH) {
+          for (const p of process.env.PATH.split(path3.delimiter)) {
+            if (p) {
+              directories.push(p);
+            }
+          }
+        }
+        const matches = [];
+        for (const directory of directories) {
+          const filePath = yield ioUtil.tryGetExecutablePath(path3.join(directory, tool), extensions);
+          if (filePath) {
+            matches.push(filePath);
+          }
+        }
+        return matches;
+      });
+    }
+    exports2.findInPath = findInPath;
+    function readCopyOptions(options) {
+      const force = options.force == null ? true : options.force;
+      const recursive = Boolean(options.recursive);
+      const copySourceDirectory = options.copySourceDirectory == null ? true : Boolean(options.copySourceDirectory);
+      return { force, recursive, copySourceDirectory };
+    }
+    function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        if (currentDepth >= 255)
+          return;
+        currentDepth++;
+        yield mkdirP(destDir);
+        const files = yield ioUtil.readdir(sourceDir);
+        for (const fileName of files) {
+          const srcFile = `${sourceDir}/${fileName}`;
+          const destFile = `${destDir}/${fileName}`;
+          const srcFileStat = yield ioUtil.lstat(srcFile);
+          if (srcFileStat.isDirectory()) {
+            yield cpDirRecursive(srcFile, destFile, currentDepth, force);
+          } else {
+            yield copyFile(srcFile, destFile, force);
+          }
+        }
+        yield ioUtil.chmod(destDir, (yield ioUtil.stat(sourceDir)).mode);
+      });
+    }
+    function copyFile(srcFile, destFile, force) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        if ((yield ioUtil.lstat(srcFile)).isSymbolicLink()) {
+          try {
+            yield ioUtil.lstat(destFile);
+            yield ioUtil.unlink(destFile);
+          } catch (e) {
+            if (e.code === "EPERM") {
+              yield ioUtil.chmod(destFile, "0666");
+              yield ioUtil.unlink(destFile);
+            }
+          }
+          const symlinkFull = yield ioUtil.readlink(srcFile);
+          yield ioUtil.symlink(symlinkFull, destFile, ioUtil.IS_WINDOWS ? "junction" : null);
+        } else if (!(yield ioUtil.exists(destFile)) || force) {
+          yield ioUtil.copyFile(srcFile, destFile);
+        }
+      });
+    }
+  }
+});
+
 // ../../node_modules/@actions/cache/node_modules/semver/semver.js
 var require_semver = __commonJS({
   "../../node_modules/@actions/cache/node_modules/semver/semver.js"(exports2, module2) {
@@ -22786,7 +23207,7 @@ var require_cacheUtils = __commonJS({
     var core5 = __importStar2(require_core());
     var exec3 = __importStar2(require_exec());
     var glob = __importStar2(require_glob());
-    var io = __importStar2(require_io());
+    var io = __importStar2(require_io2());
     var crypto2 = __importStar2(require("crypto"));
     var fs = __importStar2(require("fs"));
     var path3 = __importStar2(require("path"));
@@ -22938,6 +23359,811 @@ var require_cacheUtils = __commonJS({
       return token;
     }
     exports2.getRuntimeToken = getRuntimeToken;
+  }
+});
+
+// ../../node_modules/@actions/cache/node_modules/@actions/http-client/lib/proxy.js
+var require_proxy2 = __commonJS({
+  "../../node_modules/@actions/cache/node_modules/@actions/http-client/lib/proxy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.checkBypass = exports2.getProxyUrl = void 0;
+    function getProxyUrl(reqUrl) {
+      const usingSsl = reqUrl.protocol === "https:";
+      if (checkBypass(reqUrl)) {
+        return void 0;
+      }
+      const proxyVar = (() => {
+        if (usingSsl) {
+          return process.env["https_proxy"] || process.env["HTTPS_PROXY"];
+        } else {
+          return process.env["http_proxy"] || process.env["HTTP_PROXY"];
+        }
+      })();
+      if (proxyVar) {
+        try {
+          return new DecodedURL(proxyVar);
+        } catch (_a) {
+          if (!proxyVar.startsWith("http://") && !proxyVar.startsWith("https://"))
+            return new DecodedURL(`http://${proxyVar}`);
+        }
+      } else {
+        return void 0;
+      }
+    }
+    exports2.getProxyUrl = getProxyUrl;
+    function checkBypass(reqUrl) {
+      if (!reqUrl.hostname) {
+        return false;
+      }
+      const reqHost = reqUrl.hostname;
+      if (isLoopbackAddress(reqHost)) {
+        return true;
+      }
+      const noProxy = process.env["no_proxy"] || process.env["NO_PROXY"] || "";
+      if (!noProxy) {
+        return false;
+      }
+      let reqPort;
+      if (reqUrl.port) {
+        reqPort = Number(reqUrl.port);
+      } else if (reqUrl.protocol === "http:") {
+        reqPort = 80;
+      } else if (reqUrl.protocol === "https:") {
+        reqPort = 443;
+      }
+      const upperReqHosts = [reqUrl.hostname.toUpperCase()];
+      if (typeof reqPort === "number") {
+        upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
+      }
+      for (const upperNoProxyItem of noProxy.split(",").map((x) => x.trim().toUpperCase()).filter((x) => x)) {
+        if (upperNoProxyItem === "*" || upperReqHosts.some((x) => x === upperNoProxyItem || x.endsWith(`.${upperNoProxyItem}`) || upperNoProxyItem.startsWith(".") && x.endsWith(`${upperNoProxyItem}`))) {
+          return true;
+        }
+      }
+      return false;
+    }
+    exports2.checkBypass = checkBypass;
+    function isLoopbackAddress(host) {
+      const hostLower = host.toLowerCase();
+      return hostLower === "localhost" || hostLower.startsWith("127.") || hostLower.startsWith("[::1]") || hostLower.startsWith("[0:0:0:0:0:0:0:1]");
+    }
+    var DecodedURL = class extends URL {
+      constructor(url, base) {
+        super(url, base);
+        this._decodedUsername = decodeURIComponent(super.username);
+        this._decodedPassword = decodeURIComponent(super.password);
+      }
+      get username() {
+        return this._decodedUsername;
+      }
+      get password() {
+        return this._decodedPassword;
+      }
+    };
+  }
+});
+
+// ../../node_modules/@actions/cache/node_modules/@actions/http-client/lib/index.js
+var require_lib2 = __commonJS({
+  "../../node_modules/@actions/cache/node_modules/@actions/http-client/lib/index.js"(exports2) {
+    "use strict";
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result2 = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding2(result2, mod, k);
+      }
+      __setModuleDefault2(result2, mod);
+      return result2;
+    };
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result2) {
+          result2.done ? resolve(result2.value) : adopt(result2.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.HttpClient = exports2.isHttps = exports2.HttpClientResponse = exports2.HttpClientError = exports2.getProxyUrl = exports2.MediaTypes = exports2.Headers = exports2.HttpCodes = void 0;
+    var http = __importStar2(require("http"));
+    var https = __importStar2(require("https"));
+    var pm = __importStar2(require_proxy2());
+    var tunnel = __importStar2(require_tunnel2());
+    var undici_1 = require_undici();
+    var HttpCodes;
+    (function(HttpCodes2) {
+      HttpCodes2[HttpCodes2["OK"] = 200] = "OK";
+      HttpCodes2[HttpCodes2["MultipleChoices"] = 300] = "MultipleChoices";
+      HttpCodes2[HttpCodes2["MovedPermanently"] = 301] = "MovedPermanently";
+      HttpCodes2[HttpCodes2["ResourceMoved"] = 302] = "ResourceMoved";
+      HttpCodes2[HttpCodes2["SeeOther"] = 303] = "SeeOther";
+      HttpCodes2[HttpCodes2["NotModified"] = 304] = "NotModified";
+      HttpCodes2[HttpCodes2["UseProxy"] = 305] = "UseProxy";
+      HttpCodes2[HttpCodes2["SwitchProxy"] = 306] = "SwitchProxy";
+      HttpCodes2[HttpCodes2["TemporaryRedirect"] = 307] = "TemporaryRedirect";
+      HttpCodes2[HttpCodes2["PermanentRedirect"] = 308] = "PermanentRedirect";
+      HttpCodes2[HttpCodes2["BadRequest"] = 400] = "BadRequest";
+      HttpCodes2[HttpCodes2["Unauthorized"] = 401] = "Unauthorized";
+      HttpCodes2[HttpCodes2["PaymentRequired"] = 402] = "PaymentRequired";
+      HttpCodes2[HttpCodes2["Forbidden"] = 403] = "Forbidden";
+      HttpCodes2[HttpCodes2["NotFound"] = 404] = "NotFound";
+      HttpCodes2[HttpCodes2["MethodNotAllowed"] = 405] = "MethodNotAllowed";
+      HttpCodes2[HttpCodes2["NotAcceptable"] = 406] = "NotAcceptable";
+      HttpCodes2[HttpCodes2["ProxyAuthenticationRequired"] = 407] = "ProxyAuthenticationRequired";
+      HttpCodes2[HttpCodes2["RequestTimeout"] = 408] = "RequestTimeout";
+      HttpCodes2[HttpCodes2["Conflict"] = 409] = "Conflict";
+      HttpCodes2[HttpCodes2["Gone"] = 410] = "Gone";
+      HttpCodes2[HttpCodes2["TooManyRequests"] = 429] = "TooManyRequests";
+      HttpCodes2[HttpCodes2["InternalServerError"] = 500] = "InternalServerError";
+      HttpCodes2[HttpCodes2["NotImplemented"] = 501] = "NotImplemented";
+      HttpCodes2[HttpCodes2["BadGateway"] = 502] = "BadGateway";
+      HttpCodes2[HttpCodes2["ServiceUnavailable"] = 503] = "ServiceUnavailable";
+      HttpCodes2[HttpCodes2["GatewayTimeout"] = 504] = "GatewayTimeout";
+    })(HttpCodes || (exports2.HttpCodes = HttpCodes = {}));
+    var Headers;
+    (function(Headers2) {
+      Headers2["Accept"] = "accept";
+      Headers2["ContentType"] = "content-type";
+    })(Headers || (exports2.Headers = Headers = {}));
+    var MediaTypes;
+    (function(MediaTypes2) {
+      MediaTypes2["ApplicationJson"] = "application/json";
+    })(MediaTypes || (exports2.MediaTypes = MediaTypes = {}));
+    function getProxyUrl(serverUrl) {
+      const proxyUrl = pm.getProxyUrl(new URL(serverUrl));
+      return proxyUrl ? proxyUrl.href : "";
+    }
+    exports2.getProxyUrl = getProxyUrl;
+    var HttpRedirectCodes = [
+      HttpCodes.MovedPermanently,
+      HttpCodes.ResourceMoved,
+      HttpCodes.SeeOther,
+      HttpCodes.TemporaryRedirect,
+      HttpCodes.PermanentRedirect
+    ];
+    var HttpResponseRetryCodes = [
+      HttpCodes.BadGateway,
+      HttpCodes.ServiceUnavailable,
+      HttpCodes.GatewayTimeout
+    ];
+    var RetryableHttpVerbs = ["OPTIONS", "GET", "DELETE", "HEAD"];
+    var ExponentialBackoffCeiling = 10;
+    var ExponentialBackoffTimeSlice = 5;
+    var HttpClientError = class _HttpClientError extends Error {
+      constructor(message, statusCode) {
+        super(message);
+        this.name = "HttpClientError";
+        this.statusCode = statusCode;
+        Object.setPrototypeOf(this, _HttpClientError.prototype);
+      }
+    };
+    exports2.HttpClientError = HttpClientError;
+    var HttpClientResponse = class {
+      constructor(message) {
+        this.message = message;
+      }
+      readBody() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve) => __awaiter2(this, void 0, void 0, function* () {
+            let output = Buffer.alloc(0);
+            this.message.on("data", (chunk) => {
+              output = Buffer.concat([output, chunk]);
+            });
+            this.message.on("end", () => {
+              resolve(output.toString());
+            });
+          }));
+        });
+      }
+      readBodyBuffer() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve) => __awaiter2(this, void 0, void 0, function* () {
+            const chunks = [];
+            this.message.on("data", (chunk) => {
+              chunks.push(chunk);
+            });
+            this.message.on("end", () => {
+              resolve(Buffer.concat(chunks));
+            });
+          }));
+        });
+      }
+    };
+    exports2.HttpClientResponse = HttpClientResponse;
+    function isHttps(requestUrl) {
+      const parsedUrl = new URL(requestUrl);
+      return parsedUrl.protocol === "https:";
+    }
+    exports2.isHttps = isHttps;
+    var HttpClient = class {
+      constructor(userAgent, handlers, requestOptions) {
+        this._ignoreSslError = false;
+        this._allowRedirects = true;
+        this._allowRedirectDowngrade = false;
+        this._maxRedirects = 50;
+        this._allowRetries = false;
+        this._maxRetries = 1;
+        this._keepAlive = false;
+        this._disposed = false;
+        this.userAgent = userAgent;
+        this.handlers = handlers || [];
+        this.requestOptions = requestOptions;
+        if (requestOptions) {
+          if (requestOptions.ignoreSslError != null) {
+            this._ignoreSslError = requestOptions.ignoreSslError;
+          }
+          this._socketTimeout = requestOptions.socketTimeout;
+          if (requestOptions.allowRedirects != null) {
+            this._allowRedirects = requestOptions.allowRedirects;
+          }
+          if (requestOptions.allowRedirectDowngrade != null) {
+            this._allowRedirectDowngrade = requestOptions.allowRedirectDowngrade;
+          }
+          if (requestOptions.maxRedirects != null) {
+            this._maxRedirects = Math.max(requestOptions.maxRedirects, 0);
+          }
+          if (requestOptions.keepAlive != null) {
+            this._keepAlive = requestOptions.keepAlive;
+          }
+          if (requestOptions.allowRetries != null) {
+            this._allowRetries = requestOptions.allowRetries;
+          }
+          if (requestOptions.maxRetries != null) {
+            this._maxRetries = requestOptions.maxRetries;
+          }
+        }
+      }
+      options(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("OPTIONS", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      get(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("GET", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      del(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("DELETE", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      post(requestUrl, data, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("POST", requestUrl, data, additionalHeaders || {});
+        });
+      }
+      patch(requestUrl, data, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("PATCH", requestUrl, data, additionalHeaders || {});
+        });
+      }
+      put(requestUrl, data, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("PUT", requestUrl, data, additionalHeaders || {});
+        });
+      }
+      head(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("HEAD", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      sendStream(verb, requestUrl, stream, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request(verb, requestUrl, stream, additionalHeaders);
+        });
+      }
+      /**
+       * Gets a typed object from an endpoint
+       * Be aware that not found returns a null.  Other errors (4xx, 5xx) reject the promise
+       */
+      getJson(requestUrl, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          const res = yield this.get(requestUrl, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      postJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.post(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      putJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.put(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      patchJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.patch(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      /**
+       * Makes a raw http request.
+       * All other methods such as get, post, patch, and request ultimately call this.
+       * Prefer get, del, post and patch
+       */
+      request(verb, requestUrl, data, headers) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          if (this._disposed) {
+            throw new Error("Client has already been disposed.");
+          }
+          const parsedUrl = new URL(requestUrl);
+          let info2 = this._prepareRequest(verb, parsedUrl, headers);
+          const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
+          let numTries = 0;
+          let response;
+          do {
+            response = yield this.requestRaw(info2, data);
+            if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
+              let authenticationHandler;
+              for (const handler of this.handlers) {
+                if (handler.canHandleAuthentication(response)) {
+                  authenticationHandler = handler;
+                  break;
+                }
+              }
+              if (authenticationHandler) {
+                return authenticationHandler.handleAuthentication(this, info2, data);
+              } else {
+                return response;
+              }
+            }
+            let redirectsRemaining = this._maxRedirects;
+            while (response.message.statusCode && HttpRedirectCodes.includes(response.message.statusCode) && this._allowRedirects && redirectsRemaining > 0) {
+              const redirectUrl = response.message.headers["location"];
+              if (!redirectUrl) {
+                break;
+              }
+              const parsedRedirectUrl = new URL(redirectUrl);
+              if (parsedUrl.protocol === "https:" && parsedUrl.protocol !== parsedRedirectUrl.protocol && !this._allowRedirectDowngrade) {
+                throw new Error("Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.");
+              }
+              yield response.readBody();
+              if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
+                for (const header in headers) {
+                  if (header.toLowerCase() === "authorization") {
+                    delete headers[header];
+                  }
+                }
+              }
+              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info2, data);
+              redirectsRemaining--;
+            }
+            if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
+              return response;
+            }
+            numTries += 1;
+            if (numTries < maxTries) {
+              yield response.readBody();
+              yield this._performExponentialBackoff(numTries);
+            }
+          } while (numTries < maxTries);
+          return response;
+        });
+      }
+      /**
+       * Needs to be called if keepAlive is set to true in request options.
+       */
+      dispose() {
+        if (this._agent) {
+          this._agent.destroy();
+        }
+        this._disposed = true;
+      }
+      /**
+       * Raw request.
+       * @param info
+       * @param data
+       */
+      requestRaw(info2, data) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve, reject) => {
+            function callbackForResult(err, res) {
+              if (err) {
+                reject(err);
+              } else if (!res) {
+                reject(new Error("Unknown error"));
+              } else {
+                resolve(res);
+              }
+            }
+            this.requestRawWithCallback(info2, data, callbackForResult);
+          });
+        });
+      }
+      /**
+       * Raw request with callback.
+       * @param info
+       * @param data
+       * @param onResult
+       */
+      requestRawWithCallback(info2, data, onResult) {
+        if (typeof data === "string") {
+          if (!info2.options.headers) {
+            info2.options.headers = {};
+          }
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+        }
+        let callbackCalled = false;
+        function handleResult(err, res) {
+          if (!callbackCalled) {
+            callbackCalled = true;
+            onResult(err, res);
+          }
+        }
+        const req = info2.httpModule.request(info2.options, (msg) => {
+          const res = new HttpClientResponse(msg);
+          handleResult(void 0, res);
+        });
+        let socket;
+        req.on("socket", (sock) => {
+          socket = sock;
+        });
+        req.setTimeout(this._socketTimeout || 3 * 6e4, () => {
+          if (socket) {
+            socket.end();
+          }
+          handleResult(new Error(`Request timeout: ${info2.options.path}`));
+        });
+        req.on("error", function(err) {
+          handleResult(err);
+        });
+        if (data && typeof data === "string") {
+          req.write(data, "utf8");
+        }
+        if (data && typeof data !== "string") {
+          data.on("close", function() {
+            req.end();
+          });
+          data.pipe(req);
+        } else {
+          req.end();
+        }
+      }
+      /**
+       * Gets an http agent. This function is useful when you need an http agent that handles
+       * routing through a proxy server - depending upon the url and proxy environment variables.
+       * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
+       */
+      getAgent(serverUrl) {
+        const parsedUrl = new URL(serverUrl);
+        return this._getAgent(parsedUrl);
+      }
+      getAgentDispatcher(serverUrl) {
+        const parsedUrl = new URL(serverUrl);
+        const proxyUrl = pm.getProxyUrl(parsedUrl);
+        const useProxy = proxyUrl && proxyUrl.hostname;
+        if (!useProxy) {
+          return;
+        }
+        return this._getProxyAgentDispatcher(parsedUrl, proxyUrl);
+      }
+      _prepareRequest(method, requestUrl, headers) {
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https : http;
+        const defaultPort = usingSsl ? 443 : 80;
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
+        if (this.userAgent != null) {
+          info2.options.headers["user-agent"] = this.userAgent;
+        }
+        info2.options.agent = this._getAgent(info2.parsedUrl);
+        if (this.handlers) {
+          for (const handler of this.handlers) {
+            handler.prepareRequest(info2.options);
+          }
+        }
+        return info2;
+      }
+      _mergeHeaders(headers) {
+        if (this.requestOptions && this.requestOptions.headers) {
+          return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers || {}));
+        }
+        return lowercaseKeys(headers || {});
+      }
+      _getExistingOrDefaultHeader(additionalHeaders, header, _default) {
+        let clientHeader;
+        if (this.requestOptions && this.requestOptions.headers) {
+          clientHeader = lowercaseKeys(this.requestOptions.headers)[header];
+        }
+        return additionalHeaders[header] || clientHeader || _default;
+      }
+      _getAgent(parsedUrl) {
+        let agent;
+        const proxyUrl = pm.getProxyUrl(parsedUrl);
+        const useProxy = proxyUrl && proxyUrl.hostname;
+        if (this._keepAlive && useProxy) {
+          agent = this._proxyAgent;
+        }
+        if (!useProxy) {
+          agent = this._agent;
+        }
+        if (agent) {
+          return agent;
+        }
+        const usingSsl = parsedUrl.protocol === "https:";
+        let maxSockets = 100;
+        if (this.requestOptions) {
+          maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
+        }
+        if (proxyUrl && proxyUrl.hostname) {
+          const agentOptions = {
+            maxSockets,
+            keepAlive: this._keepAlive,
+            proxy: Object.assign(Object.assign({}, (proxyUrl.username || proxyUrl.password) && {
+              proxyAuth: `${proxyUrl.username}:${proxyUrl.password}`
+            }), { host: proxyUrl.hostname, port: proxyUrl.port })
+          };
+          let tunnelAgent;
+          const overHttps = proxyUrl.protocol === "https:";
+          if (usingSsl) {
+            tunnelAgent = overHttps ? tunnel.httpsOverHttps : tunnel.httpsOverHttp;
+          } else {
+            tunnelAgent = overHttps ? tunnel.httpOverHttps : tunnel.httpOverHttp;
+          }
+          agent = tunnelAgent(agentOptions);
+          this._proxyAgent = agent;
+        }
+        if (!agent) {
+          const options = { keepAlive: this._keepAlive, maxSockets };
+          agent = usingSsl ? new https.Agent(options) : new http.Agent(options);
+          this._agent = agent;
+        }
+        if (usingSsl && this._ignoreSslError) {
+          agent.options = Object.assign(agent.options || {}, {
+            rejectUnauthorized: false
+          });
+        }
+        return agent;
+      }
+      _getProxyAgentDispatcher(parsedUrl, proxyUrl) {
+        let proxyAgent;
+        if (this._keepAlive) {
+          proxyAgent = this._proxyAgentDispatcher;
+        }
+        if (proxyAgent) {
+          return proxyAgent;
+        }
+        const usingSsl = parsedUrl.protocol === "https:";
+        proxyAgent = new undici_1.ProxyAgent(Object.assign({ uri: proxyUrl.href, pipelining: !this._keepAlive ? 0 : 1 }, (proxyUrl.username || proxyUrl.password) && {
+          token: `Basic ${Buffer.from(`${proxyUrl.username}:${proxyUrl.password}`).toString("base64")}`
+        }));
+        this._proxyAgentDispatcher = proxyAgent;
+        if (usingSsl && this._ignoreSslError) {
+          proxyAgent.options = Object.assign(proxyAgent.options.requestTls || {}, {
+            rejectUnauthorized: false
+          });
+        }
+        return proxyAgent;
+      }
+      _performExponentialBackoff(retryNumber) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
+          const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
+          return new Promise((resolve) => setTimeout(() => resolve(), ms));
+        });
+      }
+      _processResponse(res, options) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve, reject) => __awaiter2(this, void 0, void 0, function* () {
+            const statusCode = res.message.statusCode || 0;
+            const response = {
+              statusCode,
+              result: null,
+              headers: {}
+            };
+            if (statusCode === HttpCodes.NotFound) {
+              resolve(response);
+            }
+            function dateTimeDeserializer(key, value) {
+              if (typeof value === "string") {
+                const a = new Date(value);
+                if (!isNaN(a.valueOf())) {
+                  return a;
+                }
+              }
+              return value;
+            }
+            let obj;
+            let contents;
+            try {
+              contents = yield res.readBody();
+              if (contents && contents.length > 0) {
+                if (options && options.deserializeDates) {
+                  obj = JSON.parse(contents, dateTimeDeserializer);
+                } else {
+                  obj = JSON.parse(contents);
+                }
+                response.result = obj;
+              }
+              response.headers = res.message.headers;
+            } catch (err) {
+            }
+            if (statusCode > 299) {
+              let msg;
+              if (obj && obj.message) {
+                msg = obj.message;
+              } else if (contents && contents.length > 0) {
+                msg = contents;
+              } else {
+                msg = `Failed request: (${statusCode})`;
+              }
+              const err = new HttpClientError(msg, statusCode);
+              err.result = response.result;
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          }));
+        });
+      }
+    };
+    exports2.HttpClient = HttpClient;
+    var lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
+  }
+});
+
+// ../../node_modules/@actions/cache/node_modules/@actions/http-client/lib/auth.js
+var require_auth2 = __commonJS({
+  "../../node_modules/@actions/cache/node_modules/@actions/http-client/lib/auth.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result2) {
+          result2.done ? resolve(result2.value) : adopt(result2.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.PersonalAccessTokenCredentialHandler = exports2.BearerCredentialHandler = exports2.BasicCredentialHandler = void 0;
+    var BasicCredentialHandler = class {
+      constructor(username, password) {
+        this.username = username;
+        this.password = password;
+      }
+      prepareRequest(options) {
+        if (!options.headers) {
+          throw Error("The request has no headers");
+        }
+        options.headers["Authorization"] = `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`;
+      }
+      // This handler cannot handle 401
+      canHandleAuthentication() {
+        return false;
+      }
+      handleAuthentication() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          throw new Error("not implemented");
+        });
+      }
+    };
+    exports2.BasicCredentialHandler = BasicCredentialHandler;
+    var BearerCredentialHandler = class {
+      constructor(token) {
+        this.token = token;
+      }
+      // currently implements pre-authorization
+      // TODO: support preAuth = false where it hooks on 401
+      prepareRequest(options) {
+        if (!options.headers) {
+          throw Error("The request has no headers");
+        }
+        options.headers["Authorization"] = `Bearer ${this.token}`;
+      }
+      // This handler cannot handle 401
+      canHandleAuthentication() {
+        return false;
+      }
+      handleAuthentication() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          throw new Error("not implemented");
+        });
+      }
+    };
+    exports2.BearerCredentialHandler = BearerCredentialHandler;
+    var PersonalAccessTokenCredentialHandler = class {
+      constructor(token) {
+        this.token = token;
+      }
+      // currently implements pre-authorization
+      // TODO: support preAuth = false where it hooks on 401
+      prepareRequest(options) {
+        if (!options.headers) {
+          throw Error("The request has no headers");
+        }
+        options.headers["Authorization"] = `Basic ${Buffer.from(`PAT:${this.token}`).toString("base64")}`;
+      }
+      // This handler cannot handle 401
+      canHandleAuthentication() {
+        return false;
+      }
+      handleAuthentication() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          throw new Error("not implemented");
+        });
+      }
+    };
+    exports2.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHandler;
   }
 });
 
@@ -62478,7 +63704,7 @@ var require_requestUtils = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.retryHttpClientResponse = exports2.retryTypedResponse = exports2.retry = exports2.isRetryableStatusCode = exports2.isServerErrorStatusCode = exports2.isSuccessStatusCode = void 0;
     var core5 = __importStar2(require_core());
-    var http_client_1 = require_lib();
+    var http_client_1 = require_lib2();
     var constants_1 = require_constants6();
     function isSuccessStatusCode(statusCode) {
       if (!statusCode) {
@@ -62790,7 +64016,7 @@ var require_downloadUtils = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.downloadCacheStorageSDK = exports2.downloadCacheHttpClientConcurrent = exports2.downloadCacheHttpClient = exports2.DownloadProgress = void 0;
     var core5 = __importStar2(require_core());
-    var http_client_1 = require_lib();
+    var http_client_1 = require_lib2();
     var storage_blob_1 = require_commonjs13();
     var buffer = __importStar2(require("buffer"));
     var fs = __importStar2(require("fs"));
@@ -63367,8 +64593,8 @@ var require_cacheHttpClient = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.saveCache = exports2.reserveCache = exports2.downloadCache = exports2.getCacheEntry = void 0;
     var core5 = __importStar2(require_core());
-    var http_client_1 = require_lib();
-    var auth_1 = require_auth();
+    var http_client_1 = require_lib2();
+    var auth_1 = require_auth2();
     var fs = __importStar2(require("fs"));
     var url_1 = require("url");
     var utils = __importStar2(require_cacheUtils());
@@ -68574,8 +69800,8 @@ var require_cacheTwirpClient = __commonJS({
     var errors_1 = require_errors2();
     var config_1 = require_config();
     var cacheUtils_1 = require_cacheUtils();
-    var auth_1 = require_auth();
-    var http_client_1 = require_lib();
+    var auth_1 = require_auth2();
+    var http_client_1 = require_lib2();
     var cache_twirp_client_1 = require_cache_twirp_client();
     var util_1 = require_util9();
     var CacheServiceClient = class {
@@ -68774,7 +70000,7 @@ var require_tar = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createTar = exports2.extractTar = exports2.listTar = void 0;
     var exec_1 = require_exec();
-    var io = __importStar2(require_io());
+    var io = __importStar2(require_io2());
     var fs_1 = require("fs");
     var path3 = __importStar2(require("path"));
     var utils = __importStar2(require_cacheUtils());
@@ -69023,7 +70249,7 @@ var require_cache4 = __commonJS({
     var cacheTwirpClient = __importStar2(require_cacheTwirpClient());
     var config_1 = require_config();
     var tar_1 = require_tar();
-    var http_client_1 = require_lib();
+    var http_client_1 = require_lib2();
     var ValidationError = class _ValidationError extends Error {
       constructor(message) {
         super(message);
@@ -69443,6 +70669,707 @@ var require_context = __commonJS({
   }
 });
 
+// ../../node_modules/@actions/github/node_modules/@actions/http-client/lib/proxy.js
+var require_proxy3 = __commonJS({
+  "../../node_modules/@actions/github/node_modules/@actions/http-client/lib/proxy.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.checkBypass = exports2.getProxyUrl = void 0;
+    function getProxyUrl(reqUrl) {
+      const usingSsl = reqUrl.protocol === "https:";
+      if (checkBypass(reqUrl)) {
+        return void 0;
+      }
+      const proxyVar = (() => {
+        if (usingSsl) {
+          return process.env["https_proxy"] || process.env["HTTPS_PROXY"];
+        } else {
+          return process.env["http_proxy"] || process.env["HTTP_PROXY"];
+        }
+      })();
+      if (proxyVar) {
+        try {
+          return new DecodedURL(proxyVar);
+        } catch (_a) {
+          if (!proxyVar.startsWith("http://") && !proxyVar.startsWith("https://"))
+            return new DecodedURL(`http://${proxyVar}`);
+        }
+      } else {
+        return void 0;
+      }
+    }
+    exports2.getProxyUrl = getProxyUrl;
+    function checkBypass(reqUrl) {
+      if (!reqUrl.hostname) {
+        return false;
+      }
+      const reqHost = reqUrl.hostname;
+      if (isLoopbackAddress(reqHost)) {
+        return true;
+      }
+      const noProxy = process.env["no_proxy"] || process.env["NO_PROXY"] || "";
+      if (!noProxy) {
+        return false;
+      }
+      let reqPort;
+      if (reqUrl.port) {
+        reqPort = Number(reqUrl.port);
+      } else if (reqUrl.protocol === "http:") {
+        reqPort = 80;
+      } else if (reqUrl.protocol === "https:") {
+        reqPort = 443;
+      }
+      const upperReqHosts = [reqUrl.hostname.toUpperCase()];
+      if (typeof reqPort === "number") {
+        upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
+      }
+      for (const upperNoProxyItem of noProxy.split(",").map((x) => x.trim().toUpperCase()).filter((x) => x)) {
+        if (upperNoProxyItem === "*" || upperReqHosts.some((x) => x === upperNoProxyItem || x.endsWith(`.${upperNoProxyItem}`) || upperNoProxyItem.startsWith(".") && x.endsWith(`${upperNoProxyItem}`))) {
+          return true;
+        }
+      }
+      return false;
+    }
+    exports2.checkBypass = checkBypass;
+    function isLoopbackAddress(host) {
+      const hostLower = host.toLowerCase();
+      return hostLower === "localhost" || hostLower.startsWith("127.") || hostLower.startsWith("[::1]") || hostLower.startsWith("[0:0:0:0:0:0:0:1]");
+    }
+    var DecodedURL = class extends URL {
+      constructor(url, base) {
+        super(url, base);
+        this._decodedUsername = decodeURIComponent(super.username);
+        this._decodedPassword = decodeURIComponent(super.password);
+      }
+      get username() {
+        return this._decodedUsername;
+      }
+      get password() {
+        return this._decodedPassword;
+      }
+    };
+  }
+});
+
+// ../../node_modules/@actions/github/node_modules/@actions/http-client/lib/index.js
+var require_lib3 = __commonJS({
+  "../../node_modules/@actions/github/node_modules/@actions/http-client/lib/index.js"(exports2) {
+    "use strict";
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result2 = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding2(result2, mod, k);
+      }
+      __setModuleDefault2(result2, mod);
+      return result2;
+    };
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result2) {
+          result2.done ? resolve(result2.value) : adopt(result2.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.HttpClient = exports2.isHttps = exports2.HttpClientResponse = exports2.HttpClientError = exports2.getProxyUrl = exports2.MediaTypes = exports2.Headers = exports2.HttpCodes = void 0;
+    var http = __importStar2(require("http"));
+    var https = __importStar2(require("https"));
+    var pm = __importStar2(require_proxy3());
+    var tunnel = __importStar2(require_tunnel2());
+    var undici_1 = require_undici();
+    var HttpCodes;
+    (function(HttpCodes2) {
+      HttpCodes2[HttpCodes2["OK"] = 200] = "OK";
+      HttpCodes2[HttpCodes2["MultipleChoices"] = 300] = "MultipleChoices";
+      HttpCodes2[HttpCodes2["MovedPermanently"] = 301] = "MovedPermanently";
+      HttpCodes2[HttpCodes2["ResourceMoved"] = 302] = "ResourceMoved";
+      HttpCodes2[HttpCodes2["SeeOther"] = 303] = "SeeOther";
+      HttpCodes2[HttpCodes2["NotModified"] = 304] = "NotModified";
+      HttpCodes2[HttpCodes2["UseProxy"] = 305] = "UseProxy";
+      HttpCodes2[HttpCodes2["SwitchProxy"] = 306] = "SwitchProxy";
+      HttpCodes2[HttpCodes2["TemporaryRedirect"] = 307] = "TemporaryRedirect";
+      HttpCodes2[HttpCodes2["PermanentRedirect"] = 308] = "PermanentRedirect";
+      HttpCodes2[HttpCodes2["BadRequest"] = 400] = "BadRequest";
+      HttpCodes2[HttpCodes2["Unauthorized"] = 401] = "Unauthorized";
+      HttpCodes2[HttpCodes2["PaymentRequired"] = 402] = "PaymentRequired";
+      HttpCodes2[HttpCodes2["Forbidden"] = 403] = "Forbidden";
+      HttpCodes2[HttpCodes2["NotFound"] = 404] = "NotFound";
+      HttpCodes2[HttpCodes2["MethodNotAllowed"] = 405] = "MethodNotAllowed";
+      HttpCodes2[HttpCodes2["NotAcceptable"] = 406] = "NotAcceptable";
+      HttpCodes2[HttpCodes2["ProxyAuthenticationRequired"] = 407] = "ProxyAuthenticationRequired";
+      HttpCodes2[HttpCodes2["RequestTimeout"] = 408] = "RequestTimeout";
+      HttpCodes2[HttpCodes2["Conflict"] = 409] = "Conflict";
+      HttpCodes2[HttpCodes2["Gone"] = 410] = "Gone";
+      HttpCodes2[HttpCodes2["TooManyRequests"] = 429] = "TooManyRequests";
+      HttpCodes2[HttpCodes2["InternalServerError"] = 500] = "InternalServerError";
+      HttpCodes2[HttpCodes2["NotImplemented"] = 501] = "NotImplemented";
+      HttpCodes2[HttpCodes2["BadGateway"] = 502] = "BadGateway";
+      HttpCodes2[HttpCodes2["ServiceUnavailable"] = 503] = "ServiceUnavailable";
+      HttpCodes2[HttpCodes2["GatewayTimeout"] = 504] = "GatewayTimeout";
+    })(HttpCodes || (exports2.HttpCodes = HttpCodes = {}));
+    var Headers;
+    (function(Headers2) {
+      Headers2["Accept"] = "accept";
+      Headers2["ContentType"] = "content-type";
+    })(Headers || (exports2.Headers = Headers = {}));
+    var MediaTypes;
+    (function(MediaTypes2) {
+      MediaTypes2["ApplicationJson"] = "application/json";
+    })(MediaTypes || (exports2.MediaTypes = MediaTypes = {}));
+    function getProxyUrl(serverUrl) {
+      const proxyUrl = pm.getProxyUrl(new URL(serverUrl));
+      return proxyUrl ? proxyUrl.href : "";
+    }
+    exports2.getProxyUrl = getProxyUrl;
+    var HttpRedirectCodes = [
+      HttpCodes.MovedPermanently,
+      HttpCodes.ResourceMoved,
+      HttpCodes.SeeOther,
+      HttpCodes.TemporaryRedirect,
+      HttpCodes.PermanentRedirect
+    ];
+    var HttpResponseRetryCodes = [
+      HttpCodes.BadGateway,
+      HttpCodes.ServiceUnavailable,
+      HttpCodes.GatewayTimeout
+    ];
+    var RetryableHttpVerbs = ["OPTIONS", "GET", "DELETE", "HEAD"];
+    var ExponentialBackoffCeiling = 10;
+    var ExponentialBackoffTimeSlice = 5;
+    var HttpClientError = class _HttpClientError extends Error {
+      constructor(message, statusCode) {
+        super(message);
+        this.name = "HttpClientError";
+        this.statusCode = statusCode;
+        Object.setPrototypeOf(this, _HttpClientError.prototype);
+      }
+    };
+    exports2.HttpClientError = HttpClientError;
+    var HttpClientResponse = class {
+      constructor(message) {
+        this.message = message;
+      }
+      readBody() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve) => __awaiter2(this, void 0, void 0, function* () {
+            let output = Buffer.alloc(0);
+            this.message.on("data", (chunk) => {
+              output = Buffer.concat([output, chunk]);
+            });
+            this.message.on("end", () => {
+              resolve(output.toString());
+            });
+          }));
+        });
+      }
+      readBodyBuffer() {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve) => __awaiter2(this, void 0, void 0, function* () {
+            const chunks = [];
+            this.message.on("data", (chunk) => {
+              chunks.push(chunk);
+            });
+            this.message.on("end", () => {
+              resolve(Buffer.concat(chunks));
+            });
+          }));
+        });
+      }
+    };
+    exports2.HttpClientResponse = HttpClientResponse;
+    function isHttps(requestUrl) {
+      const parsedUrl = new URL(requestUrl);
+      return parsedUrl.protocol === "https:";
+    }
+    exports2.isHttps = isHttps;
+    var HttpClient = class {
+      constructor(userAgent, handlers, requestOptions) {
+        this._ignoreSslError = false;
+        this._allowRedirects = true;
+        this._allowRedirectDowngrade = false;
+        this._maxRedirects = 50;
+        this._allowRetries = false;
+        this._maxRetries = 1;
+        this._keepAlive = false;
+        this._disposed = false;
+        this.userAgent = userAgent;
+        this.handlers = handlers || [];
+        this.requestOptions = requestOptions;
+        if (requestOptions) {
+          if (requestOptions.ignoreSslError != null) {
+            this._ignoreSslError = requestOptions.ignoreSslError;
+          }
+          this._socketTimeout = requestOptions.socketTimeout;
+          if (requestOptions.allowRedirects != null) {
+            this._allowRedirects = requestOptions.allowRedirects;
+          }
+          if (requestOptions.allowRedirectDowngrade != null) {
+            this._allowRedirectDowngrade = requestOptions.allowRedirectDowngrade;
+          }
+          if (requestOptions.maxRedirects != null) {
+            this._maxRedirects = Math.max(requestOptions.maxRedirects, 0);
+          }
+          if (requestOptions.keepAlive != null) {
+            this._keepAlive = requestOptions.keepAlive;
+          }
+          if (requestOptions.allowRetries != null) {
+            this._allowRetries = requestOptions.allowRetries;
+          }
+          if (requestOptions.maxRetries != null) {
+            this._maxRetries = requestOptions.maxRetries;
+          }
+        }
+      }
+      options(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("OPTIONS", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      get(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("GET", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      del(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("DELETE", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      post(requestUrl, data, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("POST", requestUrl, data, additionalHeaders || {});
+        });
+      }
+      patch(requestUrl, data, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("PATCH", requestUrl, data, additionalHeaders || {});
+        });
+      }
+      put(requestUrl, data, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("PUT", requestUrl, data, additionalHeaders || {});
+        });
+      }
+      head(requestUrl, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request("HEAD", requestUrl, null, additionalHeaders || {});
+        });
+      }
+      sendStream(verb, requestUrl, stream, additionalHeaders) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return this.request(verb, requestUrl, stream, additionalHeaders);
+        });
+      }
+      /**
+       * Gets a typed object from an endpoint
+       * Be aware that not found returns a null.  Other errors (4xx, 5xx) reject the promise
+       */
+      getJson(requestUrl, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          const res = yield this.get(requestUrl, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      postJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.post(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      putJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.put(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      patchJson(requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          const data = JSON.stringify(obj, null, 2);
+          additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
+          additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
+          const res = yield this.patch(requestUrl, data, additionalHeaders);
+          return this._processResponse(res, this.requestOptions);
+        });
+      }
+      /**
+       * Makes a raw http request.
+       * All other methods such as get, post, patch, and request ultimately call this.
+       * Prefer get, del, post and patch
+       */
+      request(verb, requestUrl, data, headers) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          if (this._disposed) {
+            throw new Error("Client has already been disposed.");
+          }
+          const parsedUrl = new URL(requestUrl);
+          let info2 = this._prepareRequest(verb, parsedUrl, headers);
+          const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
+          let numTries = 0;
+          let response;
+          do {
+            response = yield this.requestRaw(info2, data);
+            if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
+              let authenticationHandler;
+              for (const handler of this.handlers) {
+                if (handler.canHandleAuthentication(response)) {
+                  authenticationHandler = handler;
+                  break;
+                }
+              }
+              if (authenticationHandler) {
+                return authenticationHandler.handleAuthentication(this, info2, data);
+              } else {
+                return response;
+              }
+            }
+            let redirectsRemaining = this._maxRedirects;
+            while (response.message.statusCode && HttpRedirectCodes.includes(response.message.statusCode) && this._allowRedirects && redirectsRemaining > 0) {
+              const redirectUrl = response.message.headers["location"];
+              if (!redirectUrl) {
+                break;
+              }
+              const parsedRedirectUrl = new URL(redirectUrl);
+              if (parsedUrl.protocol === "https:" && parsedUrl.protocol !== parsedRedirectUrl.protocol && !this._allowRedirectDowngrade) {
+                throw new Error("Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.");
+              }
+              yield response.readBody();
+              if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
+                for (const header in headers) {
+                  if (header.toLowerCase() === "authorization") {
+                    delete headers[header];
+                  }
+                }
+              }
+              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info2, data);
+              redirectsRemaining--;
+            }
+            if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
+              return response;
+            }
+            numTries += 1;
+            if (numTries < maxTries) {
+              yield response.readBody();
+              yield this._performExponentialBackoff(numTries);
+            }
+          } while (numTries < maxTries);
+          return response;
+        });
+      }
+      /**
+       * Needs to be called if keepAlive is set to true in request options.
+       */
+      dispose() {
+        if (this._agent) {
+          this._agent.destroy();
+        }
+        this._disposed = true;
+      }
+      /**
+       * Raw request.
+       * @param info
+       * @param data
+       */
+      requestRaw(info2, data) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve, reject) => {
+            function callbackForResult(err, res) {
+              if (err) {
+                reject(err);
+              } else if (!res) {
+                reject(new Error("Unknown error"));
+              } else {
+                resolve(res);
+              }
+            }
+            this.requestRawWithCallback(info2, data, callbackForResult);
+          });
+        });
+      }
+      /**
+       * Raw request with callback.
+       * @param info
+       * @param data
+       * @param onResult
+       */
+      requestRawWithCallback(info2, data, onResult) {
+        if (typeof data === "string") {
+          if (!info2.options.headers) {
+            info2.options.headers = {};
+          }
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+        }
+        let callbackCalled = false;
+        function handleResult(err, res) {
+          if (!callbackCalled) {
+            callbackCalled = true;
+            onResult(err, res);
+          }
+        }
+        const req = info2.httpModule.request(info2.options, (msg) => {
+          const res = new HttpClientResponse(msg);
+          handleResult(void 0, res);
+        });
+        let socket;
+        req.on("socket", (sock) => {
+          socket = sock;
+        });
+        req.setTimeout(this._socketTimeout || 3 * 6e4, () => {
+          if (socket) {
+            socket.end();
+          }
+          handleResult(new Error(`Request timeout: ${info2.options.path}`));
+        });
+        req.on("error", function(err) {
+          handleResult(err);
+        });
+        if (data && typeof data === "string") {
+          req.write(data, "utf8");
+        }
+        if (data && typeof data !== "string") {
+          data.on("close", function() {
+            req.end();
+          });
+          data.pipe(req);
+        } else {
+          req.end();
+        }
+      }
+      /**
+       * Gets an http agent. This function is useful when you need an http agent that handles
+       * routing through a proxy server - depending upon the url and proxy environment variables.
+       * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
+       */
+      getAgent(serverUrl) {
+        const parsedUrl = new URL(serverUrl);
+        return this._getAgent(parsedUrl);
+      }
+      getAgentDispatcher(serverUrl) {
+        const parsedUrl = new URL(serverUrl);
+        const proxyUrl = pm.getProxyUrl(parsedUrl);
+        const useProxy = proxyUrl && proxyUrl.hostname;
+        if (!useProxy) {
+          return;
+        }
+        return this._getProxyAgentDispatcher(parsedUrl, proxyUrl);
+      }
+      _prepareRequest(method, requestUrl, headers) {
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https : http;
+        const defaultPort = usingSsl ? 443 : 80;
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
+        if (this.userAgent != null) {
+          info2.options.headers["user-agent"] = this.userAgent;
+        }
+        info2.options.agent = this._getAgent(info2.parsedUrl);
+        if (this.handlers) {
+          for (const handler of this.handlers) {
+            handler.prepareRequest(info2.options);
+          }
+        }
+        return info2;
+      }
+      _mergeHeaders(headers) {
+        if (this.requestOptions && this.requestOptions.headers) {
+          return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers || {}));
+        }
+        return lowercaseKeys(headers || {});
+      }
+      _getExistingOrDefaultHeader(additionalHeaders, header, _default) {
+        let clientHeader;
+        if (this.requestOptions && this.requestOptions.headers) {
+          clientHeader = lowercaseKeys(this.requestOptions.headers)[header];
+        }
+        return additionalHeaders[header] || clientHeader || _default;
+      }
+      _getAgent(parsedUrl) {
+        let agent;
+        const proxyUrl = pm.getProxyUrl(parsedUrl);
+        const useProxy = proxyUrl && proxyUrl.hostname;
+        if (this._keepAlive && useProxy) {
+          agent = this._proxyAgent;
+        }
+        if (!useProxy) {
+          agent = this._agent;
+        }
+        if (agent) {
+          return agent;
+        }
+        const usingSsl = parsedUrl.protocol === "https:";
+        let maxSockets = 100;
+        if (this.requestOptions) {
+          maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
+        }
+        if (proxyUrl && proxyUrl.hostname) {
+          const agentOptions = {
+            maxSockets,
+            keepAlive: this._keepAlive,
+            proxy: Object.assign(Object.assign({}, (proxyUrl.username || proxyUrl.password) && {
+              proxyAuth: `${proxyUrl.username}:${proxyUrl.password}`
+            }), { host: proxyUrl.hostname, port: proxyUrl.port })
+          };
+          let tunnelAgent;
+          const overHttps = proxyUrl.protocol === "https:";
+          if (usingSsl) {
+            tunnelAgent = overHttps ? tunnel.httpsOverHttps : tunnel.httpsOverHttp;
+          } else {
+            tunnelAgent = overHttps ? tunnel.httpOverHttps : tunnel.httpOverHttp;
+          }
+          agent = tunnelAgent(agentOptions);
+          this._proxyAgent = agent;
+        }
+        if (!agent) {
+          const options = { keepAlive: this._keepAlive, maxSockets };
+          agent = usingSsl ? new https.Agent(options) : new http.Agent(options);
+          this._agent = agent;
+        }
+        if (usingSsl && this._ignoreSslError) {
+          agent.options = Object.assign(agent.options || {}, {
+            rejectUnauthorized: false
+          });
+        }
+        return agent;
+      }
+      _getProxyAgentDispatcher(parsedUrl, proxyUrl) {
+        let proxyAgent;
+        if (this._keepAlive) {
+          proxyAgent = this._proxyAgentDispatcher;
+        }
+        if (proxyAgent) {
+          return proxyAgent;
+        }
+        const usingSsl = parsedUrl.protocol === "https:";
+        proxyAgent = new undici_1.ProxyAgent(Object.assign({ uri: proxyUrl.href, pipelining: !this._keepAlive ? 0 : 1 }, (proxyUrl.username || proxyUrl.password) && {
+          token: `Basic ${Buffer.from(`${proxyUrl.username}:${proxyUrl.password}`).toString("base64")}`
+        }));
+        this._proxyAgentDispatcher = proxyAgent;
+        if (usingSsl && this._ignoreSslError) {
+          proxyAgent.options = Object.assign(proxyAgent.options.requestTls || {}, {
+            rejectUnauthorized: false
+          });
+        }
+        return proxyAgent;
+      }
+      _performExponentialBackoff(retryNumber) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
+          const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
+          return new Promise((resolve) => setTimeout(() => resolve(), ms));
+        });
+      }
+      _processResponse(res, options) {
+        return __awaiter2(this, void 0, void 0, function* () {
+          return new Promise((resolve, reject) => __awaiter2(this, void 0, void 0, function* () {
+            const statusCode = res.message.statusCode || 0;
+            const response = {
+              statusCode,
+              result: null,
+              headers: {}
+            };
+            if (statusCode === HttpCodes.NotFound) {
+              resolve(response);
+            }
+            function dateTimeDeserializer(key, value) {
+              if (typeof value === "string") {
+                const a = new Date(value);
+                if (!isNaN(a.valueOf())) {
+                  return a;
+                }
+              }
+              return value;
+            }
+            let obj;
+            let contents;
+            try {
+              contents = yield res.readBody();
+              if (contents && contents.length > 0) {
+                if (options && options.deserializeDates) {
+                  obj = JSON.parse(contents, dateTimeDeserializer);
+                } else {
+                  obj = JSON.parse(contents);
+                }
+                response.result = obj;
+              }
+              response.headers = res.message.headers;
+            } catch (err) {
+            }
+            if (statusCode > 299) {
+              let msg;
+              if (obj && obj.message) {
+                msg = obj.message;
+              } else if (contents && contents.length > 0) {
+                msg = contents;
+              } else {
+                msg = `Failed request: (${statusCode})`;
+              }
+              const err = new HttpClientError(msg, statusCode);
+              err.result = response.result;
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          }));
+        });
+      }
+    };
+    exports2.HttpClient = HttpClient;
+    var lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
+  }
+});
+
 // ../../node_modules/@actions/github/lib/internal/utils.js
 var require_utils5 = __commonJS({
   "../../node_modules/@actions/github/lib/internal/utils.js"(exports2) {
@@ -69503,7 +71430,7 @@ var require_utils5 = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.getApiBaseUrl = exports2.getProxyFetch = exports2.getProxyAgentDispatcher = exports2.getProxyAgent = exports2.getAuthString = void 0;
-    var httpClient = __importStar2(require_lib());
+    var httpClient = __importStar2(require_lib3());
     var undici_1 = require_undici();
     function getAuthString(token, options) {
       if (!token && !options.auth) {
@@ -91293,7 +93220,7 @@ var require_bluetooth = __commonJS({
 });
 
 // ../../node_modules/systeminformation/lib/index.js
-var require_lib2 = __commonJS({
+var require_lib4 = __commonJS({
   "../../node_modules/systeminformation/lib/index.js"(exports2) {
     "use strict";
     var lib_version = require_package2().version;
@@ -102239,7 +104166,7 @@ var core2 = __toESM(require_core(), 1);
 var import_exec = __toESM(require_exec(), 1);
 var github2 = __toESM(require_github(), 1);
 var import_exponential_backoff = __toESM(require_backoff(), 1);
-var system = __toESM(require_lib2(), 1);
+var system = __toESM(require_lib4(), 1);
 
 // src/constants.ts
 var os = __toESM(require("node:os"), 1);

@@ -208,9 +208,9 @@ var require_file_command = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/http-client/lib/proxy.js
+// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/proxy.js
 var require_proxy = __commonJS({
-  "../../node_modules/@actions/http-client/lib/proxy.js"(exports2) {
+  "../../node_modules/@actions/core/node_modules/@actions/http-client/lib/proxy.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkBypass = exports2.getProxyUrl = void 0;
@@ -17284,9 +17284,9 @@ var require_undici = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/http-client/lib/index.js
+// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/index.js
 var require_lib = __commonJS({
-  "../../node_modules/@actions/http-client/lib/index.js"(exports2) {
+  "../../node_modules/@actions/core/node_modules/@actions/http-client/lib/index.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -17903,9 +17903,9 @@ var require_lib = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/http-client/lib/auth.js
+// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/auth.js
 var require_auth = __commonJS({
-  "../../node_modules/@actions/http-client/lib/auth.js"(exports2) {
+  "../../node_modules/@actions/core/node_modules/@actions/http-client/lib/auth.js"(exports2) {
     "use strict";
     var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
@@ -18448,9 +18448,9 @@ var require_path_utils = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/io/lib/io-util.js
+// ../../node_modules/@actions/exec/node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
-  "../../node_modules/@actions/io/lib/io-util.js"(exports2) {
+  "../../node_modules/@actions/exec/node_modules/@actions/io/lib/io-util.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
@@ -18621,9 +18621,9 @@ var require_io_util = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/io/lib/io.js
+// ../../node_modules/@actions/exec/node_modules/@actions/io/lib/io.js
 var require_io = __commonJS({
-  "../../node_modules/@actions/io/lib/io.js"(exports2) {
+  "../../node_modules/@actions/exec/node_modules/@actions/io/lib/io.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
