@@ -25,11 +25,11 @@
     "yaml": "2.8.1"
   },
   "devDependencies": {
-    "@tsconfig/node24": "24.0.1",
-    "@tsconfig/strictest": "2.0.7",
-    "@types/node": "24.10.0",
+    "@tsconfig/node24": "24.0.3",
+    "@tsconfig/strictest": "2.0.8",
+    "@types/node": "24.10.1",
     "@types/semver": "7.7.1",
-    "esbuild": "0.25.12",
+    "esbuild": "0.27.0",
     "typescript": "5.9.3"
   }
 }
