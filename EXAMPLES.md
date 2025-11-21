@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
@@ -50,7 +50,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: _build/default/_doc/_html
 
@@ -66,7 +66,7 @@ Consult the [`@actions/glob`](https://github.com/actions/toolkit/tree/main/packa
 ```yml
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v5
+    uses: actions/checkout@v6
 
   - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v3
@@ -93,7 +93,7 @@ runs-on: ubuntu-latest
 
 steps:
   - name: Checkout tree
-    uses: actions/checkout@v5
+    uses: actions/checkout@v6
 
   - name: Retrieve new lists of system packages
     run: apt-get update
