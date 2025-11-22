@@ -1,4 +1,5 @@
 import * as fs from "node:fs/promises";
+import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import { PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
 
@@ -46,10 +47,22 @@ async function skipPackageManagement() {
 }
 
 async function disableManDbAutoUpdate() {
-  await exec("sudo", ["debconf-communicate"], {
-    input: Buffer.from("set man-db/auto-update false"),
-  });
-  await exec("sudo", ["dpkg-reconfigure", "man-db"]);
+  try {
+    await exec("sudo", ["debconf-communicate"], {
+      input: Buffer.from("set man-db/auto-update false"),
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      core.info(error.message);
+    }
+  }
+  try {
+    await exec("sudo", ["dpkg-reconfigure", "man-db"]);
+  } catch (error) {
+    if (error instanceof Error) {
+      core.info(error.message);
+    }
+  }
 }
 
 export async function installUnixSystemPackages() {
