@@ -1,24 +1,20 @@
 import * as fs from "node:fs/promises";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
-import { PLATFORM, DISTRO, RUNNER_ENVIRONMENT } from "./constants.js";
+import { DISTRO, PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
 
 async function checkInstallability(packageName: string) {
-    let output;
-    if (DISTRO === "alpine") {
-        output = await getExecOutput("apk", [
-            "search",
-            "--exact",
-            packageName,
-        ]);
-    } else {
-     output = await getExecOutput("sudo", [
-        "apt-cache",
-        "search",
-        "--names-only",
-        `'^${packageName}$'`,
+  let output;
+  if (DISTRO === "alpine") {
+    output = await getExecOutput("apk", ["search", "--exact", packageName]);
+  } else {
+    output = await getExecOutput("sudo", [
+      "apt-cache",
+      "search",
+      "--names-only",
+      `'^${packageName}$'`,
     ]);
-}
+  }
   return output.stdout.length > 0;
 }
 

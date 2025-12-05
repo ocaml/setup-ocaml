@@ -82,7 +82,7 @@ export async function installer() {
     const ocamlCompiler = await resolvedCompiler;
     await installOcaml(ocamlCompiler);
     if (!SAVE_OPAM_POST_RUN) {
-        await saveOpamCache();
+      await saveOpamCache();
     }
   } else {
     await update();

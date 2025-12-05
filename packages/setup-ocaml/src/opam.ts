@@ -200,15 +200,15 @@ export async function repositoryRemoveAll() {
 }
 
 export async function update() {
-    try {
-        await core.group("Updating opam repositories", async () => {
-            await exec("opam", ["update"]);
-          })
-      } catch (error) {
-        if (error instanceof Error) {
-          core.notice(
-            `Failed to update opam. Error details: ${error.message.toLocaleLowerCase()}`,
-          );
-        }
+  try {
+    await core.group("Updating opam repositories", async () => {
+      await exec("opam", ["update"]);
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      core.notice(
+        `Failed to update opam. Error details: ${error.message.toLocaleLowerCase()}`,
+      );
     }
+  }
 }
