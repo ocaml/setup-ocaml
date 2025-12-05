@@ -1,7 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
-import { PLATFORM } from "./constants.js";
+import { PLATFORM, DISTRO, RUNNER_ENVIRONMENT } from "./constants.js";
 
 async function checkInstallability(packageName: string) {
     let output;
