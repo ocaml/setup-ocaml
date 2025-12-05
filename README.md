@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
         with:

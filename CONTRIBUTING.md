@@ -2,16 +2,13 @@
 
 Requirements:
 
-- [Node.js](https://nodejs.org)
-  - Requires a relatively up-to-date version of Node.js - preferably the version in [.nvmrc](./.nvmrc).
-- [Corepack](https://nodejs.org/api/corepack.html)
-  - Shipped with Node.js, however on some distributions it is not distributed, in which case install it through npm using: `npm install --global corepack`
+- [Mise](https://mise.jdx.dev)
+  - A polyglot tool version manager that manages Node.js and Yarn versions as specified in [mise.toml](./mise.toml)
 
 To regenerated the compiled JavaScript files in `dist/`, call:
 
 ```
-nvm install
-corepack enable
+mise install
 yarn install --immutable
 yarn build
 ```

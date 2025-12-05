@@ -15,11 +15,24 @@
       "project": "recommended"
     },
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "useImportExtensions": {
+          "fix": "safe",
+          "level": "error",
+          "options": {
+            "forceJsExtensions": true
+          }
+        }
+      },
+      "nursery": {
+        "noImportCycles": "error"
+      }
     }
   },
   "formatter": {
     "enabled": true,
+    "formatWithErrors": true,
     "useEditorconfig": true
   },
   "assist": {

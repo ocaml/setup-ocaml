@@ -68,8 +68,7 @@ export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
-// [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-export const CYGWIN_ROOT = path.join("D:", "cygwin");
+export const CYGWIN_ROOT = path.join("C:", "cygwin");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
@@ -83,16 +82,14 @@ export const DUNE_CACHE_ROOT = (() => {
     return path.join(xdgCacheHome, "dune");
   }
   if (PLATFORM === "windows") {
-    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-    return path.join("D:", "dune");
+    return path.join("C:", "dune");
   }
   return path.join(os.homedir(), ".cache", "dune");
 })();
 
 export const OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
-    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-    return path.join("D:", ".opam");
+    return path.join("C:", ".opam");
   }
   return path.join(os.homedir(), ".opam");
 })();

@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "esbuild --bundle --format=cjs --outfile=../../lint-fmt/dist/index.cjs --platform=node --target=node20 src/index.ts",
+    "build": "esbuild --bundle --format=cjs --outfile=../../lint-fmt/dist/index.cjs --platform=node --target=node24 src/index.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -12,10 +12,10 @@
     "@actions/exec": "1.1.1"
   },
   "devDependencies": {
-    "@tsconfig/node20": "20.1.5",
-    "@tsconfig/strictest": "2.0.5",
-    "@types/node": "22.15.21",
-    "esbuild": "0.25.5",
-    "typescript": "5.8.3"
+    "@tsconfig/node24": "24.0.3",
+    "@tsconfig/strictest": "2.0.8",
+    "@types/node": "24.10.1",
+    "esbuild": "0.27.0",
+    "typescript": "5.9.3"
   }
 }
