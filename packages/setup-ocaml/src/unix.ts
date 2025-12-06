@@ -4,7 +4,7 @@ import { exec, getExecOutput } from "@actions/exec";
 import { DISTRO, PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
 
 async function checkInstallability(packageName: string) {
-  let output;
+  let output = null;
   if (DISTRO === "alpine") {
     output = await getExecOutput("apk", ["search", "--exact", packageName]);
   } else {

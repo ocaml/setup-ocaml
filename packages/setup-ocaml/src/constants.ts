@@ -60,7 +60,7 @@ export const DISTRO = (() => {
     const osRelease = fs.readFileSync("/etc/os-release");
     const match = osRelease.toString().match(/^ID=(.*)$/m);
     return match ? match[1] : "(unknown)";
-  } catch (e) {
+  } catch (_e) {
     return "(unknown)";
   }
 })();
