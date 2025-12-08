@@ -1,6 +1,6 @@
+import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import * as fs from "node:fs";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import * as yaml from "yaml";
@@ -57,19 +57,18 @@ export const PLATFORM = (() => {
 
 export const DISTRO = (() => {
   try {
-    const osRelease = fs.readFileSync("/etc/os-release")
-    const match = osRelease.toString().match(/^ID=(.*)$/m)
-    return match ? match[1] : "(unknown)"
-  } catch (e) {
-    return "(unknown)"
+    const osRelease = fs.readFileSync("/etc/os-release");
+    const match = osRelease.toString().match(/^ID=(.*)$/m);
+    return match ? match[1] : "(unknown)";
+  } catch (_e) {
+    return "(unknown)";
   }
 })();
 export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
-// [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-export const CYGWIN_ROOT = path.join("D:", "cygwin");
+export const CYGWIN_ROOT = path.join("C:", "cygwin");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 
@@ -83,16 +82,14 @@ export const DUNE_CACHE_ROOT = (() => {
     return path.join(xdgCacheHome, "dune");
   }
   if (PLATFORM === "windows") {
-    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-    return path.join("D:", "dune");
+    return path.join("C:", "dune");
   }
   return path.join(os.homedir(), ".cache", "dune");
 })();
 
 export const OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
-    // [HACK] https://github.com/ocaml/setup-ocaml/pull/55
-    return path.join("D:", ".opam");
+    return path.join("C:", ".opam");
   }
   return path.join(os.homedir(), ".opam");
 })();
@@ -126,9 +123,7 @@ export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   required: true,
 });
 
-export const SAVE_OPAM_POST_RUN = core.getBooleanInput(
-  "save-opam-post-run",
-);
+export const SAVE_OPAM_POST_RUN = core.getBooleanInput("save-opam-post-run");
 
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows

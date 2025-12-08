@@ -20,7 +20,7 @@ import {
 } from "./unix.js";
 
 export const latestOpamRelease = (async () => {
-  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.4.0";
+  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.6.0";
   const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
@@ -200,15 +200,15 @@ export async function repositoryRemoveAll() {
 }
 
 export async function update() {
-    try {
-        await core.group("Updating opam repositories", async () => {
-            await exec("opam", ["update"]);
-          })
-      } catch (error) {
-        if (error instanceof Error) {
-          core.notice(
-            `Failed to update opam. Error details: ${error.message.toLocaleLowerCase()}`,
-          );
-        }
+  try {
+    await core.group("Updating opam repositories", async () => {
+      await exec("opam", ["update"]);
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      core.notice(
+        `Failed to update opam. Error details: ${error.message.toLocaleLowerCase()}`,
+      );
     }
+  }
 }
