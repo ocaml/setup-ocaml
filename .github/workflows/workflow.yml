@@ -34,7 +34,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-slim
           - ubuntu-latest
           - macos-latest
           - windows-latest
