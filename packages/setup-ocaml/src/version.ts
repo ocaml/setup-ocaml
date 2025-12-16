@@ -53,6 +53,9 @@ async function resolveVersion(semverVersion: string) {
 }
 
 export const resolvedCompiler = (async () => {
+  if (OCAML_COMPILER === "") {
+    return "";
+  }
   const resolvedCompiler = isSemverValidRange(OCAML_COMPILER)
     ? `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}`
     : OCAML_COMPILER;
