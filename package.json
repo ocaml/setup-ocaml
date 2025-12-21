@@ -14,8 +14,8 @@
     "typecheck": "turbo run typecheck --continue --parallel"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.8",
-    "turbo": "2.6.3"
+    "@biomejs/biome": "2.3.10",
+    "turbo": "2.7.1"
   },
   "packageManager": "yarn@4.12.0"
 }

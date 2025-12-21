@@ -77946,7 +77946,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.13",
+      version: "5.27.14",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -78620,17 +78620,7 @@ var require_util10 = __commonJS({
       return _smartMonToolsInstalled;
     }
     function isRaspberry(cpuinfo) {
-      const PI_MODEL_NO = [
-        "BCM2708",
-        "BCM2709",
-        "BCM2710",
-        "BCM2711",
-        "BCM2712",
-        "BCM2835",
-        "BCM2836",
-        "BCM2837",
-        "BCM2837B0"
-      ];
+      const PI_MODEL_NO = ["BCM2708", "BCM2709", "BCM2710", "BCM2711", "BCM2712", "BCM2835", "BCM2836", "BCM2837", "BCM2837B0"];
       if (_rpi_cpuinfo !== null) {
         cpuinfo = _rpi_cpuinfo;
       } else if (cpuinfo === void 0) {
@@ -78708,7 +78698,7 @@ var require_util10 = __commonJS({
       let result2 = "";
       const l = mathMin(s.length, 2e3);
       for (let i = 0; i <= l; i++) {
-        if (!(s[i] === void 0 || s[i] === ">" || s[i] === "<" || s[i] === "*" || s[i] === "?" || s[i] === "[" || s[i] === "]" || s[i] === "|" || s[i] === "\u02DA" || s[i] === "$" || s[i] === ";" || s[i] === "&" || s[i] === "]" || s[i] === "#" || s[i] === "\\" || s[i] === "	" || s[i] === "\n" || s[i] === "\r" || s[i] === "'" || s[i] === "`" || s[i] === '"' || s[i].length > 1 || strict && s[i] === "(" || strict && s[i] === ")" || strict && s[i] === "@" || strict && s[i] === " " || strict && s[i] == "{" || strict && s[i] == ";" || strict && s[i] == "}")) {
+        if (!(s[i] === void 0 || s[i] === ">" || s[i] === "<" || s[i] === "*" || s[i] === "?" || s[i] === "[" || s[i] === "]" || s[i] === "|" || s[i] === "\u02DA" || s[i] === "$" || s[i] === ";" || s[i] === "&" || s[i] === "]" || s[i] === "#" || s[i] === "\\" || s[i] === "	" || s[i] === "\n" || s[i] === "\r" || s[i] === "'" || s[i] === "`" || s[i] === '"' || s[i].length > 1 || strict && s[i] === "(" || strict && s[i] === ")" || strict && s[i] === "@" || strict && s[i] === " " || strict && s[i] === "{" || strict && s[i] === ";" || strict && s[i] === "}")) {
           result2 = result2 + s[i];
         }
       }
@@ -78951,21 +78941,8 @@ var require_util10 = __commonJS({
           processor: "BCM2835"
         }
       };
-      const processorList = [
-        "BCM2835",
-        "BCM2836",
-        "BCM2837",
-        "BCM2711",
-        "BCM2712"
-      ];
-      const manufacturerList = [
-        "Sony UK",
-        "Egoman",
-        "Embest",
-        "Sony Japan",
-        "Embest",
-        "Stadium"
-      ];
+      const processorList = ["BCM2835", "BCM2836", "BCM2837", "BCM2711", "BCM2712"];
+      const manufacturerList = ["Sony UK", "Egoman", "Embest", "Sony Japan", "Embest", "Stadium"];
       const typeList = {
         "00": "A",
         "01": "B",
@@ -78981,16 +78958,16 @@ var require_util10 = __commonJS({
         "0d": "3B+",
         "0e": "3A+",
         "0f": "Internal use only",
-        "10": "CM3+",
-        "11": "4B",
-        "12": "Zero 2 W",
-        "13": "400",
-        "14": "CM4",
-        "15": "CM4S",
-        "16": "Internal use only",
-        "17": "5",
-        "18": "CM5",
-        "19": "500/500+",
+        10: "CM3+",
+        11: "4B",
+        12: "Zero 2 W",
+        13: "400",
+        14: "CM4",
+        15: "CM4S",
+        16: "Internal use only",
+        17: "5",
+        18: "CM5",
+        19: "500/500+",
         "1a": "CM5 Lite"
       };
       const revisionCode = getValue(lines, "revision", ":", true);
@@ -86378,12 +86355,12 @@ var require_filesystem = __commonJS({
         return result2;
       }
       function filterLines(stdout) {
-        let lines = stdout.toString().split("\n");
+        const lines = stdout.toString().split("\n");
         lines.shift();
         if (stdout.toString().toLowerCase().indexOf("filesystem")) {
           let removeLines = 0;
           for (let i = 0; i < lines.length; i++) {
-            if (lines[i] && lines[i].toLowerCase().startsWith("filesystem")) {
+            if (lines[i]?.toLowerCase().startsWith("filesystem")) {
               removeLines = i;
             }
           }
@@ -86394,18 +86371,18 @@ var require_filesystem = __commonJS({
         return lines;
       }
       function parseDf(lines) {
-        let data = [];
-        lines.forEach(function(line) {
+        const data = [];
+        lines.forEach((line) => {
           if (line !== "") {
             line = line.replace(/ +/g, " ").split(" ");
             if (line && (line[0].startsWith("/") || line[6] && line[6] === "/" || line[0].indexOf("/") > 0 || line[0].indexOf(":") === 1 || !_darwin && !isLinuxTmpFs(line[1]))) {
               const fs2 = line[0];
               const fsType = _linux || _freebsd || _openbsd || _netbsd ? line[1] : getmacOsFsType(line[0]);
-              const size = parseInt(_linux || _freebsd || _openbsd || _netbsd ? line[2] : line[1]) * 1024;
-              const used = parseInt(_linux || _freebsd || _openbsd || _netbsd ? line[3] : line[2]) * 1024;
-              const available = parseInt(_linux || _freebsd || _openbsd || _netbsd ? line[4] : line[3]) * 1024;
+              const size = parseInt(_linux || _freebsd || _openbsd || _netbsd ? line[2] : line[1], 10) * 1024;
+              const used = parseInt(_linux || _freebsd || _openbsd || _netbsd ? line[3] : line[2], 10) * 1024;
+              const available = parseInt(_linux || _freebsd || _openbsd || _netbsd ? line[4] : line[3], 10) * 1024;
               const use = parseFloat((100 * (used / (used + available))).toFixed(2));
-              let rw = osMounts && Object.keys(osMounts).length > 0 ? osMounts[fs2] || false : null;
+              const rw = osMounts && Object.keys(osMounts).length > 0 ? osMounts[fs2] || false : null;
               line.splice(0, _linux || _freebsd || _openbsd || _netbsd ? 6 : 5);
               const mount = line.join(" ");
               if (!data.find((el) => el.fs === fs2 && el.type === fsType)) {
@@ -86443,7 +86420,7 @@ var require_filesystem = __commonJS({
                 }).forEach((line) => {
                   osMounts[line.split(" ")[0]] = line.toLowerCase().indexOf("read-only") === -1;
                 });
-              } catch (e) {
+              } catch {
                 util.noop();
               }
             }
@@ -86458,7 +86435,7 @@ var require_filesystem = __commonJS({
                     osMounts[line.split(" ")[0]] = line.toLowerCase().indexOf("rw,") >= 0 || line.toLowerCase().indexOf(" rw ") >= 0;
                   }
                 });
-              } catch (e) {
+              } catch {
                 util.noop();
               }
             }
@@ -86468,12 +86445,12 @@ var require_filesystem = __commonJS({
                 execSync("mount").toString().split("\n").forEach((line) => {
                   osMounts[line.split(" ")[0]] = line.toLowerCase().indexOf("read-only") === -1;
                 });
-              } catch (e) {
+              } catch {
                 util.noop();
               }
             }
-            exec3(cmd, { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
-              let lines = filterLines(stdout);
+            exec3(cmd, { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
+              const lines = filterLines(stdout);
               data = parseDf(lines);
               if (drive) {
                 data = data.filter((item) => {
@@ -86486,9 +86463,9 @@ var require_filesystem = __commonJS({
                 }
                 resolve(data);
               } else {
-                exec3("df -kPT", { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
+                exec3("df -kPT", { maxBuffer: 1024 * 1024 }, (error3, stdout2) => {
                   if (!error3) {
-                    let lines2 = filterLines(stdout2);
+                    const lines2 = filterLines(stdout2);
                     data = parseDf(lines2);
                   }
                   if (callback) {
@@ -86507,12 +86484,13 @@ var require_filesystem = __commonJS({
           }
           if (_windows) {
             try {
-              const cmd = `Get-WmiObject Win32_logicaldisk | select Access,Caption,FileSystem,FreeSpace,Size ${drive ? "| where -property Caption -eq " + drive : ""} | fl`;
+              const driveSanitized = drive ? util.sanitizeShellString(drive, true) : "";
+              const cmd = `Get-WmiObject Win32_logicaldisk | select Access,Caption,FileSystem,FreeSpace,Size ${driveSanitized ? "| where -property Caption -eq " + driveSanitized : ""} | fl`;
               util.powerShell(cmd).then((stdout, error2) => {
                 if (!error2) {
-                  let devices = stdout.toString().split(/\n\s*\n/);
-                  devices.forEach(function(device) {
-                    let lines = device.split("\r\n");
+                  const devices = stdout.toString().split(/\n\s*\n/);
+                  devices.forEach((device) => {
+                    const lines = device.split("\r\n");
                     const size = util.toInt(util.getValue(lines, "size", ":"));
                     const free = util.toInt(util.getValue(lines, "freespace", ":"));
                     const caption = util.getValue(lines, "caption", ":");
@@ -86537,7 +86515,7 @@ var require_filesystem = __commonJS({
                 }
                 resolve(data);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(data);
               }
@@ -86557,10 +86535,10 @@ var require_filesystem = __commonJS({
             available: null
           };
           if (_freebsd || _openbsd || _netbsd || _darwin) {
-            let cmd = "sysctl -i kern.maxfiles kern.num_files kern.open_files";
-            exec3(cmd, { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            const cmd = "sysctl -i kern.maxfiles kern.num_files kern.open_files";
+            exec3(cmd, { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().split("\n");
+                const lines = stdout.toString().split("\n");
                 result2.max = parseInt(util.getValue(lines, "kern.maxfiles", ":"), 10);
                 result2.allocated = parseInt(util.getValue(lines, "kern.num_files", ":"), 10) || parseInt(util.getValue(lines, "kern.open_files", ":"), 10);
                 result2.available = result2.max - result2.allocated;
@@ -86572,9 +86550,9 @@ var require_filesystem = __commonJS({
             });
           }
           if (_linux) {
-            fs.readFile("/proc/sys/fs/file-nr", function(error2, stdout) {
+            fs.readFile("/proc/sys/fs/file-nr", (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().split("\n");
+                const lines = stdout.toString().split("\n");
                 if (lines[0]) {
                   const parts = lines[0].replace(/\s+/g, " ").split(" ");
                   if (parts.length === 3) {
@@ -86591,9 +86569,9 @@ var require_filesystem = __commonJS({
                 }
                 resolve(result2);
               } else {
-                fs.readFile("/proc/sys/fs/file-max", function(error3, stdout2) {
+                fs.readFile("/proc/sys/fs/file-max", (error3, stdout2) => {
                   if (!error3) {
-                    let lines = stdout2.toString().split("\n");
+                    const lines = stdout2.toString().split("\n");
                     if (lines[0]) {
                       result2.max = parseInt(lines[0], 10);
                     }
@@ -86623,17 +86601,17 @@ var require_filesystem = __commonJS({
     }
     exports2.fsOpenFiles = fsOpenFiles;
     function parseBytes(s) {
-      return parseInt(s.substr(s.indexOf(" (") + 2, s.indexOf(" Bytes)") - 10));
+      return parseInt(s.substr(s.indexOf(" (") + 2, s.indexOf(" Bytes)") - 10), 10);
     }
     function parseDevices(lines) {
-      let devices = [];
+      const devices = [];
       let i = 0;
       lines.forEach((line) => {
         if (line.length > 0) {
           if (line[0] === "*") {
             i++;
           } else {
-            let parts = line.split(":");
+            const parts = line.split(":");
             if (parts.length > 1) {
               if (!devices[i]) {
                 devices[i] = {
@@ -86712,23 +86690,23 @@ var require_filesystem = __commonJS({
         try {
           line = decodeURIComponent(line.replace(/\\x/g, "%"));
           line = line.replace(/\\/g, "\\\\");
-          let disk = JSON.parse(line);
+          const disk = JSON.parse(line);
           data.push({
-            "name": disk.name,
-            "type": disk.type,
-            "fsType": disk.fsType,
-            "mount": disk.mountpoint,
-            "size": parseInt(disk.size),
-            "physical": disk.type === "disk" ? disk.rota === "0" ? "SSD" : "HDD" : disk.type === "rom" ? "CD/DVD" : "",
-            "uuid": disk.uuid,
-            "label": disk.label,
-            "model": (disk.model || "").trim(),
-            "serial": disk.serial,
-            "removable": disk.rm === "1",
-            "protocol": disk.tran,
-            "group": disk.group || ""
+            name: util.sanitizeShellString(disk.name),
+            type: disk.type,
+            fsType: disk.fsType,
+            mount: disk.mountpoint,
+            size: parseInt(disk.size, 10),
+            physical: disk.type === "disk" ? disk.rota === "0" ? "SSD" : "HDD" : disk.type === "rom" ? "CD/DVD" : "",
+            uuid: disk.uuid,
+            label: disk.label,
+            model: (disk.model || "").trim(),
+            serial: disk.serial,
+            removable: disk.rm === "1",
+            protocol: disk.tran,
+            group: disk.group || ""
           });
-        } catch (e) {
+        } catch {
           util.noop();
         }
       });
@@ -86762,7 +86740,7 @@ var require_filesystem = __commonJS({
             const mdData = decodeMdabmData(lines);
             element.label = mdData.label;
             element.uuid = mdData.uuid;
-            if (mdData.members && mdData.members.length && mdData.raid === element.type) {
+            if (mdData.members?.length && mdData.raid === element.type) {
               result2 = result2.map((blockdevice) => {
                 if (blockdevice.fsType === "linux_raid_member" && mdData.members.indexOf(blockdevice.name) >= 0) {
                   blockdevice.group = element.name;
@@ -86772,7 +86750,7 @@ var require_filesystem = __commonJS({
             }
           }
         });
-      } catch (e) {
+      } catch {
         util.noop();
       }
       return result2;
@@ -86800,7 +86778,7 @@ var require_filesystem = __commonJS({
           }
           return blockdevice;
         });
-      } catch (e) {
+      } catch {
         util.noop();
       }
       return result2;
@@ -86839,7 +86817,7 @@ var require_filesystem = __commonJS({
           }
           return blockdevice;
         });
-      } catch (e) {
+      } catch {
         util.noop();
       }
       return result2;
@@ -86880,9 +86858,9 @@ var require_filesystem = __commonJS({
         process.nextTick(() => {
           let data = [];
           if (_linux) {
-            const procLsblk1 = exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,TRAN,SERIAL,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            const procLsblk1 = exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,TRAN,SERIAL,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
               if (!error2) {
-                let lines = blkStdoutToObject(stdout).split("\n");
+                const lines = blkStdoutToObject(stdout).split("\n");
                 data = parseBlk(lines);
                 data = raidMatchLinux(data);
                 data = matchDevicesLinux(data);
@@ -86891,9 +86869,9 @@ var require_filesystem = __commonJS({
                 }
                 resolve(data);
               } else {
-                const procLsblk2 = exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
+                const procLsblk2 = exec3("lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,LABEL,MODEL,OWNER 2>/dev/null", { maxBuffer: 1024 * 1024 }, (error3, stdout2) => {
                   if (!error3) {
-                    let lines = blkStdoutToObject(stdout2).split("\n");
+                    const lines = blkStdoutToObject(stdout2).split("\n");
                     data = parseBlk(lines);
                     data = raidMatchLinux(data);
                   }
@@ -86902,7 +86880,7 @@ var require_filesystem = __commonJS({
                   }
                   resolve(data);
                 });
-                procLsblk2.on("error", function() {
+                procLsblk2.on("error", () => {
                   if (callback) {
                     callback(data);
                   }
@@ -86910,7 +86888,7 @@ var require_filesystem = __commonJS({
                 });
               }
             });
-            procLsblk1.on("error", function() {
+            procLsblk1.on("error", () => {
               if (callback) {
                 callback(data);
               }
@@ -86918,9 +86896,9 @@ var require_filesystem = __commonJS({
             });
           }
           if (_darwin) {
-            const procDskutil = exec3("diskutil info -all", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            const procDskutil = exec3("diskutil info -all", { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().split("\n");
+                const lines = stdout.toString().split("\n");
                 data = parseDevices(lines);
                 data = matchDevicesMac(data);
               }
@@ -86929,7 +86907,7 @@ var require_filesystem = __commonJS({
               }
               resolve(data);
             });
-            procDskutil.on("error", function() {
+            procDskutil.on("error", () => {
               if (callback) {
                 callback(data);
               }
@@ -86943,19 +86921,21 @@ var require_filesystem = __commonJS({
             resolve(data);
           }
           if (_windows) {
-            let drivetypes = ["Unknown", "NoRoot", "Removable", "Local", "Network", "CD/DVD", "RAM"];
+            const drivetypes = ["Unknown", "NoRoot", "Removable", "Local", "Network", "CD/DVD", "RAM"];
             try {
               const workload = [];
               workload.push(util.powerShell("Get-CimInstance -ClassName Win32_LogicalDisk | select Caption,DriveType,Name,FileSystem,Size,VolumeSerialNumber,VolumeName | fl"));
-              workload.push(util.powerShell("Get-WmiObject -Class Win32_diskdrive | Select-Object -Property PNPDeviceId,DeviceID, Model, Size, @{L='Partitions'; E={$_.GetRelated('Win32_DiskPartition').GetRelated('Win32_LogicalDisk') | Select-Object -Property DeviceID, VolumeName, Size, FreeSpace}} | fl"));
-              util.promiseAll(
-                workload
-              ).then((res) => {
-                let logicalDisks = res.results[0].toString().split(/\n\s*\n/);
-                let diskDrives = res.results[1].toString().split(/\n\s*\n/);
-                logicalDisks.forEach(function(device) {
-                  let lines = device.split("\r\n");
-                  let drivetype = util.getValue(lines, "drivetype", ":");
+              workload.push(
+                util.powerShell(
+                  "Get-WmiObject -Class Win32_diskdrive | Select-Object -Property PNPDeviceId,DeviceID, Model, Size, @{L='Partitions'; E={$_.GetRelated('Win32_DiskPartition').GetRelated('Win32_LogicalDisk') | Select-Object -Property DeviceID, VolumeName, Size, FreeSpace}} | fl"
+                )
+              );
+              util.promiseAll(workload).then((res) => {
+                const logicalDisks = res.results[0].toString().split(/\n\s*\n/);
+                const diskDrives = res.results[1].toString().split(/\n\s*\n/);
+                logicalDisks.forEach((device) => {
+                  const lines = device.split("\r\n");
+                  const drivetype = util.getValue(lines, "drivetype", ":");
                   if (drivetype) {
                     data.push({
                       name: util.getValue(lines, "name", ":"),
@@ -86982,7 +86962,7 @@ var require_filesystem = __commonJS({
                 }
                 resolve(data);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(data);
               }
@@ -87000,7 +86980,7 @@ var require_filesystem = __commonJS({
     }
     exports2.blockDevices = blockDevices;
     function calcFsSpeed(rx, wx) {
-      let result2 = {
+      const result2 = {
         rx: 0,
         wx: 0,
         tx: 0,
@@ -87009,7 +86989,7 @@ var require_filesystem = __commonJS({
         tx_sec: null,
         ms: 0
       };
-      if (_fs_speed && _fs_speed.ms) {
+      if (_fs_speed?.ms) {
         result2.rx = rx;
         result2.wx = wx;
         result2.tx = result2.rx + result2.wx;
@@ -87057,13 +87037,13 @@ var require_filesystem = __commonJS({
           };
           let rx = 0;
           let wx = 0;
-          if (_fs_speed && !_fs_speed.ms || _fs_speed && _fs_speed.ms && Date.now() - _fs_speed.ms >= 500) {
+          if (_fs_speed && !_fs_speed.ms || _fs_speed?.ms && Date.now() - _fs_speed.ms >= 500) {
             if (_linux) {
-              const procLsblk = exec3("lsblk -r 2>/dev/null | grep /", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+              const procLsblk = exec3("lsblk -r 2>/dev/null | grep /", { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
                 if (!error2) {
-                  let lines = stdout.toString().split("\n");
-                  let fs_filter = [];
-                  lines.forEach(function(line) {
+                  const lines = stdout.toString().split("\n");
+                  const fs_filter = [];
+                  lines.forEach((line) => {
                     if (line !== "") {
                       line = line.trim().split(" ");
                       if (fs_filter.indexOf(line[0]) === -1) {
@@ -87071,16 +87051,16 @@ var require_filesystem = __commonJS({
                       }
                     }
                   });
-                  let output = fs_filter.join("|");
-                  const procCat = exec3('cat /proc/diskstats | egrep "' + output + '"', { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
+                  const output = fs_filter.join("|");
+                  const procCat = exec3('cat /proc/diskstats | egrep "' + output + '"', { maxBuffer: 1024 * 1024 }, (error3, stdout2) => {
                     if (!error3) {
-                      let lines2 = stdout2.toString().split("\n");
-                      lines2.forEach(function(line) {
+                      const lines2 = stdout2.toString().split("\n");
+                      lines2.forEach((line) => {
                         line = line.trim();
                         if (line !== "") {
                           line = line.replace(/ +/g, " ").split(" ");
-                          rx += parseInt(line[5]) * 512;
-                          wx += parseInt(line[9]) * 512;
+                          rx += parseInt(line[5], 10) * 512;
+                          wx += parseInt(line[9], 10) * 512;
                         }
                       });
                       result2 = calcFsSpeed(rx, wx);
@@ -87090,7 +87070,7 @@ var require_filesystem = __commonJS({
                     }
                     resolve(result2);
                   });
-                  procCat.on("error", function() {
+                  procCat.on("error", () => {
                     if (callback) {
                       callback(result2);
                     }
@@ -87103,7 +87083,7 @@ var require_filesystem = __commonJS({
                   resolve(result2);
                 }
               });
-              procLsblk.on("error", function() {
+              procLsblk.on("error", () => {
                 if (callback) {
                   callback(result2);
                 }
@@ -87111,25 +87091,29 @@ var require_filesystem = __commonJS({
               });
             }
             if (_darwin) {
-              const procIoreg = exec3('ioreg -c IOBlockStorageDriver -k Statistics -r -w0 | sed -n "/IOBlockStorageDriver/,/Statistics/p" | grep "Statistics" | tr -cd "01234567890,\n"', { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
-                if (!error2) {
-                  let lines = stdout.toString().split("\n");
-                  lines.forEach(function(line) {
-                    line = line.trim();
-                    if (line !== "") {
-                      line = line.split(",");
-                      rx += parseInt(line[2]);
-                      wx += parseInt(line[9]);
-                    }
-                  });
-                  result2 = calcFsSpeed(rx, wx);
+              const procIoreg = exec3(
+                'ioreg -c IOBlockStorageDriver -k Statistics -r -w0 | sed -n "/IOBlockStorageDriver/,/Statistics/p" | grep "Statistics" | tr -cd "01234567890,\n"',
+                { maxBuffer: 1024 * 1024 },
+                (error2, stdout) => {
+                  if (!error2) {
+                    const lines = stdout.toString().split("\n");
+                    lines.forEach((line) => {
+                      line = line.trim();
+                      if (line !== "") {
+                        line = line.split(",");
+                        rx += parseInt(line[2], 10);
+                        wx += parseInt(line[9], 10);
+                      }
+                    });
+                    result2 = calcFsSpeed(rx, wx);
+                  }
+                  if (callback) {
+                    callback(result2);
+                  }
+                  resolve(result2);
                 }
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              });
-              procIoreg.on("error", function() {
+              );
+              procIoreg.on("error", () => {
                 if (callback) {
                   callback(result2);
                 }
@@ -87154,7 +87138,7 @@ var require_filesystem = __commonJS({
     }
     exports2.fsStats = fsStats;
     function calcDiskIO(rIO, wIO, rWaitTime, wWaitTime, tWaitTime) {
-      let result2 = {
+      const result2 = {
         rIO: 0,
         wIO: 0,
         tIO: 0,
@@ -87169,7 +87153,7 @@ var require_filesystem = __commonJS({
         tWaitPercent: null,
         ms: 0
       };
-      if (_disk_io && _disk_io.ms) {
+      if (_disk_io?.ms) {
         result2.rIO = rIO;
         result2.wIO = wIO;
         result2.tIO = rIO + wIO;
@@ -87248,22 +87232,22 @@ var require_filesystem = __commonJS({
           let rWaitTime = 0;
           let wWaitTime = 0;
           let tWaitTime = 0;
-          if (_disk_io && !_disk_io.ms || _disk_io && _disk_io.ms && Date.now() - _disk_io.ms >= 500) {
+          if (_disk_io && !_disk_io.ms || _disk_io?.ms && Date.now() - _disk_io.ms >= 500) {
             if (_linux || _freebsd || _openbsd || _netbsd) {
-              let cmd = 'for mount in `lsblk 2>/dev/null | grep " disk " | sed "s/[\u2502\u2514\u2500\u251C]//g" | awk \'{$1=$1};1\' | cut -d " " -f 1 | sort -u`; do cat /sys/block/$mount/stat | sed -r "s/ +/;/g" | sed -r "s/^;//"; done';
-              exec3(cmd, { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+              const cmd = 'for mount in `lsblk 2>/dev/null | grep " disk " | sed "s/[\u2502\u2514\u2500\u251C]//g" | awk \'{$1=$1};1\' | cut -d " " -f 1 | sort -u`; do cat /sys/block/$mount/stat | sed -r "s/ +/;/g" | sed -r "s/^;//"; done';
+              exec3(cmd, { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
                 if (!error2) {
-                  let lines = stdout.split("\n");
-                  lines.forEach(function(line) {
+                  const lines = stdout.split("\n");
+                  lines.forEach((line) => {
                     if (!line) {
                       return;
                     }
-                    let stats = line.split(";");
-                    rIO += parseInt(stats[0]);
-                    wIO += parseInt(stats[4]);
-                    rWaitTime += parseInt(stats[3]);
-                    wWaitTime += parseInt(stats[7]);
-                    tWaitTime += parseInt(stats[10]);
+                    const stats = line.split(";");
+                    rIO += parseInt(stats[0], 10);
+                    wIO += parseInt(stats[4], 10);
+                    rWaitTime += parseInt(stats[3], 10);
+                    wWaitTime += parseInt(stats[7], 10);
+                    tWaitTime += parseInt(stats[10], 10);
                   });
                   result2 = calcDiskIO(rIO, wIO, rWaitTime, wWaitTime, tWaitTime);
                   if (callback) {
@@ -87279,24 +87263,28 @@ var require_filesystem = __commonJS({
               });
             }
             if (_darwin) {
-              exec3('ioreg -c IOBlockStorageDriver -k Statistics -r -w0 | sed -n "/IOBlockStorageDriver/,/Statistics/p" | grep "Statistics" | tr -cd "01234567890,\n"', { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
-                if (!error2) {
-                  let lines = stdout.toString().split("\n");
-                  lines.forEach(function(line) {
-                    line = line.trim();
-                    if (line !== "") {
-                      line = line.split(",");
-                      rIO += parseInt(line[10]);
-                      wIO += parseInt(line[0]);
-                    }
-                  });
-                  result2 = calcDiskIO(rIO, wIO, rWaitTime, wWaitTime, tWaitTime);
+              exec3(
+                'ioreg -c IOBlockStorageDriver -k Statistics -r -w0 | sed -n "/IOBlockStorageDriver/,/Statistics/p" | grep "Statistics" | tr -cd "01234567890,\n"',
+                { maxBuffer: 1024 * 1024 },
+                (error2, stdout) => {
+                  if (!error2) {
+                    const lines = stdout.toString().split("\n");
+                    lines.forEach((line) => {
+                      line = line.trim();
+                      if (line !== "") {
+                        line = line.split(",");
+                        rIO += parseInt(line[10], 10);
+                        wIO += parseInt(line[0], 10);
+                      }
+                    });
+                    result2 = calcDiskIO(rIO, wIO, rWaitTime, wWaitTime, tWaitTime);
+                  }
+                  if (callback) {
+                    callback(result2);
+                  }
+                  resolve(result2);
                 }
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
-              });
+              );
             }
           } else {
             result2.rIO = _disk_io.rIO;
@@ -87379,11 +87367,11 @@ var require_filesystem = __commonJS({
             }
             resolve(res);
           };
-          let result2 = [];
+          const result2 = [];
           let cmd = "";
           if (_linux) {
             let cmdFullSmart = "";
-            exec3("export LC_ALL=C; lsblk -ablJO 2>/dev/null; unset LC_ALL", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            exec3("export LC_ALL=C; lsblk -ablJO 2>/dev/null; unset LC_ALL", { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
               if (!error2) {
                 try {
                   const out = stdout.toString().trim();
@@ -87395,15 +87383,18 @@ var require_filesystem = __commonJS({
                         return item.type === "disk" && item.size > 0 && (item.model !== null || item.mountpoint === null && item.label === null && item.fstype === null && item.parttype === null && item.path && item.path.indexOf("/ram") !== 0 && item.path.indexOf("/loop") !== 0 && item["disc-max"] && item["disc-max"] !== 0);
                       });
                     }
-                  } catch (e) {
+                  } catch {
                     try {
-                      const out2 = execSync("export LC_ALL=C; lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,LABEL,MODEL,OWNER,GROUP 2>/dev/null; unset LC_ALL", util.execOptsLinux).toString();
-                      let lines = blkStdoutToObject(out2).split("\n");
+                      const out2 = execSync(
+                        "export LC_ALL=C; lsblk -bPo NAME,TYPE,SIZE,FSTYPE,MOUNTPOINT,UUID,ROTA,RO,RM,LABEL,MODEL,OWNER,GROUP 2>/dev/null; unset LC_ALL",
+                        util.execOptsLinux
+                      ).toString();
+                      const lines = blkStdoutToObject(out2).split("\n");
                       const data = parseBlk(lines);
                       devices = data.filter((item) => {
                         return item.type === "disk" && item.size > 0 && (item.model !== null && item.model !== "" || item.mount === "" && item.label === "" && item.fsType === "");
                       });
-                    } catch (e2) {
+                    } catch {
                       util.noop();
                     }
                   }
@@ -87413,7 +87404,7 @@ var require_filesystem = __commonJS({
                     const logical = device.name;
                     try {
                       mediumType = execSync("cat /sys/block/" + logical + "/queue/rotational 2>/dev/null", util.execOptsLinux).toString().split("\n")[0];
-                    } catch (e) {
+                    } catch {
                       util.noop();
                     }
                     let interfaceType = device.tran ? device.tran.toUpperCase().trim() : "";
@@ -87445,12 +87436,12 @@ var require_filesystem = __commonJS({
 ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                     cmdFullSmart += `${cmdFullSmart ? 'printf ",";' : ""}smartctl -a -j ${BSDName};`;
                   });
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
               }
               if (cmdFullSmart) {
-                exec3(cmdFullSmart, { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
+                exec3(cmdFullSmart, { maxBuffer: 1024 * 1024 }, (error3, stdout2) => {
                   try {
                     const data = JSON.parse(`[${stdout2}]`);
                     data.forEach((disk) => {
@@ -87458,7 +87449,7 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                       for (let i = 0; i < result2.length; i++) {
                         if (result2[i].BSDName === diskBSDName) {
                           result2[i].smartStatus = disk.smart_status.passed ? "Ok" : disk.smart_status.passed === false ? "Predicted Failure" : "unknown";
-                          if (disk.temperature && disk.temperature.current) {
+                          if (disk.temperature?.current) {
                             result2[i].temperature = disk.temperature.current;
                           }
                           result2[i].smartData = disk;
@@ -87466,21 +87457,21 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                       }
                     });
                     commitResult(result2);
-                  } catch (e) {
+                  } catch {
                     if (cmd) {
                       cmd = cmd + 'printf "\n"';
-                      exec3(cmd, { maxBuffer: 1024 * 1024 }, function(error4, stdout3) {
-                        let lines = stdout3.toString().split("\n");
+                      exec3(cmd, { maxBuffer: 1024 * 1024 }, (error4, stdout3) => {
+                        const lines = stdout3.toString().split("\n");
                         lines.forEach((line) => {
                           if (line) {
-                            let parts = line.split("|");
+                            const parts = line.split("|");
                             if (parts.length === 2) {
-                              let BSDName = parts[0];
+                              const BSDName = parts[0];
                               parts[1] = parts[1].trim();
-                              let parts2 = parts[1].split(":");
+                              const parts2 = parts[1].split(":");
                               if (parts2.length === 2) {
                                 parts2[1] = parts2[1].trim();
-                                let status = parts2[1].toLowerCase();
+                                const status = parts2[1].toLowerCase();
                                 for (let i = 0; i < result2.length; i++) {
                                   if (result2[i].BSDName === BSDName) {
                                     result2[i].smartStatus = status === "passed" ? "Ok" : status === "failed!" ? "Predicted Failure" : "unknown";
@@ -87515,12 +87506,12 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
             resolve(result2);
           }
           if (_darwin) {
-            exec3("system_profiler SPSerialATADataType SPNVMeDataType SPUSBDataType", { maxBuffer: 1024 * 1024 }, function(error2, stdout) {
+            exec3("system_profiler SPSerialATADataType SPNVMeDataType SPUSBDataType", { maxBuffer: 1024 * 1024 }, (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().split("\n");
-                let linesSATA = [];
-                let linesNVMe = [];
-                let linesUSB = [];
+                const lines = stdout.toString().split("\n");
+                const linesSATA = [];
+                const linesNVMe = [];
+                const linesUSB = [];
                 let dataType = "SATA";
                 lines.forEach((line) => {
                   if (line === "NVMExpress:") {
@@ -87538,21 +87529,24 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                   }
                 });
                 try {
-                  let devices = linesSATA.join("\n").split(" Physical Interconnect: ");
+                  const devices = linesSATA.join("\n").split(" Physical Interconnect: ");
                   devices.shift();
-                  devices.forEach(function(device) {
+                  devices.forEach((device) => {
                     device = "InterfaceType: " + device;
-                    let lines2 = device.split("\n");
+                    const lines2 = device.split("\n");
                     const mediumType = util.getValue(lines2, "Medium Type", ":", true).trim();
                     const sizeStr = util.getValue(lines2, "capacity", ":", true).trim();
                     const BSDName = util.getValue(lines2, "BSD Name", ":", true).trim();
                     if (sizeStr) {
                       let sizeValue = 0;
                       if (sizeStr.indexOf("(") >= 0) {
-                        sizeValue = parseInt(sizeStr.match(/\(([^)]+)\)/)[1].replace(/\./g, "").replace(/,/g, "").replace(/\s/g, ""));
+                        sizeValue = parseInt(
+                          sizeStr.match(/\(([^)]+)\)/)[1].replace(/\./g, "").replace(/,/g, "").replace(/\s/g, ""),
+                          10
+                        );
                       }
                       if (!sizeValue) {
-                        sizeValue = parseInt(sizeStr);
+                        sizeValue = parseInt(sizeStr, 10);
                       }
                       if (sizeValue) {
                         const smartStatusString = util.getValue(lines2, "S.M.A.R.T. status", ":", true).trim().toLowerCase();
@@ -87580,25 +87574,28 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                       }
                     }
                   });
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
                 try {
-                  let devices = linesNVMe.join("\n").split("\n\n          Capacity:");
+                  const devices = linesNVMe.join("\n").split("\n\n          Capacity:");
                   devices.shift();
-                  devices.forEach(function(device) {
-                    device = "!Capacity: " + device;
-                    let lines2 = device.split("\n");
+                  devices.forEach((device) => {
+                    device = `!Capacity: ${device}`;
+                    const lines2 = device.split("\n");
                     const linkWidth = util.getValue(lines2, "link width", ":", true).trim();
                     const sizeStr = util.getValue(lines2, "!capacity", ":", true).trim();
                     const BSDName = util.getValue(lines2, "BSD Name", ":", true).trim();
                     if (sizeStr) {
                       let sizeValue = 0;
                       if (sizeStr.indexOf("(") >= 0) {
-                        sizeValue = parseInt(sizeStr.match(/\(([^)]+)\)/)[1].replace(/\./g, "").replace(/,/g, "").replace(/\s/g, ""));
+                        sizeValue = parseInt(
+                          sizeStr.match(/\(([^)]+)\)/)[1].replace(/\./g, "").replace(/,/g, "").replace(/\s/g, ""),
+                          10
+                        );
                       }
                       if (!sizeValue) {
-                        sizeValue = parseInt(sizeStr);
+                        sizeValue = parseInt(sizeStr, 10);
                       }
                       if (sizeValue) {
                         const smartStatusString = util.getValue(lines2, "S.M.A.R.T. status", ":", true).trim().toLowerCase();
@@ -87622,27 +87619,31 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                           temperature: null,
                           BSDName
                         });
-                        cmd = cmd + 'printf "\n' + BSDName + '|"; diskutil info /dev/' + BSDName + " | grep SMART;";
+                        cmd = `${cmd}printf "
+${BSDName}|"; diskutil info /dev/${BSDName} | grep SMART;`;
                       }
                     }
                   });
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
                 try {
-                  let devices = linesUSB.join("\n").replaceAll("Media:\n ", "Model:").split("\n\n          Product ID:");
+                  const devices = linesUSB.join("\n").replaceAll("Media:\n ", "Model:").split("\n\n          Product ID:");
                   devices.shift();
-                  devices.forEach(function(device) {
-                    let lines2 = device.split("\n");
+                  devices.forEach((device) => {
+                    const lines2 = device.split("\n");
                     const sizeStr = util.getValue(lines2, "Capacity", ":", true).trim();
                     const BSDName = util.getValue(lines2, "BSD Name", ":", true).trim();
                     if (sizeStr) {
                       let sizeValue = 0;
                       if (sizeStr.indexOf("(") >= 0) {
-                        sizeValue = parseInt(sizeStr.match(/\(([^)]+)\)/)[1].replace(/\./g, "").replace(/,/g, "").replace(/\s/g, ""));
+                        sizeValue = parseInt(
+                          sizeStr.match(/\(([^)]+)\)/)[1].replace(/\./g, "").replace(/,/g, "").replace(/\s/g, ""),
+                          10
+                        );
                       }
                       if (!sizeValue) {
-                        sizeValue = parseInt(sizeStr);
+                        sizeValue = parseInt(sizeStr, 10);
                       }
                       if (sizeValue) {
                         const smartStatusString = util.getValue(lines2, "S.M.A.R.T. status", ":", true).trim().toLowerCase();
@@ -87670,23 +87671,23 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                       }
                     }
                   });
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
                 if (cmd) {
                   cmd = cmd + 'printf "\n"';
-                  exec3(cmd, { maxBuffer: 1024 * 1024 }, function(error3, stdout2) {
-                    let lines2 = stdout2.toString().split("\n");
+                  exec3(cmd, { maxBuffer: 1024 * 1024 }, (error3, stdout2) => {
+                    const lines2 = stdout2.toString().split("\n");
                     lines2.forEach((line) => {
                       if (line) {
-                        let parts = line.split("|");
+                        const parts = line.split("|");
                         if (parts.length === 2) {
-                          let BSDName = parts[0];
+                          const BSDName = parts[0];
                           parts[1] = parts[1].trim();
-                          let parts2 = parts[1].split(":");
+                          const parts2 = parts[1].split(":");
                           if (parts2.length === 2) {
                             parts2[1] = parts2[1].trim();
-                            let status = parts2[1].toLowerCase();
+                            const status = parts2[1].toLowerCase();
                             for (let i = 0; i < result2.length; i++) {
                               if (result2[i].BSDName === BSDName) {
                                 result2[i].smartStatus = status === "not supported" ? "not supported" : status === "verified" ? "Ok" : status === "failing" ? "Predicted Failure" : "unknown";
@@ -87709,26 +87710,28 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
           if (_windows) {
             try {
               const workload = [];
-              workload.push(util.powerShell("Get-CimInstance Win32_DiskDrive | select Caption,Size,Status,PNPDeviceId,DeviceId,BytesPerSector,TotalCylinders,TotalHeads,TotalSectors,TotalTracks,TracksPerCylinder,SectorsPerTrack,FirmwareRevision,SerialNumber,InterfaceType | fl"));
+              workload.push(
+                util.powerShell(
+                  "Get-CimInstance Win32_DiskDrive | select Caption,Size,Status,PNPDeviceId,DeviceId,BytesPerSector,TotalCylinders,TotalHeads,TotalSectors,TotalTracks,TracksPerCylinder,SectorsPerTrack,FirmwareRevision,SerialNumber,InterfaceType | fl"
+                )
+              );
               workload.push(util.powerShell("Get-PhysicalDisk | select BusType,MediaType,FriendlyName,Model,SerialNumber,Size | fl"));
               if (util.smartMonToolsInstalled()) {
                 try {
                   const smartDev = JSON.parse(execSync("smartctl --scan -j").toString());
-                  if (smartDev && smartDev.devices && smartDev.devices.length > 0) {
+                  if (smartDev?.devices && smartDev.devices.length > 0) {
                     smartDev.devices.forEach((dev) => {
                       workload.push(execPromiseSave(`smartctl -j -a ${dev.name}`, util.execOptsWin));
                     });
                   }
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
               }
-              util.promiseAll(
-                workload
-              ).then((data) => {
+              util.promiseAll(workload).then((data) => {
                 let devices = data.results[0].toString().split(/\n\s*\n/);
-                devices.forEach(function(device) {
-                  let lines = device.split("\r\n");
+                devices.forEach((device) => {
+                  const lines = device.split("\r\n");
                   const size = util.getValue(lines, "Size", ":").trim();
                   const status = util.getValue(lines, "Status", ":").trim().toLowerCase();
                   if (size) {
@@ -87739,14 +87742,14 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                       // just a starting point ... better: MSFT_PhysicalDisk - Media Type ... see below
                       name: util.getValue(lines, "Caption", ":"),
                       vendor: getVendorFromModel(util.getValue(lines, "Caption", ":", true).trim()),
-                      size: parseInt(size),
-                      bytesPerSector: parseInt(util.getValue(lines, "BytesPerSector", ":")),
-                      totalCylinders: parseInt(util.getValue(lines, "TotalCylinders", ":")),
-                      totalHeads: parseInt(util.getValue(lines, "TotalHeads", ":")),
-                      totalSectors: parseInt(util.getValue(lines, "TotalSectors", ":")),
-                      totalTracks: parseInt(util.getValue(lines, "TotalTracks", ":")),
-                      tracksPerCylinder: parseInt(util.getValue(lines, "TracksPerCylinder", ":")),
-                      sectorsPerTrack: parseInt(util.getValue(lines, "SectorsPerTrack", ":")),
+                      size: parseInt(size, 10),
+                      bytesPerSector: parseInt(util.getValue(lines, "BytesPerSector", ":"), 10),
+                      totalCylinders: parseInt(util.getValue(lines, "TotalCylinders", ":"), 10),
+                      totalHeads: parseInt(util.getValue(lines, "TotalHeads", ":"), 10),
+                      totalSectors: parseInt(util.getValue(lines, "TotalSectors", ":"), 10),
+                      totalTracks: parseInt(util.getValue(lines, "TotalTracks", ":"), 10),
+                      tracksPerCylinder: parseInt(util.getValue(lines, "TracksPerCylinder", ":"), 10),
+                      sectorsPerTrack: parseInt(util.getValue(lines, "SectorsPerTrack", ":"), 10),
                       firmwareRevision: util.getValue(lines, "FirmwareRevision", ":").trim(),
                       serialNum: util.getValue(lines, "SerialNumber", ":").trim(),
                       interfaceType: util.getValue(lines, "InterfaceType", ":").trim(),
@@ -87756,8 +87759,8 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                   }
                 });
                 devices = data.results[1].split(/\n\s*\n/);
-                devices.forEach(function(device) {
-                  let lines = device.split("\r\n");
+                devices.forEach((device) => {
+                  const lines = device.split("\r\n");
                   const serialNum = util.getValue(lines, "SerialNumber", ":").trim();
                   const name = util.getValue(lines, "FriendlyName", ":").trim().replace("Msft ", "Microsoft");
                   const size = util.getValue(lines, "Size", ":").trim();
@@ -87781,7 +87784,7 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                     if (i === -1 || serialNum === "") {
                       i = util.findObjectByKey(result2, "name", name);
                     }
-                    if (i != -1) {
+                    if (i !== -1) {
                       result2[i].type = mediaType;
                       result2[i].interfaceType = interfaceType;
                     }
@@ -87795,16 +87798,16 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                       const smartData = JSON.parse(smartStr);
                       if (smartData.serial_number) {
                         const serialNum = smartData.serial_number;
-                        let i = util.findObjectByKey(result2, "serialNum", serialNum);
-                        if (i != -1) {
-                          result2[i].smartStatus = smartData.smart_status && smartData.smart_status.passed ? "Ok" : smartData.smart_status && smartData.smart_status.passed === false ? "Predicted Failure" : "unknown";
-                          if (smartData.temperature && smartData.temperature.current) {
+                        const i = util.findObjectByKey(result2, "serialNum", serialNum);
+                        if (i !== -1) {
+                          result2[i].smartStatus = smartData.smart_status?.passed ? "Ok" : smartData.smart_status && smartData.smart_status.passed === false ? "Predicted Failure" : "unknown";
+                          if (smartData.temperature?.current) {
                             result2[i].temperature = smartData.temperature.current;
                           }
                           result2[i].smartData = smartData;
                         }
                       }
-                    } catch (e) {
+                    } catch {
                       util.noop();
                     }
                   });
@@ -87814,7 +87817,7 @@ ${BSDName}|"; smartctl -H ${BSDName} | grep overall;`;
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }

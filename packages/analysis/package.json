@@ -20,7 +20,7 @@
     "@tsconfig/node24": "24.0.3",
     "@tsconfig/strictest": "2.0.8",
     "@types/node": "24.10.4",
-    "esbuild": "0.27.1",
+    "esbuild": "0.27.2",
     "typescript": "5.9.3"
   }
 }
