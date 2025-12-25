@@ -77946,7 +77946,7 @@ var require_package2 = __commonJS({
   "../../node_modules/systeminformation/package.json"(exports2, module2) {
     module2.exports = {
       name: "systeminformation",
-      version: "5.27.14",
+      version: "5.28.0",
       description: "Advanced, lightweight system and OS information library",
       license: "MIT",
       author: "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -78128,11 +78128,11 @@ var require_util10 = __commonJS({
       return functionToCheck && getType.toString.call(functionToCheck) === "[object Function]";
     }
     function unique(obj) {
-      let uniques = [];
-      let stringify = {};
+      const uniques = [];
+      const stringify = {};
       for (let i = 0; i < obj.length; i++) {
         let keys = Object.keys(obj[i]);
-        keys.sort(function(a, b) {
+        keys.sort((a, b) => {
           return a - b;
         });
         let str = "";
@@ -78148,10 +78148,10 @@ var require_util10 = __commonJS({
       return uniques;
     }
     function sortByKey(array, keys) {
-      return array.sort(function(a, b) {
+      return array.sort((a, b) => {
         let x = "";
         let y = "";
-        keys.forEach(function(key) {
+        keys.forEach((key) => {
           x = x + a[key];
           y = y + b[key];
         });
@@ -78183,6 +78183,7 @@ var require_util10 = __commonJS({
             return true;
           }
         }
+        return false;
       });
       return result2;
     }
@@ -78216,8 +78217,8 @@ var require_util10 = __commonJS({
       t = t.toUpperCase();
       let hour = 0;
       let min = 0;
-      let splitter = detectSplit(t);
-      let parts = t.split(splitter);
+      const splitter = detectSplit(t);
+      const parts = t.split(splitter);
       if (parts.length >= 2) {
         if (parts[2]) {
           parts[1] += parts[2];
@@ -78235,8 +78236,8 @@ var require_util10 = __commonJS({
         time: ""
       };
       culture = culture || {};
-      let dateFormat = (culture.dateFormat || "").toLowerCase();
-      let pmDesignator = culture.pmDesignator || "";
+      const dateFormat = (culture.dateFormat || "").toLowerCase();
+      const pmDesignator = culture.pmDesignator || "";
       const parts = dt.split(" ");
       if (parts[0]) {
         if (parts[0].indexOf("/") >= 0) {
@@ -78279,7 +78280,7 @@ var require_util10 = __commonJS({
       }
       if (parts[1]) {
         parts.shift();
-        let time = parts.join(" ");
+        const time = parts.join(" ");
         result2.time = parseTime(time, pmDesignator);
       }
       return result2;
@@ -78289,7 +78290,7 @@ var require_util10 = __commonJS({
       let count = 1;
       let from = 0;
       let to = 0;
-      let result2 = [];
+      const result2 = [];
       for (let i = 0; i < head.length; i++) {
         if (count <= rights) {
           if (/\s/.test(head[i]) && !space) {
@@ -78427,20 +78428,20 @@ var require_util10 = __commonJS({
         });
         if (_psChild && _psChild.pid) {
           _psPersistent = true;
-          _psChild.stdout.on("data", function(data) {
+          _psChild.stdout.on("data", (data) => {
             _psResult = _psResult + data.toString("utf8");
             if (data.indexOf(_psCmdSeperator) >= 0) {
               powerShellProceedResults(_psResult);
               _psResult = "";
             }
           });
-          _psChild.stderr.on("data", function() {
+          _psChild.stderr.on("data", () => {
             powerShellProceedResults(_psResult + _psError);
           });
-          _psChild.on("error", function() {
+          _psChild.on("error", () => {
             powerShellProceedResults(_psResult + _psError);
           });
-          _psChild.on("close", function() {
+          _psChild.on("close", () => {
             if (_psChild) {
               _psChild.kill();
             }
@@ -78498,23 +78499,23 @@ var require_util10 = __commonJS({
                 env: Object.assign({}, process.env, { LANG: "en_US.UTF-8" })
               });
               if (child && !child.pid) {
-                child.on("error", function() {
+                child.on("error", () => {
                   resolve(result2);
                 });
               }
               if (child && child.pid) {
-                child.stdout.on("data", function(data) {
+                child.stdout.on("data", (data) => {
                   result2 = result2 + data.toString("utf8");
                 });
-                child.stderr.on("data", function() {
+                child.stderr.on("data", () => {
                   child.kill();
                   resolve(result2);
                 });
-                child.on("close", function() {
+                child.on("close", () => {
                   child.kill();
                   resolve(result2);
                 });
-                child.on("error", function() {
+                child.on("error", () => {
                   child.kill();
                   resolve(result2);
                 });
@@ -78536,26 +78537,26 @@ var require_util10 = __commonJS({
           try {
             const child = spawn(cmd, args, options);
             if (child && !child.pid) {
-              child.on("error", function() {
+              child.on("error", () => {
                 resolve(result2);
               });
             }
             if (child && child.pid) {
-              child.stdout.on("data", function(data) {
+              child.stdout.on("data", (data) => {
                 result2 += data.toString();
               });
-              child.on("close", function() {
+              child.on("close", () => {
                 child.kill();
                 resolve(result2);
               });
-              child.on("error", function() {
+              child.on("error", () => {
                 child.kill();
                 resolve(result2);
               });
             } else {
               resolve(result2);
             }
-          } catch (e) {
+          } catch {
             resolve(result2);
           }
         });
@@ -78569,7 +78570,7 @@ var require_util10 = __commonJS({
             const lines = stdout.toString().split("\r\n");
             const parts = lines[0].split(":");
             codepage = parts.length > 1 ? parts[1].replace(".", "").trim() : "";
-          } catch (err) {
+          } catch {
             codepage = "437";
           }
         }
@@ -78585,7 +78586,7 @@ var require_util10 = __commonJS({
             if (!codepage) {
               codepage = "UTF-8";
             }
-          } catch (err) {
+          } catch {
             codepage = "UTF-8";
           }
         }
@@ -78605,7 +78606,7 @@ var require_util10 = __commonJS({
           } else {
             _smartMonToolsInstalled = false;
           }
-        } catch (e) {
+        } catch {
           _smartMonToolsInstalled = false;
         }
       }
@@ -78613,7 +78614,7 @@ var require_util10 = __commonJS({
         try {
           const pathArray = execSync("which smartctl 2>/dev/null", execOptsLinux).toString().split("\r\n");
           _smartMonToolsInstalled = pathArray.length > 0;
-        } catch (e) {
+        } catch {
           util.noop();
         }
       }
@@ -78627,7 +78628,7 @@ var require_util10 = __commonJS({
         try {
           cpuinfo = fs.readFileSync("/proc/cpuinfo", { encoding: "utf8" }).toString().split("\n");
           _rpi_cpuinfo = cpuinfo;
-        } catch (e) {
+        } catch {
           return false;
         }
       }
@@ -78639,7 +78640,7 @@ var require_util10 = __commonJS({
       let osrelease = [];
       try {
         osrelease = fs.readFileSync("/etc/os-release", { encoding: "utf8" }).toString().split("\n");
-      } catch (e) {
+      } catch {
         return false;
       }
       const id = getValue(osrelease, "id", "=");
@@ -78651,7 +78652,7 @@ var require_util10 = __commonJS({
         opts = execOptsWin;
       }
       let newCmd = "chcp 65001 > nul && cmd /C " + cmd + " && chcp " + codepage + " > nul";
-      exec3(newCmd, opts, function(error2, stdout) {
+      exec3(newCmd, opts, (error2, stdout) => {
         callback(error2, stdout);
       });
     }
@@ -78762,7 +78763,7 @@ var require_util10 = __commonJS({
           const s1 = st[i];
           try {
             s1.__proto__.toLowerCase = stringToLower;
-          } catch (e) {
+          } catch {
             Object.setPrototypeOf(st, stringObj);
           }
           const s2 = stl ? stl[i] : "";
@@ -78786,25 +78787,25 @@ var require_util10 = __commonJS({
         return lstatSync(source2).isFile();
       }
       function getDirectories(source2) {
-        return readdirSync(source2).map(function(name) {
+        return readdirSync(source2).map((name) => {
           return join2(source2, name);
         }).filter(isDirectory);
       }
       function getFiles(source2) {
-        return readdirSync(source2).map(function(name) {
+        return readdirSync(source2).map((name) => {
           return join2(source2, name);
         }).filter(isFile);
       }
       function getFilesRecursively(source2) {
         try {
-          let dirs = getDirectories(source2);
-          let files = dirs.map(function(dir) {
+          const dirs = getDirectories(source2);
+          const files = dirs.map((dir) => {
             return getFilesRecursively(dir);
-          }).reduce(function(a, b) {
+          }).reduce((a, b) => {
             return a.concat(b);
           }, []);
           return files.concat(getFiles(source2));
-        } catch (e) {
+        } catch {
           return [];
         }
       }
@@ -79041,8 +79042,8 @@ var require_util10 = __commonJS({
       });
       const errors = [];
       const results = [];
-      return Promise.all(resolvingPromises).then(function(items) {
-        items.forEach(function(payload) {
+      return Promise.all(resolvingPromises).then((items) => {
+        items.forEach((payload) => {
           if (payload[1]) {
             errors.push(payload[1]);
             results.push(null);
@@ -79058,10 +79059,10 @@ var require_util10 = __commonJS({
       });
     }
     function promisify(nodeStyleFunction) {
-      return function() {
+      return () => {
         const args = Array.prototype.slice.call(arguments);
-        return new Promise(function(resolve, reject) {
-          args.push(function(err, data) {
+        return new Promise((resolve, reject) => {
+          args.push((err, data) => {
             if (err) {
               reject(err);
             } else {
@@ -79073,10 +79074,10 @@ var require_util10 = __commonJS({
       };
     }
     function promisifySave(nodeStyleFunction) {
-      return function() {
+      return () => {
         const args = Array.prototype.slice.call(arguments);
-        return new Promise(function(resolve) {
-          args.push(function(err, data) {
+        return new Promise((resolve) => {
+          args.push((err, data) => {
             resolve(data);
           });
           nodeStyleFunction.apply(null, args);
@@ -79088,7 +79089,7 @@ var require_util10 = __commonJS({
       if (_linux) {
         try {
           result2 = execSync("uname -v", execOptsLinux).toString();
-        } catch (e) {
+        } catch {
           result2 = "";
         }
       }
@@ -80484,7 +80485,7 @@ var require_util10 = __commonJS({
       const http = url.startsWith("https:") || url.indexOf(":443/") > 0 || url.indexOf(":8443/") > 0 ? require("https") : require("http");
       const t = Date.now();
       return new Promise((resolve) => {
-        const request = http.get(url, function(res) {
+        const request = http.get(url, (res) => {
           res.on("data", () => {
           });
           res.on("end", () => {
@@ -80495,7 +80496,7 @@ var require_util10 = __commonJS({
               time: Date.now() - t
             });
           });
-        }).on("error", function(e) {
+        }).on("error", (e) => {
           resolve({
             url,
             statusCode: 404,
@@ -81814,7 +81815,7 @@ var require_system = __commonJS({
             virtual: false
           };
           if (_linux || _freebsd || _openbsd || _netbsd) {
-            exec3("export LC_ALL=C; dmidecode -t system 2>/dev/null; unset LC_ALL", function(error2, stdout) {
+            exec3("export LC_ALL=C; dmidecode -t system 2>/dev/null; unset LC_ALL", (error2, stdout) => {
               let lines = stdout.toString().split("\n");
               result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer"));
               result2.model = cleanDefaults(util.getValue(lines, "product name"));
@@ -81834,7 +81835,7 @@ var require_system = __commonJS({
                 result2.version = cleanDefaults(result2.version === "" ? util.getValue(lines, "product_version") : result2.version);
                 result2.serial = cleanDefaults(result2.serial === "" ? util.getValue(lines, "product_serial") : result2.serial);
                 result2.uuid = cleanDefaults(result2.uuid === "" ? util.getValue(lines, "product_uuid").toLowerCase() : result2.uuid);
-              } catch (e) {
+              } catch {
                 util.noop();
               }
               if (!result2.serial) {
@@ -81891,7 +81892,7 @@ var require_system = __commonJS({
                     result2.virtual = true;
                     result2.virtualHost = "VirtualBox";
                   }
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
               }
@@ -81907,7 +81908,7 @@ var require_system = __commonJS({
                   if (!result2.model || result2.model === "Computer") {
                     result2.model = util.getValue(lines2, "hw.model", ":").trim();
                   }
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
               }
@@ -81937,7 +81938,7 @@ var require_system = __commonJS({
                       result2.virtualHost = "bochs";
                       break;
                   }
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
               }
@@ -81946,7 +81947,7 @@ var require_system = __commonJS({
               }
               try {
                 const stdout2 = execSync('dmesg 2>/dev/null | grep -iE "virtual|hypervisor" | grep -iE "vmware|qemu|kvm|xen" | grep -viE "Nested Virtualization|/virtual/"');
-                let lines2 = stdout2.toString().split("\n");
+                const lines2 = stdout2.toString().split("\n");
                 if (lines2.length > 0) {
                   if (result2.model === "Computer") {
                     result2.model = "Virtual machine";
@@ -81965,11 +81966,11 @@ var require_system = __commonJS({
                     result2.virtualHost = "KVM";
                   }
                 }
-              } catch (e) {
+              } catch {
                 util.noop();
               }
               if (result2.manufacturer === "" && result2.model === "Computer" && result2.version === "") {
-                fs.readFile("/proc/cpuinfo", function(error3, stdout2) {
+                fs.readFile("/proc/cpuinfo", (error3, stdout2) => {
                   if (!error3) {
                     let lines2 = stdout2.toString().split("\n");
                     result2.model = util.getValue(lines2, "hardware", ":", true).toUpperCase();
@@ -82003,9 +82004,9 @@ var require_system = __commonJS({
             });
           }
           if (_darwin) {
-            exec3("ioreg -c IOPlatformExpertDevice -d 2", function(error2, stdout) {
+            exec3("ioreg -c IOPlatformExpertDevice -d 2", (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
+                const lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
                 const model = util.getAppleModel(util.getValue(lines, "model", "=", true));
                 result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
                 result2.model = model.key;
@@ -82031,7 +82032,7 @@ var require_system = __commonJS({
             try {
               util.powerShell("Get-CimInstance Win32_ComputerSystemProduct | select Name,Vendor,Version,IdentifyingNumber,UUID | fl").then((stdout, error2) => {
                 if (!error2) {
-                  let lines = stdout.split("\r\n");
+                  const lines = stdout.split("\r\n");
                   result2.manufacturer = util.getValue(lines, "vendor", ":");
                   result2.model = util.getValue(lines, "name", ":");
                   result2.version = util.getValue(lines, "version", ":");
@@ -82077,7 +82078,7 @@ var require_system = __commonJS({
                   }
                   util.powerShell('Get-CimInstance MS_Systeminformation -Namespace "root/wmi" | select systemsku | fl ').then((stdout2, error3) => {
                     if (!error3) {
-                      let lines2 = stdout2.split("\r\n");
+                      const lines2 = stdout2.split("\r\n");
                       result2.sku = util.getValue(lines2, "systemsku", ":");
                     }
                     if (!result2.virtual) {
@@ -82130,7 +82131,7 @@ var require_system = __commonJS({
                   resolve(result2);
                 }
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -82164,7 +82165,7 @@ var require_system = __commonJS({
             } else {
               cmd = "export LC_ALL=C; dmidecode -t bios 2>/dev/null; unset LC_ALL";
             }
-            exec3(cmd, function(error2, stdout) {
+            exec3(cmd, (error2, stdout) => {
               let lines = stdout.toString().split("\n");
               result2.vendor = util.getValue(lines, "Vendor");
               result2.version = util.getValue(lines, "Version");
@@ -82206,25 +82207,22 @@ var require_system = __commonJS({
           }
           if (_darwin) {
             result2.vendor = "Apple Inc.";
-            exec3(
-              "system_profiler SPHardwareDataType -json",
-              function(error2, stdout) {
-                try {
-                  const hardwareData = JSON.parse(stdout.toString());
-                  if (hardwareData && hardwareData.SPHardwareDataType && hardwareData.SPHardwareDataType.length) {
-                    let bootRomVersion = hardwareData.SPHardwareDataType[0].boot_rom_version;
-                    bootRomVersion = bootRomVersion ? bootRomVersion.split("(")[0].trim() : null;
-                    result2.version = bootRomVersion;
-                  }
-                } catch (e) {
-                  util.noop();
+            exec3("system_profiler SPHardwareDataType -json", (error2, stdout) => {
+              try {
+                const hardwareData = JSON.parse(stdout.toString());
+                if (hardwareData && hardwareData.SPHardwareDataType && hardwareData.SPHardwareDataType.length) {
+                  let bootRomVersion = hardwareData.SPHardwareDataType[0].boot_rom_version;
+                  bootRomVersion = bootRomVersion ? bootRomVersion.split("(")[0].trim() : null;
+                  result2.version = bootRomVersion;
                 }
-                if (callback) {
-                  callback(result2);
-                }
-                resolve(result2);
+              } catch (e) {
+                util.noop();
               }
-            );
+              if (callback) {
+                callback(result2);
+              }
+              resolve(result2);
+            });
           }
           if (_sunos) {
             result2.vendor = "Sun Microsystems";
@@ -82235,7 +82233,9 @@ var require_system = __commonJS({
           }
           if (_windows) {
             try {
-              util.powerShell('Get-CimInstance Win32_bios | select Description,Version,Manufacturer,@{n="ReleaseDate";e={$_.ReleaseDate.ToString("yyyy-MM-dd")}},BuildNumber,SerialNumber,SMBIOSBIOSVersion | fl').then((stdout, error2) => {
+              util.powerShell(
+                'Get-CimInstance Win32_bios | select Description,Version,Manufacturer,@{n="ReleaseDate";e={$_.ReleaseDate.ToString("yyyy-MM-dd")}},BuildNumber,SerialNumber,SMBIOSBIOSVersion | fl'
+              ).then((stdout, error2) => {
                 if (!error2) {
                   let lines = stdout.toString().split("\r\n");
                   const description = util.getValue(lines, "description", ":");
@@ -82273,7 +82273,7 @@ var require_system = __commonJS({
     function baseboard(callback) {
       return new Promise((resolve) => {
         process.nextTick(() => {
-          let result2 = {
+          const result2 = {
             manufacturer: "",
             model: "",
             version: "",
@@ -82292,9 +82292,7 @@ var require_system = __commonJS({
             const workload = [];
             workload.push(execPromise(cmd));
             workload.push(execPromise("export LC_ALL=C; dmidecode -t memory 2>/dev/null"));
-            util.promiseAll(
-              workload
-            ).then((data) => {
+            util.promiseAll(workload).then((data) => {
               let lines = data.results[0] ? data.results[0].toString().split("\n") : [""];
               result2.manufacturer = cleanDefaults(util.getValue(lines, "Manufacturer"));
               result2.model = cleanDefaults(util.getValue(lines, "Product Name"));
@@ -82313,7 +82311,7 @@ var require_system = __commonJS({
                 result2.version = cleanDefaults(!result2.version ? util.getValue(lines, "board_version") : result2.version);
                 result2.serial = cleanDefaults(!result2.serial ? util.getValue(lines, "board_serial") : result2.serial);
                 result2.assetTag = cleanDefaults(!result2.assetTag ? util.getValue(lines, "board_asset_tag") : result2.assetTag);
-              } catch (e) {
+              } catch {
                 util.noop();
               }
               lines = data.results[1] ? data.results[1].toString().split("\n") : [""];
@@ -82338,10 +82336,8 @@ var require_system = __commonJS({
             const workload = [];
             workload.push(execPromise("ioreg -c IOPlatformExpertDevice -d 2"));
             workload.push(execPromise("system_profiler SPMemoryDataType"));
-            util.promiseAll(
-              workload
-            ).then((data) => {
-              let lines = data.results[0] ? data.results[0].toString().replace(/[<>"]/g, "").split("\n") : [""];
+            util.promiseAll(workload).then((data) => {
+              const lines = data.results[0] ? data.results[0].toString().replace(/[<>"]/g, "").split("\n") : [""];
               result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
               result2.model = util.getValue(lines, "model", "=", true);
               result2.version = util.getValue(lines, "version", "=", true);
@@ -82376,9 +82372,7 @@ var require_system = __commonJS({
               const maxCapacityAttribute = win10plus ? "MaxCapacityEx" : "MaxCapacity";
               workload.push(util.powerShell("Get-CimInstance Win32_baseboard | select Model,Manufacturer,Product,Version,SerialNumber,PartNumber,SKU | fl"));
               workload.push(util.powerShell(`Get-CimInstance Win32_physicalmemoryarray | select ${maxCapacityAttribute}, MemoryDevices | fl`));
-              util.promiseAll(
-                workload
-              ).then((data) => {
+              util.promiseAll(workload).then((data) => {
                 let lines = data.results[0] ? data.results[0].toString().split("\r\n") : [""];
                 result2.manufacturer = cleanDefaults(util.getValue(lines, "manufacturer", ":"));
                 result2.model = cleanDefaults(util.getValue(lines, "model", ":"));
@@ -82399,7 +82393,7 @@ var require_system = __commonJS({
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -82491,7 +82485,7 @@ var require_system = __commonJS({
             echo -n "chassis_type: "; cat /sys/devices/virtual/dmi/id/chassis_type 2>/dev/null; echo;
             echo -n "chassis_vendor: "; cat /sys/devices/virtual/dmi/id/chassis_vendor 2>/dev/null; echo;
             echo -n "chassis_version: "; cat /sys/devices/virtual/dmi/id/chassis_version 2>/dev/null; echo;`;
-            exec3(cmd, function(error2, stdout) {
+            exec3(cmd, (error2, stdout) => {
               let lines = stdout.toString().split("\n");
               result2.manufacturer = cleanDefaults(util.getValue(lines, "chassis_vendor"));
               const ctype = parseInt(util.getValue(lines, "chassis_type").replace(/\D/g, ""));
@@ -82506,9 +82500,9 @@ var require_system = __commonJS({
             });
           }
           if (_darwin) {
-            exec3("ioreg -c IOPlatformExpertDevice -d 2", function(error2, stdout) {
+            exec3("ioreg -c IOPlatformExpertDevice -d 2", (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
+                const lines = stdout.toString().replace(/[<>"]/g, "").split("\n");
                 const model = util.getAppleModel(util.getValue(lines, "model", "=", true));
                 result2.manufacturer = util.getValue(lines, "manufacturer", "=", true);
                 result2.model = model.key;
@@ -82552,7 +82546,7 @@ var require_system = __commonJS({
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -83030,7 +83024,179 @@ var require_cpu = __commonJS({
       9254: "2.9",
       9224: "2.5",
       "9174F": "4.1",
-      9124: "3.0"
+      9124: "3.0",
+      // Epyc 4th gen
+      "4124P": "3.8",
+      "4244P": "3.8",
+      "4344P": "3.8",
+      "4364P": "4.5",
+      "4464P": "3.7",
+      "4484PX": "4.4",
+      "4564P": "4.5",
+      "4584PX": "4.2",
+      "8024P": "2.4",
+      "8024PN": "2.05",
+      "8124P": "2.45",
+      "8124PN": "2.0",
+      "8224P": "2.55",
+      "8224PN": "2.0",
+      "8324P": "2.65",
+      "8324PN": "2.05",
+      "8434P": "2.5",
+      "8434PN": "2.0",
+      "8534P": "2.3",
+      "8534PN": "2.0",
+      // Epyc 5th gen
+      9115: "2.6",
+      9135: "3.65",
+      "9175F": "4.2",
+      9255: "3.25",
+      "9275F": "4.1",
+      9335: "3.0",
+      "9355P": "3.55",
+      9355: "3.55",
+      "9375F": "3.8",
+      9365: "3.4",
+      "9455P": "3.15",
+      9455: "3.15",
+      "9475F": "3.65",
+      9535: "2.4",
+      "9555P": "3.2",
+      9555: "3.2",
+      "9575F": "3.3",
+      9565: "3.15",
+      "9655P": "2.5",
+      9655: "2.5",
+      9755: "2.7",
+      "4245P": "3.9",
+      "4345P": "3.8",
+      "4465P": "3.4",
+      "4545P": "3.0",
+      "4565P": "4.3",
+      "4585PX": "4.3",
+      "5900XT": "3.3",
+      5900: "3.0",
+      5945: "3.0",
+      "5800X3D": "3.4",
+      "5800XT": "3.8",
+      5800: "3.4",
+      "5700X3D": "3.0",
+      "5700X": "3.4",
+      5845: "3.4",
+      "5600X3D": "3.3",
+      "5600XT": "3.7",
+      "5600T": "3.5",
+      5600: "3.5",
+      "5600F": "3.0",
+      5645: "3.7",
+      "5500X3D": "3.0",
+      "5980HX": "3.3",
+      "5980HS": "3.0",
+      "5900HX": "3.3",
+      "5900HS": "3.0",
+      "5800H": "3.2",
+      "5800HS": "2.8",
+      "5800U": "1.9",
+      "5600H": "3.3",
+      "5600HS": "3.0",
+      "5600U": "2.3",
+      "5560U": "2.3",
+      "5400U": "2.7",
+      "5825U": "2.0",
+      "5625U": "2.3",
+      "5425U": "2.7",
+      "5125C": "3.0",
+      "7730U": "2.0",
+      "7530U": "2.0",
+      "7430U": "2.3",
+      "7330U": "2.3",
+      7203: "2.8",
+      7303: "2.4",
+      "7663P": "2.0",
+      "6980HX": "3.3",
+      "6980HS": "3.3",
+      "6900HX": "3.3",
+      "6900HS": "3.3",
+      "6800H": "3.2",
+      "6800HS": "3.2",
+      "6800U": "2.7",
+      "6600H": "3.3",
+      "6600HS": "3.3",
+      "6600U": "2.9",
+      "7735HS": "3.2",
+      "7735H": "3.2",
+      "7736U": "2.7",
+      "7735U": "2.7",
+      "7435HS": "3.1",
+      "7435H": "3.1",
+      "7535HS": "3.3",
+      "7535H": "3.3",
+      "7535U": "2.9",
+      "7235HS": "3.2",
+      "7235H": "3.2",
+      "7335U": "3.0",
+      270: "4.0",
+      260: "3.8",
+      250: "3.3",
+      240: "4.3",
+      230: "3.5",
+      220: "3.0",
+      210: "2.8",
+      "8945HS": "4.0",
+      "8845HS": "3.8",
+      "8840HS": "3.3",
+      "8840U": "3.3",
+      "8645HS": "4.3",
+      "8640HS": "3.5",
+      "8640U": "3.5",
+      "8540U": "3.0",
+      "8440U": "2.8",
+      "9950X3D": "4.3",
+      "9950X": "4.3",
+      "9900X3D": "4.4",
+      "9900X": "4.4",
+      "9800X3D": "4.7",
+      "9700X": "3.8",
+      "9700F": "3.8",
+      "9600X": "3.9",
+      9600: "3.8",
+      "9500F": "3.8",
+      "9995WX": "2.5",
+      "9985WX": "3.2",
+      "9975WX": "4.0",
+      "9965WX": "4.2",
+      "9955WX": "4.5",
+      "9945WX": "4.7",
+      "9980X": "3.2",
+      "9970X": "4.0",
+      "9960X": "4.2",
+      "PRO HX375": "2.0",
+      HX375: "2.0",
+      "PRO HX370": "2.0",
+      HX370: "2.0",
+      365: "2.0",
+      "PRO 360": "2.0",
+      350: "2.0",
+      "PRO 350": "2.0",
+      340: "2.0",
+      "PRO 340": "2.0",
+      330: "2.0",
+      395: "3.0",
+      "PRO 395": "3.0",
+      390: "3.2",
+      "PRO 390": "3.2",
+      385: "3.6",
+      "PRO 385": "3.6",
+      "PRO 380": "3.6",
+      "9955HX3D": "2.3",
+      "9955HX": "2.5",
+      "9850HX": "3.0",
+      9015: "3.6",
+      9965: "2.25",
+      9845: "2.1",
+      9825: "2.2",
+      9745: "2.4",
+      9645: "2.3"
     };
     var socketTypes = {
       1: "Other",
@@ -83239,8 +83405,8 @@ var require_cpu = __commonJS({
             result2.flags = flags;
             result2.virtualization = flags.indexOf("vmx") > -1 || flags.indexOf("svm") > -1;
             if (_darwin) {
-              exec3("sysctl machdep.cpu hw.cpufrequency_max hw.cpufrequency_min hw.packages hw.physicalcpu_max hw.ncpu hw.tbfrequency hw.cpufamily hw.cpusubfamily", function(error2, stdout) {
-                let lines = stdout.toString().split("\n");
+              exec3("sysctl machdep.cpu hw.cpufrequency_max hw.cpufrequency_min hw.packages hw.physicalcpu_max hw.ncpu hw.tbfrequency hw.cpufamily hw.cpusubfamily", (error2, stdout) => {
+                const lines = stdout.toString().split("\n");
                 const modelline = util.getValue(lines, "machdep.cpu.brand_string");
                 const modellineParts = modelline.split("@");
                 result2.brand = modellineParts[0].trim();
@@ -83269,12 +83435,12 @@ var require_cpu = __commonJS({
                     const performanceCores = clusters.filter((line) => line.indexOf('"P"') >= 0).length;
                     result2.efficiencyCores = efficiencyCores;
                     result2.performanceCores = performanceCores;
-                  } catch (e) {
+                  } catch {
                     util.noop();
                   }
                 }
                 if (countProcessors) {
-                  result2.processors = parseInt(countProcessors) || 1;
+                  result2.processors = parseInt(countProcessors, 10) || 1;
                 }
                 if (countCores && countThreads) {
                   result2.cores = parseInt(countThreads) || util.cores();
@@ -83292,7 +83458,7 @@ var require_cpu = __commonJS({
               if (os2.cpus()[0] && os2.cpus()[0].model) {
                 modelline = os2.cpus()[0].model;
               }
-              exec3('export LC_ALL=C; lscpu; echo -n "Governor: "; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null; echo; unset LC_ALL', function(error2, stdout) {
+              exec3('export LC_ALL=C; lscpu; echo -n "Governor: "; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null; echo; unset LC_ALL', (error2, stdout) => {
                 if (!error2) {
                   lines = stdout.toString().split("\n");
                 }
@@ -83367,7 +83533,7 @@ var require_cpu = __commonJS({
                   }
                 }
                 let lines2 = [];
-                exec3('export LC_ALL=C; dmidecode \u2013t 4 2>/dev/null | grep "Upgrade: Socket"; unset LC_ALL', function(error22, stdout2) {
+                exec3('export LC_ALL=C; dmidecode \u2013t 4 2>/dev/null | grep "Upgrade: Socket"; unset LC_ALL', (error22, stdout2) => {
                   lines2 = stdout2.toString().split("\n");
                   if (lines2 && lines2.length) {
                     result2.socket = util.getValue(lines2, "Upgrade").replace("Socket", "").trim() || result2.socket;
@@ -83382,7 +83548,7 @@ var require_cpu = __commonJS({
               if (os2.cpus()[0] && os2.cpus()[0].model) {
                 modelline = os2.cpus()[0].model;
               }
-              exec3("export LC_ALL=C; dmidecode -t 4; dmidecode -t 7 unset LC_ALL", function(error2, stdout) {
+              exec3("export LC_ALL=C; dmidecode -t 4; dmidecode -t 7 unset LC_ALL", (error2, stdout) => {
                 let cache2 = [];
                 if (!error2) {
                   const data = stdout.toString().split("# dmidecode");
@@ -83649,13 +83815,13 @@ var require_cpu = __commonJS({
             }
             const cmd = 'for mon in /sys/class/hwmon/hwmon*; do for label in "$mon"/temp*_label; do if [ -f $label ]; then value=${label%_*}_input; echo $(cat "$label")___$(cat "$value"); fi; done; done;';
             try {
-              exec3(cmd, function(error2, stdout) {
+              exec3(cmd, (error2, stdout) => {
                 stdout = stdout.toString();
                 const tdiePos = stdout.toLowerCase().indexOf("tdie");
                 if (tdiePos !== -1) {
                   stdout = stdout.substring(tdiePos);
                 }
-                let lines = stdout.split("\n");
+                const lines = stdout.split("\n");
                 let tctl = 0;
                 lines.forEach((line) => {
                   const parts = line.split("___");
@@ -83690,13 +83856,13 @@ var require_cpu = __commonJS({
                   resolve(result2);
                   return;
                 }
-                exec3("sensors", function(error3, stdout2) {
+                exec3("sensors", (error3, stdout2) => {
                   if (!error3) {
-                    let lines2 = stdout2.toString().split("\n");
+                    const lines2 = stdout2.toString().split("\n");
                     let tdieTemp = null;
                     let newSectionStarts = true;
                     let section = "";
-                    lines2.forEach(function(line) {
+                    lines2.forEach((line) => {
                       if (line.trim() === "") {
                         newSectionStarts = true;
                       } else if (newSectionStarts) {
@@ -83709,11 +83875,14 @@ var require_cpu = __commonJS({
                         if (line.trim().toLowerCase().startsWith("core")) {
                           section = "core";
                         }
+                        if (line.trim().toLowerCase().startsWith("k10temp")) {
+                          section = "coreAMD";
+                        }
                         newSectionStarts = false;
                       }
-                      let regex = /[+-]([^°]*)/g;
-                      let temps = line.match(regex);
-                      let firstPart = line.split(":")[0].toUpperCase();
+                      const regex = /[+-]([^°]*)/g;
+                      const temps = line.match(regex);
+                      const firstPart = line.split(":")[0].toUpperCase();
                       if (section === "acpi") {
                         if (firstPart.indexOf("TEMP") !== -1) {
                           result2.socket.push(parseFloat(temps));
@@ -83723,7 +83892,7 @@ var require_cpu = __commonJS({
                           result2.chipset = parseFloat(temps);
                         }
                       }
-                      if (firstPart.indexOf("PHYSICAL") !== -1 || firstPart.indexOf("PACKAGE") !== -1) {
+                      if (firstPart.indexOf("PHYSICAL") !== -1 || firstPart.indexOf("PACKAGE") !== -1 || section === "coreAMD" && firstPart.indexOf("TDIE") !== -1 || firstPart.indexOf("TEMP") !== -1) {
                         result2.main = parseFloat(temps);
                       }
                       if (firstPart.indexOf("CORE ") !== -1) {
@@ -83735,13 +83904,16 @@ var require_cpu = __commonJS({
                     });
                     if (result2.cores.length > 0) {
                       result2.main = Math.round(result2.cores.reduce((a, b) => a + b, 0) / result2.cores.length);
-                      let maxtmp = Math.max.apply(Math, result2.cores);
+                      const maxtmp = Math.max.apply(Math, result2.cores);
                       result2.max = maxtmp > result2.main ? maxtmp : result2.main;
                     } else {
                       if (result2.main === null && tdieTemp !== null) {
                         result2.main = tdieTemp;
                         result2.max = tdieTemp;
                       }
+                    }
+                    if (result2.main !== null && result2.max === null) {
+                      result2.max = result2.main;
                     }
                     if (result2.main !== null || result2.max !== null) {
                       if (callback) {
@@ -83751,11 +83923,11 @@ var require_cpu = __commonJS({
                       return;
                     }
                   }
-                  fs.stat("/sys/class/thermal/thermal_zone0/temp", function(err) {
+                  fs.stat("/sys/class/thermal/thermal_zone0/temp", (err) => {
                     if (err === null) {
-                      fs.readFile("/sys/class/thermal/thermal_zone0/temp", function(error4, stdout3) {
+                      fs.readFile("/sys/class/thermal/thermal_zone0/temp", (error4, stdout3) => {
                         if (!error4) {
-                          let lines2 = stdout3.toString().split("\n");
+                          const lines2 = stdout3.toString().split("\n");
                           if (lines2.length > 0) {
                             result2.main = parseFloat(lines2[0]) / 1e3;
                             result2.max = result2.main;
@@ -83767,9 +83939,9 @@ var require_cpu = __commonJS({
                         resolve(result2);
                       });
                     } else {
-                      exec3("/opt/vc/bin/vcgencmd measure_temp", function(error4, stdout3) {
+                      exec3("/opt/vc/bin/vcgencmd measure_temp", (error4, stdout3) => {
                         if (!error4) {
-                          let lines2 = stdout3.toString().split("\n");
+                          const lines2 = stdout3.toString().split("\n");
                           if (lines2.length > 0 && lines2[0].indexOf("=")) {
                             result2.main = parseFloat(lines2[0].split("=")[1]);
                             result2.max = result2.main;
@@ -83784,7 +83956,7 @@ var require_cpu = __commonJS({
                   });
                 });
               });
-            } catch (er) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -83792,11 +83964,11 @@ var require_cpu = __commonJS({
             }
           }
           if (_freebsd || _openbsd || _netbsd) {
-            exec3("sysctl dev.cpu | grep temp", function(error2, stdout) {
+            exec3("sysctl dev.cpu | grep temp", (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().split("\n");
+                const lines = stdout.toString().split("\n");
                 let sum = 0;
-                lines.forEach(function(line) {
+                lines.forEach((line) => {
                   const parts = line.split(":");
                   if (parts.length > 1) {
                     const temp = parseFloat(parts[1].replace(",", "."));
@@ -83818,13 +83990,8 @@ var require_cpu = __commonJS({
             });
           }
           if (_darwin) {
-            let osxTemp = null;
             try {
-              osxTemp = require("osx-temperature-sensor");
-            } catch (er) {
-              osxTemp = null;
-            }
-            if (osxTemp) {
+              const osxTemp = require("osx-temperature-sensor");
               result2 = osxTemp.cpuTemperature();
               if (result2.main) {
                 result2.main = Math.round(result2.main * 100) / 100;
@@ -83832,11 +83999,31 @@ var require_cpu = __commonJS({
               if (result2.max) {
                 result2.max = Math.round(result2.max * 100) / 100;
               }
-              if (result2.cores && result2.cores.length) {
+              if (result2?.cores.length) {
                 for (let i = 0; i < result2.cores.length; i++) {
                   result2.cores[i] = Math.round(result2.cores[i] * 100) / 100;
                 }
               }
+            } catch {
+              util.noop();
+            }
+            try {
+              const macosTemp = require("macos-temperature-sensor");
+              const res = macosTemp.temperature();
+              if (res.cpu) {
+                result2.main = Math.round(res.cpu * 100) / 100;
+                result2.max = result2.main;
+              }
+              if (res.soc) {
+                result2.chipset = Math.round(res.soc * 100) / 100;
+              }
+              if (res?.cpuDieTemps.length) {
+                for (const temp of res.cpuDieTemps) {
+                  result2.cores.push(Math.round(temp * 100) / 100);
+                }
+              }
+            } catch {
+              util.noop();
             }
             if (callback) {
               callback(result2);
@@ -83854,9 +84041,9 @@ var require_cpu = __commonJS({
               util.powerShell('Get-CimInstance MSAcpi_ThermalZoneTemperature -Namespace "root/wmi" | Select CurrentTemperature').then((stdout, error2) => {
                 if (!error2) {
                   let sum = 0;
-                  let lines = stdout.split("\r\n").filter((line) => line.trim() !== "").filter((line, idx) => idx > 0);
-                  lines.forEach(function(line) {
-                    let value = (parseInt(line, 10) - 2732) / 10;
+                  const lines = stdout.split("\r\n").filter((line) => line.trim() !== "").filter((line, idx) => idx > 0);
+                  lines.forEach((line) => {
+                    const value = (parseInt(line, 10) - 2732) / 10;
                     if (!isNaN(value)) {
                       sum = sum + value;
                       if (value > result2.max) {
@@ -83874,7 +84061,7 @@ var require_cpu = __commonJS({
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -83891,7 +84078,7 @@ var require_cpu = __commonJS({
           let result2 = "";
           if (_windows) {
             try {
-              exec3('reg query "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0" /v FeatureSet', util.execOptsWin, function(error2, stdout) {
+              exec3('reg query "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0" /v FeatureSet', util.execOptsWin, (error2, stdout) => {
                 if (!error2) {
                   let flag_hex = stdout.split("0x").pop().trim();
                   let flag_bin_unpadded = parseInt(flag_hex, 16).toString(2);
@@ -83942,7 +84129,7 @@ var require_cpu = __commonJS({
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -83951,17 +84138,17 @@ var require_cpu = __commonJS({
           }
           if (_linux) {
             try {
-              exec3("export LC_ALL=C; lscpu; unset LC_ALL", function(error2, stdout) {
+              exec3("export LC_ALL=C; lscpu; unset LC_ALL", (error2, stdout) => {
                 if (!error2) {
                   let lines = stdout.toString().split("\n");
-                  lines.forEach(function(line) {
+                  lines.forEach((line) => {
                     if (line.split(":")[0].toUpperCase().indexOf("FLAGS") !== -1) {
                       result2 = line.split(":")[1].trim().toLowerCase();
                     }
                   });
                 }
                 if (!result2) {
-                  fs.readFile("/proc/cpuinfo", function(error3, stdout2) {
+                  fs.readFile("/proc/cpuinfo", (error3, stdout2) => {
                     if (!error3) {
                       let lines = stdout2.toString().split("\n");
                       result2 = util.getValue(lines, "features", ":", true).toLowerCase();
@@ -83978,7 +84165,7 @@ var require_cpu = __commonJS({
                   resolve(result2);
                 }
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -83986,13 +84173,13 @@ var require_cpu = __commonJS({
             }
           }
           if (_freebsd || _openbsd || _netbsd) {
-            exec3("export LC_ALL=C; dmidecode -t 4 2>/dev/null; unset LC_ALL", function(error2, stdout) {
-              let flags = [];
+            exec3("export LC_ALL=C; dmidecode -t 4 2>/dev/null; unset LC_ALL", (error2, stdout) => {
+              const flags = [];
               if (!error2) {
-                let parts = stdout.toString().split("	Flags:");
+                const parts = stdout.toString().split("	Flags:");
                 const lines = parts.length > 1 ? parts[1].split("	Version:")[0].split("\n") : [];
-                lines.forEach(function(line) {
-                  let flag = (line.indexOf("(") ? line.split("(")[0].toLowerCase() : "").trim().replace(/\t/g, "");
+                lines.forEach((line) => {
+                  const flag = (line.indexOf("(") ? line.split("(")[0].toLowerCase() : "").trim().replace(/\t/g, "");
                   if (flag) {
                     flags.push(flag);
                   }
@@ -84006,7 +84193,7 @@ var require_cpu = __commonJS({
             });
           }
           if (_darwin) {
-            exec3("sysctl machdep.cpu.features", function(error2, stdout) {
+            exec3("sysctl machdep.cpu.features", (error2, stdout) => {
               if (!error2) {
                 let lines = stdout.toString().split("\n");
                 if (lines.length > 0 && lines[0].indexOf("machdep.cpu.features:") !== -1) {
@@ -84040,11 +84227,11 @@ var require_cpu = __commonJS({
           };
           if (_linux) {
             try {
-              exec3("export LC_ALL=C; lscpu; unset LC_ALL", function(error2, stdout) {
+              exec3("export LC_ALL=C; lscpu; unset LC_ALL", (error2, stdout) => {
                 if (!error2) {
-                  let lines = stdout.toString().split("\n");
-                  lines.forEach(function(line) {
-                    let parts = line.split(":");
+                  const lines = stdout.toString().split("\n");
+                  lines.forEach((line) => {
+                    const parts = line.split(":");
                     if (parts[0].toUpperCase().indexOf("L1D CACHE") !== -1) {
                       result2.l1d = parseInt(parts[1].trim()) * (parts[1].indexOf("M") !== -1 ? 1024 * 1024 : parts[1].indexOf("K") !== -1 ? 1024 : 1);
                     }
@@ -84064,7 +84251,7 @@ var require_cpu = __commonJS({
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -84072,7 +84259,7 @@ var require_cpu = __commonJS({
             }
           }
           if (_freebsd || _openbsd || _netbsd) {
-            exec3("export LC_ALL=C; dmidecode -t 7 2>/dev/null; unset LC_ALL", function(error2, stdout) {
+            exec3("export LC_ALL=C; dmidecode -t 7 2>/dev/null; unset LC_ALL", (error2, stdout) => {
               let cache2 = [];
               if (!error2) {
                 const data = stdout.toString();
@@ -84103,10 +84290,10 @@ var require_cpu = __commonJS({
             });
           }
           if (_darwin) {
-            exec3("sysctl hw.l1icachesize hw.l1dcachesize hw.l2cachesize hw.l3cachesize", function(error2, stdout) {
+            exec3("sysctl hw.l1icachesize hw.l1dcachesize hw.l2cachesize hw.l3cachesize", (error2, stdout) => {
               if (!error2) {
                 let lines = stdout.toString().split("\n");
-                lines.forEach(function(line) {
+                lines.forEach((line) => {
                   let parts = line.split(":");
                   if (parts[0].toLowerCase().indexOf("hw.l1icachesize") !== -1) {
                     result2.l1d = parseInt(parts[1].trim()) * (parts[1].indexOf("K") !== -1 ? 1024 : 1);
@@ -84146,7 +84333,7 @@ var require_cpu = __commonJS({
                 }
                 resolve(result2);
               });
-            } catch (e) {
+            } catch {
               if (callback) {
                 callback(result2);
               }
@@ -84157,7 +84344,7 @@ var require_cpu = __commonJS({
       });
     }
     function parseWinCache(linesProc, linesCache) {
-      let result2 = {
+      const result2 = {
         l1d: null,
         l1i: null,
         l2: null,
@@ -84182,7 +84369,7 @@ var require_cpu = __commonJS({
       let l1i = 0;
       let l1d = 0;
       let l2 = 0;
-      parts.forEach(function(part) {
+      parts.forEach((part) => {
         const lines2 = part.split("\r\n");
         const cacheType = util.getValue(lines2, "CacheType");
         const level = util.getValue(lines2, "Level");
@@ -84214,15 +84401,15 @@ var require_cpu = __commonJS({
     function getLoad() {
       return new Promise((resolve) => {
         process.nextTick(() => {
-          let loads = os2.loadavg().map(function(x) {
+          const loads = os2.loadavg().map((x) => {
             return x / util.cores();
           });
-          let avgLoad = parseFloat(Math.max.apply(Math, loads).toFixed(2));
+          const avgLoad = parseFloat(Math.max.apply(Math, loads).toFixed(2));
           let result2 = {};
-          let now = Date.now() - _current_cpu.ms;
+          const now = Date.now() - _current_cpu.ms;
           if (now >= 200) {
             _current_cpu.ms = Date.now();
-            const cpus = os2.cpus().map(function(cpu2) {
+            const cpus = os2.cpus().map((cpu2) => {
               cpu2.times.steal = 0;
               cpu2.times.guest = 0;
               return cpu2;
@@ -84234,7 +84421,7 @@ var require_cpu = __commonJS({
             let totalIdle = 0;
             let totalSteal = 0;
             let totalGuest = 0;
-            let cores = [];
+            const cores = [];
             _corecount = cpus && cpus.length ? cpus.length : 0;
             if (_linux) {
               try {
@@ -84253,7 +84440,7 @@ var require_cpu = __commonJS({
                     }
                   }
                 }
-              } catch (e) {
+              } catch {
                 util.noop();
               }
             }
@@ -84266,15 +84453,15 @@ var require_cpu = __commonJS({
               totalIrq += cpu2.irq;
               totalSteal += cpu2.steal || 0;
               totalGuest += cpu2.guest || 0;
-              let tmpTick = _cpus && _cpus[i] && _cpus[i].totalTick ? _cpus[i].totalTick : 0;
-              let tmpLoad = _cpus && _cpus[i] && _cpus[i].totalLoad ? _cpus[i].totalLoad : 0;
-              let tmpUser = _cpus && _cpus[i] && _cpus[i].user ? _cpus[i].user : 0;
-              let tmpSystem = _cpus && _cpus[i] && _cpus[i].sys ? _cpus[i].sys : 0;
-              let tmpNice = _cpus && _cpus[i] && _cpus[i].nice ? _cpus[i].nice : 0;
-              let tmpIdle = _cpus && _cpus[i] && _cpus[i].idle ? _cpus[i].idle : 0;
-              let tmpIrq = _cpus && _cpus[i] && _cpus[i].irq ? _cpus[i].irq : 0;
-              let tmpSteal = _cpus && _cpus[i] && _cpus[i].steal ? _cpus[i].steal : 0;
-              let tmpGuest = _cpus && _cpus[i] && _cpus[i].guest ? _cpus[i].guest : 0;
+              const tmpTick = _cpus && _cpus[i] && _cpus[i].totalTick ? _cpus[i].totalTick : 0;
+              const tmpLoad = _cpus && _cpus[i] && _cpus[i].totalLoad ? _cpus[i].totalLoad : 0;
+              const tmpUser = _cpus && _cpus[i] && _cpus[i].user ? _cpus[i].user : 0;
+              const tmpSystem = _cpus && _cpus[i] && _cpus[i].sys ? _cpus[i].sys : 0;
+              const tmpNice = _cpus && _cpus[i] && _cpus[i].nice ? _cpus[i].nice : 0;
+              const tmpIdle = _cpus && _cpus[i] && _cpus[i].idle ? _cpus[i].idle : 0;
+              const tmpIrq = _cpus && _cpus[i] && _cpus[i].irq ? _cpus[i].irq : 0;
+              const tmpSteal = _cpus && _cpus[i] && _cpus[i].steal ? _cpus[i].steal : 0;
+              const tmpGuest = _cpus && _cpus[i] && _cpus[i].guest ? _cpus[i].guest : 0;
               _cpus[i] = cpu2;
               _cpus[i].totalTick = _cpus[i].user + _cpus[i].sys + _cpus[i].nice + _cpus[i].irq + _cpus[i].steal + _cpus[i].guest + _cpus[i].idle;
               _cpus[i].totalLoad = _cpus[i].user + _cpus[i].sys + _cpus[i].nice + _cpus[i].irq + _cpus[i].steal + _cpus[i].guest;
@@ -84305,9 +84492,9 @@ var require_cpu = __commonJS({
               cores[i].rawLoadSteal = _cpus[i].loadSteal;
               cores[i].rawLoadGuest = _cpus[i].loadGuest;
             }
-            let totalTick = totalUser + totalSystem + totalNice + totalIrq + totalSteal + totalGuest + totalIdle;
-            let totalLoad = totalUser + totalSystem + totalNice + totalIrq + totalSteal + totalGuest;
-            let currentTick = totalTick - _current_cpu.tick;
+            const totalTick = totalUser + totalSystem + totalNice + totalIrq + totalSteal + totalGuest + totalIdle;
+            const totalLoad = totalUser + totalSystem + totalNice + totalIrq + totalSteal + totalGuest;
+            const currentTick = totalTick - _current_cpu.tick;
             result2 = {
               avgLoad,
               currentLoad: (totalLoad - _current_cpu.load) / currentTick * 100,
@@ -84357,7 +84544,7 @@ var require_cpu = __commonJS({
               rawCurrentLoadGuest: result2.rawCurrentLoadGuest
             };
           } else {
-            let cores = [];
+            const cores = [];
             for (let i = 0; i < _corecount; i++) {
               cores[i] = {};
               cores[i].load = _cpus[i].load / _cpus[i].currentTick * 100;
@@ -84423,7 +84610,7 @@ var require_cpu = __commonJS({
           let totalIrq = 0;
           let totalIdle = 0;
           let result2 = 0;
-          if (cpus && cpus.length) {
+          if (cpus?.length) {
             for (let i = 0, len = cpus.length; i < len; i++) {
               const cpu2 = cpus[i].times;
               totalUser += cpu2.user;
@@ -84432,7 +84619,7 @@ var require_cpu = __commonJS({
               totalIrq += cpu2.irq;
               totalIdle += cpu2.idle;
             }
-            let totalTicks = totalIdle + totalIrq + totalNice + totalSystem + totalUser;
+            const totalTicks = totalIdle + totalIrq + totalNice + totalSystem + totalUser;
             result2 = (totalTicks - totalIdle) / totalTicks * 100;
           }
           resolve(result2);
@@ -85260,22 +85447,22 @@ var require_graphics = __commonJS({
     var videoTypes = {
       "-2": "UNINITIALIZED",
       "-1": "OTHER",
-      "0": "HD15",
-      "1": "SVIDEO",
-      "2": "Composite video",
-      "3": "Component video",
-      "4": "DVI",
-      "5": "HDMI",
-      "6": "LVDS",
-      "8": "D_JPN",
-      "9": "SDI",
-      "10": "DP",
-      "11": "DP embedded",
-      "12": "UDI",
-      "13": "UDI embedded",
-      "14": "SDTVDONGLE",
-      "15": "MIRACAST",
-      "2147483648": "INTERNAL"
+      0: "HD15",
+      1: "SVIDEO",
+      2: "Composite video",
+      3: "Component video",
+      4: "DVI",
+      5: "HDMI",
+      6: "LVDS",
+      8: "D_JPN",
+      9: "SDI",
+      10: "DP",
+      11: "DP embedded",
+      12: "UDI",
+      13: "UDI embedded",
+      14: "SDTVDONGLE",
+      15: "MIRACAST",
+      2147483648: "INTERNAL"
     };
     function getVendorFromModel(model) {
       const manufacturers = [
@@ -85315,7 +85502,7 @@ var require_graphics = __commonJS({
     }
     function getVendorFromId(id) {
       const vendors = {
-        "610": "Apple",
+        610: "Apple",
         "1e6d": "LG",
         "10ac": "DELL",
         "4dd9": "Sony",
@@ -85339,20 +85526,20 @@ var require_graphics = __commonJS({
     }
     function getMetalVersion(id) {
       const families = {
-        "spdisplays_mtlgpufamilymac1": "mac1",
-        "spdisplays_mtlgpufamilymac2": "mac2",
-        "spdisplays_mtlgpufamilyapple1": "apple1",
-        "spdisplays_mtlgpufamilyapple2": "apple2",
-        "spdisplays_mtlgpufamilyapple3": "apple3",
-        "spdisplays_mtlgpufamilyapple4": "apple4",
-        "spdisplays_mtlgpufamilyapple5": "apple5",
-        "spdisplays_mtlgpufamilyapple6": "apple6",
-        "spdisplays_mtlgpufamilyapple7": "apple7",
-        "spdisplays_metalfeaturesetfamily11": "family1_v1",
-        "spdisplays_metalfeaturesetfamily12": "family1_v2",
-        "spdisplays_metalfeaturesetfamily13": "family1_v3",
-        "spdisplays_metalfeaturesetfamily14": "family1_v4",
-        "spdisplays_metalfeaturesetfamily21": "family2_v1"
+        spdisplays_mtlgpufamilymac1: "mac1",
+        spdisplays_mtlgpufamilymac2: "mac2",
+        spdisplays_mtlgpufamilyapple1: "apple1",
+        spdisplays_mtlgpufamilyapple2: "apple2",
+        spdisplays_mtlgpufamilyapple3: "apple3",
+        spdisplays_mtlgpufamilyapple4: "apple4",
+        spdisplays_mtlgpufamilyapple5: "apple5",
+        spdisplays_mtlgpufamilyapple6: "apple6",
+        spdisplays_mtlgpufamilyapple7: "apple7",
+        spdisplays_metalfeaturesetfamily11: "family1_v1",
+        spdisplays_metalfeaturesetfamily12: "family1_v2",
+        spdisplays_metalfeaturesetfamily13: "family1_v3",
+        spdisplays_metalfeaturesetfamily14: "family1_v4",
+        spdisplays_metalfeaturesetfamily21: "family2_v1"
       };
       return families[id] || "";
     }
@@ -85363,7 +85550,7 @@ var require_graphics = __commonJS({
           displays: []
         };
         try {
-          graphicsArr.forEach(function(item) {
+          graphicsArr.forEach((item) => {
             const bus = (item.sppci_bus || "").indexOf("builtin") > -1 ? "Built-In" : (item.sppci_bus || "").indexOf("pcie") > -1 ? "PCIe" : "";
             const vram = (parseInt(item.spdisplays_vram || "", 10) || 0) * ((item.spdisplays_vram || "").indexOf("GB") > -1 ? 1024 : 1);
             const vramDyn = (parseInt(item.spdisplays_vram_shared || "", 10) || 0) * ((item.spdisplays_vram_shared || "").indexOf("GB") > -1 ? 1024 : 1);
@@ -85381,7 +85568,7 @@ var require_graphics = __commonJS({
               metalVersion
             });
             if (item.spdisplays_ndrvs && item.spdisplays_ndrvs.length) {
-              item.spdisplays_ndrvs.forEach(function(displayItem) {
+              item.spdisplays_ndrvs.forEach((displayItem) => {
                 const connectionType = displayItem["spdisplays_connection_type"] || "";
                 const currentResolutionParts = (displayItem["_spdisplays_resolution"] || "").split("@");
                 const currentResolution = currentResolutionParts[0].split("x");
@@ -85603,9 +85790,13 @@ var require_graphics = __commonJS({
         }
         if (_windows) {
           try {
-            const basePath = util.WINDIR + "\\System32\\DriverStore\\FileRepository";
+            const basePath = util.WINDIR + String.raw`\System32\DriverStore\FileRepository`;
             const candidateDirs = fs.readdirSync(basePath).filter((dir) => {
-              return fs.readdirSync([basePath, dir].join("/")).includes("nvidia-smi.exe");
+              if (fs.statSync([basePath, dir].join("/")).isDirectory()) {
+                return fs.readdirSync([basePath, dir].join("/")).includes("nvidia-smi.exe");
+              } else {
+                return false;
+              }
             });
             const targetDir = candidateDirs.reduce((prevDir, currentDir) => {
               const previousNvidiaSmi = fs.statSync([basePath, prevDir, "nvidia-smi.exe"].join("/"));
@@ -85615,7 +85806,7 @@ var require_graphics = __commonJS({
             if (targetDir) {
               _nvidiaSmiPath = [basePath, targetDir, "nvidia-smi.exe"].join("/");
             }
-          } catch (e) {
+          } catch {
             util.noop();
           }
         } else if (_linux) {
@@ -85628,15 +85819,15 @@ var require_graphics = __commonJS({
         options = options || util.execOptsWin;
         if (nvidiaSmiExe) {
           const nvidiaSmiOpts = "--query-gpu=driver_version,pci.sub_device_id,name,pci.bus_id,fan.speed,memory.total,memory.used,memory.free,utilization.gpu,utilization.memory,temperature.gpu,temperature.memory,power.draw,power.limit,clocks.gr,clocks.mem --format=csv,noheader,nounits";
-          const cmd = nvidiaSmiExe + " " + nvidiaSmiOpts + (_linux ? "  2>/dev/null" : "");
+          const cmd = nvidiaSmiExe + " " + nvidiaSmiOpts;
           if (_linux) {
             options.stdio = ["pipe", "pipe", "ignore"];
           }
           try {
-            const sanitized = util.sanitizeShellString(cmd);
+            const sanitized = util.sanitizeShellString(cmd) + (_linux ? "  2>/dev/null" : "");
             const res = execSync(sanitized, options).toString();
             return res;
-          } catch (e) {
+          } catch {
             util.noop();
           }
         }
@@ -85738,7 +85929,7 @@ var require_graphics = __commonJS({
         return controller;
       }
       function parseLinesLinuxEdid(edid) {
-        let result2 = {
+        const result2 = {
           vendor: "",
           model: "",
           deviceName: "",
@@ -85781,11 +85972,9 @@ var require_graphics = __commonJS({
           }
           try {
             if (model_raw.length > 2) {
-              result2.model = model_raw.match(/.{1,2}/g).map(function(v) {
-                return String.fromCharCode(parseInt(v, 16));
-              }).join("");
+              result2.model = model_raw.match(/.{1,2}/g).map((v) => String.fromCharCode(parseInt(v, 16))).join("");
             }
-          } catch (e) {
+          } catch {
             util.noop();
           }
         } else {
@@ -85794,7 +85983,7 @@ var require_graphics = __commonJS({
         return result2;
       }
       function parseLinesLinuxDisplays(lines, depth) {
-        let displays = [];
+        const displays = [];
         let currentDisplay = {
           vendor: "",
           model: "",
@@ -85894,8 +86083,8 @@ var require_graphics = __commonJS({
             displays: []
           };
           if (_darwin) {
-            let cmd = "system_profiler -xml -detailLevel full SPDisplaysDataType";
-            exec3(cmd, function(error2, stdout) {
+            const cmd = "system_profiler -xml -detailLevel full SPDisplaysDataType";
+            exec3(cmd, (error2, stdout) => {
               if (!error2) {
                 try {
                   const output = stdout.toString();
@@ -85904,7 +86093,10 @@ var require_graphics = __commonJS({
                   util.noop();
                 }
                 try {
-                  stdout = execSync('defaults read /Library/Preferences/com.apple.windowserver.plist 2>/dev/null;defaults read /Library/Preferences/com.apple.windowserver.displays.plist 2>/dev/null; echo ""', { maxBuffer: 1024 * 2e4 });
+                  stdout = execSync(
+                    'defaults read /Library/Preferences/com.apple.windowserver.plist 2>/dev/null;defaults read /Library/Preferences/com.apple.windowserver.displays.plist 2>/dev/null; echo ""',
+                    { maxBuffer: 1024 * 2e4 }
+                  );
                   const output = (stdout || "").toString();
                   const obj = util.plistReader(output);
                   if (obj["DisplayAnyUserSets"] && obj["DisplayAnyUserSets"]["Configs"] && obj["DisplayAnyUserSets"]["Configs"][0] && obj["DisplayAnyUserSets"]["Configs"][0]["DisplayConfig"]) {
@@ -85936,7 +86128,7 @@ var require_graphics = __commonJS({
                       i++;
                     });
                   }
-                } catch (e) {
+                } catch {
                   util.noop();
                 }
               }
@@ -85948,9 +86140,9 @@ var require_graphics = __commonJS({
           }
           if (_linux) {
             if (util.isRaspberry()) {
-              let cmd2 = `fbset -s 2> /dev/null | grep 'mode "' ; vcgencmd get_mem gpu 2> /dev/null; tvservice -s 2> /dev/null; tvservice -n 2> /dev/null;`;
-              exec3(cmd2, function(error2, stdout) {
-                let lines = stdout.toString().split("\n");
+              const cmd2 = `fbset -s 2> /dev/null | grep 'mode "' ; vcgencmd get_mem gpu 2> /dev/null; tvservice -s 2> /dev/null; tvservice -n 2> /dev/null;`;
+              exec3(cmd2, (error2, stdout) => {
+                const lines = stdout.toString().split("\n");
                 if (lines.length > 3 && lines[0].indexOf('mode "') >= -1 && lines[2].indexOf("0x12000a") > -1) {
                   const parts = lines[0].replace("mode", "").replace(/"/g, "").trim().split("x");
                   if (parts.length === 2) {
@@ -85984,10 +86176,10 @@ var require_graphics = __commonJS({
                 }
               });
             }
-            let cmd = "lspci -vvv  2>/dev/null";
-            exec3(cmd, function(error2, stdout) {
+            const cmd = "lspci -vvv  2>/dev/null";
+            exec3(cmd, (error2, stdout) => {
               if (!error2) {
-                let lines = stdout.toString().split("\n");
+                const lines = stdout.toString().split("\n");
                 if (result2.controllers.length === 0) {
                   result2.controllers = parseLinesLinuxControllers(lines);
                   const nvidiaData = nvidiaDevices();
@@ -85996,23 +86188,23 @@ var require_graphics = __commonJS({
                   });
                 }
               }
-              let cmd2 = "clinfo --raw";
-              exec3(cmd2, function(error3, stdout2) {
+              const cmd2 = "clinfo --raw";
+              exec3(cmd2, (error3, stdout2) => {
                 if (!error3) {
-                  let lines = stdout2.toString().split("\n");
+                  const lines = stdout2.toString().split("\n");
                   result2.controllers = parseLinesLinuxClinfo(result2.controllers, lines);
                 }
-                let cmd3 = "xdpyinfo 2>/dev/null | grep 'depth of root window' | awk '{ print $5 }'";
-                exec3(cmd3, function(error4, stdout3) {
+                const cmd3 = "xdpyinfo 2>/dev/null | grep 'depth of root window' | awk '{ print $5 }'";
+                exec3(cmd3, (error4, stdout3) => {
                   let depth = 0;
                   if (!error4) {
-                    let lines = stdout3.toString().split("\n");
+                    const lines = stdout3.toString().split("\n");
                     depth = parseInt(lines[0]) || 0;
                   }
-                  let cmd4 = "xrandr --verbose 2>/dev/null";
-                  exec3(cmd4, function(error5, stdout4) {
+                  const cmd4 = "xrandr --verbose 2>/dev/null";
+                  exec3(cmd4, (error5, stdout4) => {
                     if (!error5) {
-                      let lines = stdout4.toString().split("\n");
+                      const lines = stdout4.toString().split("\n");
                       result2.displays = parseLinesLinuxDisplays(lines, depth);
                     }
                     if (callback) {
@@ -86040,56 +86232,65 @@ var require_graphics = __commonJS({
             try {
               const workload = [];
               workload.push(util.powerShell("Get-CimInstance win32_VideoController | fl *"));
-              workload.push(util.powerShell('gp "HKLM:\\SYSTEM\\ControlSet001\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\*" -ErrorAction SilentlyContinue | where MatchingDeviceId $null -NE | select MatchingDeviceId,HardwareInformation.qwMemorySize | fl'));
+              workload.push(
+                util.powerShell(
+                  'gp "HKLM:\\SYSTEM\\ControlSet001\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\*" -ErrorAction SilentlyContinue | where MatchingDeviceId $null -NE | select MatchingDeviceId,HardwareInformation.qwMemorySize | fl'
+                )
+              );
               workload.push(util.powerShell("Get-CimInstance win32_desktopmonitor | fl *"));
               workload.push(util.powerShell("Get-CimInstance -Namespace root\\wmi -ClassName WmiMonitorBasicDisplayParams | fl"));
               workload.push(util.powerShell("Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::AllScreens"));
               workload.push(util.powerShell("Get-CimInstance -Namespace root\\wmi -ClassName WmiMonitorConnectionParams | fl"));
-              workload.push(util.powerShell('gwmi WmiMonitorID -Namespace root\\wmi | ForEach-Object {(($_.ManufacturerName -notmatch 0 | foreach {[char]$_}) -join "") + "|" + (($_.ProductCodeID -notmatch 0 | foreach {[char]$_}) -join "") + "|" + (($_.UserFriendlyName -notmatch 0 | foreach {[char]$_}) -join "") + "|" + (($_.SerialNumberID -notmatch 0 | foreach {[char]$_}) -join "") + "|" + $_.InstanceName}'));
+              workload.push(
+                util.powerShell(
+                  'gwmi WmiMonitorID -Namespace root\\wmi | ForEach-Object {(($_.ManufacturerName -notmatch 0 | foreach {[char]$_}) -join "") + "|" + (($_.ProductCodeID -notmatch 0 | foreach {[char]$_}) -join "") + "|" + (($_.UserFriendlyName -notmatch 0 | foreach {[char]$_}) -join "") + "|" + (($_.SerialNumberID -notmatch 0 | foreach {[char]$_}) -join "") + "|" + $_.InstanceName}'
+                )
+              );
               const nvidiaData = nvidiaDevices();
-              Promise.all(
-                workload
-              ).then((data) => {
-                let csections = data[0].replace(/\r/g, "").split(/\n\s*\n/);
-                let vsections = data[1].replace(/\r/g, "").split(/\n\s*\n/);
+              Promise.all(workload).then((data) => {
+                const csections = data[0].replace(/\r/g, "").split(/\n\s*\n/);
+                const vsections = data[1].replace(/\r/g, "").split(/\n\s*\n/);
                 result2.controllers = parseLinesWindowsControllers(csections, vsections);
                 result2.controllers = result2.controllers.map((controller) => {
                   if (controller.vendor.toLowerCase() === "nvidia") {
-                    return mergeControllerNvidia(controller, nvidiaData.find((device) => {
-                      let windowsSubDeviceId = (controller.subDeviceId || "").toLowerCase();
-                      const nvidiaSubDeviceIdParts = device.subDeviceId.split("x");
-                      let nvidiaSubDeviceId = nvidiaSubDeviceIdParts.length > 1 ? nvidiaSubDeviceIdParts[1].toLowerCase() : nvidiaSubDeviceIdParts[0].toLowerCase();
-                      const lengthDifference = Math.abs(windowsSubDeviceId.length - nvidiaSubDeviceId.length);
-                      if (windowsSubDeviceId.length > nvidiaSubDeviceId.length) {
-                        for (let i = 0; i < lengthDifference; i++) {
-                          nvidiaSubDeviceId = "0" + nvidiaSubDeviceId;
+                    return mergeControllerNvidia(
+                      controller,
+                      nvidiaData.find((device) => {
+                        let windowsSubDeviceId = (controller.subDeviceId || "").toLowerCase();
+                        const nvidiaSubDeviceIdParts = device.subDeviceId.split("x");
+                        let nvidiaSubDeviceId = nvidiaSubDeviceIdParts.length > 1 ? nvidiaSubDeviceIdParts[1].toLowerCase() : nvidiaSubDeviceIdParts[0].toLowerCase();
+                        const lengthDifference = Math.abs(windowsSubDeviceId.length - nvidiaSubDeviceId.length);
+                        if (windowsSubDeviceId.length > nvidiaSubDeviceId.length) {
+                          for (let i = 0; i < lengthDifference; i++) {
+                            nvidiaSubDeviceId = "0" + nvidiaSubDeviceId;
+                          }
+                        } else if (windowsSubDeviceId.length < nvidiaSubDeviceId.length) {
+                          for (let i = 0; i < lengthDifference; i++) {
+                            windowsSubDeviceId = "0" + windowsSubDeviceId;
+                          }
                         }
-                      } else if (windowsSubDeviceId.length < nvidiaSubDeviceId.length) {
-                        for (let i = 0; i < lengthDifference; i++) {
-                          windowsSubDeviceId = "0" + windowsSubDeviceId;
-                        }
-                      }
-                      return windowsSubDeviceId === nvidiaSubDeviceId;
-                    }) || {});
+                        return windowsSubDeviceId === nvidiaSubDeviceId;
+                      }) || {}
+                    );
                   } else {
                     return controller;
                   }
                 });
-                let dsections = data[2].replace(/\r/g, "").split(/\n\s*\n/);
+                const dsections = data[2].replace(/\r/g, "").split(/\n\s*\n/);
                 if (dsections[0].trim() === "") {
                   dsections.shift();
                 }
                 if (dsections.length && dsections[dsections.length - 1].trim() === "") {
                   dsections.pop();
                 }
-                let msections = data[3].replace(/\r/g, "").split("Active ");
+                const msections = data[3].replace(/\r/g, "").split("Active ");
                 msections.shift();
-                let ssections = data[4].replace(/\r/g, "").split("BitsPerPixel ");
+                const ssections = data[4].replace(/\r/g, "").split("BitsPerPixel ");
                 ssections.shift();
-                let tsections = data[5].replace(/\r/g, "").split(/\n\s*\n/);
+                const tsections = data[5].replace(/\r/g, "").split(/\n\s*\n/);
                 tsections.shift();
                 const res = data[6].replace(/\r/g, "").split(/\n/);
-                let isections = [];
+                const isections = [];
                 res.forEach((element) => {
                   const parts = element.split("|");
                   if (parts.length === 5) {
@@ -86168,12 +86369,12 @@ var require_graphics = __commonJS({
             }
           }
         }
-        let controllers = [];
-        for (let i in sections) {
+        const controllers = [];
+        for (const i in sections) {
           if ({}.hasOwnProperty.call(sections, i)) {
             if (sections[i].trim() !== "") {
-              let lines = sections[i].trim().split("\n");
-              let pnpDeviceId = util.getValue(lines, "PNPDeviceID", ":").match(/PCI\\(VEN_[0-9A-F]{4})&(DEV_[0-9A-F]{4})(?:&(SUBSYS_[0-9A-F]{8}))?(?:&(REV_[0-9A-F]{2}))?/i);
+              const lines = sections[i].trim().split("\n");
+              const pnpDeviceId = util.getValue(lines, "PNPDeviceID", ":").match(/PCI\\(VEN_[0-9A-F]{4})&(DEV_[0-9A-F]{4})(?:&(SUBSYS_[0-9A-F]{8}))?(?:&(REV_[0-9A-F]{2}))?/i);
               let subDeviceId = null;
               let memorySize = null;
               if (pnpDeviceId) {
@@ -86224,14 +86425,14 @@ var require_graphics = __commonJS({
         return controllers;
       }
       function parseLinesWindowsDisplaysPowershell(ssections, msections, dsections, tsections, isections) {
-        let displays = [];
+        const displays = [];
         let vendor = "";
         let model = "";
         let deviceID = "";
         let resolutionX = 0;
         let resolutionY = 0;
         if (dsections && dsections.length) {
-          let linesDisplay = dsections[0].split("\n");
+          const linesDisplay = dsections[0].split("\n");
           vendor = util.getValue(linesDisplay, "MonitorManufacturer", ":");
           model = util.getValue(linesDisplay, "Name", ":");
           deviceID = util.getValue(linesDisplay, "PNPDeviceID", ":").replace(/&amp;/g, "&").toLowerCase();
@@ -86245,9 +86446,9 @@ var require_graphics = __commonJS({
             if (tsections.length === 0 || tsections[i] === void 0) {
               tsections[i] = "Unknown";
             }
-            let linesScreen = ssections[i].split("\n");
-            let linesMonitor = msections[i].split("\n");
-            let linesConnection = tsections[i].split("\n");
+            const linesScreen = ssections[i].split("\n");
+            const linesMonitor = msections[i].split("\n");
+            const linesConnection = tsections[i].split("\n");
             const bitsPerPixel = util.getValue(linesScreen, "BitsPerPixel");
             const bounds = util.getValue(linesScreen, "Bounds").replace("{", "").replace("}", "").replace(/=/g, ":").split(",");
             const primary = util.getValue(linesScreen, "Primary");
@@ -88090,7 +88291,7 @@ var require_network = __commonJS({
         const ipconfig = execSync("ipconfig /all", util.execOptsWin);
         const ipconfigArray = ipconfig.split("\r\n\r\n");
         ipconfigArray.forEach((element, index) => {
-          if (index == 1) {
+          if (index === 1) {
             const longPrimaryDNS = element.split("\r\n").filter((element2) => {
               return element2.toUpperCase().includes("DNS");
             });
@@ -88101,7 +88302,7 @@ var require_network = __commonJS({
             }
           }
           if (index > 1) {
-            if (index % 2 == 0) {
+            if (index % 2 === 0) {
               const name = element.substring(element.lastIndexOf(" ") + 1).replace(":", "");
               iface.name = name;
             } else {
@@ -88174,7 +88375,7 @@ var require_network = __commonJS({
         i8021x.protocol = "Not defined";
         return i8021x;
       }
-      if (connectionType == "wired" && ifaces.length > 0) {
+      if (connectionType === "wired" && ifaces.length > 0) {
         try {
           const iface8021xInfo = ifaces.find((element) => {
             return element.includes(iface + "\r\n");
@@ -88196,7 +88397,7 @@ var require_network = __commonJS({
         } catch (error2) {
           return i8021x;
         }
-      } else if (connectionType == "wireless") {
+      } else if (connectionType === "wireless") {
         let i8021xState = "";
         let i8021xProtocol = "";
         try {
@@ -88318,7 +88519,7 @@ var require_network = __commonJS({
         const resultFormat = result2.replace(/\s+/g, " ").trim();
         const connectionNameLines = resultFormat.split(" ").slice(3);
         const connectionName = connectionNameLines.join(" ");
-        return connectionName != "--" ? connectionName : "";
+        return connectionName !== "--" ? connectionName : "";
       } catch (e) {
         return "";
       }
@@ -88326,7 +88527,7 @@ var require_network = __commonJS({
     function checkLinuxDCHPInterfaces(file) {
       let result2 = [];
       try {
-        let cmd = `cat ${file} 2> /dev/null | grep 'iface\\|source'`;
+        const cmd = `cat ${file} 2> /dev/null | grep 'iface\\|source'`;
         const lines = execSync(cmd, util.execOptsLinux).toString().split("\n");
         lines.forEach((line) => {
           const parts = line.replace(/\s+/g, " ").trim().split(" ");
@@ -88427,7 +88628,7 @@ var require_network = __commonJS({
           const result2 = execSync(cmd, util.execOptsLinux).toString();
           const resultFormat = result2.replace(/\s+/g, " ").trim();
           const dnsSuffix = resultFormat.split(" ").slice(1).toString();
-          return dnsSuffix == "--" ? "Not defined" : dnsSuffix;
+          return dnsSuffix === "--" ? "Not defined" : dnsSuffix;
         } catch (e) {
           return "Unknown";
         }
@@ -88442,7 +88643,7 @@ var require_network = __commonJS({
           const result2 = execSync(cmd, util.execOptsLinux).toString();
           const resultFormat = result2.replace(/\s+/g, " ").trim();
           const authenticationProtocol = resultFormat.split(" ").slice(1).toString();
-          return authenticationProtocol == "--" ? "" : authenticationProtocol;
+          return authenticationProtocol === "--" ? "" : authenticationProtocol;
         } catch (e) {
           return "Not defined";
         }
@@ -88452,7 +88653,7 @@ var require_network = __commonJS({
     }
     function getLinuxIfaceIEEE8021xState(authenticationProtocol) {
       if (authenticationProtocol) {
-        if (authenticationProtocol == "Not defined") {
+        if (authenticationProtocol === "Not defined") {
           return "Disabled";
         }
         return "Enabled";
@@ -88461,7 +88662,30 @@ var require_network = __commonJS({
       }
     }
     function testVirtualNic(iface, ifaceName, mac) {
-      const virtualMacs = ["00:00:00:00:00:00", "00:03:FF", "00:05:69", "00:0C:29", "00:0F:4B", "00:13:07", "00:13:BE", "00:15:5d", "00:16:3E", "00:1C:42", "00:21:F6", "00:24:0B", "00:50:56", "00:A0:B1", "00:E0:C8", "08:00:27", "0A:00:27", "18:92:2C", "16:DF:49", "3C:F3:92", "54:52:00", "FC:15:97"];
+      const virtualMacs = [
+        "00:00:00:00:00:00",
+        "00:03:FF",
+        "00:05:69",
+        "00:0C:29",
+        "00:0F:4B",
+        "00:13:07",
+        "00:13:BE",
+        "00:15:5d",
+        "00:16:3E",
+        "00:1C:42",
+        "00:21:F6",
+        "00:24:0B",
+        "00:50:56",
+        "00:A0:B1",
+        "00:E0:C8",
+        "08:00:27",
+        "0A:00:27",
+        "18:92:2C",
+        "16:DF:49",
+        "3C:F3:92",
+        "54:52:00",
+        "FC:15:97"
+      ];
       if (mac) {
         return virtualMacs.filter((item) => {
           return mac.toUpperCase().toUpperCase().startsWith(item.substring(0, mac.length));
@@ -88506,7 +88730,7 @@ var require_network = __commonJS({
               nics = getDarwinNics();
               nics.forEach((nic) => {
                 if ({}.hasOwnProperty.call(ifaces, nic.iface)) {
-                  ifaces[nic.iface].forEach(function(details) {
+                  ifaces[nic.iface].forEach((details) => {
                     if (details.family === "IPv4" || details.family === 4) {
                       nic.ip4subnet = details.netmask;
                     }
@@ -88651,7 +88875,7 @@ var require_network = __commonJS({
                     dnsSuffix = getLinuxIfaceDNSsuffix(connectionName);
                     ieee8021xAuth = getLinuxIfaceIEEE8021xAuth(connectionName);
                     ieee8021xState = getLinuxIfaceIEEE8021xState(ieee8021xAuth);
-                  } catch (e) {
+                  } catch {
                     util.noop();
                   }
                   duplex = util.getValue(lines, "duplex");
@@ -88945,9 +89169,7 @@ var require_network = __commonJS({
               workload.push(networkStatsSingle(iface.trim()));
             }
             if (workload.length) {
-              Promise.all(
-                workload
-              ).then((data) => {
+              Promise.all(workload).then((data) => {
                 if (callback) {
                   callback(data);
                 }
@@ -89096,7 +89318,9 @@ var require_network = __commonJS({
             if (_windows) {
               let perfData = [];
               let ifaceName = ifaceSanitized;
-              util.powerShell("Get-CimInstance Win32_PerfRawData_Tcpip_NetworkInterface | select Name,BytesReceivedPersec,PacketsReceivedErrors,PacketsReceivedDiscarded,BytesSentPersec,PacketsOutboundErrors,PacketsOutboundDiscarded | fl").then((stdout, error2) => {
+              util.powerShell(
+                "Get-CimInstance Win32_PerfRawData_Tcpip_NetworkInterface | select Name,BytesReceivedPersec,PacketsReceivedErrors,PacketsReceivedDiscarded,BytesSentPersec,PacketsOutboundErrors,PacketsOutboundDiscarded | fl"
+              ).then((stdout, error2) => {
                 if (!error2) {
                   const psections = stdout.toString().split(/\n\s*\n/);
                   perfData = parseLinesWindowsPerfData(psections);
@@ -89163,7 +89387,7 @@ var require_network = __commonJS({
             }
             exec3(cmd, { maxBuffer: 1024 * 2e4 }, function(error2, stdout) {
               let lines = stdout.toString().split("\n");
-              if (!error2 && (lines.length > 1 || lines[0] != "")) {
+              if (!error2 && (lines.length > 1 || lines[0] !== "")) {
                 lines.forEach(function(line) {
                   line = line.replace(/ +/g, " ").split(" ");
                   if (line.length >= 7) {
@@ -89273,9 +89497,9 @@ var require_network = __commonJS({
               if (!error2) {
                 exec3("ps -axo pid,command", { maxBuffer: 1024 * 2e4 }, function(err2, stdout2) {
                   let processes = stdout2.toString().split("\n");
-                  processes = processes.map(((line) => {
+                  processes = processes.map((line) => {
                     return line.trim().replace(/ +/g, " ");
-                  }));
+                  });
                   let lines = stdout.toString().split("\n");
                   lines.shift();
                   let pidPos = 8;
@@ -89480,7 +89704,9 @@ var require_network = __commonJS({
                   cmd = "netstat -rn | awk '/default/ {print $2}'";
                   exec3(cmd, { maxBuffer: 1024 * 2e4 }, function(error3, stdout2) {
                     const lines = stdout2.toString().split("\n").map((line) => line.trim());
-                    result2 = lines.find((line) => /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(line));
+                    result2 = lines.find(
+                      (line) => /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(line)
+                    );
                     if (callback) {
                       callback(result2);
                     }
@@ -89827,7 +90053,7 @@ var require_wifi = __commonJS({
             }
             const wpaFlags = [];
             let wpaFlag = "";
-            lines.forEach(function(line) {
+            lines.forEach((line) => {
               const l = line.trim().toLowerCase();
               if (l.indexOf("group cipher") >= 0) {
                 if (wpaFlag) {
@@ -89888,8 +90114,8 @@ var require_wifi = __commonJS({
       try {
         let wifiObj = JSON.parse(wifiStr);
         wifiObj = wifiObj.SPAirPortDataType[0].spairport_airport_interfaces[0].spairport_airport_other_local_wireless_networks;
-        wifiObj.forEach(function(wifiItem) {
-          let security = [];
+        wifiObj.forEach((wifiItem) => {
+          const security = [];
           const sm = wifiItem.spairport_security_mode || "";
           if (sm === "spairport_security_mode_wep") {
             security.push("WEP");
@@ -89948,9 +90174,9 @@ var require_wifi = __commonJS({
                   }
                   const res = getWifiNetworkListIw(ifaceSanitized);
                   if (res === -1) {
-                    setTimeout(function(iface2) {
+                    setTimeout((iface2) => {
                       const res2 = getWifiNetworkListIw(iface2);
-                      if (res2 != -1) {
+                      if (res2 !== -1) {
                         result2 = res2;
                       }
                       if (callback) {
@@ -89984,8 +90210,8 @@ var require_wifi = __commonJS({
               resolve(result2);
             }
           } else if (_darwin) {
-            let cmd = "system_profiler SPAirPortDataType -json 2>/dev/null";
-            exec3(cmd, { maxBuffer: 1024 * 4e4 }, function(error2, stdout) {
+            const cmd = "system_profiler SPAirPortDataType -json 2>/dev/null";
+            exec3(cmd, { maxBuffer: 1024 * 4e4 }, (error2, stdout) => {
               result2 = parseWifiDarwin(stdout.toString());
               if (callback) {
                 callback(result2);
@@ -89993,7 +90219,7 @@ var require_wifi = __commonJS({
               resolve(result2);
             });
           } else if (_windows) {
-            let cmd = "netsh wlan show networks mode=Bssid";
+            const cmd = "netsh wlan show networks mode=Bssid";
             util.powerShell(cmd).then((stdout) => {
               const ssidParts = stdout.toString("utf8").split(os2.EOL + os2.EOL + "SSID ");
               ssidParts.shift();
@@ -90125,8 +90351,8 @@ var require_wifi = __commonJS({
             }
             resolve(result2);
           } else if (_darwin) {
-            let cmd = 'system_profiler SPNetworkDataType SPAirPortDataType -xml 2>/dev/null; echo "######" ; ioreg -n AppleBCMWLANSkywalkInterface -r 2>/dev/null';
-            exec3(cmd, function(error2, stdout) {
+            const cmd = 'system_profiler SPNetworkDataType SPAirPortDataType -xml 2>/dev/null; echo "######" ; ioreg -n AppleBCMWLANSkywalkInterface -r 2>/dev/null';
+            exec3(cmd, (error2, stdout) => {
               try {
                 const parts = stdout.toString().split("######");
                 const profilerObj = util.plistParser(parts[0]);
@@ -90140,9 +90366,9 @@ var require_wifi = __commonJS({
                   return item._name === "Wi-Fi";
                 });
                 const airportWifiObj = airportObj[0].spairport_current_network_information;
-                const channel = parseInt(("" + airportWifiObj.spairport_network_channel).split(" ")[0]) || 0;
+                const channel = parseInt(("" + airportWifiObj.spairport_network_channel).split(" ")[0], 10) || 0;
                 const signalLevel = airportWifiObj.spairport_signal_noise || null;
-                let security = [];
+                const security = [];
                 const sm = airportWifiObj.spairport_security_mode || "";
                 if (sm === "spairport_security_mode_wep") {
                   security.push("WEP");
@@ -90159,7 +90385,7 @@ var require_wifi = __commonJS({
                   id: networkWifiObj._name || "Wi-Fi",
                   iface: networkWifiObj.interface || "",
                   model: networkWifiObj.hardware || "",
-                  ssid: airportWifiObj._name || "",
+                  ssid: (airportWifiObj._name || "").replace("&lt;", "<").replace("&gt;", ">"),
                   bssid: airportWifiObj.spairport_network_bssid || "",
                   channel,
                   frequency: channel ? wifiFrequencyFromChannel(channel) : null,
@@ -90169,7 +90395,7 @@ var require_wifi = __commonJS({
                   quality: wifiQualityFromDB(signalLevel),
                   txRate: airportWifiObj.spairport_network_rate || null
                 });
-              } catch (e) {
+              } catch {
                 util.noop();
               }
               if (callback) {
@@ -90178,8 +90404,8 @@ var require_wifi = __commonJS({
               resolve(result2);
             });
           } else if (_windows) {
-            let cmd = "netsh wlan show interfaces";
-            util.powerShell(cmd).then(function(stdout) {
+            const cmd = "netsh wlan show interfaces";
+            util.powerShell(cmd).then((stdout) => {
               const allLines = stdout.toString().split("\r\n");
               for (let i = 0; i < allLines.length; i++) {
                 allLines[i] = allLines[i].trim();
@@ -90254,8 +90480,8 @@ var require_wifi = __commonJS({
             }
             resolve(result2);
           } else if (_darwin) {
-            let cmd = "system_profiler SPNetworkDataType";
-            exec3(cmd, function(error2, stdout) {
+            const cmd = "system_profiler SPNetworkDataType";
+            exec3(cmd, (error2, stdout) => {
               const parts1 = stdout.toString().split("\n\n    Wi-Fi:\n\n");
               if (parts1.length > 1) {
                 const lines = parts1[1].split("\n\n")[0].split("\n");
@@ -90276,8 +90502,8 @@ var require_wifi = __commonJS({
               resolve(result2);
             });
           } else if (_windows) {
-            let cmd = "netsh wlan show interfaces";
-            util.powerShell(cmd).then(function(stdout) {
+            const cmd = "netsh wlan show interfaces";
+            util.powerShell(cmd).then((stdout) => {
               const allLines = stdout.toString().split("\r\n");
               for (let i = 0; i < allLines.length; i++) {
                 allLines[i] = allLines[i].trim();
