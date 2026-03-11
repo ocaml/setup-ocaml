@@ -679,7 +679,7 @@ __metadata:
     esbuild: "npm:0.27.2"
     exponential-backoff: "npm:3.1.3"
     semver: "npm:7.7.3"
-    systeminformation: "npm:5.28.0"
+    systeminformation: "npm:5.30.8"
     yaml: "npm:2.8.2"
   languageName: unknown
   linkType: soft
@@ -1486,12 +1486,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:5.28.0":
-  version: 5.28.0
-  resolution: "systeminformation@npm:5.28.0"
+"systeminformation@npm:5.30.8":
+  version: 5.30.8
+  resolution: "systeminformation@npm:5.30.8"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/6d1ae32cbcd8dc20d71eaaba370bec67f86a047cc9529c7bd5341d52a90f321fc333c059e0eebc693705990a89d447596165568befc452dab3c26b23114a3498
+  checksum: 10c0/58d7911944c59bb8198e88a069f393a05b5e96d1a1504ee25b3f15631e49322ca26aafc52eab181d76a770d60fe02923b4d9edffc1256dc6d7599f73d9ff4b32
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
