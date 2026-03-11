@@ -54,7 +54,7 @@ export const PLATFORM = (() => {
   }
 })();
 
-export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
+export const CYGWIN_MIRROR = "https://mirrors.sonic.net/cygwin/";
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
