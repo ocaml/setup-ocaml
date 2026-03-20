@@ -158,11 +158,11 @@ The `ocaml-compiler` input supports the Semantic Versioning Specification, for m
 
 Examples:
 
-- Exact package name: `ocaml-base-compiler.5.3.0`
-- Combine multiple packages: `ocaml-variants.5.3.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
+- Exact package name: `ocaml-base-compiler.5.4.0`
+- Combine multiple packages: `ocaml-variants.5.4.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
 - Major versions: `4`, `5`
-- Minor versions: `4.08`, `4.14`, `5.3`, `5.3.x`
-- More specific versions: `~4.02.2`, `5.3.0`
+- Minor versions: `4.08`, `4.14`, `5.4`, `5.4.x`
+- More specific versions: `~4.02.2`, `5.4.0`
 
 ## Advanced Configurations
 

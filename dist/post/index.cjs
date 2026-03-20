@@ -93854,7 +93854,7 @@ async function retrieveAllCompilerVersions() {
           // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
           `0${_minor}`
         ) : (
-          // ocaml-base-compiler.5.3.0, ocaml-base-compiler.4.14.2
+          // ocaml-base-compiler.5.4.0, ocaml-base-compiler.4.14.2
           _minor
         );
         const version4 = `${major}.${minor}.${patch}`;

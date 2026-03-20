@@ -27,7 +27,7 @@ async function retrieveAllCompilerVersions() {
           major < 5 && _minor < 10
             ? // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
               `0${_minor}`
-            : // ocaml-base-compiler.5.3.0, ocaml-base-compiler.4.14.2
+            : // ocaml-base-compiler.5.4.0, ocaml-base-compiler.4.14.2
               _minor;
         const version = `${major}.${minor}.${patch}`;
         versions.add(version);
