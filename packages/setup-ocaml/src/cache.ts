@@ -1,7 +1,7 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
+import type { DownloadOptions } from "@actions/cache";
 import * as cache from "@actions/cache";
-import type { DownloadOptions } from "@actions/cache/lib/options.js";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
