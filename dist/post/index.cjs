@@ -93708,9 +93708,6 @@ var OPAM_ROOT = (() => {
   }
   return path11.join(os7.homedir(), ".opam");
 })();
-var CYGWIN_ROOT = path11.join(OPAM_ROOT, ".cygwin", "root");
-var CYGWIN_ROOT_BIN = path11.join(CYGWIN_ROOT, "bin");
-var CYGWIN_BASH_ENV = path11.join(CYGWIN_ROOT, "bash_env");
 var DUNE_CACHE_ROOT = (() => {
   const xdgCacheHome = process4.env.XDG_CACHE_HOME;
   if (xdgCacheHome) {
