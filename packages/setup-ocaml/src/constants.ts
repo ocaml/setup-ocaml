@@ -54,15 +54,18 @@ export const PLATFORM = (() => {
   }
 })();
 
-export const CYGWIN_MIRROR = "https://mirrors.kernel.org/sourceware/cygwin/";
-
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
-export const CYGWIN_ROOT = path.join("C:", "cygwin");
+export const OPAM_ROOT = (() => {
+  if (PLATFORM === "windows") {
+    return path.join("C:", ".opam");
+  }
+  return path.join(os.homedir(), ".opam");
+})();
+
+export const CYGWIN_ROOT = path.join(OPAM_ROOT, ".cygwin", "root");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
-
-export const CYGWIN_LOCAL_PACKAGE_DIR = path.join(CYGWIN_ROOT, "packages");
 
 export const CYGWIN_BASH_ENV = path.join(CYGWIN_ROOT, "bash_env");
 
@@ -75,13 +78,6 @@ export const DUNE_CACHE_ROOT = (() => {
     return path.join("C:", "dune");
   }
   return path.join(os.homedir(), ".cache", "dune");
-})();
-
-export const OPAM_ROOT = (() => {
-  if (PLATFORM === "windows") {
-    return path.join("C:", ".opam");
-  }
-  return path.join(os.homedir(), ".opam");
 })();
 
 export const RUNNER_ENVIRONMENT = ((): "github-hosted" | "self-hosted" => {

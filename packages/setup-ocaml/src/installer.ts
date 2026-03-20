@@ -3,12 +3,7 @@ import * as os from "node:os";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
-import {
-  restoreDuneCache,
-  restoreOpamCaches,
-  saveCygwinCache,
-  saveOpamCache,
-} from "./cache.js";
+import { restoreDuneCache, restoreOpamCache, saveOpamCache } from "./cache.js";
 import {
   CYGWIN_BASH_ENV,
   CYGWIN_ROOT_BIN,
@@ -30,8 +25,6 @@ import {
 } from "./opam.js";
 import { retrieveOpamLocalPackages } from "./packages.js";
 import { resolvedCompiler } from "./version.js";
-import { fixFstab, setupCygwin } from "./windows.js";
-
 export async function installer() {
   if (core.isDebug()) {
     core.exportVariable("OPAMVERBOSE", 1);
@@ -63,18 +56,13 @@ export async function installer() {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     });
   }
-  const { opamCacheHit, cygwinCacheHit } = await restoreOpamCaches();
+  const opamCacheHit = await restoreOpamCache();
+  await setupOpam();
   if (PLATFORM === "windows") {
-    await setupCygwin();
-    if (!cygwinCacheHit) {
-      await saveCygwinCache();
-    }
     await fs.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
     core.exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
-    await fixFstab();
     core.addPath(CYGWIN_ROOT_BIN);
   }
-  await setupOpam();
   if (!opamCacheHit) {
     await repositoryRemoveAll();
     await repositoryAddAll(OPAM_REPOSITORIES);
