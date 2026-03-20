@@ -93702,9 +93702,14 @@ var PLATFORM = (() => {
   }
 })();
 var GITHUB_WORKSPACE = process4.env.GITHUB_WORKSPACE ?? process4.cwd();
-var CYGWIN_ROOT = path11.join("C:", "cygwin");
+var OPAM_ROOT = (() => {
+  if (PLATFORM === "windows") {
+    return path11.join("C:", ".opam");
+  }
+  return path11.join(os7.homedir(), ".opam");
+})();
+var CYGWIN_ROOT = path11.join(OPAM_ROOT, ".cygwin", "root");
 var CYGWIN_ROOT_BIN = path11.join(CYGWIN_ROOT, "bin");
-var CYGWIN_LOCAL_PACKAGE_DIR = path11.join(CYGWIN_ROOT, "packages");
 var CYGWIN_BASH_ENV = path11.join(CYGWIN_ROOT, "bash_env");
 var DUNE_CACHE_ROOT = (() => {
   const xdgCacheHome = process4.env.XDG_CACHE_HOME;
@@ -93715,12 +93720,6 @@ var DUNE_CACHE_ROOT = (() => {
     return path11.join("C:", "dune");
   }
   return path11.join(os7.homedir(), ".cache", "dune");
-})();
-var OPAM_ROOT = (() => {
-  if (PLATFORM === "windows") {
-    return path11.join("C:", ".opam");
-  }
-  return path11.join(os7.homedir(), ".opam");
 })();
 var RUNNER_ENVIRONMENT = (() => {
   const ImageOS = process4.env.ImageOS;
