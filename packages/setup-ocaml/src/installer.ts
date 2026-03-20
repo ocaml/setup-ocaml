@@ -25,8 +25,6 @@ import {
 } from "./opam.js";
 import { retrieveOpamLocalPackages } from "./packages.js";
 import { resolvedCompiler } from "./version.js";
-import { fixFstab } from "./windows.js";
-
 export async function installer() {
   if (core.isDebug()) {
     core.exportVariable("OPAMVERBOSE", 1);
@@ -63,7 +61,6 @@ export async function installer() {
   if (PLATFORM === "windows") {
     await fs.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
     core.exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
-    await fixFstab();
     core.addPath(CYGWIN_ROOT_BIN);
   }
   if (!opamCacheHit) {
