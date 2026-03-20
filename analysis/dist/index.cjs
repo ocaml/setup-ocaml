@@ -46552,7 +46552,6 @@ async function analysis() {
         name
       ],
       {
-        // @ts-expect-error: process.env may contain undefined values
         env: {
           ...process2.env,
           PATH: process2.env.PATH ?? ""

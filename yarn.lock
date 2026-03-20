@@ -624,10 +624,10 @@ __metadata:
     "@tsconfig/node24": "npm:24.0.4"
     "@tsconfig/strictest": "npm:2.0.8"
     "@types/node": "npm:24.12.0"
-    "@typescript/native-preview": "npm:7.0.0-dev.20260319.1"
     esbuild: "npm:0.27.4"
     packageurl-js: "npm:2.0.1"
     strip-ansi: "npm:7.2.0"
+    typescript: "npm:5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -640,8 +640,8 @@ __metadata:
     "@tsconfig/node24": "npm:24.0.4"
     "@tsconfig/strictest": "npm:2.0.8"
     "@types/node": "npm:24.12.0"
-    "@typescript/native-preview": "npm:7.0.0-dev.20260319.1"
     esbuild: "npm:0.27.4"
+    typescript: "npm:5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -654,8 +654,8 @@ __metadata:
     "@tsconfig/node24": "npm:24.0.4"
     "@tsconfig/strictest": "npm:2.0.8"
     "@types/node": "npm:24.12.0"
-    "@typescript/native-preview": "npm:7.0.0-dev.20260319.1"
     esbuild: "npm:0.27.4"
+    typescript: "npm:5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -668,8 +668,8 @@ __metadata:
     "@tsconfig/node24": "npm:24.0.4"
     "@tsconfig/strictest": "npm:2.0.8"
     "@types/node": "npm:24.12.0"
-    "@typescript/native-preview": "npm:7.0.0-dev.20260319.1"
     esbuild: "npm:0.27.4"
+    typescript: "npm:5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -690,12 +690,12 @@ __metadata:
     "@tsconfig/strictest": "npm:2.0.8"
     "@types/node": "npm:24.12.0"
     "@types/semver": "npm:7.7.1"
-    "@typescript/native-preview": "npm:7.0.0-dev.20260319.1"
     cheerio: "npm:1.2.0"
     esbuild: "npm:0.27.4"
     exponential-backoff: "npm:3.1.3"
     semver: "npm:7.7.4"
     systeminformation: "npm:5.31.5"
+    typescript: "npm:5.9.3"
     yaml: "npm:2.8.2"
   languageName: unknown
   linkType: soft
@@ -1054,87 +1054,6 @@ __metadata:
   version: 7.7.1
   resolution: "@types/semver@npm:7.7.1"
   checksum: 10c0/c938aef3bf79a73f0f3f6037c16e2e759ff40c54122ddf0b2583703393d8d3127130823facb880e694caa324eb6845628186aac1997ee8b31dc2d18fafe26268
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-darwin-arm64@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-darwin-arm64@npm:7.0.0-dev.20260319.1"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-darwin-x64@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-darwin-x64@npm:7.0.0-dev.20260319.1"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-linux-arm64@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-linux-arm64@npm:7.0.0-dev.20260319.1"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-linux-arm@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-linux-arm@npm:7.0.0-dev.20260319.1"
-  conditions: os=linux & cpu=arm
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-linux-x64@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-linux-x64@npm:7.0.0-dev.20260319.1"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-win32-arm64@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-win32-arm64@npm:7.0.0-dev.20260319.1"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview-win32-x64@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview-win32-x64@npm:7.0.0-dev.20260319.1"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@typescript/native-preview@npm:7.0.0-dev.20260319.1":
-  version: 7.0.0-dev.20260319.1
-  resolution: "@typescript/native-preview@npm:7.0.0-dev.20260319.1"
-  dependencies:
-    "@typescript/native-preview-darwin-arm64": "npm:7.0.0-dev.20260319.1"
-    "@typescript/native-preview-darwin-x64": "npm:7.0.0-dev.20260319.1"
-    "@typescript/native-preview-linux-arm": "npm:7.0.0-dev.20260319.1"
-    "@typescript/native-preview-linux-arm64": "npm:7.0.0-dev.20260319.1"
-    "@typescript/native-preview-linux-x64": "npm:7.0.0-dev.20260319.1"
-    "@typescript/native-preview-win32-arm64": "npm:7.0.0-dev.20260319.1"
-    "@typescript/native-preview-win32-x64": "npm:7.0.0-dev.20260319.1"
-  dependenciesMeta:
-    "@typescript/native-preview-darwin-arm64":
-      optional: true
-    "@typescript/native-preview-darwin-x64":
-      optional: true
-    "@typescript/native-preview-linux-arm":
-      optional: true
-    "@typescript/native-preview-linux-arm64":
-      optional: true
-    "@typescript/native-preview-linux-x64":
-      optional: true
-    "@typescript/native-preview-win32-arm64":
-      optional: true
-    "@typescript/native-preview-win32-x64":
-      optional: true
-  bin:
-    tsgo: bin/tsgo.js
-  checksum: 10c0/daafd3bae5cbc3eb255b95bf8712c30ddffb2dd71200dd24f4de74043c7a7909a52cca50fb66b600755fb04cc1e9a5a6c0820f201ce842c8d59352a697c556a2
   languageName: node
   linkType: hard
 
@@ -1710,6 +1629,26 @@ __metadata:
   bin:
     turbo: bin/turbo
   checksum: 10c0/a102bd30067c040240719c831e2ae2d5d9c5994b7028f75445339d4b3cf2e334e93ebbd05669871e22f41af8acb4f26268df5099a8a6d1f5b297dac02023bc8e
+  languageName: node
+  linkType: hard
+
+"typescript@npm:5.9.3":
+  version: 5.9.3
+  resolution: "typescript@npm:5.9.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/6bd7552ce39f97e711db5aa048f6f9995b53f1c52f7d8667c1abdc1700c68a76a308f579cd309ce6b53646deb4e9a1be7c813a93baaf0a28ccd536a30270e1c5
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>":
+  version: 5.9.3
+  resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/ad09fdf7a756814dce65bc60c1657b40d44451346858eea230e10f2e95a289d9183b6e32e5c11e95acc0ccc214b4f36289dcad4bf1886b0adb84d711d336a430
   languageName: node
   linkType: hard
 

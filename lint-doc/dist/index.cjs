@@ -19780,7 +19780,6 @@ function group(name, fn) {
 var process2 = __toESM(require("node:process"), 1);
 async function lintOdoc() {
   const exitCode = await exec("opam", ["exec", "--", "dune", "build", "@doc"], {
-    // @ts-expect-error: process.env may contain undefined values
     env: {
       ...process2.env,
       PATH: process2.env.PATH ?? "",
