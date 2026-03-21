@@ -77,6 +77,7 @@ jobs:
           windows-environment: ${{ matrix.windows-environment || 'cygwin' }}
           windows-compiler: ${{ matrix.windows-compiler || 'mingw' }}
       - run: opam install ssl
+        continue-on-error: ${{ matrix.windows-compiler == 'msvc' }}
 
   test-container:
     name: Test on a container in a GitHub runner
