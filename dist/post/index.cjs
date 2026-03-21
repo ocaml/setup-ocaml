@@ -93752,6 +93752,15 @@ var WINDOWS_ENVIRONMENT = (() => {
   }
   return value;
 })();
+var WINDOWS_COMPILER = (() => {
+  const value = getInput("windows-compiler").toLowerCase();
+  if (value !== "mingw" && value !== "msvc") {
+    throw new Error(
+      `Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`
+    );
+  }
+  return value;
+})();
 var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_PIN = getBooleanInput("opam-pin");
 var OPAM_REPOSITORIES = (() => {

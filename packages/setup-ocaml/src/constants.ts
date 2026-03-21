@@ -127,6 +127,18 @@ export const WINDOWS_ENVIRONMENT: WindowsEnvironment = (() => {
   return value;
 })();
 
+type WindowsCompiler = "mingw" | "msvc";
+
+export const WINDOWS_COMPILER: WindowsCompiler = (() => {
+  const value = core.getInput("windows-compiler").toLowerCase();
+  if (value !== "mingw" && value !== "msvc") {
+    throw new Error(
+      `Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`,
+    );
+  }
+  return value;
+})();
+
 export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
 
 export const OPAM_PIN = core.getBooleanInput("opam-pin");

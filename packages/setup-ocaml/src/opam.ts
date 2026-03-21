@@ -10,6 +10,7 @@ import {
   MSYS2_ROOT,
   OPAM_DISABLE_SANDBOXING,
   PLATFORM,
+  WINDOWS_COMPILER,
   WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { octokit } from "./github-client.js";
@@ -21,13 +22,6 @@ import {
 // Stable opam version range — excludes 2.6.x pre-releases which may
 // contain breaking changes to the CLI or repository format.
 const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
-
-// MSYS2 packages that must be present before opam runs. Unlike Cygwin's
-// internal installation (which lives inside OPAM_ROOT and is cached), MSYS2
-// packages are installed to C:\msys64 which is outside the cache. Without
-// pre-installing these, a cache-hit run would detect missing system packages
-// and trigger a full recompilation of the OCaml compiler.
-const MSYS2_EXTRA_PACKAGES = ["mingw-w64-x86_64-gcc"];
 
 const EXECUTABLE_PERMISSION = 0o755;
 
@@ -116,14 +110,20 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       if (WINDOWS_ENVIRONMENT === "msys2") {
-        await core.group("Installing MSYS2 packages", async () => {
-          await exec(path.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
-            "-S",
-            "--noconfirm",
-            "--needed",
-            ...MSYS2_EXTRA_PACKAGES,
-          ]);
-        });
+        // MSYS2 packages are installed to C:\msys64 which is outside the
+        // opam cache. Without pre-installing GCC, a cache-hit run would
+        // detect missing system packages and trigger a full recompilation
+        // of the OCaml compiler. MSVC builds use cl.exe instead of GCC.
+        if (WINDOWS_COMPILER === "mingw") {
+          await core.group("Installing MSYS2 packages", async () => {
+            await exec(path.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
+              "-S",
+              "--noconfirm",
+              "--needed",
+              "mingw-w64-x86_64-gcc",
+            ]);
+          });
+        }
         extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
       }
       if (WINDOWS_ENVIRONMENT === "cygwin") {
@@ -150,10 +150,14 @@ export async function setupOpam() {
 
 export async function installOcaml(ocamlCompiler: string) {
   await core.group("Installing OCaml compiler", async () => {
+    const packages = [ocamlCompiler];
+    if (PLATFORM === "windows" && WINDOWS_COMPILER === "msvc") {
+      packages.push("system-msvc");
+    }
     await exec("opam", [
       "switch",
       "--no-install",
-      `--packages=${ocamlCompiler}`,
+      `--packages=${packages.join(",")}`,
       "create",
       ".",
     ]);

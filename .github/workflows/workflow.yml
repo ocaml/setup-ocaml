@@ -55,6 +55,16 @@ jobs:
             ocaml-compiler: "5.4"
             allow-prerelease-opam: false
             windows-environment: msys2
+          - os: windows-latest
+            ocaml-compiler: "5.4"
+            allow-prerelease-opam: false
+            windows-environment: cygwin
+            windows-compiler: msvc
+          - os: windows-latest
+            ocaml-compiler: "5.4"
+            allow-prerelease-opam: false
+            windows-environment: msys2
+            windows-compiler: msvc
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout tree
@@ -65,6 +75,7 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
           windows-environment: ${{ matrix.windows-environment || 'cygwin' }}
+          windows-compiler: ${{ matrix.windows-compiler || 'mingw' }}
       - run: opam install ssl
 
   test-container:

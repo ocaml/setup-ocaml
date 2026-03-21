@@ -16,6 +16,7 @@ import {
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
+  WINDOWS_COMPILER,
   WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { latestOpamRelease } from "./opam.js";
@@ -53,6 +54,7 @@ async function composeOpamCacheKeys() {
   ];
   if (PLATFORM === "windows") {
     components.push(WINDOWS_ENVIRONMENT);
+    components.push(WINDOWS_COMPILER);
   }
   const plainKey = components.join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
