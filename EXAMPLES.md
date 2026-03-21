@@ -77,6 +77,38 @@ steps:
         !exclude.opam
 ```
 
+## Using MSVC on Windows
+
+```yml
+runs-on: windows-latest
+
+steps:
+  - name: Checkout tree
+    uses: actions/checkout@v6
+
+  - name: Set-up OCaml with MSVC
+    uses: ocaml/setup-ocaml@v3
+    with:
+      ocaml-compiler: "5.4"
+      windows-compiler: msvc
+```
+
+## Using MSYS2 on Windows
+
+```yml
+runs-on: windows-latest
+
+steps:
+  - name: Checkout tree
+    uses: actions/checkout@v6
+
+  - name: Set-up OCaml with MSYS2
+    uses: ocaml/setup-ocaml@v3
+    with:
+      ocaml-compiler: "5.4"
+      windows-environment: msys2
+```
+
 ## Using with [Containers](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontainer)
 
 ```yml

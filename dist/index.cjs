@@ -94514,6 +94514,15 @@ var WINDOWS_ENVIRONMENT = (() => {
   }
   return value;
 })();
+var WINDOWS_COMPILER = (() => {
+  const value = getInput("windows-compiler").toLowerCase();
+  if (value !== "mingw" && value !== "msvc") {
+    throw new Error(
+      `Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`
+    );
+  }
+  return value;
+})();
 var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_PIN = getBooleanInput("opam-pin");
 var OPAM_REPOSITORIES = (() => {
@@ -95031,7 +95040,6 @@ async function updateUnixPackageIndexFiles() {
 
 // src/opam.ts
 var OPAM_STABLE_VERSION_RANGE = "<2.6.0";
-var MSYS2_EXTRA_PACKAGES = ["mingw-w64-x86_64-gcc"];
 var EXECUTABLE_PERMISSION = 493;
 var latestOpamRelease = (async () => {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
@@ -95114,14 +95122,16 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       if (WINDOWS_ENVIRONMENT === "msys2") {
-        await group("Installing MSYS2 packages", async () => {
-          await exec(path14.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
-            "-S",
-            "--noconfirm",
-            "--needed",
-            ...MSYS2_EXTRA_PACKAGES
-          ]);
-        });
+        if (WINDOWS_COMPILER === "mingw") {
+          await group("Installing MSYS2 packages", async () => {
+            await exec(path14.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
+              "-S",
+              "--noconfirm",
+              "--needed",
+              "mingw-w64-x86_64-gcc"
+            ]);
+          });
+        }
         extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
       }
       if (WINDOWS_ENVIRONMENT === "cygwin") {
@@ -95146,10 +95156,14 @@ async function setupOpam() {
 }
 async function installOcaml(ocamlCompiler) {
   await group("Installing OCaml compiler", async () => {
+    const packages = [ocamlCompiler];
+    if (PLATFORM === "windows" && WINDOWS_COMPILER === "msvc") {
+      packages.push("system-msvc");
+    }
     await exec("opam", [
       "switch",
       "--no-install",
-      `--packages=${ocamlCompiler}`,
+      `--packages=${packages.join(",")}`,
       "create",
       "."
     ]);
@@ -95299,6 +95313,7 @@ async function composeOpamCacheKeys() {
   ];
   if (PLATFORM === "windows") {
     components.push(WINDOWS_ENVIRONMENT);
+    components.push(WINDOWS_COMPILER);
   }
   const plainKey = components.join();
   const hash = crypto5.createHash("sha256").update(plainKey).digest("hex");

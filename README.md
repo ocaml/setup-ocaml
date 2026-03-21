@@ -148,6 +148,8 @@ steps:
 | `dune-cache`              | No       | Enable the dune cache feature. This feature **_requires_** dune 2.8.5 or later on the Windows runners.                                                                               | bool   | `false`                                                 |
 | `cache-prefix`            | No       | The prefix of the cache keys.                                                                                                                                                        | string | `v1`                                                    |
 | `allow-prerelease-opam`   | No       | Allow to use a pre-release version of opam.                                                                                                                                          | bool   | `false`                                                 |
+| `windows-environment`     | No       | The Unix environment used for building on Windows: `cygwin` (default) or `msys2`.                                                                                                    | string | `cygwin`                                                |
+| `windows-compiler`        | No       | The C compiler toolchain for Windows: `mingw` (default) for mingw-w64, or `msvc` for Microsoft Visual C. MSVC requires Visual Studio (pre-installed on GitHub-hosted runners).       | string | `mingw`                                                 |
 
 ### Supported version syntax
 
@@ -215,5 +217,5 @@ Please feel free to post to the discuss.ocaml.org forum with any questions you h
 
 Previous discussions include:
 
-- https://discuss.ocaml.org/t/github-actions-for-ocaml-now-stable-and-on-the-ocaml-org/7889
-- https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745
+- <https://discuss.ocaml.org/t/github-actions-for-ocaml-now-stable-and-on-the-ocaml-org/7889>
+- <https://discuss.ocaml.org/t/github-actions-for-ocaml-opam-now-available/4745>

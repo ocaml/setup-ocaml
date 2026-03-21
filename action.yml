@@ -44,6 +44,14 @@ inputs:
       the pre-installed MSYS2 on GitHub-hosted runners.
     required: false
     default: cygwin
+  windows-compiler:
+    description: >-
+      The C compiler toolchain used for building on Windows.
+      Use "mingw" (default) for mingw-w64 (GCC), or "msvc" for the
+      Microsoft Visual C compiler. MSVC requires Visual Studio on the
+      runner (pre-installed on GitHub-hosted runners).
+    required: false
+    default: mingw
   github-token:
     description: DO NOT SET THIS.
     required: false
