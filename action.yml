@@ -37,6 +37,13 @@ inputs:
     description: The prefix of the cache keys.
     required: false
     default: v3
+  windows-environment:
+    description: >-
+      The Unix environment used for building on Windows.
+      Use "cygwin" (default) for opam's internal Cygwin, or "msys2" to use
+      the pre-installed MSYS2 on GitHub-hosted runners.
+    required: false
+    default: cygwin
   github-token:
     description: DO NOT SET THIS.
     required: false

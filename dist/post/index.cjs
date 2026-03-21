@@ -93713,6 +93713,7 @@ var RUNNER_ENVIRONMENT = (() => {
   return RUNNER_ENVIRONMENT2;
 })();
 var GITHUB_WORKSPACE = process4.env.GITHUB_WORKSPACE ?? process4.cwd();
+var MSYS2_ROOT = path11.join("C:", "msys64");
 var OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
     return path11.join("C:", ".opam");
@@ -93742,6 +93743,15 @@ var OPAM_DISABLE_SANDBOXING = (
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && getBooleanInput("opam-disable-sandboxing")
 );
+var WINDOWS_ENVIRONMENT = (() => {
+  const value = getInput("windows-environment").toLowerCase();
+  if (value !== "cygwin" && value !== "msys2") {
+    throw new Error(
+      `Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`
+    );
+  }
+  return value;
+})();
 var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_PIN = getBooleanInput("opam-pin");
 var OPAM_REPOSITORIES = (() => {

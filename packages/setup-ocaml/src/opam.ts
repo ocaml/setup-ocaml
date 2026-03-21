@@ -7,8 +7,10 @@ import * as semver from "semver";
 import {
   ALLOW_PRERELEASE_OPAM,
   ARCHITECTURE,
+  MSYS2_ROOT,
   OPAM_DISABLE_SANDBOXING,
   PLATFORM,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { octokit } from "./github-client.js";
 import {
@@ -20,18 +22,12 @@ import {
 // contain breaking changes to the CLI or repository format.
 const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
 
-const CYGWIN_EXTRA_PACKAGES = [
-  "curl",
-  "m4",
-  "make",
-  "mingw64-i686-gcc-core",
-  "mingw64-i686-gcc-g++",
-  "mingw64-x86_64-gcc-core",
-  "mingw64-x86_64-gcc-g++",
-  "perl",
-  "rsync",
-  "unzip",
-];
+// MSYS2 packages that must be present before opam runs. Unlike Cygwin's
+// internal installation (which lives inside OPAM_ROOT and is cached), MSYS2
+// packages are installed to C:\msys64 which is outside the cache. Without
+// pre-installing these, a cache-hit run would detect missing system packages
+// and trigger a full recompilation of the OCaml compiler.
+const MSYS2_EXTRA_PACKAGES = ["mingw-w64-x86_64-gcc"];
 
 const EXECUTABLE_PERMISSION = 0o755;
 
@@ -119,10 +115,20 @@ async function initializeOpam() {
     }
     const extraOptions = [];
     if (PLATFORM === "windows") {
-      extraOptions.push("--cygwin-internal-install");
-      extraOptions.push(
-        `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`,
-      );
+      if (WINDOWS_ENVIRONMENT === "msys2") {
+        await core.group("Installing MSYS2 packages", async () => {
+          await exec(path.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
+            "-S",
+            "--noconfirm",
+            "--needed",
+            ...MSYS2_EXTRA_PACKAGES,
+          ]);
+        });
+        extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
+      }
+      if (WINDOWS_ENVIRONMENT === "cygwin") {
+        extraOptions.push("--cygwin-internal-install");
+      }
     }
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");

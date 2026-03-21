@@ -94475,6 +94475,7 @@ var RUNNER_ENVIRONMENT = (() => {
   return RUNNER_ENVIRONMENT2;
 })();
 var GITHUB_WORKSPACE = process4.env.GITHUB_WORKSPACE ?? process4.cwd();
+var MSYS2_ROOT = path12.join("C:", "msys64");
 var OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
     return path12.join("C:", ".opam");
@@ -94504,6 +94505,15 @@ var OPAM_DISABLE_SANDBOXING = (
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && getBooleanInput("opam-disable-sandboxing")
 );
+var WINDOWS_ENVIRONMENT = (() => {
+  const value = getInput("windows-environment").toLowerCase();
+  if (value !== "cygwin" && value !== "msys2") {
+    throw new Error(
+      `Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`
+    );
+  }
+  return value;
+})();
 var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_PIN = getBooleanInput("opam-pin");
 var OPAM_REPOSITORIES = (() => {
@@ -95021,18 +95031,7 @@ async function updateUnixPackageIndexFiles() {
 
 // src/opam.ts
 var OPAM_STABLE_VERSION_RANGE = "<2.6.0";
-var CYGWIN_EXTRA_PACKAGES = [
-  "curl",
-  "m4",
-  "make",
-  "mingw64-i686-gcc-core",
-  "mingw64-i686-gcc-g++",
-  "mingw64-x86_64-gcc-core",
-  "mingw64-x86_64-gcc-g++",
-  "perl",
-  "rsync",
-  "unzip"
-];
+var MSYS2_EXTRA_PACKAGES = ["mingw-w64-x86_64-gcc"];
 var EXECUTABLE_PERMISSION = 493;
 var latestOpamRelease = (async () => {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
@@ -95114,10 +95113,20 @@ async function initializeOpam() {
     }
     const extraOptions = [];
     if (PLATFORM === "windows") {
-      extraOptions.push("--cygwin-internal-install");
-      extraOptions.push(
-        `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`
-      );
+      if (WINDOWS_ENVIRONMENT === "msys2") {
+        await group("Installing MSYS2 packages", async () => {
+          await exec(path14.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
+            "-S",
+            "--noconfirm",
+            "--needed",
+            ...MSYS2_EXTRA_PACKAGES
+          ]);
+        });
+        extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
+      }
+      if (WINDOWS_ENVIRONMENT === "cygwin") {
+        extraOptions.push("--cygwin-internal-install");
+      }
     }
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");
@@ -95279,7 +95288,7 @@ async function composeOpamCacheKeys() {
   const ocamlCompiler = await resolvedCompiler;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
   const osInfo2 = await system.osInfo();
-  const plainKey = [
+  const components = [
     PLATFORM,
     osInfo2.release,
     ARCHITECTURE,
@@ -95287,7 +95296,11 @@ async function composeOpamCacheKeys() {
     ocamlCompiler,
     repositoryUrls,
     sandbox
-  ].join();
+  ];
+  if (PLATFORM === "windows") {
+    components.push(WINDOWS_ENVIRONMENT);
+  }
+  const plainKey = components.join();
   const hash = crypto5.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
@@ -95304,15 +95317,27 @@ function composeOpamCachePaths() {
     const {
       repo: { repo }
     } = context4;
-    const opamCygwinLocalCachePath = path16.posix.join(
-      "/cygdrive",
-      "d",
-      "a",
-      repo,
-      repo,
-      "_opam"
-    );
-    paths.push(opamCygwinLocalCachePath);
+    if (WINDOWS_ENVIRONMENT === "msys2") {
+      const opamMsys2LocalCachePath = path16.posix.join(
+        "/d",
+        "a",
+        repo,
+        repo,
+        "_opam"
+      );
+      paths.push(opamMsys2LocalCachePath);
+    }
+    if (WINDOWS_ENVIRONMENT === "cygwin") {
+      const opamCygwinLocalCachePath = path16.posix.join(
+        "/cygdrive",
+        "d",
+        "a",
+        repo,
+        repo,
+        "_opam"
+      );
+      paths.push(opamCygwinLocalCachePath);
+    }
   }
   return paths;
 }
@@ -95433,9 +95458,11 @@ async function installer() {
   exportVariable("OPAMSOLVERTIMEOUT", OPAM_SOLVER_TIMEOUT);
   exportVariable("OPAMYES", 1);
   if (PLATFORM === "windows") {
-    exportVariable("CYGWIN", "winsymlinks:native");
     exportVariable("HOME", process5.env.USERPROFILE);
     exportVariable("MSYS", "winsymlinks:native");
+    if (WINDOWS_ENVIRONMENT === "cygwin") {
+      exportVariable("CYGWIN", "winsymlinks:native");
+    }
     await group("Configuring Windows symlink settings", async () => {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
       await exec("fsutil", [

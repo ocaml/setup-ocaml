@@ -16,6 +16,7 @@ import {
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { latestOpamRelease } from "./opam.js";
 import { resolvedCompiler } from "./version.js";
@@ -41,7 +42,7 @@ async function composeOpamCacheKeys() {
   const ocamlCompiler = await resolvedCompiler;
   const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
   const osInfo = await system.osInfo();
-  const plainKey = [
+  const components = [
     PLATFORM,
     osInfo.release,
     ARCHITECTURE,
@@ -49,7 +50,11 @@ async function composeOpamCacheKeys() {
     ocamlCompiler,
     repositoryUrls,
     sandbox,
-  ].join();
+  ];
+  if (PLATFORM === "windows") {
+    components.push(WINDOWS_ENVIRONMENT);
+  }
+  const plainKey = components.join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
@@ -68,15 +73,27 @@ function composeOpamCachePaths() {
     const {
       repo: { repo },
     } = github.context;
-    const opamCygwinLocalCachePath = path.posix.join(
-      "/cygdrive",
-      "d",
-      "a",
-      repo,
-      repo,
-      "_opam",
-    );
-    paths.push(opamCygwinLocalCachePath);
+    if (WINDOWS_ENVIRONMENT === "msys2") {
+      const opamMsys2LocalCachePath = path.posix.join(
+        "/d",
+        "a",
+        repo,
+        repo,
+        "_opam",
+      );
+      paths.push(opamMsys2LocalCachePath);
+    }
+    if (WINDOWS_ENVIRONMENT === "cygwin") {
+      const opamCygwinLocalCachePath = path.posix.join(
+        "/cygdrive",
+        "d",
+        "a",
+        repo,
+        repo,
+        "_opam",
+      );
+      paths.push(opamCygwinLocalCachePath);
+    }
   }
   return paths;
 }
