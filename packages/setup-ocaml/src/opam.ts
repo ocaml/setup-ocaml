@@ -2,25 +2,41 @@ import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
-import * as github from "@actions/github";
 import * as toolCache from "@actions/tool-cache";
-import { retry } from "@octokit/plugin-retry";
 import * as semver from "semver";
 import {
   ALLOW_PRERELEASE_OPAM,
   ARCHITECTURE,
-  GITHUB_TOKEN,
   OPAM_DISABLE_SANDBOXING,
   PLATFORM,
 } from "./constants.js";
+import { octokit } from "./github-client.js";
 import {
   installUnixSystemPackages,
   updateUnixPackageIndexFiles,
-} from "./unix.js";
+} from "./system-packages.js";
+
+// Stable opam version range — excludes 2.6.x pre-releases which may
+// contain breaking changes to the CLI or repository format.
+const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
+
+const CYGWIN_EXTRA_PACKAGES = [
+  "curl",
+  "m4",
+  "make",
+  "mingw64-i686-gcc-core",
+  "mingw64-i686-gcc-g++",
+  "mingw64-x86_64-gcc-core",
+  "mingw64-x86_64-gcc-g++",
+  "perl",
+  "rsync",
+  "unzip",
+];
+
+const EXECUTABLE_PERMISSION = 0o755;
 
 export const latestOpamRelease = (async () => {
-  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.6.0";
-  const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
+  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam",
@@ -76,7 +92,7 @@ async function acquireOpam() {
         ARCHITECTURE,
       );
       core.info(`Successfully cached opam to ${cachedPath}`);
-      await fs.chmod(path.join(cachedPath, opam), 0o755);
+      await fs.chmod(path.join(cachedPath, opam), EXECUTABLE_PERMISSION);
       core.addPath(cachedPath);
       core.info("Added opam to the path");
     } else {
@@ -104,19 +120,9 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       extraOptions.push("--cygwin-internal-install");
-      const extraPackages = [
-        "curl",
-        "m4",
-        "make",
-        "mingw64-i686-gcc-core",
-        "mingw64-i686-gcc-g++",
-        "mingw64-x86_64-gcc-core",
-        "mingw64-x86_64-gcc-g++",
-        "perl",
-        "rsync",
-        "unzip",
-      ].join(",");
-      extraOptions.push(`--cygwin-extra-packages=${extraPackages}`);
+      extraOptions.push(
+        `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`,
+      );
     }
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");

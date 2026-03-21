@@ -2,10 +2,12 @@ import * as os from "node:os";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
+import * as glob from "@actions/glob";
 import { restoreDuneCache, restoreOpamCache, saveOpamCache } from "./cache.js";
 import {
   DUNE_CACHE,
   DUNE_CACHE_ROOT,
+  OPAM_LOCAL_PACKAGES,
   OPAM_PIN,
   OPAM_REPOSITORIES,
   OPAM_ROOT,
@@ -20,8 +22,11 @@ import {
   setupOpam,
   update,
 } from "./opam.js";
-import { retrieveOpamLocalPackages } from "./packages.js";
 import { resolvedCompiler } from "./version.js";
+
+// 10 minutes — the 0install solver can be slow on large dependency trees.
+const OPAM_SOLVER_TIMEOUT = 600;
+
 export async function installer() {
   if (core.isDebug()) {
     core.exportVariable("OPAMVERBOSE", 1);
@@ -34,7 +39,7 @@ export async function installer() {
   core.exportVariable("OPAMPRECISETRACKING", 1);
   core.exportVariable("OPAMRETRIES", 10);
   core.exportVariable("OPAMROOT", OPAM_ROOT);
-  core.exportVariable("OPAMSOLVERTIMEOUT", 600);
+  core.exportVariable("OPAMSOLVERTIMEOUT", OPAM_SOLVER_TIMEOUT);
   core.exportVariable("OPAMYES", 1);
   if (PLATFORM === "windows") {
     core.exportVariable("CYGWIN", "winsymlinks:native");
@@ -42,13 +47,14 @@ export async function installer() {
     core.exportVariable("MSYS", "winsymlinks:native");
     await core.group("Configuring Windows symlink settings", async () => {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
-      // [INFO] https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
+      // Enable Remote-to-Local and Remote-to-Remote symlink evaluation.
+      // https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior
       await exec("fsutil", [
         "behavior",
         "set",
         "symlinkEvaluation",
-        "R2L:1",
-        "R2R:1",
+        "R2L:1", // Remote-to-Local
+        "R2R:1", // Remote-to-Remote
       ]);
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     });
@@ -71,7 +77,8 @@ export async function installer() {
   }
   core.exportVariable("CLICOLOR_FORCE", "1");
   if (OPAM_PIN) {
-    const fnames = await retrieveOpamLocalPackages();
+    const globber = await glob.create(OPAM_LOCAL_PACKAGES);
+    const fnames = await globber.glob();
     await pin(fnames);
   }
   await exec("opam", ["config", "report"]);

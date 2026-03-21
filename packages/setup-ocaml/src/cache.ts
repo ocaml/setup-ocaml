@@ -58,8 +58,7 @@ async function composeOpamCacheKeys() {
 }
 
 function composeDuneCachePaths() {
-  const paths = [DUNE_CACHE_ROOT];
-  return paths;
+  return [DUNE_CACHE_ROOT];
 }
 
 function composeOpamCachePaths() {
