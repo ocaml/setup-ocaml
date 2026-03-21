@@ -97,23 +97,39 @@ export const DUNE_CACHE_ROOT = (() => {
 
 // ── Action Inputs ──
 
-export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
-  "allow-prerelease-opam",
-);
-
-export const CACHE_PREFIX = core.getInput("cache-prefix");
-
-export const DUNE_CACHE = core.getBooleanInput("dune-cache");
-
-export const GITHUB_TOKEN = core.getInput("github-token");
-
 export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   required: true,
 });
 
+export const OPAM_REPOSITORIES: [string, string][] = (() => {
+  // The failsafe schema treats every scalar as a string, preventing
+  // implicit type coercion (e.g. `true` → boolean, `1.0` → number).
+  const parsed: unknown = yaml.parse(core.getInput("opam-repositories"), {
+    schema: "failsafe",
+  });
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error(
+      "opam-repositories input must be a YAML mapping of name: URL pairs",
+    );
+  }
+  const entries = Object.entries(parsed as Record<string, string>);
+  if (entries.length === 0) {
+    throw new Error("opam-repositories input must not be empty");
+  }
+  return entries.reverse();
+})();
+
+export const OPAM_PIN = core.getBooleanInput("opam-pin");
+
+export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
+
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && core.getBooleanInput("opam-disable-sandboxing");
+
+export const DUNE_CACHE = core.getBooleanInput("dune-cache");
+
+export const CACHE_PREFIX = core.getInput("cache-prefix");
 
 type WindowsEnvironment = "cygwin" | "msys2";
 
@@ -139,24 +155,8 @@ export const WINDOWS_COMPILER: WindowsCompiler = (() => {
   return value;
 })();
 
-export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
+export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
+  "allow-prerelease-opam",
+);
 
-export const OPAM_PIN = core.getBooleanInput("opam-pin");
-
-export const OPAM_REPOSITORIES: [string, string][] = (() => {
-  // The failsafe schema treats every scalar as a string, preventing
-  // implicit type coercion (e.g. `true` → boolean, `1.0` → number).
-  const parsed: unknown = yaml.parse(core.getInput("opam-repositories"), {
-    schema: "failsafe",
-  });
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error(
-      "opam-repositories input must be a YAML mapping of name: URL pairs",
-    );
-  }
-  const entries = Object.entries(parsed as Record<string, string>);
-  if (entries.length === 0) {
-    throw new Error("opam-repositories input must not be empty");
-  }
-  return entries.reverse();
-})();
+export const GITHUB_TOKEN = core.getInput("github-token");

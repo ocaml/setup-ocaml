@@ -93730,19 +93730,32 @@ var DUNE_CACHE_ROOT = (() => {
   }
   return path11.join(os7.homedir(), ".cache", "dune");
 })();
-var ALLOW_PRERELEASE_OPAM = getBooleanInput(
-  "allow-prerelease-opam"
-);
-var CACHE_PREFIX = getInput("cache-prefix");
-var DUNE_CACHE = getBooleanInput("dune-cache");
-var GITHUB_TOKEN = getInput("github-token");
 var OCAML_COMPILER = getInput("ocaml-compiler", {
   required: true
 });
+var OPAM_REPOSITORIES = (() => {
+  const parsed = yaml.parse(getInput("opam-repositories"), {
+    schema: "failsafe"
+  });
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error(
+      "opam-repositories input must be a YAML mapping of name: URL pairs"
+    );
+  }
+  const entries = Object.entries(parsed);
+  if (entries.length === 0) {
+    throw new Error("opam-repositories input must not be empty");
+  }
+  return entries.reverse();
+})();
+var OPAM_PIN = getBooleanInput("opam-pin");
+var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_DISABLE_SANDBOXING = (
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && getBooleanInput("opam-disable-sandboxing")
 );
+var DUNE_CACHE = getBooleanInput("dune-cache");
+var CACHE_PREFIX = getInput("cache-prefix");
 var WINDOWS_ENVIRONMENT = (() => {
   const value = getInput("windows-environment").toLowerCase();
   if (value !== "cygwin" && value !== "msys2") {
@@ -93761,23 +93774,10 @@ var WINDOWS_COMPILER = (() => {
   }
   return value;
 })();
-var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
-var OPAM_PIN = getBooleanInput("opam-pin");
-var OPAM_REPOSITORIES = (() => {
-  const parsed = yaml.parse(getInput("opam-repositories"), {
-    schema: "failsafe"
-  });
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error(
-      "opam-repositories input must be a YAML mapping of name: URL pairs"
-    );
-  }
-  const entries = Object.entries(parsed);
-  if (entries.length === 0) {
-    throw new Error("opam-repositories input must not be empty");
-  }
-  return entries.reverse();
-})();
+var ALLOW_PRERELEASE_OPAM = getBooleanInput(
+  "allow-prerelease-opam"
+);
+var GITHUB_TOKEN = getInput("github-token");
 
 // ../../node_modules/@octokit/plugin-retry/dist-bundle/index.js
 var import_light = __toESM(require_light(), 1);
