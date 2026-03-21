@@ -4,6 +4,8 @@ import * as process from "node:process";
 import * as core from "@actions/core";
 import * as yaml from "yaml";
 
+// ── Platform & Architecture ──
+
 export const ARCHITECTURE = (() => {
   switch (process.arch) {
     case "arm": {
@@ -54,6 +56,23 @@ export const PLATFORM = (() => {
   }
 })();
 
+export const RUNNER_ENVIRONMENT = ((): "github-hosted" | "self-hosted" => {
+  const ImageOS = process.env.ImageOS;
+  const RUNNER_ENVIRONMENT = process.env.RUNNER_ENVIRONMENT as
+    | "github-hosted"
+    | "self-hosted"
+    | undefined;
+  if (ImageOS) {
+    return "github-hosted";
+  }
+  if (!RUNNER_ENVIRONMENT) {
+    return "self-hosted";
+  }
+  return RUNNER_ENVIRONMENT;
+})();
+
+// ── Paths ──
+
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
 export const OPAM_ROOT = (() => {
@@ -74,20 +93,7 @@ export const DUNE_CACHE_ROOT = (() => {
   return path.join(os.homedir(), ".cache", "dune");
 })();
 
-export const RUNNER_ENVIRONMENT = ((): "github-hosted" | "self-hosted" => {
-  const ImageOS = process.env.ImageOS;
-  const RUNNER_ENVIRONMENT = process.env.RUNNER_ENVIRONMENT as
-    | "github-hosted"
-    | "self-hosted"
-    | undefined;
-  if (ImageOS) {
-    return "github-hosted";
-  }
-  if (!RUNNER_ENVIRONMENT) {
-    return "self-hosted";
-  }
-  return RUNNER_ENVIRONMENT;
-})();
+// ── Action Inputs ──
 
 export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
   "allow-prerelease-opam",
@@ -95,9 +101,9 @@ export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
 
 export const CACHE_PREFIX = core.getInput("cache-prefix");
 
-export const GITHUB_TOKEN = core.getInput("github-token");
-
 export const DUNE_CACHE = core.getBooleanInput("dune-cache");
+
+export const GITHUB_TOKEN = core.getInput("github-token");
 
 export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
   required: true,
@@ -112,8 +118,19 @@ export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
 export const OPAM_PIN = core.getBooleanInput("opam-pin");
 
 export const OPAM_REPOSITORIES: [string, string][] = (() => {
-  const repositoriesYaml = yaml.parse(
-    core.getInput("opam-repositories"),
-  ) as Record<string, string>;
-  return Object.entries(repositoriesYaml).reverse();
+  // The failsafe schema treats every scalar as a string, preventing
+  // implicit type coercion (e.g. `true` → boolean, `1.0` → number).
+  const parsed: unknown = yaml.parse(core.getInput("opam-repositories"), {
+    schema: "failsafe",
+  });
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error(
+      "opam-repositories input must be a YAML mapping of name: URL pairs",
+    );
+  }
+  const entries = Object.entries(parsed as Record<string, string>);
+  if (entries.length === 0) {
+    throw new Error("opam-repositories input must not be empty");
+  }
+  return entries.reverse();
 })();

@@ -89954,8 +89954,8 @@ var Context = class {
   }
   get repo() {
     if (process.env.GITHUB_REPOSITORY) {
-      const [owner2, repo2] = process.env.GITHUB_REPOSITORY.split("/");
-      return { owner: owner2, repo: repo2 };
+      const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+      return { owner, repo };
     }
     if (this.payload.repository) {
       return {
@@ -93412,7 +93412,7 @@ var handler = {
   set(target, methodName, value) {
     return target.cache[methodName] = value;
   },
-  get({ octokit, scope, cache }, methodName) {
+  get({ octokit: octokit2, scope, cache }, methodName) {
     if (cache[methodName]) {
       return cache[methodName];
     }
@@ -93423,27 +93423,27 @@ var handler = {
     const { endpointDefaults, decorations } = method;
     if (decorations) {
       cache[methodName] = decorate(
-        octokit,
+        octokit2,
         scope,
         methodName,
         endpointDefaults,
         decorations
       );
     } else {
-      cache[methodName] = octokit.request.defaults(endpointDefaults);
+      cache[methodName] = octokit2.request.defaults(endpointDefaults);
     }
     return cache[methodName];
   }
 };
-function endpointsToMethods(octokit) {
+function endpointsToMethods(octokit2) {
   const newMethods = {};
   for (const scope of endpointMethodsMap.keys()) {
-    newMethods[scope] = new Proxy({ octokit, scope, cache: {} }, handler);
+    newMethods[scope] = new Proxy({ octokit: octokit2, scope, cache: {} }, handler);
   }
   return newMethods;
 }
-function decorate(octokit, scope, methodName, defaults2, decorations) {
-  const requestWithDefaults = octokit.request.defaults(defaults2);
+function decorate(octokit2, scope, methodName, defaults2, decorations) {
+  const requestWithDefaults = octokit2.request.defaults(defaults2);
   function withDecorations(...args) {
     let options = requestWithDefaults.endpoint.merge(...args);
     if (decorations.mapToData) {
@@ -93455,12 +93455,12 @@ function decorate(octokit, scope, methodName, defaults2, decorations) {
     }
     if (decorations.renamed) {
       const [newScope, newMethodName] = decorations.renamed;
-      octokit.log.warn(
+      octokit2.log.warn(
         `octokit.${scope}.${methodName}() has been renamed to octokit.${newScope}.${newMethodName}()`
       );
     }
     if (decorations.deprecated) {
-      octokit.log.warn(decorations.deprecated);
+      octokit2.log.warn(decorations.deprecated);
     }
     if (decorations.renamedParameters) {
       const options2 = requestWithDefaults.endpoint.merge(...args);
@@ -93468,7 +93468,7 @@ function decorate(octokit, scope, methodName, defaults2, decorations) {
         decorations.renamedParameters
       )) {
         if (name in options2) {
-          octokit.log.warn(
+          octokit2.log.warn(
             `"${name}" parameter is deprecated for "octokit.${scope}.${methodName}()". Use "${alias}" instead`
           );
           if (!(alias in options2)) {
@@ -93485,15 +93485,15 @@ function decorate(octokit, scope, methodName, defaults2, decorations) {
 }
 
 // ../../node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/index.js
-function restEndpointMethods(octokit) {
-  const api = endpointsToMethods(octokit);
+function restEndpointMethods(octokit2) {
+  const api = endpointsToMethods(octokit2);
   return {
     rest: api
   };
 }
 restEndpointMethods.VERSION = VERSION5;
-function legacyRestEndpointMethods(octokit) {
-  const api = endpointsToMethods(octokit);
+function legacyRestEndpointMethods(octokit2) {
+  const api = endpointsToMethods(octokit2);
   return {
     ...api,
     rest: api
@@ -93533,9 +93533,9 @@ function normalizePaginatedListResponse(response) {
   response.data.total_commits = totalCommits;
   return response;
 }
-function iterator(octokit, route, parameters) {
-  const options = typeof route === "function" ? route.endpoint(parameters) : octokit.request.endpoint(route, parameters);
-  const requestMethod = typeof route === "function" ? route : octokit.request;
+function iterator(octokit2, route, parameters) {
+  const options = typeof route === "function" ? route.endpoint(parameters) : octokit2.request.endpoint(route, parameters);
+  const requestMethod = typeof route === "function" ? route : octokit2.request;
   const method = options.method;
   const headers = options.headers;
   let url2 = options.url;
@@ -93575,19 +93575,19 @@ function iterator(octokit, route, parameters) {
     })
   };
 }
-function paginate(octokit, route, parameters, mapFn) {
+function paginate(octokit2, route, parameters, mapFn) {
   if (typeof parameters === "function") {
     mapFn = parameters;
     parameters = void 0;
   }
   return gather(
-    octokit,
+    octokit2,
     [],
-    iterator(octokit, route, parameters)[Symbol.asyncIterator](),
+    iterator(octokit2, route, parameters)[Symbol.asyncIterator](),
     mapFn
   );
 }
-function gather(octokit, results, iterator2, mapFn) {
+function gather(octokit2, results, iterator2, mapFn) {
   return iterator2.next().then((result2) => {
     if (result2.done) {
       return results;
@@ -93602,16 +93602,16 @@ function gather(octokit, results, iterator2, mapFn) {
     if (earlyExit) {
       return results;
     }
-    return gather(octokit, results, iterator2, mapFn);
+    return gather(octokit2, results, iterator2, mapFn);
   });
 }
 var composePaginateRest = Object.assign(paginate, {
   iterator
 });
-function paginateRest(octokit) {
+function paginateRest(octokit2) {
   return {
-    paginate: Object.assign(paginate.bind(null, octokit), {
-      iterator: iterator.bind(null, octokit)
+    paginate: Object.assign(paginate.bind(null, octokit2), {
+      iterator: iterator.bind(null, octokit2)
     })
   };
 }
@@ -93701,6 +93701,17 @@ var PLATFORM = (() => {
     }
   }
 })();
+var RUNNER_ENVIRONMENT = (() => {
+  const ImageOS = process4.env.ImageOS;
+  const RUNNER_ENVIRONMENT2 = process4.env.RUNNER_ENVIRONMENT;
+  if (ImageOS) {
+    return "github-hosted";
+  }
+  if (!RUNNER_ENVIRONMENT2) {
+    return "self-hosted";
+  }
+  return RUNNER_ENVIRONMENT2;
+})();
 var GITHUB_WORKSPACE = process4.env.GITHUB_WORKSPACE ?? process4.cwd();
 var OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
@@ -93718,23 +93729,12 @@ var DUNE_CACHE_ROOT = (() => {
   }
   return path11.join(os7.homedir(), ".cache", "dune");
 })();
-var RUNNER_ENVIRONMENT = (() => {
-  const ImageOS = process4.env.ImageOS;
-  const RUNNER_ENVIRONMENT2 = process4.env.RUNNER_ENVIRONMENT;
-  if (ImageOS) {
-    return "github-hosted";
-  }
-  if (!RUNNER_ENVIRONMENT2) {
-    return "self-hosted";
-  }
-  return RUNNER_ENVIRONMENT2;
-})();
 var ALLOW_PRERELEASE_OPAM = getBooleanInput(
   "allow-prerelease-opam"
 );
 var CACHE_PREFIX = getInput("cache-prefix");
-var GITHUB_TOKEN = getInput("github-token");
 var DUNE_CACHE = getBooleanInput("dune-cache");
+var GITHUB_TOKEN = getInput("github-token");
 var OCAML_COMPILER = getInput("ocaml-compiler", {
   required: true
 });
@@ -93745,10 +93745,19 @@ var OPAM_DISABLE_SANDBOXING = (
 var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_PIN = getBooleanInput("opam-pin");
 var OPAM_REPOSITORIES = (() => {
-  const repositoriesYaml = yaml.parse(
-    getInput("opam-repositories")
-  );
-  return Object.entries(repositoriesYaml).reverse();
+  const parsed = yaml.parse(getInput("opam-repositories"), {
+    schema: "failsafe"
+  });
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error(
+      "opam-repositories input must be a YAML mapping of name: URL pairs"
+    );
+  }
+  const entries = Object.entries(parsed);
+  if (entries.length === 0) {
+    throw new Error("opam-repositories input must not be empty");
+  }
+  return entries.reverse();
 })();
 
 // ../../node_modules/@octokit/plugin-retry/dist-bundle/index.js
@@ -93757,18 +93766,18 @@ var VERSION7 = "0.0.0-development";
 function isRequestError(error2) {
   return error2.request !== void 0;
 }
-async function errorRequest(state3, octokit, error2, options) {
+async function errorRequest(state3, octokit2, error2, options) {
   if (!isRequestError(error2) || !error2?.request.request) {
     throw error2;
   }
   if (error2.status >= 400 && !state3.doNotRetry.includes(error2.status)) {
     const retries = options.request.retries != null ? options.request.retries : state3.retries;
     const retryAfter = Math.pow((options.request.retryCount || 0) + 1, 2);
-    throw octokit.retry.retryRequest(error2, retries, retryAfter);
+    throw octokit2.retry.retryRequest(error2, retries, retryAfter);
   }
   throw error2;
 }
-async function wrapRequest(state3, octokit, request2, options) {
+async function wrapRequest(state3, octokit2, request2, options) {
   const limiter = new import_light.default();
   limiter.on("failed", function(error2, info2) {
     const maxRetries = ~~error2.request.request?.retries;
@@ -93779,11 +93788,11 @@ async function wrapRequest(state3, octokit, request2, options) {
     }
   });
   return limiter.schedule(
-    requestWithGraphqlErrorHandling.bind(null, state3, octokit, request2),
+    requestWithGraphqlErrorHandling.bind(null, state3, octokit2, request2),
     options
   );
 }
-async function requestWithGraphqlErrorHandling(state3, octokit, request2, options) {
+async function requestWithGraphqlErrorHandling(state3, octokit2, request2, options) {
   const response = await request2(options);
   if (response.data && response.data.errors && response.data.errors.length > 0 && /Something went wrong while executing your query/.test(
     response.data.errors[0].message
@@ -93792,11 +93801,11 @@ async function requestWithGraphqlErrorHandling(state3, octokit, request2, option
       request: options,
       response
     });
-    return errorRequest(state3, octokit, error2, options);
+    return errorRequest(state3, octokit2, error2, options);
   }
   return response;
 }
-function retry2(octokit, octokitOptions) {
+function retry2(octokit2, octokitOptions) {
   const state3 = Object.assign(
     {
       enabled: true,
@@ -93818,12 +93827,15 @@ function retry2(octokit, octokitOptions) {
     }
   };
   if (state3.enabled) {
-    octokit.hook.error("request", errorRequest.bind(null, state3, retryPlugin));
-    octokit.hook.wrap("request", wrapRequest.bind(null, state3, retryPlugin));
+    octokit2.hook.error("request", errorRequest.bind(null, state3, retryPlugin));
+    octokit2.hook.wrap("request", wrapRequest.bind(null, state3, retryPlugin));
   }
   return retryPlugin;
 }
 retry2.VERSION = VERSION7;
+
+// src/github-client.ts
+var octokit = getOctokit(GITHUB_TOKEN, void 0, retry2);
 
 // src/version.ts
 var path12 = __toESM(require("node:path"), 1);
@@ -93832,7 +93844,6 @@ function isSemverValidRange(semverVersion) {
   return semver2.validRange(semverVersion, { loose: true }) !== null;
 }
 async function retrieveAllCompilerVersions() {
-  const octokit = getOctokit(GITHUB_TOKEN, void 0, retry2);
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
     repo: "opam-repository",
@@ -93895,8 +93906,7 @@ async function composeDuneCacheKeys() {
   return { key, restoreKeys };
 }
 function composeDuneCachePaths() {
-  const paths = [DUNE_CACHE_ROOT];
-  return paths;
+  return [DUNE_CACHE_ROOT];
 }
 async function saveCache3(key, paths) {
   if (!isFeatureAvailable()) {
@@ -93928,13 +93938,13 @@ async function saveDuneCache() {
 }
 
 // src/dune.ts
-var {
-  repo: { owner, repo },
-  runId: run_id
-} = context4;
+var DUNE_CACHE_TOTAL_SIZE_MB = 5e3;
 async function trimDuneCache() {
   await group("Clearing old dune cache files to save space", async () => {
-    const octokit = getOctokit(GITHUB_TOKEN, void 0, retry2);
+    const {
+      repo: { owner, repo },
+      runId: run_id
+    } = context4;
     const {
       data: { total_count: totalCount }
     } = await octokit.rest.actions.listJobsForWorkflowRun({
@@ -93942,7 +93952,7 @@ async function trimDuneCache() {
       repo,
       run_id
     });
-    const cacheSize = Math.floor(5e3 / totalCount);
+    const cacheSize = Math.floor(DUNE_CACHE_TOTAL_SIZE_MB / totalCount);
     await exec("opam", [
       "exec",
       "--",

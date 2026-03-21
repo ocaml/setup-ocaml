@@ -57302,13 +57302,6 @@ function group(name, fn) {
 var os10 = __toESM(require("node:os"), 1);
 var process5 = __toESM(require("node:process"), 1);
 
-// src/cache.ts
-var crypto5 = __toESM(require("node:crypto"), 1);
-var path16 = __toESM(require("node:path"), 1);
-
-// ../../node_modules/@actions/cache/lib/cache.js
-var path11 = __toESM(require("path"), 1);
-
 // ../../node_modules/@actions/glob/lib/internal-globber.js
 var fs3 = __toESM(require("fs"), 1);
 
@@ -58005,6 +57998,13 @@ function create(patterns, options) {
     return yield DefaultGlobber.create(patterns, options);
   });
 }
+
+// src/cache.ts
+var crypto5 = __toESM(require("node:crypto"), 1);
+var path16 = __toESM(require("node:path"), 1);
+
+// ../../node_modules/@actions/cache/lib/cache.js
+var path11 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/cache/lib/internal/cacheUtils.js
 var crypto3 = __toESM(require("crypto"), 1);
@@ -90716,8 +90716,8 @@ var Context = class {
   }
   get repo() {
     if (process.env.GITHUB_REPOSITORY) {
-      const [owner2, repo2] = process.env.GITHUB_REPOSITORY.split("/");
-      return { owner: owner2, repo: repo2 };
+      const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+      return { owner, repo };
     }
     if (this.payload.repository) {
       return {
@@ -94174,7 +94174,7 @@ var handler = {
   set(target, methodName, value) {
     return target.cache[methodName] = value;
   },
-  get({ octokit, scope, cache }, methodName) {
+  get({ octokit: octokit2, scope, cache }, methodName) {
     if (cache[methodName]) {
       return cache[methodName];
     }
@@ -94185,27 +94185,27 @@ var handler = {
     const { endpointDefaults, decorations } = method;
     if (decorations) {
       cache[methodName] = decorate(
-        octokit,
+        octokit2,
         scope,
         methodName,
         endpointDefaults,
         decorations
       );
     } else {
-      cache[methodName] = octokit.request.defaults(endpointDefaults);
+      cache[methodName] = octokit2.request.defaults(endpointDefaults);
     }
     return cache[methodName];
   }
 };
-function endpointsToMethods(octokit) {
+function endpointsToMethods(octokit2) {
   const newMethods = {};
   for (const scope of endpointMethodsMap.keys()) {
-    newMethods[scope] = new Proxy({ octokit, scope, cache: {} }, handler);
+    newMethods[scope] = new Proxy({ octokit: octokit2, scope, cache: {} }, handler);
   }
   return newMethods;
 }
-function decorate(octokit, scope, methodName, defaults2, decorations) {
-  const requestWithDefaults = octokit.request.defaults(defaults2);
+function decorate(octokit2, scope, methodName, defaults2, decorations) {
+  const requestWithDefaults = octokit2.request.defaults(defaults2);
   function withDecorations(...args) {
     let options = requestWithDefaults.endpoint.merge(...args);
     if (decorations.mapToData) {
@@ -94217,12 +94217,12 @@ function decorate(octokit, scope, methodName, defaults2, decorations) {
     }
     if (decorations.renamed) {
       const [newScope, newMethodName] = decorations.renamed;
-      octokit.log.warn(
+      octokit2.log.warn(
         `octokit.${scope}.${methodName}() has been renamed to octokit.${newScope}.${newMethodName}()`
       );
     }
     if (decorations.deprecated) {
-      octokit.log.warn(decorations.deprecated);
+      octokit2.log.warn(decorations.deprecated);
     }
     if (decorations.renamedParameters) {
       const options2 = requestWithDefaults.endpoint.merge(...args);
@@ -94230,7 +94230,7 @@ function decorate(octokit, scope, methodName, defaults2, decorations) {
         decorations.renamedParameters
       )) {
         if (name in options2) {
-          octokit.log.warn(
+          octokit2.log.warn(
             `"${name}" parameter is deprecated for "octokit.${scope}.${methodName}()". Use "${alias}" instead`
           );
           if (!(alias in options2)) {
@@ -94247,15 +94247,15 @@ function decorate(octokit, scope, methodName, defaults2, decorations) {
 }
 
 // ../../node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/index.js
-function restEndpointMethods(octokit) {
-  const api = endpointsToMethods(octokit);
+function restEndpointMethods(octokit2) {
+  const api = endpointsToMethods(octokit2);
   return {
     rest: api
   };
 }
 restEndpointMethods.VERSION = VERSION5;
-function legacyRestEndpointMethods(octokit) {
-  const api = endpointsToMethods(octokit);
+function legacyRestEndpointMethods(octokit2) {
+  const api = endpointsToMethods(octokit2);
   return {
     ...api,
     rest: api
@@ -94295,9 +94295,9 @@ function normalizePaginatedListResponse(response) {
   response.data.total_commits = totalCommits;
   return response;
 }
-function iterator(octokit, route, parameters) {
-  const options = typeof route === "function" ? route.endpoint(parameters) : octokit.request.endpoint(route, parameters);
-  const requestMethod = typeof route === "function" ? route : octokit.request;
+function iterator(octokit2, route, parameters) {
+  const options = typeof route === "function" ? route.endpoint(parameters) : octokit2.request.endpoint(route, parameters);
+  const requestMethod = typeof route === "function" ? route : octokit2.request;
   const method = options.method;
   const headers = options.headers;
   let url2 = options.url;
@@ -94337,19 +94337,19 @@ function iterator(octokit, route, parameters) {
     })
   };
 }
-function paginate(octokit, route, parameters, mapFn) {
+function paginate(octokit2, route, parameters, mapFn) {
   if (typeof parameters === "function") {
     mapFn = parameters;
     parameters = void 0;
   }
   return gather(
-    octokit,
+    octokit2,
     [],
-    iterator(octokit, route, parameters)[Symbol.asyncIterator](),
+    iterator(octokit2, route, parameters)[Symbol.asyncIterator](),
     mapFn
   );
 }
-function gather(octokit, results, iterator2, mapFn) {
+function gather(octokit2, results, iterator2, mapFn) {
   return iterator2.next().then((result2) => {
     if (result2.done) {
       return results;
@@ -94364,16 +94364,16 @@ function gather(octokit, results, iterator2, mapFn) {
     if (earlyExit) {
       return results;
     }
-    return gather(octokit, results, iterator2, mapFn);
+    return gather(octokit2, results, iterator2, mapFn);
   });
 }
 var composePaginateRest = Object.assign(paginate, {
   iterator
 });
-function paginateRest(octokit) {
+function paginateRest(octokit2) {
   return {
-    paginate: Object.assign(paginate.bind(null, octokit), {
-      iterator: iterator.bind(null, octokit)
+    paginate: Object.assign(paginate.bind(null, octokit2), {
+      iterator: iterator.bind(null, octokit2)
     })
   };
 }
@@ -94463,6 +94463,17 @@ var PLATFORM = (() => {
     }
   }
 })();
+var RUNNER_ENVIRONMENT = (() => {
+  const ImageOS = process4.env.ImageOS;
+  const RUNNER_ENVIRONMENT2 = process4.env.RUNNER_ENVIRONMENT;
+  if (ImageOS) {
+    return "github-hosted";
+  }
+  if (!RUNNER_ENVIRONMENT2) {
+    return "self-hosted";
+  }
+  return RUNNER_ENVIRONMENT2;
+})();
 var GITHUB_WORKSPACE = process4.env.GITHUB_WORKSPACE ?? process4.cwd();
 var OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
@@ -94480,23 +94491,12 @@ var DUNE_CACHE_ROOT = (() => {
   }
   return path12.join(os8.homedir(), ".cache", "dune");
 })();
-var RUNNER_ENVIRONMENT = (() => {
-  const ImageOS = process4.env.ImageOS;
-  const RUNNER_ENVIRONMENT2 = process4.env.RUNNER_ENVIRONMENT;
-  if (ImageOS) {
-    return "github-hosted";
-  }
-  if (!RUNNER_ENVIRONMENT2) {
-    return "self-hosted";
-  }
-  return RUNNER_ENVIRONMENT2;
-})();
 var ALLOW_PRERELEASE_OPAM = getBooleanInput(
   "allow-prerelease-opam"
 );
 var CACHE_PREFIX = getInput("cache-prefix");
-var GITHUB_TOKEN = getInput("github-token");
 var DUNE_CACHE = getBooleanInput("dune-cache");
+var GITHUB_TOKEN = getInput("github-token");
 var OCAML_COMPILER = getInput("ocaml-compiler", {
   required: true
 });
@@ -94507,10 +94507,19 @@ var OPAM_DISABLE_SANDBOXING = (
 var OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 var OPAM_PIN = getBooleanInput("opam-pin");
 var OPAM_REPOSITORIES = (() => {
-  const repositoriesYaml = yaml.parse(
-    getInput("opam-repositories")
-  );
-  return Object.entries(repositoriesYaml).reverse();
+  const parsed = yaml.parse(getInput("opam-repositories"), {
+    schema: "failsafe"
+  });
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error(
+      "opam-repositories input must be a YAML mapping of name: URL pairs"
+    );
+  }
+  const entries = Object.entries(parsed);
+  if (entries.length === 0) {
+    throw new Error("opam-repositories input must not be empty");
+  }
+  return entries.reverse();
 })();
 
 // src/opam.ts
@@ -94828,24 +94837,27 @@ function _getGlobal(key, defaultValue) {
   return value !== void 0 ? value : defaultValue;
 }
 
+// src/opam.ts
+var semver4 = __toESM(require_semver2(), 1);
+
 // ../../node_modules/@octokit/plugin-retry/dist-bundle/index.js
 var import_light = __toESM(require_light(), 1);
 var VERSION7 = "0.0.0-development";
 function isRequestError(error2) {
   return error2.request !== void 0;
 }
-async function errorRequest(state3, octokit, error2, options) {
+async function errorRequest(state3, octokit2, error2, options) {
   if (!isRequestError(error2) || !error2?.request.request) {
     throw error2;
   }
   if (error2.status >= 400 && !state3.doNotRetry.includes(error2.status)) {
     const retries = options.request.retries != null ? options.request.retries : state3.retries;
     const retryAfter = Math.pow((options.request.retryCount || 0) + 1, 2);
-    throw octokit.retry.retryRequest(error2, retries, retryAfter);
+    throw octokit2.retry.retryRequest(error2, retries, retryAfter);
   }
   throw error2;
 }
-async function wrapRequest(state3, octokit, request2, options) {
+async function wrapRequest(state3, octokit2, request2, options) {
   const limiter = new import_light.default();
   limiter.on("failed", function(error2, info2) {
     const maxRetries = ~~error2.request.request?.retries;
@@ -94856,11 +94868,11 @@ async function wrapRequest(state3, octokit, request2, options) {
     }
   });
   return limiter.schedule(
-    requestWithGraphqlErrorHandling.bind(null, state3, octokit, request2),
+    requestWithGraphqlErrorHandling.bind(null, state3, octokit2, request2),
     options
   );
 }
-async function requestWithGraphqlErrorHandling(state3, octokit, request2, options) {
+async function requestWithGraphqlErrorHandling(state3, octokit2, request2, options) {
   const response = await request2(options);
   if (response.data && response.data.errors && response.data.errors.length > 0 && /Something went wrong while executing your query/.test(
     response.data.errors[0].message
@@ -94869,11 +94881,11 @@ async function requestWithGraphqlErrorHandling(state3, octokit, request2, option
       request: options,
       response
     });
-    return errorRequest(state3, octokit, error2, options);
+    return errorRequest(state3, octokit2, error2, options);
   }
   return response;
 }
-function retry2(octokit, octokitOptions) {
+function retry2(octokit2, octokitOptions) {
   const state3 = Object.assign(
     {
       enabled: true,
@@ -94895,17 +94907,17 @@ function retry2(octokit, octokitOptions) {
     }
   };
   if (state3.enabled) {
-    octokit.hook.error("request", errorRequest.bind(null, state3, retryPlugin));
-    octokit.hook.wrap("request", wrapRequest.bind(null, state3, retryPlugin));
+    octokit2.hook.error("request", errorRequest.bind(null, state3, retryPlugin));
+    octokit2.hook.wrap("request", wrapRequest.bind(null, state3, retryPlugin));
   }
   return retryPlugin;
 }
 retry2.VERSION = VERSION7;
 
-// src/opam.ts
-var semver4 = __toESM(require_semver2(), 1);
+// src/github-client.ts
+var octokit = getOctokit(GITHUB_TOKEN, void 0, retry2);
 
-// src/unix.ts
+// src/system-packages.ts
 var fs9 = __toESM(require("node:fs/promises"), 1);
 async function checkAptInstallability(packageName) {
   const output = await getExecOutput("sudo", [
@@ -95008,9 +95020,22 @@ async function updateUnixPackageIndexFiles() {
 }
 
 // src/opam.ts
+var OPAM_STABLE_VERSION_RANGE = "<2.6.0";
+var CYGWIN_EXTRA_PACKAGES = [
+  "curl",
+  "m4",
+  "make",
+  "mingw64-i686-gcc-core",
+  "mingw64-i686-gcc-g++",
+  "mingw64-x86_64-gcc-core",
+  "mingw64-x86_64-gcc-g++",
+  "perl",
+  "rsync",
+  "unzip"
+];
+var EXECUTABLE_PERMISSION = 493;
 var latestOpamRelease = (async () => {
-  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : "<2.6.0";
-  const octokit = getOctokit(GITHUB_TOKEN, void 0, retry2);
+  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
   const { data: releases } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam"
@@ -95063,7 +95088,7 @@ async function acquireOpam() {
         ARCHITECTURE
       );
       info(`Successfully cached opam to ${cachedPath2}`);
-      await import_node_fs2.promises.chmod(path14.join(cachedPath2, opam), 493);
+      await import_node_fs2.promises.chmod(path14.join(cachedPath2, opam), EXECUTABLE_PERMISSION);
       addPath(cachedPath2);
       info("Added opam to the path");
     } else {
@@ -95090,19 +95115,9 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       extraOptions.push("--cygwin-internal-install");
-      const extraPackages = [
-        "curl",
-        "m4",
-        "make",
-        "mingw64-i686-gcc-core",
-        "mingw64-i686-gcc-g++",
-        "mingw64-x86_64-gcc-core",
-        "mingw64-x86_64-gcc-g++",
-        "perl",
-        "rsync",
-        "unzip"
-      ].join(",");
-      extraOptions.push(`--cygwin-extra-packages=${extraPackages}`);
+      extraOptions.push(
+        `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`
+      );
     }
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");
@@ -95197,7 +95212,6 @@ function isSemverValidRange(semverVersion) {
   return semver5.validRange(semverVersion, { loose: true }) !== null;
 }
 async function retrieveAllCompilerVersions() {
-  const octokit = getOctokit(GITHUB_TOKEN, void 0, retry2);
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
     repo: "opam-repository",
@@ -95281,22 +95295,21 @@ async function composeOpamCacheKeys() {
   return { key, restoreKeys };
 }
 function composeDuneCachePaths() {
-  const paths = [DUNE_CACHE_ROOT];
-  return paths;
+  return [DUNE_CACHE_ROOT];
 }
 function composeOpamCachePaths() {
   const opamLocalCachePath = path16.join(GITHUB_WORKSPACE, "_opam");
   const paths = [OPAM_ROOT, opamLocalCachePath];
   if (PLATFORM === "windows") {
     const {
-      repo: { repo: repo2 }
+      repo: { repo }
     } = context4;
     const opamCygwinLocalCachePath = path16.posix.join(
       "/cygdrive",
       "d",
       "a",
-      repo2,
-      repo2,
+      repo,
+      repo,
       "_opam"
     );
     paths.push(opamCygwinLocalCachePath);
@@ -95397,24 +95410,14 @@ async function saveOpamCache() {
 }
 
 // src/dune.ts
-var {
-  repo: { owner, repo },
-  runId: run_id
-} = context4;
 async function installDune() {
   await group("Installing dune", async () => {
     await exec("opam", ["install", "dune"]);
   });
 }
 
-// src/packages.ts
-async function retrieveOpamLocalPackages() {
-  const globber = await create(OPAM_LOCAL_PACKAGES);
-  const fpaths = await globber.glob();
-  return fpaths;
-}
-
 // src/installer.ts
+var OPAM_SOLVER_TIMEOUT = 600;
 async function installer() {
   if (isDebug()) {
     exportVariable("OPAMVERBOSE", 1);
@@ -95427,7 +95430,7 @@ async function installer() {
   exportVariable("OPAMPRECISETRACKING", 1);
   exportVariable("OPAMRETRIES", 10);
   exportVariable("OPAMROOT", OPAM_ROOT);
-  exportVariable("OPAMSOLVERTIMEOUT", 600);
+  exportVariable("OPAMSOLVERTIMEOUT", OPAM_SOLVER_TIMEOUT);
   exportVariable("OPAMYES", 1);
   if (PLATFORM === "windows") {
     exportVariable("CYGWIN", "winsymlinks:native");
@@ -95440,7 +95443,9 @@ async function installer() {
         "set",
         "symlinkEvaluation",
         "R2L:1",
+        // Remote-to-Local
         "R2R:1"
+        // Remote-to-Remote
       ]);
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     });
@@ -95463,7 +95468,8 @@ async function installer() {
   }
   exportVariable("CLICOLOR_FORCE", "1");
   if (OPAM_PIN) {
-    const fnames = await retrieveOpamLocalPackages();
+    const globber = await create(OPAM_LOCAL_PACKAGES);
+    const fnames = await globber.glob();
     await pin(fnames);
   }
   await exec("opam", ["config", "report"]);

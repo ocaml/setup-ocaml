@@ -1,15 +1,13 @@
 import * as path from "node:path";
-import * as github from "@actions/github";
-import { retry } from "@octokit/plugin-retry";
 import * as semver from "semver";
-import { GITHUB_TOKEN, OCAML_COMPILER } from "./constants.js";
+import { OCAML_COMPILER } from "./constants.js";
+import { octokit } from "./github-client.js";
 
 function isSemverValidRange(semverVersion: string) {
   return semver.validRange(semverVersion, { loose: true }) !== null;
 }
 
 async function retrieveAllCompilerVersions() {
-  const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
     repo: "opam-repository",

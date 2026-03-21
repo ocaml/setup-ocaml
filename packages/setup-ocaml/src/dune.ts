@@ -1,13 +1,9 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
-import { retry } from "@octokit/plugin-retry";
-import { GITHUB_TOKEN } from "./constants.js";
+import { octokit } from "./github-client.js";
 
-const {
-  repo: { owner, repo },
-  runId: run_id,
-} = github.context;
+const DUNE_CACHE_TOTAL_SIZE_MB = 5000;
 
 export async function installDune() {
   await core.group("Installing dune", async () => {
@@ -17,7 +13,10 @@ export async function installDune() {
 
 export async function trimDuneCache() {
   await core.group("Clearing old dune cache files to save space", async () => {
-    const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
+    const {
+      repo: { owner, repo },
+      runId: run_id,
+    } = github.context;
     const {
       data: { total_count: totalCount },
     } = await octokit.rest.actions.listJobsForWorkflowRun({
@@ -25,7 +24,7 @@ export async function trimDuneCache() {
       repo,
       run_id,
     });
-    const cacheSize = Math.floor(5000 / totalCount);
+    const cacheSize = Math.floor(DUNE_CACHE_TOTAL_SIZE_MB / totalCount);
     await exec("opam", [
       "exec",
       "--",
