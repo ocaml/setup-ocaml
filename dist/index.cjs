@@ -95031,6 +95031,7 @@ async function updateUnixPackageIndexFiles() {
 
 // src/opam.ts
 var OPAM_STABLE_VERSION_RANGE = "<2.6.0";
+var MSYS2_EXTRA_PACKAGES = ["mingw-w64-x86_64-gcc"];
 var EXECUTABLE_PERMISSION = 493;
 var latestOpamRelease = (async () => {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
@@ -95113,6 +95114,14 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       if (WINDOWS_ENVIRONMENT === "msys2") {
+        await group("Installing MSYS2 packages", async () => {
+          await exec(path14.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
+            "-S",
+            "--noconfirm",
+            "--needed",
+            ...MSYS2_EXTRA_PACKAGES
+          ]);
+        });
         extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
       }
       if (WINDOWS_ENVIRONMENT === "cygwin") {
