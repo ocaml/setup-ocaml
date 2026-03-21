@@ -22,19 +22,6 @@ import {
 // contain breaking changes to the CLI or repository format.
 const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
 
-const CYGWIN_EXTRA_PACKAGES = [
-  "curl",
-  "m4",
-  "make",
-  "mingw64-i686-gcc-core",
-  "mingw64-i686-gcc-g++",
-  "mingw64-x86_64-gcc-core",
-  "mingw64-x86_64-gcc-g++",
-  "perl",
-  "rsync",
-  "unzip",
-];
-
 const EXECUTABLE_PERMISSION = 0o755;
 
 export const latestOpamRelease = (async () => {
@@ -126,9 +113,6 @@ async function initializeOpam() {
       }
       if (WINDOWS_ENVIRONMENT === "cygwin") {
         extraOptions.push("--cygwin-internal-install");
-        extraOptions.push(
-          `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`,
-        );
       }
     }
     if (OPAM_DISABLE_SANDBOXING) {
