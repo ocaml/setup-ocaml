@@ -7,8 +7,10 @@ import * as semver from "semver";
 import {
   ALLOW_PRERELEASE_OPAM,
   ARCHITECTURE,
+  MSYS2_ROOT,
   OPAM_DISABLE_SANDBOXING,
   PLATFORM,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { octokit } from "./github-client.js";
 import {
@@ -119,10 +121,15 @@ async function initializeOpam() {
     }
     const extraOptions = [];
     if (PLATFORM === "windows") {
-      extraOptions.push("--cygwin-internal-install");
-      extraOptions.push(
-        `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`,
-      );
+      if (WINDOWS_ENVIRONMENT === "msys2") {
+        extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
+      }
+      if (WINDOWS_ENVIRONMENT === "cygwin") {
+        extraOptions.push("--cygwin-internal-install");
+        extraOptions.push(
+          `--cygwin-extra-packages=${CYGWIN_EXTRA_PACKAGES.join(",")}`,
+        );
+      }
     }
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");

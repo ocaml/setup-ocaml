@@ -12,6 +12,7 @@ import {
   OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
+  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { installDune } from "./dune.js";
 import {
@@ -42,9 +43,11 @@ export async function installer() {
   core.exportVariable("OPAMSOLVERTIMEOUT", OPAM_SOLVER_TIMEOUT);
   core.exportVariable("OPAMYES", 1);
   if (PLATFORM === "windows") {
-    core.exportVariable("CYGWIN", "winsymlinks:native");
     core.exportVariable("HOME", process.env.USERPROFILE);
     core.exportVariable("MSYS", "winsymlinks:native");
+    if (WINDOWS_ENVIRONMENT === "cygwin") {
+      core.exportVariable("CYGWIN", "winsymlinks:native");
+    }
     await core.group("Configuring Windows symlink settings", async () => {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
       // Enable Remote-to-Local and Remote-to-Remote symlink evaluation.

@@ -75,6 +75,8 @@ export const RUNNER_ENVIRONMENT = ((): "github-hosted" | "self-hosted" => {
 
 export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
+export const MSYS2_ROOT = path.join("C:", "msys64");
+
 export const OPAM_ROOT = (() => {
   if (PLATFORM === "windows") {
     return path.join("C:", ".opam");
@@ -112,6 +114,18 @@ export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
 export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && core.getBooleanInput("opam-disable-sandboxing");
+
+type WindowsEnvironment = "cygwin" | "msys2";
+
+export const WINDOWS_ENVIRONMENT: WindowsEnvironment = (() => {
+  const value = core.getInput("windows-environment").toLowerCase();
+  if (value !== "cygwin" && value !== "msys2") {
+    throw new Error(
+      `Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`,
+    );
+  }
+  return value;
+})();
 
 export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
 
