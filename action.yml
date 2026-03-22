@@ -57,13 +57,6 @@ inputs:
       stale.
     required: false
     default: v3
-  windows-environment:
-    description: >-
-      The Unix environment used for building on Windows.
-      Use "cygwin" (default) for opam's internal Cygwin, or "msys2" to use
-      the pre-installed MSYS2 on GitHub-hosted runners.
-    required: false
-    default: cygwin
   windows-compiler:
     description: >-
       The C compiler toolchain used for building on Windows.
@@ -72,6 +65,13 @@ inputs:
       runner (pre-installed on GitHub-hosted runners).
     required: false
     default: mingw
+  windows-environment:
+    description: >-
+      The Unix environment used for building on Windows.
+      Use "cygwin" (default) for opam's internal Cygwin, or "msys2" to use
+      the pre-installed MSYS2 on GitHub-hosted runners.
+    required: false
+    default: cygwin
   allow-prerelease-opam:
     description: >-
       Allow the use of a pre-release version of opam. Set to "true" to opt

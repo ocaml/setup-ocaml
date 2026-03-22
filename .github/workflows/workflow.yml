@@ -4,7 +4,6 @@ on:
   pull_request:
   push:
   schedule:
-    # Prime the caches every Monday
     - cron: 0 1 * * MON
 
 permissions: read-all
@@ -23,64 +22,70 @@ jobs:
         run: yarn lint
       - if: always()
         run: yarn typecheck
-      - name: Ensure dist directory is up-to-date
-        if: always()
+      - if: always()
+        name: Ensure dist directory is up-to-date
         run: yarn build && git diff --exit-code --ignore-cr-at-eol
 
-  test:
-    name: Test
+  ubuntu:
+    name: Ubuntu
     needs: hygiene
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-        ocaml-compiler:
-          - "5.4"
         allow-prerelease-opam:
+          - true
           - false
-        include:
-          - os: ubuntu-latest
-            ocaml-compiler: ocaml-variants.5.4.0+options,ocaml-option-flambda
-            allow-prerelease-opam: false
-          - os: ubuntu-latest
-            ocaml-compiler: "5.4"
-            allow-prerelease-opam: true
-          - os: windows-latest
-            ocaml-compiler: "5.4"
-            allow-prerelease-opam: false
-            windows-environment: cygwin
-          - os: windows-latest
-            ocaml-compiler: "5.4"
-            allow-prerelease-opam: false
-            windows-environment: msys2
-          - os: windows-latest
-            ocaml-compiler: "5.4"
-            allow-prerelease-opam: false
-            windows-environment: cygwin
-            windows-compiler: msvc
-          - os: windows-latest
-            ocaml-compiler: "5.4"
-            allow-prerelease-opam: false
-            windows-environment: msys2
-            windows-compiler: msvc
-    runs-on: ${{ matrix.os }}
+      fail-fast: false
     steps:
       - name: Checkout tree
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
+      - name: Set-up OCaml 5.4
         uses: ./
         with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          ocaml-compiler: "5.4"
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
-          windows-environment: ${{ matrix.windows-environment || 'cygwin' }}
-          windows-compiler: ${{ matrix.windows-compiler || 'mingw' }}
+      - run: opam install ssl
+
+  macos:
+    name: macOS
+    needs: hygiene
+    runs-on: macos-latest
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set-up OCaml 5.4
+        uses: ./
+        with:
+          ocaml-compiler: "5.4"
+      - run: opam install ssl
+
+  windows:
+    name: Windows
+    needs: hygiene
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        windows-compiler:
+          - mingw
+          - msvc
+        windows-environment:
+          - cygwin
+          - msys2
+      fail-fast: false
+    steps:
+      - name: Checkout tree
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set-up OCaml 5.4
+        uses: ./
+        with:
+          ocaml-compiler: "5.4"
+          windows-compiler: ${{ matrix.windows-compiler }}
+          windows-environment: ${{ matrix.windows-environment }}
       - run: opam install ssl
         continue-on-error: ${{ matrix.windows-compiler == 'msvc' }}
 
-  test-container:
-    name: Test on a container in a GitHub runner
+  container:
+    name: Container
     needs: hygiene
     runs-on: ubuntu-latest
     container:

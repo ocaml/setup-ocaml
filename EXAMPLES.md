@@ -20,16 +20,16 @@ jobs:
   deploy-odoc:
     name: Deploy odoc to GitHub Pages
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     permissions:
       contents: read
       id-token: write
       pages: write
 
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout tree
@@ -54,8 +54,8 @@ jobs:
         with:
           path: _build/default/_doc/_html
 
-      - name: Deploy odoc to GitHub Pages
-        id: deployment
+      - id: deployment
+        name: Deploy odoc to GitHub Pages
         uses: actions/deploy-pages@v4
 ```
 
@@ -112,16 +112,16 @@ steps:
 ## Using with [Containers](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontainer)
 
 ```yml
+runs-on: ubuntu-latest
+
+container: ${{ matrix.container }}
+
 strategy:
-  fail-fast: false
   matrix:
     container:
       - debian:latest
       - ubuntu:latest
-
-container: ${{ matrix.container }}
-
-runs-on: ubuntu-latest
+  fail-fast: false
 
 steps:
   - name: Checkout tree
