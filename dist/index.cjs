@@ -95314,6 +95314,14 @@ async function composeDuneCacheKeys() {
   debug(`dune cache key: ${plainKey}`);
   return { key, restoreKeys };
 }
+async function getMsvcVersion() {
+  const { stdout } = await getExecOutput(
+    "vswhere",
+    ["-latest", "-property", "installationVersion"],
+    { silent: true }
+  );
+  return stdout.trim();
+}
 async function composeOpamCacheKeys() {
   const { version: opamVersion } = await latestOpamRelease;
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
@@ -95332,6 +95340,10 @@ async function composeOpamCacheKeys() {
   if (PLATFORM === "windows") {
     components.push(WINDOWS_ENVIRONMENT);
     components.push(WINDOWS_COMPILER);
+    if (WINDOWS_COMPILER === "msvc") {
+      const msvcVersion = await getMsvcVersion();
+      components.push(msvcVersion);
+    }
   }
   const plainKey = components.join();
   const hash = crypto5.createHash("sha256").update(plainKey).digest("hex");

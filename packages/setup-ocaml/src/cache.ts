@@ -3,7 +3,7 @@ import * as path from "node:path";
 import type { DownloadOptions } from "@actions/cache";
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
-import { exec } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import { backOff } from "exponential-backoff";
 import * as system from "systeminformation";
@@ -37,6 +37,15 @@ async function composeDuneCacheKeys() {
   return { key, restoreKeys };
 }
 
+async function getMsvcVersion() {
+  const { stdout } = await getExecOutput(
+    "vswhere",
+    ["-latest", "-property", "installationVersion"],
+    { silent: true },
+  );
+  return stdout.trim();
+}
+
 async function composeOpamCacheKeys() {
   const { version: opamVersion } = await latestOpamRelease;
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
@@ -55,6 +64,10 @@ async function composeOpamCacheKeys() {
   if (PLATFORM === "windows") {
     components.push(WINDOWS_ENVIRONMENT);
     components.push(WINDOWS_COMPILER);
+    if (WINDOWS_COMPILER === "msvc") {
+      const msvcVersion = await getMsvcVersion();
+      components.push(msvcVersion);
+    }
   }
   const plainKey = components.join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
