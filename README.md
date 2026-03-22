@@ -88,11 +88,13 @@ When using GitHub-hosted runners, specifying compiler version `4` or `5` should 
 
 #### x86 64 bits
 
-| Version           | Ubuntu             | macOS              | Windows            |
-| ----------------- | ------------------ | ------------------ | ------------------ |
-| >= 4.13           | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| >= 4.02 & <= 4.12 | :white_check_mark: | :white_check_mark: | :x:                |
-| <= 4.01           | :white_check_mark: | :white_check_mark: | :x:                |
+| Version           | Ubuntu             | macOS              | Windows (MinGW-w64) | Windows (MSVC)     |
+| ----------------- | ------------------ | ------------------ | ------------------- | ------------------ |
+| >= 5.3            | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
+| >= 5.0 & <= 5.2   | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :x:                |
+| >= 4.13 & <= 4.14 | :white_check_mark: | :white_check_mark: | :white_check_mark:  | :white_check_mark: |
+| >= 4.02 & <= 4.12 | :white_check_mark: | :white_check_mark: | :x:                 | :x:                |
+| <= 4.01           | :white_check_mark: | :white_check_mark: | :x:                 | :x:                |
 
 #### ARM 64 bits
 
