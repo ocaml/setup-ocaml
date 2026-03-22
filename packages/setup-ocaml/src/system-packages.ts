@@ -13,9 +13,7 @@ async function checkAptInstallability(packageName: string) {
   return output.stdout.length > 0;
 }
 
-async function retrieveInstallableOptionalDependencies(
-  optionalDependencies: string[],
-) {
+async function retrieveInstallableOptionalDependencies(optionalDependencies: string[]) {
   switch (PLATFORM) {
     case "linux": {
       const installableOptionalDependencies: string[] = [];
@@ -72,13 +70,12 @@ export async function installUnixSystemPackages() {
   switch (PLATFORM) {
     case "linux": {
       await disableManDbAutoUpdate();
-      const optionalDependencies =
-        await retrieveInstallableOptionalDependencies([
-          "darcs",
-          "g++-multilib",
-          "gcc-multilib",
-          "mercurial",
-        ]);
+      const optionalDependencies = await retrieveInstallableOptionalDependencies([
+        "darcs",
+        "g++-multilib",
+        "gcc-multilib",
+        "mercurial",
+      ]);
       await exec("sudo", [
         "apt-get",
         "--yes",

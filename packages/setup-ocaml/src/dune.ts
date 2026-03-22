@@ -25,13 +25,6 @@ export async function trimDuneCache() {
       run_id,
     });
     const cacheSize = Math.floor(DUNE_CACHE_TOTAL_SIZE_MB / totalCount);
-    await exec("opam", [
-      "exec",
-      "--",
-      "dune",
-      "cache",
-      "trim",
-      `--size=${cacheSize}MB`,
-    ]);
+    await exec("opam", ["exec", "--", "dune", "cache", "trim", `--size=${cacheSize}MB`]);
   });
 }

@@ -1,26 +1,20 @@
 {
   "name": "@ocaml/analysis",
   "private": true,
-  "sideEffects": false,
   "type": "module",
-  "scripts": {
-    "build": "esbuild --bundle --format=cjs --outfile=../../analysis/dist/index.cjs --platform=node --target=node24 src/index.ts",
-    "typecheck": "tsc"
-  },
-  "dependencies": {
+  "sideEffects": false,
+  "devDependencies": {
     "@actions/core": "3.0.0",
     "@actions/exec": "3.0.0",
     "@actions/github": "9.0.0",
     "@actions/glob": "0.6.1",
     "@github/dependency-submission-toolkit": "2.0.5",
-    "packageurl-js": "2.0.1",
-    "strip-ansi": "7.2.0"
-  },
-  "devDependencies": {
     "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
     "@types/node": "24.12.0",
-    "esbuild": "0.27.4",
-    "typescript": "5.9.3"
+    "packageurl-js": "2.0.1",
+    "strip-ansi": "7.2.0",
+    "typescript": "5.9.3",
+    "vite-plus": "0.1.13"
   }
 }

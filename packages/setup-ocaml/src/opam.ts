@@ -14,10 +14,7 @@ import {
   WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { octokit } from "./github-client.js";
-import {
-  installUnixSystemPackages,
-  updateUnixPackageIndexFiles,
-} from "./system-packages.js";
+import { installUnixSystemPackages, updateUnixPackageIndexFiles } from "./system-packages.js";
 
 // Stable opam version range — excludes 2.6.x pre-releases which may
 // contain breaking changes to the CLI or repository format.
@@ -38,9 +35,7 @@ export const latestOpamRelease = (async () => {
         loose: true,
       }),
     )
-    .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
-      semver.rcompare(v1, v2, { loose: true }),
-    );
+    .sort(({ tag_name: v1 }, { tag_name: v2 }) => semver.rcompare(v1, v2, { loose: true }));
   const latestRelease = matchedReleases.at(0);
   if (!latestRelease) {
     throw new Error(
@@ -49,9 +44,7 @@ export const latestOpamRelease = (async () => {
   }
   const matchedAssets = latestRelease.assets.find((asset) => {
     if (PLATFORM === "windows") {
-      return asset.browser_download_url.endsWith(
-        `${ARCHITECTURE}-${PLATFORM}.exe`,
-      );
+      return asset.browser_download_url.endsWith(`${ARCHITECTURE}-${PLATFORM}.exe`);
     }
     return asset.browser_download_url.endsWith(`${ARCHITECTURE}-${PLATFORM}`);
   });
@@ -133,13 +126,7 @@ async function initializeOpam() {
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");
     }
-    await exec("opam", [
-      "init",
-      "--auto-setup",
-      "--bare",
-      ...extraOptions,
-      "--enable-shell-hook",
-    ]);
+    await exec("opam", ["init", "--auto-setup", "--bare", ...extraOptions, "--enable-shell-hook"]);
   });
 }
 
@@ -180,14 +167,7 @@ export async function pin(fpaths: string[]) {
 }
 
 async function repositoryAdd(name: string, address: string) {
-  await exec("opam", [
-    "repository",
-    "--all-switches",
-    "--set-default",
-    "add",
-    name,
-    address,
-  ]);
+  await exec("opam", ["repository", "--all-switches", "--set-default", "add", name, address]);
 }
 
 export async function repositoryAddAll(repositories: [string, string][]) {
