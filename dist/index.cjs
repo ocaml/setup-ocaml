@@ -95234,35 +95234,35 @@ var semver5 = __toESM(require_semver2(), 1);
 function isSemverValidRange(semverVersion) {
   return semver5.validRange(semverVersion, { loose: true }) !== null;
 }
+function parseCompilerVersion(packagePath) {
+  const opamVersion = path15.basename(packagePath).replace("ocaml-base-compiler.", "");
+  const parsed = semver5.parse(opamVersion.replace("~", "-"), { loose: true });
+  if (parsed === null) {
+    return void 0;
+  }
+  const minor = parsed.major < 5 && parsed.minor < 10 ? (
+    // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
+    `0${parsed.minor}`
+  ) : (
+    // ocaml-base-compiler.5.4.0, ocaml-base-compiler.4.14.2
+    parsed.minor
+  );
+  const prerelease = parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
+  const semverVersion = `${parsed.major}.${minor}.${parsed.patch}${prerelease}`;
+  return [semverVersion, opamVersion];
+}
 async function retrieveAllCompilerVersions() {
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
     repo: "opam-repository",
     path: "packages/ocaml-base-compiler"
   });
-  const versions = /* @__PURE__ */ new Map();
-  if (Array.isArray(packages)) {
-    for (const { path: p } of packages) {
-      const basename7 = path15.basename(p);
-      const opamVersion = basename7.replace("ocaml-base-compiler.", "");
-      const parsed = semver5.parse(opamVersion.replace("~", "-"), {
-        loose: true
-      });
-      if (parsed !== null) {
-        const minor = parsed.major < 5 && parsed.minor < 10 ? (
-          // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
-          `0${parsed.minor}`
-        ) : (
-          // ocaml-base-compiler.5.4.0, ocaml-base-compiler.4.14.2
-          parsed.minor
-        );
-        const prerelease = parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
-        const semverVersion = `${parsed.major}.${minor}.${parsed.patch}${prerelease}`;
-        versions.set(semverVersion, opamVersion);
-      }
-    }
+  if (!Array.isArray(packages)) {
+    return /* @__PURE__ */ new Map();
   }
-  return versions;
+  return new Map(
+    packages.values().map(({ path: path17 }) => parseCompilerVersion(path17)).filter((entry) => entry !== void 0)
+  );
 }
 async function resolveVersion(semverVersion) {
   const versions = await retrieveAllCompilerVersions();

@@ -19797,6 +19797,10 @@ function convertToUnix(str) {
 }
 
 // src/ocamlformat.ts
+function parseKeyValue(line) {
+  const [key = "", value = ""] = line.split("=").map((s) => s.trim());
+  return [key, value];
+}
 async function parse() {
   const githubWorkspace = process2.env.GITHUB_WORKSPACE ?? process2.cwd();
   const fpath = path4.join(githubWorkspace, ".ocamlformat");
@@ -19805,9 +19809,7 @@ async function parse() {
     const buf = await import_node_fs.promises.readFile(fpath);
     const str = buf.toString();
     const normalisedStr = convertToUnix(str);
-    const kv = normalisedStr.split("\n").map((line) => line.split("=").map((str2) => str2.trim()));
-    const config = Object.fromEntries(kv);
-    return config;
+    return new Map(normalisedStr.split("\n").values().map(parseKeyValue));
   } catch {
     return;
   }
@@ -19818,8 +19820,9 @@ async function retrieveOcamlformatVersion() {
     warning(".ocamlformat file not found");
     return;
   }
-  if (config.version) {
-    return config.version;
+  const version = config.get("version");
+  if (version) {
+    return version;
   }
   warning(
     "No ocamlformat version found in .ocamlformat file. It's recommended to specify the version in your .ocamlformat file for better consistency."

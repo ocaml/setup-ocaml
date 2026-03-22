@@ -45,12 +45,8 @@ function parseDependencies(
     if (cache.hasPackage(purl)) {
       return cache.package(purl);
     }
-    const pkgs = new Set<Package>();
-    if (dependency.dependencies.length > 0) {
-      for (const pkg of parseDependencies(cache, dependency.dependencies))
-        pkgs.add(pkg);
-    }
-    return cache.package(purl).dependsOnPackages([...pkgs]);
+    const pkgs = new Set(parseDependencies(cache, dependency.dependencies));
+    return cache.package(purl).dependsOnPackages(pkgs.values().toArray());
   });
   return packages;
 }
