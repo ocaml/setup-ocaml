@@ -1,8 +1,5 @@
 import type { Package } from "@github/dependency-submission-toolkit";
-import {
-  BuildTarget,
-  PackageCache,
-} from "@github/dependency-submission-toolkit";
+import { BuildTarget, PackageCache } from "@github/dependency-submission-toolkit";
 import { PackageURL } from "packageurl-js";
 
 export interface Output {
@@ -29,10 +26,7 @@ interface OpamDepsNode extends OpamDepsTree {
 type Forest = OpamDepsTree[];
 type Dependencies = OpamDepsNode[];
 
-function parseDependencies(
-  cache: PackageCache,
-  dependencies: Dependencies,
-): Package[] {
+function parseDependencies(cache: PackageCache, dependencies: Dependencies): Package[] {
   const packages = dependencies.map((dependency) => {
     const purl = new PackageURL(
       "opam",
@@ -59,10 +53,7 @@ export function createBuildTarget(output: Output, filePath: string) {
     );
   }
   const cache = new PackageCache();
-  const topLevelDependencies = parseDependencies(
-    cache,
-    opamPackage.dependencies,
-  );
+  const topLevelDependencies = parseDependencies(cache, opamPackage.dependencies);
   const buildTarget = new BuildTarget(opamPackage.name, filePath);
   for (const topLevelDependency of topLevelDependencies) {
     buildTarget.addBuildDependency(topLevelDependency);

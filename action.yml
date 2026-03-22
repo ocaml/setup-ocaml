@@ -88,6 +88,6 @@ inputs:
     default: ${{ github.token }}
 runs:
   using: node24
-  main: dist/index.cjs
-  post: dist/post/index.cjs
+  main: dist/index.mjs
+  post: dist/post/index.mjs
   post-if: success()

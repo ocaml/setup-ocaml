@@ -2,20 +2,18 @@
   "name": "setup-ocaml",
   "version": "3.4.8",
   "private": true,
-  "type": "module",
   "workspaces": [
     "packages/*"
   ],
+  "type": "module",
   "scripts": {
-    "build": "turbo run build --continue --parallel",
-    "check": "biome check",
-    "fix": "biome check --fix",
-    "lint": "biome check",
-    "typecheck": "turbo run typecheck --continue --parallel"
+    "build": "vp run --recursive build",
+    "fix": "vp check --fix",
+    "lint": "vp check",
+    "typecheck": "vp run --recursive typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.8",
-    "turbo": "2.8.20"
+    "vite-plus": "0.1.13"
   },
   "packageManager": "yarn@4.13.0"
 }

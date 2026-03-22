@@ -11,4 +11,4 @@ inputs:
     default: ${{ github.token }}
 runs:
   using: node24
-  main: dist/index.cjs
+  main: dist/index.mjs

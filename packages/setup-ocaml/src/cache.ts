@@ -89,24 +89,11 @@ function composeOpamCachePaths() {
       repo: { repo },
     } = github.context;
     if (WINDOWS_ENVIRONMENT === "msys2") {
-      const opamMsys2LocalCachePath = path.posix.join(
-        "/d",
-        "a",
-        repo,
-        repo,
-        "_opam",
-      );
+      const opamMsys2LocalCachePath = path.posix.join("/d", "a", repo, repo, "_opam");
       paths.push(opamMsys2LocalCachePath);
     }
     if (WINDOWS_ENVIRONMENT === "cygwin") {
-      const opamCygwinLocalCachePath = path.posix.join(
-        "/cygdrive",
-        "d",
-        "a",
-        repo,
-        repo,
-        "_opam",
-      );
+      const opamCygwinLocalCachePath = path.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
       paths.push(opamCygwinLocalCachePath);
     }
   }
@@ -135,9 +122,7 @@ async function restoreCache(
     if (cacheKey) {
       core.info(`Cache restored from key: ${cacheKey}`);
     } else {
-      core.info(
-        `Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`,
-      );
+      core.info(`Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
     }
     return cacheKey;
   } catch (error) {
@@ -207,9 +192,7 @@ export async function saveOpamCache() {
       lookupOnly: true,
     });
     if (cacheHit) {
-      core.info(
-        "Cache entry with the same key, version, and scope already exists",
-      );
+      core.info("Cache entry with the same key, version, and scope already exists");
     } else {
       await exec("opam", [
         "clean",

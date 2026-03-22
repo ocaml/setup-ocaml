@@ -108,9 +108,7 @@ export const OPAM_REPOSITORIES: [string, string][] = (() => {
     schema: "failsafe",
   });
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error(
-      "opam-repositories input must be a YAML mapping of name: URL pairs",
-    );
+    throw new Error("opam-repositories input must be a YAML mapping of name: URL pairs");
   }
   const entries = Object.entries(parsed as Record<string, string>);
   if (entries.length === 0) {
@@ -148,15 +146,11 @@ type WindowsCompiler = "mingw" | "msvc";
 export const WINDOWS_COMPILER: WindowsCompiler = (() => {
   const value = core.getInput("windows-compiler").toLowerCase();
   if (value !== "mingw" && value !== "msvc") {
-    throw new Error(
-      `Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`,
-    );
+    throw new Error(`Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`);
   }
   return value;
 })();
 
-export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput(
-  "allow-prerelease-opam",
-);
+export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput("allow-prerelease-opam");
 
 export const GITHUB_TOKEN = core.getInput("github-token");
