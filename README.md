@@ -23,15 +23,15 @@ permissions: read-all
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
+
     strategy:
-      fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-
-    runs-on: ${{ matrix.os }}
+      fail-fast: false
 
     steps:
       - name: Checkout tree
@@ -149,8 +149,8 @@ steps:
 | `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature. opam uses Bubblewrap on Linux and sandbox-exec on macOS. Useful for self-hosted runners where the sandbox tool is not available. On Windows, sandboxing is always disabled.         | bool   | `false`                                                     |
 | `dune-cache`              | No       | Enable Dune build caching via GitHub Actions cache. When enabled, the Dune cache directory is saved and restored between workflow runs to speed up incremental builds.                                                   | bool   | `false`                                                     |
 | `cache-prefix`            | No       | The prefix used for all cache keys. Change this value to force a cache invalidation when the cache becomes corrupted or stale.                                                                                           | string | `v3`                                                        |
-| `windows-environment`     | No       | The Unix environment used for building on Windows. Use `cygwin` (default) for opam's internal Cygwin, or `msys2` to use the pre-installed MSYS2 on GitHub-hosted runners.                                                | string | `cygwin`                                                    |
 | `windows-compiler`        | No       | The C compiler toolchain used for building on Windows. Use `mingw` (default) for mingw-w64 (GCC), or `msvc` for the Microsoft Visual C compiler. MSVC requires Visual Studio (pre-installed on GitHub-hosted runners).   | string | `mingw`                                                     |
+| `windows-environment`     | No       | The Unix environment used for building on Windows. Use `cygwin` (default) for opam's internal Cygwin, or `msys2` to use the pre-installed MSYS2 on GitHub-hosted runners.                                                | string | `cygwin`                                                    |
 | `allow-prerelease-opam`   | No       | Allow the use of a pre-release version of opam. Has no effect when no pre-release version is available.                                                                                                                  | bool   | `false`                                                     |
 
 ### Supported version syntax
