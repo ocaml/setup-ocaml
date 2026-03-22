@@ -95240,45 +95240,63 @@ async function retrieveAllCompilerVersions() {
     repo: "opam-repository",
     path: "packages/ocaml-base-compiler"
   });
-  const versions = /* @__PURE__ */ new Set();
+  const versions = /* @__PURE__ */ new Map();
   if (Array.isArray(packages)) {
     for (const { path: p } of packages) {
       const basename7 = path15.basename(p);
-      const version3 = basename7.replace("ocaml-base-compiler.", "");
-      const parsed = semver5.parse(version3, { loose: true });
+      const opamVersion = basename7.replace("ocaml-base-compiler.", "");
+      const parsed = semver5.parse(opamVersion.replace("~", "-"), {
+        loose: true
+      });
       if (parsed !== null) {
-        const { major, minor: _minor, patch } = parsed;
-        const minor = major < 5 && _minor < 10 ? (
+        const minor = parsed.major < 5 && parsed.minor < 10 ? (
           // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
-          `0${_minor}`
+          `0${parsed.minor}`
         ) : (
           // ocaml-base-compiler.5.4.0, ocaml-base-compiler.4.14.2
-          _minor
+          parsed.minor
         );
-        const version4 = `${major}.${minor}.${patch}`;
-        versions.add(version4);
+        const prerelease = parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
+        const semverVersion = `${parsed.major}.${minor}.${parsed.patch}${prerelease}`;
+        versions.set(semverVersion, opamVersion);
       }
     }
   }
-  return [...versions];
+  return versions;
 }
 async function resolveVersion(semverVersion) {
-  const compilerVersions = await retrieveAllCompilerVersions();
-  const matchedFullCompilerVersion = semver5.maxSatisfying(
-    compilerVersions,
-    semverVersion,
-    { loose: true }
-  );
-  if (matchedFullCompilerVersion === null) {
-    throw new Error(
-      `Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository. Please check if you specified a valid version number or version range.`
-    );
+  const versions = await retrieveAllCompilerVersions();
+  const semverVersions = versions.keys().toArray();
+  const stableMatch = semver5.maxSatisfying(semverVersions, semverVersion, {
+    loose: true
+  });
+  if (stableMatch !== null) {
+    const opamVersion = versions.get(stableMatch);
+    if (opamVersion !== void 0) {
+      return opamVersion;
+    }
   }
-  return matchedFullCompilerVersion;
+  const prereleaseMatch = semver5.maxSatisfying(semverVersions, semverVersion, {
+    loose: true,
+    includePrerelease: true
+  });
+  if (prereleaseMatch !== null) {
+    const opamVersion = versions.get(prereleaseMatch);
+    if (opamVersion !== void 0) {
+      return opamVersion;
+    }
+  }
+  throw new Error(
+    `Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository. Please check if you specified a valid version number or version range.`
+  );
 }
 var resolvedCompiler = (async () => {
-  const resolvedCompiler2 = isSemverValidRange(OCAML_COMPILER) ? `ocaml-base-compiler.${await resolveVersion(OCAML_COMPILER)}` : OCAML_COMPILER;
-  return resolvedCompiler2;
+  const semverInput = OCAML_COMPILER.replace("~", "-");
+  if (isSemverValidRange(semverInput)) {
+    const opamVersion = await resolveVersion(semverInput);
+    return `ocaml-base-compiler.${opamVersion}`;
+  }
+  return OCAML_COMPILER;
 })();
 
 // src/cache.ts
