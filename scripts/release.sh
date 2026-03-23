@@ -22,6 +22,9 @@ function Release() {
 
   echo "Push tags"
   git push --tags
+
+  echo "Create a GitHub release: $FULL_VERSION"
+  gh release create "$FULL_VERSION" --generate-notes
 }
 
 Release "$1" "$2"
