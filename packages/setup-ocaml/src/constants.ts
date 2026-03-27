@@ -36,21 +36,15 @@ export const PLATFORM = (() => {
     case "darwin": {
       return "macos";
     }
-    case "freebsd": {
-      return "freebsd";
-    }
     case "linux": {
       return "linux";
-    }
-    case "openbsd": {
-      return "openbsd";
     }
     case "win32": {
       return "windows";
     }
     default: {
       throw new Error(
-        `'${process.platform}' is not supported. Supported platforms: darwin, freebsd, linux, openbsd, win32`,
+        `'${process.platform}' is not supported. Supported platforms: darwin, linux, win32`,
       );
     }
   }
