@@ -226,10 +226,6 @@ To stay within GitHub Actions' 10 GB per-repository cache limit, the action auto
 If the cache becomes corrupted or stale, you can delete it using the [GitHub CLI](https://cli.github.com):
 
 ```sh
-# List all caches for the repository
-gh cache list
-
-# Delete all caches
 gh cache delete --all
 ```
 
