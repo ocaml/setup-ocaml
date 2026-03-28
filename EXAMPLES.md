@@ -109,6 +109,24 @@ steps:
       windows-environment: msys2
 ```
 
+## Using a custom OCaml compiler
+
+To use a custom or unreleased OCaml compiler, create a custom [opam repository](https://opam.ocaml.org/doc/Manual.html#Repositories) containing the compiler package and add it via the `opam-repositories` input. When specifying a compiler from a custom repository, you must use the full opam package name rather than a semver version range, because semver resolution only queries the official [opam-repository](https://github.com/ocaml/opam-repository).
+
+```yml
+steps:
+  - name: Checkout tree
+    uses: actions/checkout@v6
+
+  - name: Set-up OCaml
+    uses: ocaml/setup-ocaml@v3
+    with:
+      ocaml-compiler: ocaml-base-compiler.5.4.0~dev
+      opam-repositories: |
+        custom: git+https://github.com/<username>/<custom-opam-repository>.git
+        default: git+https://github.com/ocaml/opam-repository.git
+```
+
 ## Using with [Containers](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontainer)
 
 ```yml
