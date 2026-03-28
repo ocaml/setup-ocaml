@@ -148,7 +148,6 @@ steps:
 | `opam-local-packages`     | No       | A glob pattern matching the local `.opam` files to be pinned when `opam-pin` is enabled. Consult the [`@actions/glob` documentation](https://github.com/actions/toolkit/tree/main/packages/glob) for supported patterns. | string | `*.opam`                                                    |
 | `opam-disable-sandboxing` | No       | Disable the opam sandboxing feature. opam uses Bubblewrap on Linux and sandbox-exec on macOS. Useful for self-hosted runners where the sandbox tool is not available. On Windows, sandboxing is always disabled.         | bool   | `false`                                                     |
 | `dune-cache`              | No       | Enable Dune build caching via GitHub Actions cache. When enabled, the Dune cache directory is saved and restored between workflow runs to speed up incremental builds.                                                   | bool   | `false`                                                     |
-| `cache-prefix`            | No       | The prefix used for all cache keys. Change this value to force a cache invalidation when the cache becomes corrupted or stale.                                                                                           | string | `v3`                                                        |
 | `windows-compiler`        | No       | The C compiler toolchain used for building on Windows. Use `mingw` (default) for mingw-w64 (GCC), or `msvc` for the Microsoft Visual C compiler. MSVC requires Visual Studio (pre-installed on GitHub-hosted runners).   | string | `mingw`                                                     |
 | `windows-environment`     | No       | The Unix environment used for building on Windows. Use `cygwin` (default) for opam's internal Cygwin, or `msys2` to use the pre-installed MSYS2 on GitHub-hosted runners.                                                | string | `cygwin`                                                    |
 | `allow-prerelease-opam`   | No       | Allow the use of a pre-release version of opam. Has no effect when no pre-release version is available.                                                                                                                  | bool   | `false`                                                     |
@@ -176,6 +175,63 @@ Examples:
 - Major versions: `"4"`, `"5"`
 - Minor versions: `"4.08"`, `"4.14"`, `"5.4"`, `"5.4.x"`
 - More specific versions: `"~4.02.2"`, `"5.4.0"`
+
+## Caching
+
+### opam cache
+
+This action automatically caches the opam root and the local switch (`_opam`) using the GitHub Actions cache. When the cache is hit, the compiler installation is skipped and only `opam update` is run to ensure the repository metadata stays current. This significantly reduces setup time whilst keeping dependency resolution up to date.
+
+The cache key is computed from the following components:
+
+- Platform (Linux, macOS, or Windows)
+- OS version
+- Architecture (`x86_64`, `arm64`, etc.)
+- opam version
+- OCaml compiler version
+- opam repository URLs
+- Sandbox setting (enabled or disabled)
+
+On Windows, the following additional components are included:
+
+- Windows environment (`cygwin` or `msys2`)
+- Windows compiler (`mingw` or `msvc`)
+- MSVC version (when using the MSVC compiler)
+
+### Why project dependencies are not cached
+
+This action intentionally does not cache the results of `opam install . --deps-only`. Unlike package managers such as npm or Cargo, opam does not use a lock file by default — dependency versions are resolved against the current state of opam-repository at install time.
+
+If these resolved dependencies were cached, opam-repository updates (bug fixes, security patches, new package versions) would not be picked up for as long as the cache remains valid. On active repositories where CI runs frequently, the cache would be hit continuously and never expire, effectively freezing dependencies indefinitely. This would make CI unreliable, as it could pass with stale dependencies whilst failing on a fresh install.
+
+### Dune cache
+
+Optionally, you can enable Dune's build cache by setting `dune-cache: true`. This caches incremental build artefacts to speed up subsequent builds.
+
+The Dune cache key is scoped to the following components:
+
+- Platform
+- Architecture
+- OCaml compiler version
+- Workflow name
+- Job name
+- Run ID
+
+When restoring, the action falls back to partial key matches, so a cache from a previous run of the same workflow and job can be reused.
+
+To stay within GitHub Actions' 10 GB per-repository cache limit, the action automatically trims the Dune cache by dividing a 5 GB budget equally amongst all the jobs in the workflow run.
+
+### Clearing the cache
+
+If the cache becomes corrupted or stale, you can delete it using the [GitHub CLI](https://cli.github.com):
+
+```sh
+# List all caches for the repository
+gh cache list
+
+# Delete all caches
+gh cache delete --all
+```
 
 ## Advanced Configurations
 
