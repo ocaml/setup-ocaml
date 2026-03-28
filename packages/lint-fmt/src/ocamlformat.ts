@@ -10,17 +10,16 @@ function parseKeyValue(line: string): [string, string] {
 }
 
 async function parse() {
-  const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  const fpath = path.join(githubWorkspace, ".ocamlformat");
+  const fpath = path.join(process.cwd(), ".ocamlformat");
   try {
     await fs.access(fpath, fs.constants.R_OK);
-    const buf = await fs.readFile(fpath);
-    const str = buf.toString();
-    const normalisedStr = convertToUnix(str);
-    return new Map(normalisedStr.split("\n").values().map(parseKeyValue));
   } catch {
     return;
   }
+  const buf = await fs.readFile(fpath);
+  const str = buf.toString();
+  const normalisedStr = convertToUnix(str);
+  return new Map(normalisedStr.split("\n").values().map(parseKeyValue));
 }
 
 export async function retrieveOcamlformatVersion() {

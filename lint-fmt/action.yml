@@ -4,6 +4,13 @@ author: Sora Morimoto
 branding:
   icon: package
   color: orange
+inputs:
+  working-directory:
+    description: >-
+      The working directory for the workflow. Defaults to the root of
+      the repository.
+    required: false
+    default: "."
 runs:
   using: node24
   main: dist/index.mjs
