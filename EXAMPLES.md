@@ -127,6 +127,26 @@ steps:
         default: git+https://github.com/ocaml/opam-repository.git
 ```
 
+## Using opam lock files
+
+To use dependencies specified by [opam lock files](https://opam.ocaml.org/doc/Manual.html#opam-lock), set the `OPAMLOCKED` environment variable to `locked` in the setup-ocaml step. This ensures that `opam pin` uses the `.opam.locked` files, so subsequent `opam install . --deps-only --locked` correctly installs the locked dependencies.
+
+```yml
+steps:
+  - name: Checkout tree
+    uses: actions/checkout@v6
+
+  - name: Set-up OCaml
+    uses: ocaml/setup-ocaml@v3
+    with:
+      ocaml-compiler: "5.4"
+    env:
+      OPAMLOCKED: locked
+
+  - name: Install dependencies
+    run: opam install . --deps-only --locked
+```
+
 ## Using with [Containers](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontainer)
 
 ```yml
