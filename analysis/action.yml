@@ -1,12 +1,19 @@
 name: Analysis
-description: Calculates dependencies for a opam build-target and submits the list to the Dependency Submission API
+description: >-
+  Analyse opam dependencies and submit them to the GitHub Dependency
+  Submission API. Runs "opam tree" for every local .opam package and
+  converts the result into a dependency snapshot so that the
+  repository's Dependency Graph stays up to date.
 author: Sora Morimoto
 branding:
   icon: package
   color: orange
 inputs:
   token:
-    description: DO NOT SET THIS.
+    description: >-
+      GitHub token used internally to submit the dependency snapshot.
+      The default token is sufficient for most use cases. DO NOT SET
+      THIS unless you need to use a custom token.
     required: false
     default: ${{ github.token }}
 runs:

@@ -1,5 +1,8 @@
 name: Lint doc
-description: Performs several quality checks on the doc comment
+description: >-
+  Check OCaml documentation comments by building with Odoc. Runs
+  "dune build @doc" with ODOC_WARN_ERROR=true so that any Odoc
+  warning is treated as an error.
 author: Sora Morimoto
 branding:
   icon: package
