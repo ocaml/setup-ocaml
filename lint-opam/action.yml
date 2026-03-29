@@ -1,5 +1,7 @@
 name: Lint opam
-description: Perform several quality checks on the opam file
+description: >-
+  Lint opam files with "opam lint" and check consistency between opam
+  and Dune metadata with opam-dune-lint.
 author: Sora Morimoto
 branding:
   icon: package
