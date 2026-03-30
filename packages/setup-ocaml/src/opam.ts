@@ -14,7 +14,11 @@ import {
   WINDOWS_ENVIRONMENT,
 } from "./constants.js";
 import { octokit } from "./github-client.js";
-import { installUnixSystemPackages, updateUnixPackageIndexFiles } from "./system-packages.js";
+import {
+  installMsys2Packages,
+  installUnixSystemPackages,
+  updateUnixPackageIndexFiles,
+} from "./system-packages.js";
 
 // Stable opam version range — excludes 2.6.x pre-releases which may
 // contain breaking changes to the CLI or repository format.
@@ -87,6 +91,9 @@ async function acquireOpam() {
 
 async function initializeOpam() {
   await core.group("Initialising opam state", async () => {
+    if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "msys2") {
+      await installMsys2Packages();
+    }
     if (PLATFORM !== "windows") {
       try {
         await installUnixSystemPackages();
@@ -103,20 +110,6 @@ async function initializeOpam() {
     const extraOptions = [];
     if (PLATFORM === "windows") {
       if (WINDOWS_ENVIRONMENT === "msys2") {
-        // MSYS2 packages are installed to C:\msys64 which is outside the
-        // opam cache. Without pre-installing GCC, a cache-hit run would
-        // detect missing system packages and trigger a full recompilation
-        // of the OCaml compiler. MSVC builds use cl.exe instead of GCC.
-        if (WINDOWS_COMPILER === "mingw") {
-          await core.group("Installing MSYS2 packages", async () => {
-            await exec(path.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
-              "-S",
-              "--noconfirm",
-              "--needed",
-              "mingw-w64-x86_64-gcc",
-            ]);
-          });
-        }
         extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
       }
       if (WINDOWS_ENVIRONMENT === "cygwin") {
