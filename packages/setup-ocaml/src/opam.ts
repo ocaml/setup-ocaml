@@ -28,11 +28,11 @@ const EXECUTABLE_PERMISSION = 0o755;
 
 export const latestOpamRelease = (async () => {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
-  const { data: releases } = await octokit.rest.repos.listReleases({
+  const { data } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam",
   });
-  const matchedReleases = releases
+  const releases = data
     .filter((release) =>
       semver.satisfies(release.tag_name, semverRange, {
         includePrerelease: ALLOW_PRERELEASE_OPAM,
@@ -40,27 +40,25 @@ export const latestOpamRelease = (async () => {
       }),
     )
     .sort(({ tag_name: v1 }, { tag_name: v2 }) => semver.rcompare(v1, v2, { loose: true }));
-  const latestRelease = matchedReleases.at(0);
-  if (!latestRelease) {
+  if (releases.length === 0) {
     throw new Error(
       "Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases.",
     );
   }
-  const matchedAssets = latestRelease.assets.find((asset) => {
-    if (PLATFORM === "windows") {
-      return asset.browser_download_url.endsWith(`${ARCHITECTURE}-${PLATFORM}.exe`);
+  const binarySuffix =
+    PLATFORM === "windows" ? `${ARCHITECTURE}-${PLATFORM}.exe` : `${ARCHITECTURE}-${PLATFORM}`;
+  for (const release of releases) {
+    const asset = release.assets.find((a) => a.name.endsWith(binarySuffix));
+    if (asset) {
+      return {
+        version: release.tag_name,
+        browserDownloadUrl: asset.browser_download_url,
+      };
     }
-    return asset.browser_download_url.endsWith(`${ARCHITECTURE}-${PLATFORM}`);
-  });
-  if (!matchedAssets) {
-    throw new Error(
-      `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`,
-    );
   }
-  return {
-    version: latestRelease.tag_name,
-    browserDownloadUrl: matchedAssets.browser_download_url,
-  };
+  throw new Error(
+    `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`,
+  );
 })();
 
 async function acquireOpam() {
