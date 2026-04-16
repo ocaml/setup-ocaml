@@ -8,8 +8,8 @@
     "@actions/exec": "3.0.0",
     "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
-    "@types/node": "24.12.0",
+    "@types/node": "24.12.2",
     "typescript": "6.0.2",
-    "vite-plus": "0.1.14"
+    "vite-plus": "0.1.18"
   }
 }
