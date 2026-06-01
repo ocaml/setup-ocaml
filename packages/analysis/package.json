@@ -4,17 +4,17 @@
   "type": "module",
   "sideEffects": false,
   "devDependencies": {
-    "@actions/core": "3.0.0",
+    "@actions/core": "3.0.1",
     "@actions/exec": "3.0.0",
-    "@actions/github": "9.1.0",
-    "@actions/glob": "0.6.1",
+    "@actions/github": "9.1.1",
+    "@actions/glob": "0.7.0",
     "@github/dependency-submission-toolkit": "2.0.5",
     "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
-    "@types/node": "24.12.2",
+    "@types/node": "24.12.4",
     "packageurl-js": "2.0.1",
     "strip-ansi": "7.2.0",
-    "typescript": "6.0.2",
-    "vite-plus": "0.1.18"
+    "typescript": "6.0.3",
+    "vite-plus": "0.1.23"
   }
 }
