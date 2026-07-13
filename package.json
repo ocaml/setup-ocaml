@@ -13,7 +13,7 @@
     "typecheck": "vp run --recursive typecheck"
   },
   "devDependencies": {
-    "vite-plus": "0.1.23"
+    "vite-plus": "0.2.4"
   },
-  "packageManager": "yarn@4.15.0"
+  "packageManager": "yarn@4.17.1"
 }
