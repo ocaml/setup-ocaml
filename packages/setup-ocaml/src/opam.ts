@@ -1,4 +1,5 @@
 import { promises as fs } from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
@@ -26,6 +27,61 @@ const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
 
 const EXECUTABLE_PERMISSION = 0o755;
 
+const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
+const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
+
+function toGpgPath(filePath: string) {
+  if (PLATFORM !== "windows") {
+    return filePath;
+  }
+  const { root } = path.parse(filePath);
+  return `/${root.charAt(0).toLowerCase()}/${filePath.slice(root.length).replaceAll("\\", "/")}`;
+}
+
+async function verifyOpamSignature(
+  binaryPath: string,
+  signaturePath: string,
+  publicKeyPath: string,
+) {
+  const gpgHome = await fs.mkdtemp(path.join(os.tmpdir(), "setup-ocaml-gpg-"));
+  const gpg = PLATFORM === "windows" ? path.join(MSYS2_ROOT, "usr", "bin", "gpg.exe") : "gpg";
+  try {
+    await exec(gpg, [
+      "--batch",
+      "--homedir",
+      toGpgPath(gpgHome),
+      "--import",
+      toGpgPath(publicKeyPath),
+    ]);
+    const verification = await getExecOutput(
+      gpg,
+      [
+        "--batch",
+        "--homedir",
+        toGpgPath(gpgHome),
+        "--status-fd",
+        "1",
+        "--verify",
+        toGpgPath(signaturePath),
+        toGpgPath(binaryPath),
+      ],
+      { silent: true },
+    );
+    const validSignature = verification.stdout
+      .split("\n")
+      .find((line) => line.startsWith("[GNUPG:] VALIDSIG "));
+    const primaryKeyFingerprint = validSignature?.split(" ").at(-1);
+    if (primaryKeyFingerprint !== OPAM_DEV_PUBLIC_KEY_FINGERPRINT) {
+      throw new Error(
+        `The opam binary was not signed by the expected key '${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}'.`,
+      );
+    }
+    core.info(`Verified opam signature with key ${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}`);
+  } finally {
+    await fs.rm(gpgHome, { recursive: true, force: true });
+  }
+}
+
 export const latestOpamRelease = (async () => {
   const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
   const { data } = await octokit.rest.repos.listReleases({
@@ -50,9 +106,16 @@ export const latestOpamRelease = (async () => {
   for (const release of releases) {
     const asset = release.assets.find((a) => a.name.endsWith(binarySuffix));
     if (asset) {
+      const signature = release.assets.find((candidate) => candidate.name === `${asset.name}.sig`);
+      if (!signature) {
+        throw new Error(
+          `Failed to find the signature '${asset.name}.sig' in the opam ${release.tag_name} release. Refusing to install an unsigned opam binary.`,
+        );
+      }
       return {
         version: release.tag_name,
         browserDownloadUrl: asset.browser_download_url,
+        signatureBrowserDownloadUrl: signature.browser_download_url,
       };
     }
   }
@@ -63,12 +126,17 @@ export const latestOpamRelease = (async () => {
 
 async function acquireOpam() {
   await core.group("Installing opam", async () => {
-    const { version, browserDownloadUrl } = await latestOpamRelease;
+    const { version, browserDownloadUrl, signatureBrowserDownloadUrl } = await latestOpamRelease;
     const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
     const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
     if (cachedPath === "") {
-      const downloadedPath = await toolCache.downloadTool(browserDownloadUrl);
+      const [downloadedPath, signaturePath, publicKeyPath] = await Promise.all([
+        toolCache.downloadTool(browserDownloadUrl),
+        toolCache.downloadTool(signatureBrowserDownloadUrl),
+        toolCache.downloadTool(OPAM_DEV_PUBLIC_KEY_URL),
+      ]);
       core.info(`Downloaded opam ${version} from ${browserDownloadUrl}`);
+      await verifyOpamSignature(downloadedPath, signaturePath, publicKeyPath);
       const cachedPath = await toolCache.cacheFile(
         downloadedPath,
         opam,
