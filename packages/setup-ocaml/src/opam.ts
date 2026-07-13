@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
@@ -222,13 +223,12 @@ export async function pin(fpaths: string[]) {
     return;
   }
   await core.group("Pinning local packages", async () => {
-    for (const fpath of fpaths) {
+    const pins = fpaths.map((fpath) => {
       const fname = path.basename(fpath, ".opam");
-      const dname = path.dirname(fpath);
-      await exec("opam", ["pin", "--no-action", "add", `${fname}.dev`, "."], {
-        cwd: dname,
-      });
-    }
+      const target = pathToFileURL(path.resolve(path.dirname(fpath))).href;
+      return `${fname}.dev^${target}`;
+    });
+    await exec("opam", ["pin", "--no-action", "add", ...pins]);
   });
 }
 
