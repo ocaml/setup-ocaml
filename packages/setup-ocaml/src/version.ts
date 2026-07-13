@@ -24,10 +24,10 @@ function parseCompilerVersion(packagePath: string): readonly [string, string] | 
   return [semverVersion, opamVersion] as const;
 }
 
-async function retrieveAllCompilerVersions() {
+async function retrieveCompilerVersions(repo: string) {
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
-    repo: "opam-repository",
+    repo,
     path: "packages/ocaml-base-compiler",
   });
   if (!Array.isArray(packages)) {
@@ -41,8 +41,7 @@ async function retrieveAllCompilerVersions() {
   );
 }
 
-async function resolveVersion(semverVersion: string) {
-  const versions = await retrieveAllCompilerVersions();
+function matchVersion(versions: Map<string, string>, semverVersion: string) {
   const semverVersions = versions.keys().toArray();
   const stableMatch = semver.maxSatisfying(semverVersions, semverVersion, {
     loose: true,
@@ -63,8 +62,28 @@ async function resolveVersion(semverVersion: string) {
       return opamVersion;
     }
   }
+  return undefined;
+}
+
+async function resolveVersion(semverVersion: string) {
+  const versions = await retrieveCompilerVersions("opam-repository");
+  const match = matchVersion(versions, semverVersion);
+  if (match !== undefined) {
+    return match;
+  }
+  // Old compiler releases are no longer in opam-repository itself.
+  const archivedVersions = await retrieveCompilerVersions("opam-repository-archive");
+  for (const [key, opamVersion] of archivedVersions) {
+    if (!versions.has(key)) {
+      versions.set(key, opamVersion);
+    }
+  }
+  const archivedMatch = matchVersion(versions, semverVersion);
+  if (archivedMatch !== undefined) {
+    return archivedMatch;
+  }
   throw new Error(
-    `Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository. Please check if you specified a valid version number or version range.`,
+    `Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository or opam-repository-archive. Please check if you specified a valid version number or version range.`,
   );
 }
 
