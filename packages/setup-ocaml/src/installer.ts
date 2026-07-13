@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
+import * as path from "node:path";
 import * as process from "node:process";
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
@@ -66,15 +67,24 @@ export async function installer() {
     });
   }
   const opamCacheHit = await restoreOpamCache();
-  await setupOpam();
+  const opamRootInitialized = await fs.access(path.join(OPAM_ROOT, "config")).then(
+    () => true,
+    () => false,
+  );
+  const useInitialRepository = !opamCacheHit && !opamRootInitialized;
+  await setupOpam(useInitialRepository ? OPAM_REPOSITORIES[0] : undefined);
   if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin") {
     await fs.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
     core.exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
     core.addPath(CYGWIN_ROOT_BIN);
   }
   if (!opamCacheHit) {
-    await repositoryRemoveAll();
-    await repositoryAddAll(OPAM_REPOSITORIES);
+    if (useInitialRepository) {
+      await repositoryAddAll(OPAM_REPOSITORIES.slice(1));
+    } else {
+      await repositoryRemoveAll();
+      await repositoryAddAll(OPAM_REPOSITORIES);
+    }
     const ocamlCompiler = await resolvedCompiler;
     await installOcaml(ocamlCompiler);
     await saveOpamCache();

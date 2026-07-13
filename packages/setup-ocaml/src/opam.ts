@@ -155,7 +155,7 @@ async function acquireOpam() {
   });
 }
 
-async function initializeOpam() {
+async function initializeOpam(initialRepository?: [string, string]) {
   await core.group("Initialising opam state", async () => {
     if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "msys2") {
       await installMsys2Packages();
@@ -185,13 +185,20 @@ async function initializeOpam() {
     if (OPAM_DISABLE_SANDBOXING) {
       extraOptions.push("--disable-sandboxing");
     }
-    await exec("opam", ["init", "--auto-setup", "--bare", ...extraOptions, "--enable-shell-hook"]);
+    await exec("opam", [
+      "init",
+      "--auto-setup",
+      "--bare",
+      ...extraOptions,
+      "--enable-shell-hook",
+      ...(initialRepository ?? []),
+    ]);
   });
 }
 
-export async function setupOpam() {
+export async function setupOpam(initialRepository?: [string, string]) {
   await acquireOpam();
-  await initializeOpam();
+  await initializeOpam(initialRepository);
 }
 
 export async function installOcaml(ocamlCompiler: string) {
@@ -230,15 +237,14 @@ async function repositoryAdd(name: string, address: string) {
 }
 
 export async function repositoryAddAll(repositories: [string, string][]) {
+  if (repositories.length === 0) {
+    return;
+  }
   await core.group("Initialising opam repositories", async () => {
     for (const [name, address] of repositories) {
       await repositoryAdd(name, address);
     }
   });
-}
-
-async function repositoryRemove(name: string) {
-  await exec("opam", ["repository", "--all-switches", "remove", name]);
 }
 
 async function repositoryList() {
@@ -259,8 +265,8 @@ async function repositoryList() {
 export async function repositoryRemoveAll() {
   await core.group("Removing opam repositories", async () => {
     const repositories = await repositoryList();
-    for (const repository of repositories) {
-      await repositoryRemove(repository);
+    if (repositories.length > 0) {
+      await exec("opam", ["repository", "--all-switches", "remove", ...repositories]);
     }
   });
 }
