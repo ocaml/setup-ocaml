@@ -1,14 +1,12 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
-export async function installOcamlformat(version: string) {
-  await core.group("Installing ocamlformat", async () => {
-    await exec("opam", ["install", `ocamlformat=${version}`]);
-  });
-}
-
-export async function installDune() {
-  await core.group("Installing dune", async () => {
-    await exec("opam", ["install", "dune"]);
+export async function installFormattingDependencies(ocamlformatVersion?: string) {
+  await core.group("Installing formatting dependencies", async () => {
+    const packages = ["dune"];
+    if (ocamlformatVersion) {
+      packages.push(`ocamlformat=${ocamlformatVersion}`);
+    }
+    await exec("opam", ["install", ...packages]);
   });
 }

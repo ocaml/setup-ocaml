@@ -4,27 +4,24 @@ import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import { MSYS2_ROOT, PLATFORM, RUNNER_ENVIRONMENT, WINDOWS_COMPILER } from "./constants.js";
 
-async function checkAptInstallability(packageName: string) {
-  const output = await getExecOutput("sudo", [
-    "apt-cache",
-    "search",
-    "--names-only",
-    `'^${packageName}$'`,
-  ]);
-  return output.stdout.length > 0;
-}
-
 async function retrieveInstallableOptionalDependencies(optionalDependencies: string[]) {
   switch (PLATFORM) {
     case "linux": {
-      const installableOptionalDependencies: string[] = [];
-      for (const optionalDependency of optionalDependencies) {
-        const isInstallable = await checkAptInstallability(optionalDependency);
-        if (isInstallable) {
-          installableOptionalDependencies.push(optionalDependency);
-        }
+      if (optionalDependencies.length === 0) {
+        return [];
       }
-      return installableOptionalDependencies;
+      const output = await getExecOutput("apt-cache", [
+        "show",
+        "--no-all-versions",
+        ...optionalDependencies,
+      ]);
+      const installablePackages = new Set(
+        output.stdout
+          .split("\n")
+          .filter((line) => line.startsWith("Package: "))
+          .map((line) => line.slice("Package: ".length)),
+      );
+      return optionalDependencies.filter((packageName) => installablePackages.has(packageName));
     }
     default: {
       return [];
