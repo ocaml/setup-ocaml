@@ -1,7 +1,6 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { pathToFileURL } from "node:url";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
@@ -223,12 +222,15 @@ export async function pin(fpaths: string[]) {
     return;
   }
   await core.group("Pinning local packages", async () => {
-    const pins = fpaths.map((fpath) => {
+    for (const fpath of fpaths) {
       const fname = path.basename(fpath, ".opam");
-      const target = pathToFileURL(path.resolve(path.dirname(fpath))).href;
-      return `${fname}.dev^${target}`;
-    });
-    await exec("opam", ["pin", "--no-action", "add", ...pins]);
+      const dname = path.dirname(fpath);
+      // Keep the target as a local path so opam can detect the VCS backend.
+      // Normalised pins parse file:// URLs directly and therefore use rsync.
+      await exec("opam", ["pin", "--no-action", "add", `${fname}.dev`, "."], {
+        cwd: dname,
+      });
+    }
   });
 }
 
