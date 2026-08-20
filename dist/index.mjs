@@ -1,4 +1,2367 @@
-import{A as e,C as t,D as n,E as r,O as i,S as a,T as o,_ as s,b as c,c as l,d as u,f as d,g as f,h as p,i as m,k as h,l as ee,m as te,o as ne,p as re,r as ie,s as ae,t as oe,u as se,v as ce,w as le,x as ue,y as de}from"./dune.mjs";import*as g from"node:process";import*as _ from"os";import*as v from"fs";import*as y from"path";import b from"assert";import{promises as fe}from"node:fs";import*as pe from"node:os";import*as me from"node:path";function he(e){let t={followSymbolicLinks:!0,implicitDescendants:!0,matchDirectories:!0,omitBrokenSymbolicLinks:!0,excludeHiddenFiles:!1};return e&&(typeof e.followSymbolicLinks==`boolean`&&(t.followSymbolicLinks=e.followSymbolicLinks,o(`followSymbolicLinks '${t.followSymbolicLinks}'`)),typeof e.implicitDescendants==`boolean`&&(t.implicitDescendants=e.implicitDescendants,o(`implicitDescendants '${t.implicitDescendants}'`)),typeof e.matchDirectories==`boolean`&&(t.matchDirectories=e.matchDirectories,o(`matchDirectories '${t.matchDirectories}'`)),typeof e.omitBrokenSymbolicLinks==`boolean`&&(t.omitBrokenSymbolicLinks=e.omitBrokenSymbolicLinks,o(`omitBrokenSymbolicLinks '${t.omitBrokenSymbolicLinks}'`)),typeof e.excludeHiddenFiles==`boolean`&&(t.excludeHiddenFiles=e.excludeHiddenFiles,o(`excludeHiddenFiles '${t.excludeHiddenFiles}'`))),t}const x=process.platform===`win32`;function S(e){if(e=D(e),x&&/^\\\\[^\\]+(\\[^\\]+)?$/.test(e))return e;let t=y.dirname(e);return x&&/^\\\\[^\\]+\\[^\\]+\\$/.test(t)&&(t=D(t)),t}function C(e,t){if(b(e,`ensureAbsoluteRoot parameter 'root' must not be empty`),b(t,`ensureAbsoluteRoot parameter 'itemPath' must not be empty`),w(t))return t;if(x){if(t.match(/^[A-Z]:[^\\/]|^[A-Z]:$/i)){let e=process.cwd();return b(e.match(/^[A-Z]:\\/i),`Expected current directory to start with an absolute drive root. Actual '${e}'`),t[0].toUpperCase()===e[0].toUpperCase()?t.length===2?`${t[0]}:\\${e.substr(3)}`:(e.endsWith(`\\`)||(e+=`\\`),`${t[0]}:\\${e.substr(3)}${t.substr(2)}`):`${t[0]}:\\${t.substr(2)}`}if(E(t).match(/^\\$|^\\[^\\]/)){let e=process.cwd();return b(e.match(/^[A-Z]:\\/i),`Expected current directory to start with an absolute drive root. Actual '${e}'`),`${e[0]}:\\${t.substr(1)}`}}return b(w(e),`ensureAbsoluteRoot parameter 'root' must have an absolute root`),e.endsWith(`/`)||x&&e.endsWith(`\\`)||(e+=y.sep),e+t}function w(e){return b(e,`hasAbsoluteRoot parameter 'itemPath' must not be empty`),e=E(e),x?e.startsWith(`\\\\`)||/^[A-Z]:\\/i.test(e):e.startsWith(`/`)}function T(e){return b(e,`isRooted parameter 'itemPath' must not be empty`),e=E(e),x?e.startsWith(`\\`)||/^[A-Z]:/i.test(e):e.startsWith(`/`)}function E(e){return e||=``,x?(e=e.replace(/\//g,`\\`),(/^\\\\+[^\\]/.test(e)?`\\`:``)+e.replace(/\\\\+/g,`\\`)):e.replace(/\/\/+/g,`/`)}function D(e){return e?(e=E(e),!e.endsWith(y.sep)||e===y.sep||x&&/^[A-Z]:\\$/i.test(e)?e:e.substr(0,e.length-1)):``}var O;(function(e){e[e.None=0]=`None`,e[e.Directory=1]=`Directory`,e[e.File=2]=`File`,e[e.All=3]=`All`})(O||={});const k=process.platform===`win32`;function A(e){e=e.filter(e=>!e.negate);let t={};for(let n of e){let e=k?n.searchPath.toUpperCase():n.searchPath;t[e]=`candidate`}let n=[];for(let r of e){let e=k?r.searchPath.toUpperCase():r.searchPath;if(t[e]===`included`)continue;let i=!1,a=e,o=S(a);for(;o!==a;){if(t[o]){i=!0;break}a=o,o=S(a)}i||(n.push(r.searchPath),t[e]=`included`)}return n}function ge(e,t){let n=O.None;for(let r of e)r.negate?n&=~r.match(t):n|=r.match(t);return n}function _e(e,t){return e.some(e=>!e.negate&&e.partialMatch(t))}const j=(e,t,n)=>{let r=e instanceof RegExp?M(e,n):e,i=t instanceof RegExp?M(t,n):t,a=r!==null&&i!=null&&ve(r,i,n);return a&&{start:a[0],end:a[1],pre:n.slice(0,a[0]),body:n.slice(a[0]+r.length,a[1]),post:n.slice(a[1]+i.length)}},M=(e,t)=>{let n=t.match(e);return n?n[0]:null},ve=(e,t,n)=>{let r,i,a,o,s,c=n.indexOf(e),l=n.indexOf(t,c+1),u=c;if(c>=0&&l>0){if(e===t)return[c,l];for(r=[],a=n.length;u>=0&&!s;){if(u===c)r.push(u),c=n.indexOf(e,u+1);else if(r.length===1){let e=r.pop();e!==void 0&&(s=[e,l])}else i=r.pop(),i!==void 0&&i<a&&(a=i,o=l),l=n.indexOf(t,u+1);u=c<l&&c>=0?c:l}r.length&&o!==void 0&&(s=[a,o])}return s},ye=`\0SLASH`+Math.random()+`\0`,be=`\0OPEN`+Math.random()+`\0`,N=`\0CLOSE`+Math.random()+`\0`,xe=`\0COMMA`+Math.random()+`\0`,Se=`\0PERIOD`+Math.random()+`\0`,Ce=new RegExp(ye,`g`),we=new RegExp(be,`g`),Te=new RegExp(N,`g`),Ee=new RegExp(xe,`g`),De=new RegExp(Se,`g`),Oe=/\\\\/g,ke=/\\{/g,Ae=/\\}/g,je=/\\,/g,Me=/\\\./g;function P(e){return isNaN(e)?e.charCodeAt(0):parseInt(e,10)}function Ne(e){return e.replace(Oe,ye).replace(ke,be).replace(Ae,N).replace(je,xe).replace(Me,Se)}function Pe(e){return e.replace(Ce,`\\`).replace(we,`{`).replace(Te,`}`).replace(Ee,`,`).replace(De,`.`)}function F(e){if(!e)return[``];let t=[],n=j(`{`,`}`,e);if(!n)return e.split(`,`);let{pre:r,body:i,post:a}=n,o=r.split(`,`);o[o.length-1]+=`{`+i+`}`;let s=F(a);return a.length&&(o[o.length-1]+=s.shift(),o.push.apply(o,s)),t.push.apply(t,o),t}function Fe(e,t={}){if(!e)return[];let{max:n=1e5,maxLength:r=4e6}=t;return e.slice(0,2)===`{}`&&(e=`\\{\\}`+e.slice(2)),L(Ne(e),n,r,!0).map(Pe)}function Ie(e){return`{`+e+`}`}function Le(e){return/^-?0\d/.test(e)}function Re(e,t){return e<=t}function ze(e,t){return e>=t}function I(e,t,n,r,i,a){let o=[],s=0;for(let c=0;c<e.length;c++)for(let l=0;l<n.length;l++){if(o.length>=r)return o;let u=e[c]+t+n[l];if(!(a&&!u)){if(s+u.length>i)return o;o.push(u),s+=u.length}}return o}function Be(e,t,n,r){let i=e.split(/\.\./),a=[];if(i[0]===void 0||i[1]===void 0)return a;let o=P(i[0]),s=P(i[1]),c=Math.max(i[0].length,i[1].length),l=i.length===3&&i[2]!==void 0?Math.max(Math.abs(P(i[2])),1):1,u=Re;s<o&&(l*=-1,u=ze);let d=i.some(Le),f=0;for(let e=o;u(e,s)&&a.length<n;e+=l){let n;if(t)n=String.fromCharCode(e),n===`\\`&&(n=``);else if(n=String(e),d){let t=c-n.length;if(t>0){let r=Array(t+1).join(`0`);n=e<0?`-`+r+n.slice(1):r+n}}if(f+n.length>r)break;a.push(n),f+=n.length}return a}function L(e,t,n,r){let i=[``],a=!1,o=!0;for(;;){let s=j(`{`,`}`,e);if(!s)return I(i,e,[``],t,n,a);let c=s.pre;if(/\$$/.test(c)){if(i=I(i,c+`{`+s.body+`}`,[``],t,n,a&&!s.post.length),o=!1,!s.post.length)break;e=s.post;continue}let l=/^-?\d+\.\.-?\d+(?:\.\.-?\d+)?$/.test(s.body),u=/^[a-zA-Z]\.\.[a-zA-Z](?:\.\.-?\d+)?$/.test(s.body),d=l||u,f=s.body.indexOf(`,`)>=0;if(!d&&!f){if(s.post.match(/,(?!,).*\}/)){e=s.pre+`{`+s.body+N+s.post,r=!0;continue}return I(i,c+`{`+s.body+`}`+s.post,[``],t,n,a)}o&&=(a=r&&!d,!1);let p;if(d)p=Be(s.body,u,t,n);else{let r=F(s.body);if(r.length===1&&r[0]!==void 0&&(r=L(r[0],t,n,!1).map(Ie),r.length===1)){if(i=I(i,c+r[0],[``],t,n,a&&!s.post.length),!s.post.length)break;e=s.post;continue}let o=a&&!s.post.length&&!c;for(let e=0;o&&e<i.length;e++)i[e]&&(o=!1);p=[];let l=0;outer:for(let e=0;e<r.length;e++){let i=L(r[e],t,n,!1);for(let e=0;e<i.length;e++){let r=i[e];if(!(o&&!r)){if(p.length>=t||l+r.length>n)break outer;p.push(r),l+=r.length}}}}if(i=I(i,c,p,t,n,a&&!s.post.length),!s.post.length)break;e=s.post}return i}const R=e=>{if(typeof e!=`string`)throw TypeError(`invalid pattern`);if(e.length>65536)throw TypeError(`pattern is too long`)},Ve={"[:alnum:]":[`\\p{L}\\p{Nl}\\p{Nd}`,!0],"[:alpha:]":[`\\p{L}\\p{Nl}`,!0],"[:ascii:]":[`\\x00-\\x7f`,!1],"[:blank:]":[`\\p{Zs}\\t`,!0],"[:cntrl:]":[`\\p{Cc}`,!0],"[:digit:]":[`\\p{Nd}`,!0],"[:graph:]":[`\\p{Z}\\p{C}`,!0,!0],"[:lower:]":[`\\p{Ll}`,!0],"[:print:]":[`\\p{C}`,!0],"[:punct:]":[`\\p{P}`,!0],"[:space:]":[`\\p{Z}\\t\\r\\n\\v\\f`,!0],"[:upper:]":[`\\p{Lu}`,!0],"[:word:]":[`\\p{L}\\p{Nl}\\p{Nd}\\p{Pc}`,!0],"[:xdigit:]":[`A-Fa-f0-9`,!1]},z=e=>e.replace(/[[\]\\-]/g,`\\$&`),He=e=>e.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,`\\$&`),Ue=e=>e.join(``),We=(e,t)=>{let n=t;if(e.charAt(n)!==`[`)throw Error(`not in a brace expression`);let r=[],i=[],a=n+1,o=!1,s=!1,c=!1,l=!1,u=n,d=``;WHILE:for(;a<e.length;){let t=e.charAt(a);if((t===`!`||t===`^`)&&a===n+1){l=!0,a++;continue}if(t===`]`&&o&&!c){u=a+1;break}if(o=!0,t===`\\`&&!c){c=!0,a++;continue}if(t===`[`&&!c){for(let[t,[o,c,l]]of Object.entries(Ve))if(e.startsWith(t,a)){if(d)return[`$.`,!1,e.length-n,!0];a+=t.length,l?i.push(o):r.push(o),s||=c;continue WHILE}}if(c=!1,d){t>d?r.push(z(d)+`-`+z(t)):t===d&&r.push(z(t)),d=``,a++;continue}if(e.startsWith(`-]`,a+1)){r.push(z(t+`-`)),a+=2;continue}if(e.startsWith(`-`,a+1)){d=t,a+=2;continue}r.push(z(t)),a++}if(u<a)return[``,!1,0,!1];if(!r.length&&!i.length)return[`$.`,!1,e.length-n,!0];if(i.length===0&&r.length===1&&/^\\?.$/.test(r[0])&&!l){let e=r[0].length===2?r[0].slice(-1):r[0];return[He(e),!1,u-n,!1]}let f=`[`+(l?`^`:``)+Ue(r)+`]`,p=`[`+(l?``:`^`)+Ue(i)+`]`;return[r.length&&i.length?`(`+f+`|`+p+`)`:r.length?f:p,s,u-n,!0]},B=(e,{windowsPathsNoEscape:t=!1,magicalBraces:n=!0}={})=>n?t?e.replace(/\[([^/\\])\]/g,`$1`):e.replace(/((?!\\).|^)\[([^/\\])\]/g,`$1$2`).replace(/\\([^/])/g,`$1`):t?e.replace(/\[([^/\\{}])\]/g,`$1`):e.replace(/((?!\\).|^)\[([^/\\{}])\]/g,`$1$2`).replace(/\\([^/{}])/g,`$1`);var V;const Ge=new Set([`!`,`?`,`+`,`*`,`@`]),H=e=>Ge.has(e),Ke=e=>H(e.type),qe=new Map([[`!`,[`@`]],[`?`,[`?`,`@`]],[`@`,[`@`]],[`*`,[`*`,`+`,`?`,`@`]],[`+`,[`+`,`@`]]]),Je=new Map([[`!`,[`?`]],[`@`,[`?`]],[`+`,[`?`,`*`]]]),Ye=new Map([[`!`,[`?`,`@`]],[`?`,[`?`,`@`]],[`@`,[`?`,`@`]],[`*`,[`*`,`+`,`?`,`@`]],[`+`,[`+`,`@`,`?`,`*`]]]),Xe=new Map([[`!`,new Map([[`!`,`@`]])],[`?`,new Map([[`*`,`*`],[`+`,`*`]])],[`@`,new Map([[`!`,`!`],[`?`,`?`],[`@`,`@`],[`*`,`*`],[`+`,`+`]])],[`+`,new Map([[`?`,`*`],[`*`,`*`]])]]),U=`(?!\\.)`,Ze=new Set([`[`,`.`]),Qe=new Set([`..`,`.`]),$e=new Set(`().*{}+?[]^$\\!`),et=e=>e.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,`\\$&`),tt=`[^/]+?`;let nt=0;var W=class{type;#e;#t;#n=!1;#r=[];#i;#a;#o;#s=!1;#c;#l;#u=!1;id=++nt;get depth(){return(this.#i?.depth??-1)+1}[Symbol.for(`nodejs.util.inspect.custom`)](){return{"@@type":`AST`,id:this.id,type:this.type,root:this.#e.id,parent:this.#i?.id,depth:this.depth,partsLength:this.#r.length,parts:this.#r}}constructor(e,t,n={}){this.type=e,e&&(this.#t=!0),this.#i=t,this.#e=this.#i?this.#i.#e:this,this.#c=this.#e===this?n:this.#e.#c,this.#o=this.#e===this?[]:this.#e.#o,e===`!`&&!this.#e.#s&&this.#o.push(this),this.#a=this.#i?this.#i.#r.length:0}get hasMagic(){if(this.#t!==void 0)return this.#t;for(let e of this.#r)if(typeof e!=`string`&&(e.type||e.hasMagic))return this.#t=!0;return this.#t}toString(){return this.#l===void 0?this.#l=this.type?this.type+`(`+this.#r.map(e=>String(e)).join(`|`)+`)`:this.#r.map(e=>String(e)).join(``):this.#l}#d(){if(this!==this.#e)throw Error(`should only call on root`);if(this.#s)return this;this.toString(),this.#s=!0;let e;for(;e=this.#o.pop();){if(e.type!==`!`)continue;let t=e,n=t.#i;for(;n;){for(let r=t.#a+1;!n.type&&r<n.#r.length;r++)for(let t of e.#r){if(typeof t==`string`)throw Error(`string part in extglob AST??`);t.copyIn(n.#r[r])}t=n,n=t.#i}}return this}push(...e){for(let t of e)if(t!==``){if(typeof t!=`string`&&!(t instanceof V&&t.#i===this))throw Error(`invalid part: `+t);this.#r.push(t)}}toJSON(){let e=this.type===null?this.#r.slice().map(e=>typeof e==`string`?e:e.toJSON()):[this.type,...this.#r.map(e=>e.toJSON())];return this.isStart()&&!this.type&&e.unshift([]),this.isEnd()&&(this===this.#e||this.#e.#s&&this.#i?.type===`!`)&&e.push({}),e}isStart(){if(this.#e===this)return!0;if(!this.#i?.isStart())return!1;if(this.#a===0)return!0;let e=this.#i;for(let t=0;t<this.#a;t++){let n=e.#r[t];if(!(n instanceof V&&n.type===`!`))return!1}return!0}isEnd(){if(this.#e===this||this.#i?.type===`!`)return!0;if(!this.#i?.isEnd())return!1;if(!this.type)return this.#i?.isEnd();let e=this.#i?this.#i.#r.length:0;return this.#a===e-1}copyIn(e){typeof e==`string`?this.push(e):this.push(e.clone(this))}clone(e){let t=new V(this.type,e);for(let e of this.#r)t.copyIn(e);return t}static#f(e,t,n,r,i){let a=r.maxExtglobRecursion??2,o=!1,s=!1,c=-1,l=!1;if(t.type===null){let u=n,d=``;for(;u<e.length;){let n=e.charAt(u++);if(o||n===`\\`){o=!o,d+=n;continue}if(s){u===c+1?(n===`^`||n===`!`)&&(l=!0):n===`]`&&!(u===c+2&&l)&&(s=!1),d+=n;continue}if(n===`[`){s=!0,c=u,l=!1,d+=n;continue}if(!r.noext&&H(n)&&e.charAt(u)===`(`&&i<=a){t.push(d),d=``;let a=new V(n,t);u=V.#f(e,a,u,r,i+1),t.push(a);continue}d+=n}return t.push(d),u}let u=n+1,d=new V(null,t),f=[],p=``;for(;u<e.length;){let n=e.charAt(u++);if(o||n===`\\`){o=!o,p+=n;continue}if(s){u===c+1?(n===`^`||n===`!`)&&(l=!0):n===`]`&&!(u===c+2&&l)&&(s=!1),p+=n;continue}if(n===`[`){s=!0,c=u,l=!1,p+=n;continue}if(!r.noext&&H(n)&&e.charAt(u)===`(`&&(i<=a||t&&t.#h(n))){let a=t&&t.#h(n)?0:1;d.push(p),p=``;let o=new V(n,d);d.push(o),u=V.#f(e,o,u,r,i+a);continue}if(n===`|`){d.push(p),p=``,f.push(d),d=new V(null,t);continue}if(n===`)`)return p===``&&t.#r.length===0&&(t.#u=!0),d.push(p),p=``,t.push(...f,d),u;p+=n}return t.type=null,t.#t=void 0,t.#r=[e.substring(n-1)],u}#p(e){return this.#m(e,Je)}#m(e,t=qe){if(!e||typeof e!=`object`||e.type!==null||e.#r.length!==1||this.type===null)return!1;let n=e.#r[0];return!n||typeof n!=`object`||n.type===null?!1:this.#h(n.type,t)}#h(e,t=Ye){return!!t.get(this.type)?.includes(e)}#g(e,t){let n=e.#r[0],r=new V(null,n,this.options);r.#r.push(``),n.push(r),this.#_(e,t)}#_(e,t){let n=e.#r[0];this.#r.splice(t,1,...n.#r);for(let e of n.#r)typeof e==`object`&&(e.#i=this);this.#l=void 0}#v(e){return!!Xe.get(this.type)?.has(e)}#y(e){if(!e||typeof e!=`object`||e.type!==null||e.#r.length!==1||this.type===null||this.#r.length!==1)return!1;let t=e.#r[0];return!t||typeof t!=`object`||t.type===null?!1:this.#v(t.type)}#b(e){let t=Xe.get(this.type),n=e.#r[0],r=t?.get(n.type);if(!r)return!1;this.#r=n.#r;for(let e of this.#r)typeof e==`object`&&(e.#i=this);this.type=r,this.#l=void 0,this.#u=!1}static fromGlob(e,t={}){let n=new V(null,void 0,t);return V.#f(e,n,0,t,0),n}toMMPattern(){if(this!==this.#e)return this.#e.toMMPattern();let e=this.toString(),[t,n,r,i]=this.toRegExpSource();if(!(r||this.#t||this.#c.nocase&&!this.#c.nocaseMagicOnly&&e.toUpperCase()!==e.toLowerCase()))return n;let a=(this.#c.nocase?`i`:``)+(i?`u`:``);return Object.assign(RegExp(`^${t}$`,a),{_src:t,_glob:e})}get options(){return this.#c}toRegExpSource(e){let t=e??!!this.#c.dot;if(this.#e===this&&(this.#x(),this.#d()),!Ke(this)){let n=this.isStart()&&this.isEnd()&&!this.#r.some(e=>typeof e!=`string`),r=this.#r.map(t=>{let[r,i,a,o]=typeof t==`string`?V.#C(t,this.#t,n):t.toRegExpSource(e);return this.#t=this.#t||a,this.#n=this.#n||o,r}).join(``),i=``;if(this.isStart()&&typeof this.#r[0]==`string`&&!(this.#r.length===1&&Qe.has(this.#r[0]))){let n=Ze,a=t&&n.has(r.charAt(0))||r.startsWith(`\\.`)&&n.has(r.charAt(2))||r.startsWith(`\\.\\.`)&&n.has(r.charAt(4)),o=!t&&!e&&n.has(r.charAt(0));i=a?`(?!(?:^|/)\\.\\.?(?:$|/))`:o?U:``}let a=``;return this.isEnd()&&this.#e.#s&&this.#i?.type===`!`&&(a=`(?:$|\\/)`),[i+r+a,B(r),this.#t=!!this.#t,this.#n]}let n=this.type===`*`||this.type===`+`,r=this.type===`!`?`(?:(?!(?:`:`(?:`,i=this.#S(t);if(this.isStart()&&this.isEnd()&&!i&&this.type!==`!`){let e=this.toString(),t=this;return t.#r=[e],t.type=null,t.#t=void 0,[e,B(this.toString()),!1,!1]}let a=!n||e||t?``:this.#S(!0);a===i&&(a=``),a&&(i=`(?:${i})(?:${a})*?`);let o=``;if(this.type===`!`&&this.#u)o=(this.isStart()&&!t?U:``)+tt;else{let n=this.type===`!`?`))`+(this.isStart()&&!t&&!e?U:``)+`[^/]*?)`:this.type===`@`?`)`:this.type===`?`?`)?`:this.type===`+`&&a?`)`:this.type===`*`&&a?`)?`:`)${this.type}`;o=r+i+n}return[o,B(i),this.#t=!!this.#t,this.#n]}#x(){if(Ke(this)){let e=0,t=!1;do{t=!0;for(let e=0;e<this.#r.length;e++){let n=this.#r[e];typeof n==`object`&&(n.#x(),this.#m(n)?(t=!1,this.#_(n,e)):this.#p(n)?(t=!1,this.#g(n,e)):this.#y(n)&&(t=!1,this.#b(n)))}}while(!t&&++e<10)}else for(let e of this.#r)typeof e==`object`&&e.#x();this.#l=void 0}#S(e){return this.#r.map(t=>{if(typeof t==`string`)throw Error(`string type in extglob ast??`);let[n,r,i,a]=t.toRegExpSource(e);return this.#n=this.#n||a,n}).filter(e=>!(this.isStart()&&this.isEnd())||!!e).join(`|`)}static#C(e,t,n=!1){let r=!1,i=``,a=!1,o=!1;for(let s=0;s<e.length;s++){let c=e.charAt(s);if(r){r=!1,i+=($e.has(c)?`\\`:``)+c;continue}if(c===`*`){if(o)continue;o=!0,i+=n&&/^[*]+$/.test(e)?tt:`[^/]*?`,t=!0;continue}if(o=!1,c===`\\`){s===e.length-1?i+=`\\\\`:r=!0;continue}if(c===`[`){let[n,r,o,c]=We(e,s);if(o){i+=n,a||=r,s+=o-1,t||=c;continue}}if(c===`?`){i+=`[^/]`,t=!0;continue}i+=et(c)}return[i,B(e),!!t,a]}};V=W;const rt=(e,{windowsPathsNoEscape:t=!1,magicalBraces:n=!1}={})=>n?t?e.replace(/[?*()[\]{}]/g,`[$&]`):e.replace(/[?*()[\]\\{}]/g,`\\$&`):t?e.replace(/[?*()[\]]/g,`[$&]`):e.replace(/[?*()[\]\\]/g,`\\$&`),G=(e,t,n={})=>(R(t),!n.nocomment&&t.charAt(0)===`#`?!1:new Y(t,n).match(e)),it=/^\*+([^+@!?*[(]*)$/,at=e=>t=>!t.startsWith(`.`)&&t.endsWith(e),ot=e=>t=>t.endsWith(e),st=e=>(e=e.toLowerCase(),t=>!t.startsWith(`.`)&&t.toLowerCase().endsWith(e)),ct=e=>(e=e.toLowerCase(),t=>t.toLowerCase().endsWith(e)),lt=/^\*+\.\*+$/,ut=e=>!e.startsWith(`.`)&&e.includes(`.`),dt=e=>e!==`.`&&e!==`..`&&e.includes(`.`),ft=/^\.\*+$/,pt=e=>e!==`.`&&e!==`..`&&e.startsWith(`.`),mt=/^\*+$/,ht=e=>e.length!==0&&!e.startsWith(`.`),gt=e=>e.length!==0&&e!==`.`&&e!==`..`,_t=/^\?+([^+@!?*[(]*)?$/,vt=([e,t=``])=>{let n=K([e]);return t?(t=t.toLowerCase(),e=>n(e)&&e.toLowerCase().endsWith(t)):n},yt=([e,t=``])=>{let n=St([e]);return t?(t=t.toLowerCase(),e=>n(e)&&e.toLowerCase().endsWith(t)):n},bt=([e,t=``])=>{let n=St([e]);return t?e=>n(e)&&e.endsWith(t):n},xt=([e,t=``])=>{let n=K([e]);return t?e=>n(e)&&e.endsWith(t):n},K=([e])=>{let t=e.length;return e=>e.length===t&&!e.startsWith(`.`)},St=([e])=>{let t=e.length;return e=>e.length===t&&e!==`.`&&e!==`..`},Ct=typeof process==`object`&&process?typeof process.env==`object`&&process.env&&process.env.__MINIMATCH_TESTING_PLATFORM__||process.platform:`posix`,wt={win32:{sep:`\\`},posix:{sep:`/`}};G.sep=Ct===`win32`?wt.win32.sep:wt.posix.sep;const q=Symbol(`globstar **`);G.GLOBSTAR=q,G.filter=(e,t={})=>n=>G(n,e,t);const J=(e,t={})=>Object.assign({},e,t);G.defaults=e=>{if(!e||typeof e!=`object`||!Object.keys(e).length)return G;let t=G;return Object.assign((n,r,i={})=>t(n,r,J(e,i)),{Minimatch:class extends t.Minimatch{constructor(t,n={}){super(t,J(e,n))}static defaults(n){return t.defaults(J(e,n)).Minimatch}},AST:class extends t.AST{constructor(t,n,r={}){super(t,n,J(e,r))}static fromGlob(n,r={}){return t.AST.fromGlob(n,J(e,r))}},unescape:(n,r={})=>t.unescape(n,J(e,r)),escape:(n,r={})=>t.escape(n,J(e,r)),filter:(n,r={})=>t.filter(n,J(e,r)),defaults:n=>t.defaults(J(e,n)),makeRe:(n,r={})=>t.makeRe(n,J(e,r)),braceExpand:(n,r={})=>t.braceExpand(n,J(e,r)),match:(n,r,i={})=>t.match(n,r,J(e,i)),sep:t.sep,GLOBSTAR:q})};const Tt=(e,t={})=>(R(e),t.nobrace||!/\{(?:(?!\{).)*\}/.test(e)?[e]:Fe(e,{max:t.braceExpandMax}));G.braceExpand=Tt,G.makeRe=(e,t={})=>new Y(e,t).makeRe(),G.match=(e,t,n={})=>{let r=new Y(t,n);return e=e.filter(e=>r.match(e)),r.options.nonull&&!e.length&&e.push(t),e};const Et=/[?*]|[+@!]\(.*?\)|\[|\]/,Dt=e=>e.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,`\\$&`);var Y=class{options;set;pattern;windowsPathsNoEscape;nonegate;negate;comment;empty;preserveMultipleSlashes;partial;globSet;globParts;nocase;isWindows;platform;windowsNoMagicRoot;maxGlobstarRecursion;regexp;constructor(e,t={}){R(e),t||={},this.options=t,this.maxGlobstarRecursion=t.maxGlobstarRecursion??200,this.pattern=e,this.platform=t.platform||Ct,this.isWindows=this.platform===`win32`,this.windowsPathsNoEscape=!!t.windowsPathsNoEscape||t.allowWindowsEscape===!1,this.windowsPathsNoEscape&&(this.pattern=this.pattern.replace(/\\/g,`/`)),this.preserveMultipleSlashes=!!t.preserveMultipleSlashes,this.regexp=null,this.negate=!1,this.nonegate=!!t.nonegate,this.comment=!1,this.empty=!1,this.partial=!!t.partial,this.nocase=!!this.options.nocase,this.windowsNoMagicRoot=t.windowsNoMagicRoot===void 0?!!(this.isWindows&&this.nocase):t.windowsNoMagicRoot,this.globSet=[],this.globParts=[],this.set=[],this.make()}hasMagic(){if(this.options.magicalBraces&&this.set.length>1)return!0;for(let e of this.set)for(let t of e)if(typeof t!=`string`)return!0;return!1}debug(...e){}make(){let e=this.pattern,t=this.options;if(!t.nocomment&&e.charAt(0)===`#`){this.comment=!0;return}if(!e){this.empty=!0;return}this.parseNegate(),this.globSet=[...new Set(this.braceExpand())],t.debug&&(this.debug=(...e)=>console.error(...e)),this.debug(this.pattern,this.globSet);let n=this.globSet.map(e=>this.slashSplit(e));this.globParts=this.preprocess(n),this.debug(this.pattern,this.globParts);let r=this.globParts.map((e,t,n)=>{if(this.isWindows&&this.windowsNoMagicRoot){let t=e[0]===``&&e[1]===``&&(e[2]===`?`||!Et.test(e[2]))&&!Et.test(e[3]),n=/^[a-z]:/i.test(e[0]);if(t)return[...e.slice(0,4),...e.slice(4).map(e=>this.parse(e))];if(n)return[e[0],...e.slice(1).map(e=>this.parse(e))]}return e.map(e=>this.parse(e))});if(this.debug(this.pattern,r),this.set=r.filter(e=>e.indexOf(!1)===-1),this.isWindows)for(let e=0;e<this.set.length;e++){let t=this.set[e];t[0]===``&&t[1]===``&&this.globParts[e][2]===`?`&&typeof t[3]==`string`&&/^[a-z]:$/i.test(t[3])&&(t[2]=`?`)}this.debug(this.pattern,this.set)}preprocess(e){if(this.options.noglobstar)for(let t of e)for(let e=0;e<t.length;e++)t[e]===`**`&&(t[e]=`*`);let{optimizationLevel:t=1}=this.options;return t>=2?(e=this.firstPhasePreProcess(e),e=this.secondPhasePreProcess(e)):e=t>=1?this.levelOneOptimize(e):this.adjascentGlobstarOptimize(e),e}adjascentGlobstarOptimize(e){return e.map(e=>{let t=-1;for(;(t=e.indexOf(`**`,t+1))!==-1;){let n=t;for(;e[n+1]===`**`;)n++;n!==t&&e.splice(t,n-t)}return e})}levelOneOptimize(e){return e.map(e=>(e=e.reduce((e,t)=>{let n=e[e.length-1];return t===`**`&&n===`**`?e:t===`..`&&n&&n!==`..`&&n!==`.`&&n!==`**`?(e.pop(),e):(e.push(t),e)},[]),e.length===0?[``]:e))}levelTwoFileOptimize(e){Array.isArray(e)||(e=this.slashSplit(e));let t=!1;do{if(t=!1,!this.preserveMultipleSlashes){for(let n=1;n<e.length-1;n++){let r=e[n];(n!==1||r!==``||e[0]!==``)&&(r===`.`||r===``)&&(t=!0,e.splice(n,1),n--)}e[0]===`.`&&e.length===2&&(e[1]===`.`||e[1]===``)&&(t=!0,e.pop())}let n=0;for(;(n=e.indexOf(`..`,n+1))!==-1;){let r=e[n-1];r&&r!==`.`&&r!==`..`&&r!==`**`&&!(this.isWindows&&/^[a-z]:$/i.test(r))&&(t=!0,e.splice(n-1,2),n-=2)}}while(t);return e.length===0?[``]:e}firstPhasePreProcess(e){let t=!1;do{t=!1;for(let n of e){let r=-1;for(;(r=n.indexOf(`**`,r+1))!==-1;){let i=r;for(;n[i+1]===`**`;)i++;i>r&&n.splice(r+1,i-r);let a=n[r+1],o=n[r+2],s=n[r+3];if(a!==`..`||!o||o===`.`||o===`..`||!s||s===`.`||s===`..`)continue;t=!0,n.splice(r,1);let c=n.slice(0);c[r]=`**`,e.push(c),r--}if(!this.preserveMultipleSlashes){for(let e=1;e<n.length-1;e++){let r=n[e];(e!==1||r!==``||n[0]!==``)&&(r===`.`||r===``)&&(t=!0,n.splice(e,1),e--)}n[0]===`.`&&n.length===2&&(n[1]===`.`||n[1]===``)&&(t=!0,n.pop())}let i=0;for(;(i=n.indexOf(`..`,i+1))!==-1;){let e=n[i-1];if(e&&e!==`.`&&e!==`..`&&e!==`**`){t=!0;let e=i===1&&n[i+1]===`**`?[`.`]:[];n.splice(i-1,2,...e),n.length===0&&n.push(``),i-=2}}}}while(t);return e}secondPhasePreProcess(e){for(let t=0;t<e.length-1;t++)for(let n=t+1;n<e.length;n++){let r=this.partsMatch(e[t],e[n],!this.preserveMultipleSlashes);if(r){e[t]=[],e[n]=r;break}}return e.filter(e=>e.length)}partsMatch(e,t,n=!1){let r=0,i=0,a=[],o=``;for(;r<e.length&&i<t.length;)if(e[r]===t[i])a.push(o===`b`?t[i]:e[r]),r++,i++;else if(n&&e[r]===`**`&&t[i]===e[r+1])a.push(e[r]),r++;else if(n&&t[i]===`**`&&e[r]===t[i+1])a.push(t[i]),i++;else if(e[r]===`*`&&t[i]&&(this.options.dot||!t[i].startsWith(`.`))&&t[i]!==`**`){if(o===`b`)return!1;o=`a`,a.push(e[r]),r++,i++}else if(t[i]===`*`&&e[r]&&(this.options.dot||!e[r].startsWith(`.`))&&e[r]!==`**`){if(o===`a`)return!1;o=`b`,a.push(t[i]),r++,i++}else return!1;return e.length===t.length&&a}parseNegate(){if(this.nonegate)return;let e=this.pattern,t=!1,n=0;for(let r=0;r<e.length&&e.charAt(r)===`!`;r++)t=!t,n++;n&&(this.pattern=e.slice(n)),this.negate=t}matchOne(e,t,n=!1){let r=0,i=0;if(this.isWindows){let n=typeof e[0]==`string`&&/^[a-z]:$/i.test(e[0]),a=!n&&e[0]===``&&e[1]===``&&e[2]===`?`&&/^[a-z]:$/i.test(e[3]),o=typeof t[0]==`string`&&/^[a-z]:$/i.test(t[0]),s=!o&&t[0]===``&&t[1]===``&&t[2]===`?`&&typeof t[3]==`string`&&/^[a-z]:$/i.test(t[3]),c=a?3:n?0:void 0,l=s?3:o?0:void 0;if(typeof c==`number`&&typeof l==`number`){let[n,a]=[e[c],t[l]];n.toLowerCase()===a.toLowerCase()&&(t[l]=n,i=l,r=c)}}let{optimizationLevel:a=1}=this.options;return a>=2&&(e=this.levelTwoFileOptimize(e)),t.includes(q)?this.#e(e,t,n,r,i):this.#n(e,t,n,r,i)}#e(e,t,n,r,i){let a=t.indexOf(q,i),o=t.lastIndexOf(q),[s,c,l]=n?[t.slice(i,a),t.slice(a+1),[]]:[t.slice(i,a),t.slice(a+1,o),t.slice(o+1)];if(s.length){let t=e.slice(r,r+s.length);if(!this.#n(t,s,n,0,0))return!1;r+=s.length,i+=s.length}let u=0;if(l.length){if(l.length+r>e.length)return!1;let t=e.length-l.length;if(this.#n(e,l,n,t,0))u=l.length;else{if(e[e.length-1]!==``||r+l.length===e.length||(t--,!this.#n(e,l,n,t,0)))return!1;u=l.length+1}}if(!c.length){let t=!!u;for(let n=r;n<e.length-u;n++){let r=String(e[n]);if(t=!0,r===`.`||r===`..`||!this.options.dot&&r.startsWith(`.`))return!1}return n||t}let d=[[[],0]],f=d[0],p=0,m=[0];for(let e of c)e===q?(m.push(p),f=[[],0],d.push(f)):(f[0].push(e),p++);let h=d.length-1,ee=e.length-u;for(let e of d)e[1]=ee-(m[h--]+e[0].length);return!!this.#t(e,d,r,0,n,0,!!u)}#t(e,t,n,r,i,a,o){let s=t[r];if(!s){for(let t=n;t<e.length;t++){o=!0;let n=e[t];if(n===`.`||n===`..`||!this.options.dot&&n.startsWith(`.`))return!1}return o}let[c,l]=s;for(;n<=l;){if(this.#n(e.slice(0,n+c.length),c,i,n,0)&&a<this.maxGlobstarRecursion){let s=this.#t(e,t,n+c.length,r+1,i,a+1,o);if(s!==!1)return s}let s=e[n];if(s===`.`||s===`..`||!this.options.dot&&s.startsWith(`.`))return!1;n++}return i||null}#n(e,t,n,r,i){let a,o,s,c;for(a=r,o=i,c=e.length,s=t.length;a<c&&o<s;a++,o++){this.debug(`matchOne loop`);let n=t[o],r=e[a];if(this.debug(t,n,r),n===!1||n===q)return!1;let i;if(typeof n==`string`?(i=r===n,this.debug(`string match`,n,r,i)):(i=n.test(r),this.debug(`pattern match`,n,r,i)),!i)return!1}if(a===c&&o===s)return!0;if(a===c)return n;if(o===s)return a===c-1&&e[a]===``;throw Error(`wtf?`)}braceExpand(){return Tt(this.pattern,this.options)}parse(e){R(e);let t=this.options;if(e===`**`)return q;if(e===``)return``;let n,r=null;(n=e.match(mt))?r=t.dot?gt:ht:(n=e.match(it))?r=(t.nocase?t.dot?ct:st:t.dot?ot:at)(n[1]):(n=e.match(_t))?r=(t.nocase?t.dot?yt:vt:t.dot?bt:xt)(n):(n=e.match(lt))?r=t.dot?dt:ut:(n=e.match(ft))&&(r=pt);let i=W.fromGlob(e,this.options).toMMPattern();return r&&typeof i==`object`&&Reflect.defineProperty(i,"test",{value:r}),i}makeRe(){if(this.regexp||this.regexp===!1)return this.regexp;let e=this.set;if(!e.length)return this.regexp=!1,this.regexp;let t=this.options,n=t.noglobstar?`[^/]*?`:t.dot?`(?:(?!(?:\\/|^)(?:\\.{1,2})($|\\/)).)*?`:`(?:(?!(?:\\/|^)\\.).)*?`,r=new Set(t.nocase?[`i`]:[]),i=e.map(e=>{let t=e.map(e=>{if(e instanceof RegExp)for(let t of e.flags.split(``))r.add(t);return typeof e==`string`?Dt(e):e===q?q:e._src});t.forEach((e,r)=>{let i=t[r+1],a=t[r-1];e===q&&a!==q&&(a===void 0?i!==void 0&&i!==q?t[r+1]=`(?:\\/|`+n+`\\/)?`+i:t[r]=n:i===void 0?t[r-1]=a+`(?:\\/|\\/`+n+`)?`:i!==q&&(t[r-1]=a+`(?:\\/|\\/`+n+`\\/)`+i,t[r+1]=q))});let i=t.filter(e=>e!==q);if(this.partial&&i.length>=1){let e=[];for(let t=1;t<=i.length;t++)e.push(i.slice(0,t).join(`/`));return`(?:`+e.join(`|`)+`)`}return i.join(`/`)}).join(`|`),[a,o]=e.length>1?[`(?:`,`)`]:[``,``];i=`^`+a+i+o+`$`,this.partial&&(i=`^(?:\\/|`+a+i.slice(1,-1)+o+`)$`),this.negate&&(i=`^(?!`+i+`).+$`);try{this.regexp=new RegExp(i,[...r].join(``))}catch{this.regexp=!1}return this.regexp}slashSplit(e){return this.preserveMultipleSlashes?e.split(`/`):this.isWindows&&/^\/\/[^/]+/.test(e)?[``,...e.split(/\/+/)]:e.split(/\/+/)}match(e,t=this.partial){if(this.debug(`match`,e,this.pattern),this.comment)return!1;if(this.empty)return e===``;if(e===`/`&&t)return!0;let n=this.options;this.isWindows&&(e=e.split(`\\`).join(`/`));let r=this.slashSplit(e);this.debug(this.pattern,`split`,r);let i=this.set;this.debug(this.pattern,`set`,i);let a=r[r.length-1];if(!a)for(let e=r.length-2;!a&&e>=0;e--)a=r[e];for(let e of i){let i=r;if(n.matchBase&&e.length===1&&(i=[a]),this.matchOne(i,e,t))return n.flipNegate?!0:!this.negate}return!n.flipNegate&&this.negate}static defaults(e){return G.defaults(e).Minimatch}};G.AST=W,G.Minimatch=Y,G.escape=rt,G.unescape=B;const Ot=process.platform===`win32`;var X=class{constructor(e){if(this.segments=[],typeof e==`string`)if(b(e,`Parameter 'itemPath' must not be empty`),e=D(e),!T(e))this.segments=e.split(y.sep);else{let t=e,n=S(t);for(;n!==t;){let e=y.basename(t);this.segments.unshift(e),t=n,n=S(t)}this.segments.unshift(t)}else{b(e.length>0,`Parameter 'itemPath' must not be an empty array`);for(let t=0;t<e.length;t++){let n=e[t];b(n,`Parameter 'itemPath' must not contain any empty segments`),n=E(e[t]),t===0&&T(n)?(n=D(n),b(n===S(n),`Parameter 'itemPath' root segment contains information for multiple segments`),this.segments.push(n)):(b(!n.includes(y.sep),`Parameter 'itemPath' contains unexpected path separators`),this.segments.push(n))}}}toString(){let e=this.segments[0],t=e.endsWith(y.sep)||Ot&&/^[A-Z]:$/i.test(e);for(let n=1;n<this.segments.length;n++)t?t=!1:e+=y.sep,e+=this.segments[n];return e}};const Z=process.platform===`win32`;var kt=class e{constructor(t,n=!1,r,i){this.negate=!1;let a;if(typeof t==`string`)a=t.trim();else{r||=[],b(r.length,`Parameter 'segments' must not empty`);let n=e.getLiteral(r[0]);b(n&&w(n),`Parameter 'segments' first element must be a root path`),a=new X(r).toString().trim(),t&&(a=`!${a}`)}for(;a.startsWith(`!`);)this.negate=!this.negate,a=a.substr(1).trim();a=e.fixupPattern(a,i),this.segments=new X(a).segments,this.trailingSeparator=E(a).endsWith(y.sep),a=D(a);let o=!1,s=this.segments.map(t=>e.getLiteral(t)).filter(e=>!o&&!(o=e===``));this.searchPath=new X(s).toString(),this.rootRegExp=new RegExp(e.regExpEscape(s[0]),Z?`i`:``),this.isImplicitPattern=n;let c={dot:!0,nobrace:!0,nocase:Z,nocomment:!0,noext:!0,nonegate:!0};a=Z?a.replace(/\\/g,`/`):a,this.minimatch=new Y(a,c)}match(e){return this.segments[this.segments.length-1]===`**`?(e=E(e),!e.endsWith(y.sep)&&this.isImplicitPattern===!1&&(e=`${e}${y.sep}`)):e=D(e),this.minimatch.match(e)?this.trailingSeparator?O.Directory:O.All:O.None}partialMatch(e){return e=D(e),S(e)===e?this.rootRegExp.test(e):this.minimatch.matchOne(e.split(Z?/\\+/:/\/+/),this.minimatch.set[0],!0)}static globEscape(e){return(Z?e:e.replace(/\\/g,`\\\\`)).replace(/(\[)(?=[^/]+\])/g,`[[]`).replace(/\?/g,`[?]`).replace(/\*/g,`[*]`)}static fixupPattern(t,n){b(t,`pattern cannot be empty`);let r=new X(t).segments.map(t=>e.getLiteral(t));if(b(r.every((e,t)=>(e!==`.`||t===0)&&e!==`..`),`Invalid pattern '${t}'. Relative pathing '.' and '..' is not allowed.`),b(!T(t)||r[0],`Invalid pattern '${t}'. Root segment must not contain globs.`),t=E(t),t===`.`||t.startsWith(`.${y.sep}`))t=e.globEscape(process.cwd())+t.substr(1);else if(t===`~`||t.startsWith(`~${y.sep}`))n||=_.homedir(),b(n,`Unable to determine HOME directory`),b(w(n),`Expected HOME directory to be a rooted path. Actual '${n}'`),t=e.globEscape(n)+t.substr(1);else if(Z&&(t.match(/^[A-Z]:$/i)||t.match(/^[A-Z]:[^\\]/i))){let n=C(`C:\\dummy-root`,t.substr(0,2));t.length>2&&!n.endsWith(`\\`)&&(n+=`\\`),t=e.globEscape(n)+t.substr(2)}else if(Z&&(t===`\\`||t.match(/^\\[^\\]/))){let n=C(`C:\\dummy-root`,`\\`);n.endsWith(`\\`)||(n+=`\\`),t=e.globEscape(n)+t.substr(1)}else t=C(e.globEscape(process.cwd()),t);return E(t)}static getLiteral(e){let t=``;for(let n=0;n<e.length;n++){let r=e[n];if(r===`\\`&&!Z&&n+1<e.length){t+=e[++n];continue}if(r===`*`||r===`?`)return``;if(r===`[`&&n+1<e.length){let r=``,i=-1;for(let t=n+1;t<e.length;t++){let n=e[t];if(n===`\\`&&!Z&&t+1<e.length){r+=e[++t];continue}if(n===`]`){i=t;break}r+=n}if(i>=0){if(r.length>1)return``;if(r){t+=r,n=i;continue}}}t+=r}return t}static regExpEscape(e){return e.replace(/[[\\^$.|?*+()]/g,`\\$&`)}},At=class{constructor(e,t){this.path=e,this.level=t}},Q=function(e,t,n,r){function i(e){return e instanceof n?e:new n(function(t){t(e)})}return new(n||=Promise)(function(n,a){function o(e){try{c(r.next(e))}catch(e){a(e)}}function s(e){try{c(r.throw(e))}catch(e){a(e)}}function c(e){e.done?n(e.value):i(e.value).then(o,s)}c((r=r.apply(e,t||[])).next())})},jt=function(e){if(!Symbol.asyncIterator)throw TypeError(`Symbol.asyncIterator is not defined.`);var t=e[Symbol.asyncIterator],n;return t?t.call(e):(e=typeof __values==`function`?__values(e):e[Symbol.iterator](),n={},r(`next`),r(`throw`),r(`return`),n[Symbol.asyncIterator]=function(){return this},n);function r(t){n[t]=e[t]&&function(n){return new Promise(function(r,a){n=e[t](n),i(r,a,n.done,n.value)})}}function i(e,t,n,r){Promise.resolve(r).then(function(t){e({value:t,done:n})},t)}},$=function(e){return this instanceof $?(this.v=e,this):new $(e)},Mt=function(e,t,n){if(!Symbol.asyncIterator)throw TypeError(`Symbol.asyncIterator is not defined.`);var r=n.apply(e,t||[]),i,a=[];return i=Object.create((typeof AsyncIterator==`function`?AsyncIterator:Object).prototype),s(`next`),s(`throw`),s(`return`,o),i[Symbol.asyncIterator]=function(){return this},i;function o(e){return function(t){return Promise.resolve(t).then(e,d)}}function s(e,t){r[e]&&(i[e]=function(t){return new Promise(function(n,r){a.push([e,t,n,r])>1||c(e,t)})},t&&(i[e]=t(i[e])))}function c(e,t){try{l(r[e](t))}catch(e){f(a[0][3],e)}}function l(e){e.value instanceof $?Promise.resolve(e.value.v).then(u,d):f(a[0][2],e)}function u(e){c(`next`,e)}function d(e){c(`throw`,e)}function f(e,t){e(t),a.shift(),a.length&&c(a[0][0],a[0][1])}};const Nt=process.platform===`win32`;var Pt=class e{constructor(e){this.patterns=[],this.searchPaths=[],this.options=he(e)}getSearchPaths(){return this.searchPaths.slice()}glob(){return Q(this,void 0,void 0,function*(){var e,t,n,r;let i=[];try{for(var a=!0,o=jt(this.globGenerator()),s;s=yield o.next(),e=s.done,!e;a=!0){r=s.value,a=!1;let e=r;i.push(e)}}catch(e){t={error:e}}finally{try{!a&&!e&&(n=o.return)&&(yield n.call(o))}finally{if(t)throw t.error}}return i})}globGenerator(){return Mt(this,arguments,function*(){let t=he(this.options),n=[];for(let e of this.patterns)n.push(e),t.implicitDescendants&&(e.trailingSeparator||e.segments[e.segments.length-1]!==`**`)&&n.push(new kt(e.negate,!0,e.segments.concat(`**`)));let r=[];for(let e of A(n)){o(`Search path '${e}'`);try{yield $(v.promises.lstat(e))}catch(e){if(e.code===`ENOENT`)continue;throw e}r.unshift(new At(e,1))}let i=[];for(;r.length;){let a=r.pop(),o=ge(n,a.path),s=!!o||_e(n,a.path);if(!o&&!s)continue;let c=yield $(e.stat(a,t,i));if(c&&!(t.excludeHiddenFiles&&y.basename(a.path).match(/^\./)))if(c.isDirectory()){if(o&O.Directory&&t.matchDirectories)yield yield $(a.path);else if(!s)continue;let e=a.level+1,n=(yield $(v.promises.readdir(a.path))).map(t=>new At(y.join(a.path,t),e));r.push(...n.reverse())}else o&O.File&&(yield yield $(a.path))}})}static create(t,n){return Q(this,void 0,void 0,function*(){let r=new e(n);Nt&&(t=t.replace(/\r\n/g,`
-`),t=t.replace(/\r/g,`
-`));let i=t.split(`
-`).map(e=>e.trim());for(let e of i)if(!e||e.startsWith(`#`))continue;else r.patterns.push(new kt(e));return r.searchPaths.push(...A(r.patterns)),r})}static stat(e,t,n){return Q(this,void 0,void 0,function*(){let r;if(t.followSymbolicLinks)try{r=yield v.promises.stat(e.path)}catch(n){if(n.code===`ENOENT`){if(t.omitBrokenSymbolicLinks){o(`Broken symlink '${e.path}'`);return}throw Error(`No information found for the path '${e.path}'. This may indicate a broken symbolic link.`)}throw n}else r=yield v.promises.lstat(e.path);if(r.isDirectory()&&t.followSymbolicLinks){let t=yield v.promises.realpath(e.path);for(;n.length>=e.level;)n.pop();if(n.some(e=>e===t)){o(`Symlink cycle detected for path '${e.path}' and realpath '${t}'`);return}n.push(t)}return r})}},Ft=function(e,t,n,r){function i(e){return e instanceof n?e:new n(function(t){t(e)})}return new(n||=Promise)(function(n,a){function o(e){try{c(r.next(e))}catch(e){a(e)}}function s(e){try{c(r.throw(e))}catch(e){a(e)}}function c(e){e.done?n(e.value):i(e.value).then(o,s)}c((r=r.apply(e,t||[])).next())})};function It(e,t){return Ft(this,void 0,void 0,function*(){return yield Pt.create(e,t)})}async function Lt(){h()&&n(`OPAMVERBOSE`,1),n(`OPAMCOLOR`,`always`),n(`OPAMCONFIRMLEVEL`,`unsafe-yes`),n(`OPAMDOWNLOADJOBS`,pe.availableParallelism()),n(`OPAMERRLOGLEN`,0),n(`OPAMEXTERNALSOLVER`,`builtin-0install`),n(`OPAMPRECISETRACKING`,1),n(`OPAMRETRIES`,10),n(`OPAMROOT`,ue),n(`OPAMSOLVERTIMEOUT`,600),n(`OPAMYES`,1),a===`windows`&&(n(`HOME`,g.env.USERPROFILE),n(`MSYS`,`winsymlinks:native`),t===`cygwin`&&n(`CYGWIN`,`winsymlinks:native`),await i(`Configuring Windows symlink settings`,async()=>{await e(`fsutil`,[`behavior`,`query`,`SymlinkEvaluation`]),await e(`fsutil`,[`behavior`,`set`,`symlinkEvaluation`,`R2L:1`,`R2R:1`]),await e(`fsutil`,[`behavior`,`query`,`SymlinkEvaluation`])}));let r=await m(),o=await fe.access(me.join(ue,`config`)).then(()=>!0,()=>!1),_=!r&&!o;if(await d(_?c[0]:void 0),a===`windows`&&t===`cygwin`&&(await fe.writeFile(te,`set -o igncr`),n(`BASH_ENV`,te),le(p)),r)await re();else{_?await se(c.slice(1)):(await u(),await se(c));let e=await ae;await l(e),await ne()}if(f&&(await ie(),await oe(),n(`DUNE_CACHE_ROOT`,s)),n(`CLICOLOR_FORCE`,`1`),de){let e=await(await It(ce)).glob();await ee(e)}await e(`opam`,[`config`,`report`])}async function Rt(){try{await Lt(),g.exit(0)}catch(e){e instanceof Error&&r(e.message),g.exit(1)}}Rt();export{};
+import { A as exec, C as WINDOWS_ENVIRONMENT, D as exportVariable, E as error, O as group, S as PLATFORM, T as debug, _ as DUNE_CACHE_ROOT, b as OPAM_REPOSITORIES, c as installOcaml, d as repositoryRemoveAll, f as setupOpam, g as DUNE_CACHE, h as CYGWIN_ROOT_BIN, i as restoreOpamCache, k as isDebug, l as pin, m as CYGWIN_BASH_ENV, o as saveOpamCache, p as update, r as restoreDuneCache, s as resolvedCompiler, t as installDune, u as repositoryAddAll, v as OPAM_LOCAL_PACKAGES, w as addPath, x as OPAM_ROOT, y as OPAM_PIN } from "./dune.mjs";
+import * as process$2 from "node:process";
+import * as os$3 from "os";
+import * as fs$1 from "fs";
+import * as path$2 from "path";
+import assert from "assert";
+import { promises as promises$1 } from "node:fs";
+import * as os$2 from "node:os";
+import * as path from "node:path";
+
+//#region node_modules/@actions/glob/lib/internal-glob-options-helper.js
+/**
+* Returns a copy with defaults filled in.
+*/
+function getOptions(copy) {
+	const result = {
+		followSymbolicLinks: true,
+		implicitDescendants: true,
+		matchDirectories: true,
+		omitBrokenSymbolicLinks: true,
+		excludeHiddenFiles: false
+	};
+	if (copy) {
+		if (typeof copy.followSymbolicLinks === "boolean") {
+			result.followSymbolicLinks = copy.followSymbolicLinks;
+			debug(`followSymbolicLinks '${result.followSymbolicLinks}'`);
+		}
+		if (typeof copy.implicitDescendants === "boolean") {
+			result.implicitDescendants = copy.implicitDescendants;
+			debug(`implicitDescendants '${result.implicitDescendants}'`);
+		}
+		if (typeof copy.matchDirectories === "boolean") {
+			result.matchDirectories = copy.matchDirectories;
+			debug(`matchDirectories '${result.matchDirectories}'`);
+		}
+		if (typeof copy.omitBrokenSymbolicLinks === "boolean") {
+			result.omitBrokenSymbolicLinks = copy.omitBrokenSymbolicLinks;
+			debug(`omitBrokenSymbolicLinks '${result.omitBrokenSymbolicLinks}'`);
+		}
+		if (typeof copy.excludeHiddenFiles === "boolean") {
+			result.excludeHiddenFiles = copy.excludeHiddenFiles;
+			debug(`excludeHiddenFiles '${result.excludeHiddenFiles}'`);
+		}
+	}
+	return result;
+}
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-path-helper.js
+const IS_WINDOWS$4 = process.platform === "win32";
+/**
+* Similar to path.dirname except normalizes the path separators and slightly better handling for Windows UNC paths.
+*
+* For example, on Linux/macOS:
+* - `/               => /`
+* - `/hello          => /`
+*
+* For example, on Windows:
+* - `C:\             => C:\`
+* - `C:\hello        => C:\`
+* - `C:              => C:`
+* - `C:hello         => C:`
+* - `\               => \`
+* - `\hello          => \`
+* - `\\hello         => \\hello`
+* - `\\hello\world   => \\hello\world`
+*/
+function dirname(p) {
+	p = safeTrimTrailingSeparator(p);
+	if (IS_WINDOWS$4 && /^\\\\[^\\]+(\\[^\\]+)?$/.test(p)) return p;
+	let result = path$2.dirname(p);
+	if (IS_WINDOWS$4 && /^\\\\[^\\]+\\[^\\]+\\$/.test(result)) result = safeTrimTrailingSeparator(result);
+	return result;
+}
+/**
+* Roots the path if not already rooted. On Windows, relative roots like `\`
+* or `C:` are expanded based on the current working directory.
+*/
+function ensureAbsoluteRoot(root, itemPath) {
+	assert(root, `ensureAbsoluteRoot parameter 'root' must not be empty`);
+	assert(itemPath, `ensureAbsoluteRoot parameter 'itemPath' must not be empty`);
+	if (hasAbsoluteRoot(itemPath)) return itemPath;
+	if (IS_WINDOWS$4) {
+		if (itemPath.match(/^[A-Z]:[^\\/]|^[A-Z]:$/i)) {
+			let cwd = process.cwd();
+			assert(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
+			if (itemPath[0].toUpperCase() === cwd[0].toUpperCase()) if (itemPath.length === 2) return `${itemPath[0]}:\\${cwd.substr(3)}`;
+			else {
+				if (!cwd.endsWith("\\")) cwd += "\\";
+				return `${itemPath[0]}:\\${cwd.substr(3)}${itemPath.substr(2)}`;
+			}
+			else return `${itemPath[0]}:\\${itemPath.substr(2)}`;
+		} else if (normalizeSeparators(itemPath).match(/^\\$|^\\[^\\]/)) {
+			const cwd = process.cwd();
+			assert(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
+			return `${cwd[0]}:\\${itemPath.substr(1)}`;
+		}
+	}
+	assert(hasAbsoluteRoot(root), `ensureAbsoluteRoot parameter 'root' must have an absolute root`);
+	if (root.endsWith("/") || IS_WINDOWS$4 && root.endsWith("\\")) {} else root += path$2.sep;
+	return root + itemPath;
+}
+/**
+* On Linux/macOS, true if path starts with `/`. On Windows, true for paths like:
+* `\\hello\share` and `C:\hello` (and using alternate separator).
+*/
+function hasAbsoluteRoot(itemPath) {
+	assert(itemPath, `hasAbsoluteRoot parameter 'itemPath' must not be empty`);
+	itemPath = normalizeSeparators(itemPath);
+	if (IS_WINDOWS$4) return itemPath.startsWith("\\\\") || /^[A-Z]:\\/i.test(itemPath);
+	return itemPath.startsWith("/");
+}
+/**
+* On Linux/macOS, true if path starts with `/`. On Windows, true for paths like:
+* `\`, `\hello`, `\\hello\share`, `C:`, and `C:\hello` (and using alternate separator).
+*/
+function hasRoot(itemPath) {
+	assert(itemPath, `isRooted parameter 'itemPath' must not be empty`);
+	itemPath = normalizeSeparators(itemPath);
+	if (IS_WINDOWS$4) return itemPath.startsWith("\\") || /^[A-Z]:/i.test(itemPath);
+	return itemPath.startsWith("/");
+}
+/**
+* Removes redundant slashes and converts `/` to `\` on Windows
+*/
+function normalizeSeparators(p) {
+	p = p || "";
+	if (IS_WINDOWS$4) {
+		p = p.replace(/\//g, "\\");
+		return (/^\\\\+[^\\]/.test(p) ? "\\" : "") + p.replace(/\\\\+/g, "\\");
+	}
+	return p.replace(/\/\/+/g, "/");
+}
+/**
+* Normalizes the path separators and trims the trailing separator (when safe).
+* For example, `/foo/ => /foo` but `/ => /`
+*/
+function safeTrimTrailingSeparator(p) {
+	if (!p) return "";
+	p = normalizeSeparators(p);
+	if (!p.endsWith(path$2.sep)) return p;
+	if (p === path$2.sep) return p;
+	if (IS_WINDOWS$4 && /^[A-Z]:\\$/i.test(p)) return p;
+	return p.substr(0, p.length - 1);
+}
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-match-kind.js
+/**
+* Indicates whether a pattern matches a path
+*/
+var MatchKind;
+(function(MatchKind) {
+	/** Not matched */
+	MatchKind[MatchKind["None"] = 0] = "None";
+	/** Matched if the path is a directory */
+	MatchKind[MatchKind["Directory"] = 1] = "Directory";
+	/** Matched if the path is a regular file */
+	MatchKind[MatchKind["File"] = 2] = "File";
+	/** Matched */
+	MatchKind[MatchKind["All"] = 3] = "All";
+})(MatchKind || (MatchKind = {}));
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-pattern-helper.js
+const IS_WINDOWS$3 = process.platform === "win32";
+/**
+* Given an array of patterns, returns an array of paths to search.
+* Duplicates and paths under other included paths are filtered out.
+*/
+function getSearchPaths(patterns) {
+	patterns = patterns.filter((x) => !x.negate);
+	const searchPathMap = {};
+	for (const pattern of patterns) {
+		const key = IS_WINDOWS$3 ? pattern.searchPath.toUpperCase() : pattern.searchPath;
+		searchPathMap[key] = "candidate";
+	}
+	const result = [];
+	for (const pattern of patterns) {
+		const key = IS_WINDOWS$3 ? pattern.searchPath.toUpperCase() : pattern.searchPath;
+		if (searchPathMap[key] === "included") continue;
+		let foundAncestor = false;
+		let tempKey = key;
+		let parent = dirname(tempKey);
+		while (parent !== tempKey) {
+			if (searchPathMap[parent]) {
+				foundAncestor = true;
+				break;
+			}
+			tempKey = parent;
+			parent = dirname(tempKey);
+		}
+		if (!foundAncestor) {
+			result.push(pattern.searchPath);
+			searchPathMap[key] = "included";
+		}
+	}
+	return result;
+}
+/**
+* Matches the patterns against the path
+*/
+function match$1(patterns, itemPath) {
+	let result = MatchKind.None;
+	for (const pattern of patterns) if (pattern.negate) result &= ~pattern.match(itemPath);
+	else result |= pattern.match(itemPath);
+	return result;
+}
+/**
+* Checks whether to descend further into the directory
+*/
+function partialMatch(patterns, itemPath) {
+	return patterns.some((x) => !x.negate && x.partialMatch(itemPath));
+}
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/balanced-match/dist/esm/index.js
+const balanced = (a, b, str) => {
+	const ma = a instanceof RegExp ? maybeMatch(a, str) : a;
+	const mb = b instanceof RegExp ? maybeMatch(b, str) : b;
+	const r = ma !== null && mb != null && range(ma, mb, str);
+	return r && {
+		start: r[0],
+		end: r[1],
+		pre: str.slice(0, r[0]),
+		body: str.slice(r[0] + ma.length, r[1]),
+		post: str.slice(r[1] + mb.length)
+	};
+};
+const maybeMatch = (reg, str) => {
+	const m = str.match(reg);
+	return m ? m[0] : null;
+};
+const range = (a, b, str) => {
+	let begs, beg, left, right = void 0, result;
+	let ai = str.indexOf(a);
+	let bi = str.indexOf(b, ai + 1);
+	let i = ai;
+	if (ai >= 0 && bi > 0) {
+		if (a === b) return [ai, bi];
+		begs = [];
+		left = str.length;
+		while (i >= 0 && !result) {
+			if (i === ai) {
+				begs.push(i);
+				ai = str.indexOf(a, i + 1);
+			} else if (begs.length === 1) {
+				const r = begs.pop();
+				if (r !== void 0) result = [r, bi];
+			} else {
+				beg = begs.pop();
+				if (beg !== void 0 && beg < left) {
+					left = beg;
+					right = bi;
+				}
+				bi = str.indexOf(b, i + 1);
+			}
+			i = ai < bi && ai >= 0 ? ai : bi;
+		}
+		if (begs.length && right !== void 0) result = [left, right];
+	}
+	return result;
+};
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/brace-expansion/dist/esm/index.js
+const escSlash = "\0SLASH" + Math.random() + "\0";
+const escOpen = "\0OPEN" + Math.random() + "\0";
+const escClose = "\0CLOSE" + Math.random() + "\0";
+const escComma = "\0COMMA" + Math.random() + "\0";
+const escPeriod = "\0PERIOD" + Math.random() + "\0";
+const escSlashPattern = new RegExp(escSlash, "g");
+const escOpenPattern = new RegExp(escOpen, "g");
+const escClosePattern = new RegExp(escClose, "g");
+const escCommaPattern = new RegExp(escComma, "g");
+const escPeriodPattern = new RegExp(escPeriod, "g");
+const slashPattern = /\\\\/g;
+const openPattern = /\\{/g;
+const closePattern = /\\}/g;
+const commaPattern = /\\,/g;
+const periodPattern = /\\\./g;
+const EXPANSION_MAX = 1e5;
+const EXPANSION_MAX_LENGTH = 4e6;
+function numeric(str) {
+	return !isNaN(str) ? parseInt(str, 10) : str.charCodeAt(0);
+}
+function escapeBraces(str) {
+	return str.replace(slashPattern, escSlash).replace(openPattern, escOpen).replace(closePattern, escClose).replace(commaPattern, escComma).replace(periodPattern, escPeriod);
+}
+function unescapeBraces(str) {
+	return str.replace(escSlashPattern, "\\").replace(escOpenPattern, "{").replace(escClosePattern, "}").replace(escCommaPattern, ",").replace(escPeriodPattern, ".");
+}
+/**
+* Basically just str.split(","), but handling cases
+* where we have nested braced sections, which should be
+* treated as individual members, like {a,{b,c},d}
+*/
+function parseCommaParts(str) {
+	if (!str) return [""];
+	const parts = [];
+	const m = balanced("{", "}", str);
+	if (!m) return str.split(",");
+	const { pre, body, post } = m;
+	const p = pre.split(",");
+	p[p.length - 1] += "{" + body + "}";
+	const postParts = parseCommaParts(post);
+	if (post.length) {
+		p[p.length - 1] += postParts.shift();
+		p.push.apply(p, postParts);
+	}
+	parts.push.apply(parts, p);
+	return parts;
+}
+function expand(str, options = {}) {
+	if (!str) return [];
+	const { max = EXPANSION_MAX, maxLength = EXPANSION_MAX_LENGTH } = options;
+	if (str.slice(0, 2) === "{}") str = "\\{\\}" + str.slice(2);
+	return expand_(escapeBraces(str), max, maxLength, true).map(unescapeBraces);
+}
+function embrace(str) {
+	return "{" + str + "}";
+}
+function isPadded(el) {
+	return /^-?0\d/.test(el);
+}
+function lte(i, y) {
+	return i <= y;
+}
+function gte(i, y) {
+	return i >= y;
+}
+function combine(acc, pre, values, max, maxLength, dropEmpties) {
+	const out = [];
+	let length = 0;
+	for (let a = 0; a < acc.length; a++) for (let v = 0; v < values.length; v++) {
+		if (out.length >= max) return out;
+		const expansion = acc[a] + pre + values[v];
+		if (dropEmpties && !expansion) continue;
+		if (length + expansion.length > maxLength) return out;
+		out.push(expansion);
+		length += expansion.length;
+	}
+	return out;
+}
+function expandSequence(body, isAlphaSequence, max, maxLength) {
+	const n = body.split(/\.\./);
+	const N = [];
+	/* c8 ignore start */
+	if (n[0] === void 0 || n[1] === void 0) return N;
+	/* c8 ignore stop */
+	const x = numeric(n[0]);
+	const y = numeric(n[1]);
+	const width = Math.max(n[0].length, n[1].length);
+	let incr = n.length === 3 && n[2] !== void 0 ? Math.max(Math.abs(numeric(n[2])), 1) : 1;
+	let test = lte;
+	if (y < x) {
+		incr *= -1;
+		test = gte;
+	}
+	const pad = n.some(isPadded);
+	let length = 0;
+	for (let i = x; test(i, y) && N.length < max; i += incr) {
+		let c;
+		if (isAlphaSequence) {
+			c = String.fromCharCode(i);
+			if (c === "\\") c = "";
+		} else {
+			c = String(i);
+			if (pad) {
+				const need = width - c.length;
+				if (need > 0) {
+					const z = new Array(need + 1).join("0");
+					if (i < 0) c = "-" + z + c.slice(1);
+					else c = z + c;
+				}
+			}
+		}
+		if (length + c.length > maxLength) break;
+		N.push(c);
+		length += c.length;
+	}
+	return N;
+}
+function expand_(str, max, maxLength, isTop) {
+	let acc = [""];
+	let dropEmpties = false;
+	let firstGroup = true;
+	for (;;) {
+		const m = balanced("{", "}", str);
+		if (!m) return combine(acc, str, [""], max, maxLength, dropEmpties);
+		const pre = m.pre;
+		if (/\$$/.test(pre)) {
+			acc = combine(acc, pre + "{" + m.body + "}", [""], max, maxLength, dropEmpties && !m.post.length);
+			firstGroup = false;
+			if (!m.post.length) break;
+			str = m.post;
+			continue;
+		}
+		const isNumericSequence = /^-?\d+\.\.-?\d+(?:\.\.-?\d+)?$/.test(m.body);
+		const isAlphaSequence = /^[a-zA-Z]\.\.[a-zA-Z](?:\.\.-?\d+)?$/.test(m.body);
+		const isSequence = isNumericSequence || isAlphaSequence;
+		const isOptions = m.body.indexOf(",") >= 0;
+		if (!isSequence && !isOptions) {
+			if (m.post.match(/,(?!,).*\}/)) {
+				str = m.pre + "{" + m.body + escClose + m.post;
+				isTop = true;
+				continue;
+			}
+			return combine(acc, pre + "{" + m.body + "}" + m.post, [""], max, maxLength, dropEmpties);
+		}
+		if (firstGroup) {
+			dropEmpties = isTop && !isSequence;
+			firstGroup = false;
+		}
+		let values;
+		if (isSequence) values = expandSequence(m.body, isAlphaSequence, max, maxLength);
+		else {
+			let n = parseCommaParts(m.body);
+			if (n.length === 1 && n[0] !== void 0) {
+				n = expand_(n[0], max, maxLength, false).map(embrace);
+				/* c8 ignore start */
+				if (n.length === 1) {
+					acc = combine(acc, pre + n[0], [""], max, maxLength, dropEmpties && !m.post.length);
+					if (!m.post.length) break;
+					str = m.post;
+					continue;
+				}
+			}
+			let dropsEmpties = dropEmpties && !m.post.length && !pre;
+			for (let d = 0; dropsEmpties && d < acc.length; d++) if (acc[d]) dropsEmpties = false;
+			values = [];
+			let valuesLength = 0;
+			outer: for (let j = 0; j < n.length; j++) {
+				const expanded = expand_(n[j], max, maxLength, false);
+				for (let k = 0; k < expanded.length; k++) {
+					const v = expanded[k];
+					if (dropsEmpties && !v) continue;
+					if (values.length >= max || valuesLength + v.length > maxLength) break outer;
+					values.push(v);
+					valuesLength += v.length;
+				}
+			}
+		}
+		acc = combine(acc, pre, values, max, maxLength, dropEmpties && !m.post.length);
+		if (!m.post.length) break;
+		str = m.post;
+	}
+	return acc;
+}
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/minimatch/dist/esm/assert-valid-pattern.js
+const MAX_PATTERN_LENGTH = 65536;
+const assertValidPattern = (pattern) => {
+	if (typeof pattern !== "string") throw new TypeError("invalid pattern");
+	if (pattern.length > MAX_PATTERN_LENGTH) throw new TypeError("pattern is too long");
+};
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/minimatch/dist/esm/brace-expressions.js
+const posixClasses = {
+	"[:alnum:]": ["\\p{L}\\p{Nl}\\p{Nd}", true],
+	"[:alpha:]": ["\\p{L}\\p{Nl}", true],
+	"[:ascii:]": ["\\x00-\\x7f", false],
+	"[:blank:]": ["\\p{Zs}\\t", true],
+	"[:cntrl:]": ["\\p{Cc}", true],
+	"[:digit:]": ["\\p{Nd}", true],
+	"[:graph:]": [
+		"\\p{Z}\\p{C}",
+		true,
+		true
+	],
+	"[:lower:]": ["\\p{Ll}", true],
+	"[:print:]": ["\\p{C}", true],
+	"[:punct:]": ["\\p{P}", true],
+	"[:space:]": ["\\p{Z}\\t\\r\\n\\v\\f", true],
+	"[:upper:]": ["\\p{Lu}", true],
+	"[:word:]": ["\\p{L}\\p{Nl}\\p{Nd}\\p{Pc}", true],
+	"[:xdigit:]": ["A-Fa-f0-9", false]
+};
+const braceEscape = (s) => s.replace(/[[\]\\-]/g, "\\$&");
+const regexpEscape = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+const rangesToString = (ranges) => ranges.join("");
+const parseClass = (glob, position) => {
+	const pos = position;
+	/* c8 ignore start */
+	if (glob.charAt(pos) !== "[") throw new Error("not in a brace expression");
+	/* c8 ignore stop */
+	const ranges = [];
+	const negs = [];
+	let i = pos + 1;
+	let sawStart = false;
+	let uflag = false;
+	let escaping = false;
+	let negate = false;
+	let endPos = pos;
+	let rangeStart = "";
+	WHILE: while (i < glob.length) {
+		const c = glob.charAt(i);
+		if ((c === "!" || c === "^") && i === pos + 1) {
+			negate = true;
+			i++;
+			continue;
+		}
+		if (c === "]" && sawStart && !escaping) {
+			endPos = i + 1;
+			break;
+		}
+		sawStart = true;
+		if (c === "\\") {
+			if (!escaping) {
+				escaping = true;
+				i++;
+				continue;
+			}
+		}
+		if (c === "[" && !escaping) {
+			for (const [cls, [unip, u, neg]] of Object.entries(posixClasses)) if (glob.startsWith(cls, i)) {
+				if (rangeStart) return [
+					"$.",
+					false,
+					glob.length - pos,
+					true
+				];
+				i += cls.length;
+				if (neg) negs.push(unip);
+				else ranges.push(unip);
+				uflag = uflag || u;
+				continue WHILE;
+			}
+		}
+		escaping = false;
+		if (rangeStart) {
+			if (c > rangeStart) ranges.push(braceEscape(rangeStart) + "-" + braceEscape(c));
+			else if (c === rangeStart) ranges.push(braceEscape(c));
+			rangeStart = "";
+			i++;
+			continue;
+		}
+		if (glob.startsWith("-]", i + 1)) {
+			ranges.push(braceEscape(c + "-"));
+			i += 2;
+			continue;
+		}
+		if (glob.startsWith("-", i + 1)) {
+			rangeStart = c;
+			i += 2;
+			continue;
+		}
+		ranges.push(braceEscape(c));
+		i++;
+	}
+	if (endPos < i) return [
+		"",
+		false,
+		0,
+		false
+	];
+	if (!ranges.length && !negs.length) return [
+		"$.",
+		false,
+		glob.length - pos,
+		true
+	];
+	if (negs.length === 0 && ranges.length === 1 && /^\\?.$/.test(ranges[0]) && !negate) {
+		const r = ranges[0].length === 2 ? ranges[0].slice(-1) : ranges[0];
+		return [
+			regexpEscape(r),
+			false,
+			endPos - pos,
+			false
+		];
+	}
+	const sranges = "[" + (negate ? "^" : "") + rangesToString(ranges) + "]";
+	const snegs = "[" + (negate ? "" : "^") + rangesToString(negs) + "]";
+	return [
+		ranges.length && negs.length ? "(" + sranges + "|" + snegs + ")" : ranges.length ? sranges : snegs,
+		uflag,
+		endPos - pos,
+		true
+	];
+};
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/minimatch/dist/esm/unescape.js
+/**
+* Un-escape a string that has been escaped with {@link escape}.
+*
+* If the {@link MinimatchOptions.windowsPathsNoEscape} option is used, then
+* square-bracket escapes are removed, but not backslash escapes.
+*
+* For example, it will turn the string `'[*]'` into `*`, but it will not
+* turn `'\\*'` into `'*'`, because `\` is a path separator in
+* `windowsPathsNoEscape` mode.
+*
+* When `windowsPathsNoEscape` is not set, then both square-bracket escapes and
+* backslash escapes are removed.
+*
+* Slashes (and backslashes in `windowsPathsNoEscape` mode) cannot be escaped
+* or unescaped.
+*
+* When `magicalBraces` is not set, escapes of braces (`{` and `}`) will not be
+* unescaped.
+*/
+const unescape = (s, { windowsPathsNoEscape = false, magicalBraces = true } = {}) => {
+	if (magicalBraces) return windowsPathsNoEscape ? s.replace(/\[([^/\\])\]/g, "$1") : s.replace(/((?!\\).|^)\[([^/\\])\]/g, "$1$2").replace(/\\([^/])/g, "$1");
+	return windowsPathsNoEscape ? s.replace(/\[([^/\\{}])\]/g, "$1") : s.replace(/((?!\\).|^)\[([^/\\{}])\]/g, "$1$2").replace(/\\([^/{}])/g, "$1");
+};
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/minimatch/dist/esm/ast.js
+var _a;
+const types = /* @__PURE__ */ new Set([
+	"!",
+	"?",
+	"+",
+	"*",
+	"@"
+]);
+const isExtglobType = (c) => types.has(c);
+const isExtglobAST = (c) => isExtglobType(c.type);
+const adoptionMap = /* @__PURE__ */ new Map([
+	["!", ["@"]],
+	["?", ["?", "@"]],
+	["@", ["@"]],
+	["*", [
+		"*",
+		"+",
+		"?",
+		"@"
+	]],
+	["+", ["+", "@"]]
+]);
+const adoptionWithSpaceMap = /* @__PURE__ */ new Map([
+	["!", ["?"]],
+	["@", ["?"]],
+	["+", ["?", "*"]]
+]);
+const adoptionAnyMap = /* @__PURE__ */ new Map([
+	["!", ["?", "@"]],
+	["?", ["?", "@"]],
+	["@", ["?", "@"]],
+	["*", [
+		"*",
+		"+",
+		"?",
+		"@"
+	]],
+	["+", [
+		"+",
+		"@",
+		"?",
+		"*"
+	]]
+]);
+const usurpMap = /* @__PURE__ */ new Map([
+	["!", /* @__PURE__ */ new Map([["!", "@"]])],
+	["?", /* @__PURE__ */ new Map([["*", "*"], ["+", "*"]])],
+	["@", /* @__PURE__ */ new Map([
+		["!", "!"],
+		["?", "?"],
+		["@", "@"],
+		["*", "*"],
+		["+", "+"]
+	])],
+	["+", /* @__PURE__ */ new Map([["?", "*"], ["*", "*"]])]
+]);
+const startNoTraversal = "(?!(?:^|/)\\.\\.?(?:$|/))";
+const startNoDot = "(?!\\.)";
+const addPatternStart = /* @__PURE__ */ new Set(["[", "."]);
+const justDots = /* @__PURE__ */ new Set(["..", "."]);
+const reSpecials = /* @__PURE__ */ new Set("().*{}+?[]^$\\!");
+const regExpEscape$1 = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+const qmark = "[^/]";
+const star$1 = "[^/]*?";
+const starNoEmpty = "[^/]+?";
+let ID = 0;
+var AST = class {
+	type;
+	#root;
+	#hasMagic;
+	#uflag = false;
+	#parts = [];
+	#parent;
+	#parentIndex;
+	#negs;
+	#filledNegs = false;
+	#options;
+	#toString;
+	#emptyExt = false;
+	id = ++ID;
+	get depth() {
+		return (this.#parent?.depth ?? -1) + 1;
+	}
+	[Symbol.for("nodejs.util.inspect.custom")]() {
+		return {
+			"@@type": "AST",
+			id: this.id,
+			type: this.type,
+			root: this.#root.id,
+			parent: this.#parent?.id,
+			depth: this.depth,
+			partsLength: this.#parts.length,
+			parts: this.#parts
+		};
+	}
+	constructor(type, parent, options = {}) {
+		this.type = type;
+		if (type) this.#hasMagic = true;
+		this.#parent = parent;
+		this.#root = this.#parent ? this.#parent.#root : this;
+		this.#options = this.#root === this ? options : this.#root.#options;
+		this.#negs = this.#root === this ? [] : this.#root.#negs;
+		if (type === "!" && !this.#root.#filledNegs) this.#negs.push(this);
+		this.#parentIndex = this.#parent ? this.#parent.#parts.length : 0;
+	}
+	get hasMagic() {
+		/* c8 ignore start */
+		if (this.#hasMagic !== void 0) return this.#hasMagic;
+		/* c8 ignore stop */
+		for (const p of this.#parts) {
+			if (typeof p === "string") continue;
+			if (p.type || p.hasMagic) return this.#hasMagic = true;
+		}
+		return this.#hasMagic;
+	}
+	toString() {
+		return this.#toString !== void 0 ? this.#toString : !this.type ? this.#toString = this.#parts.map((p) => String(p)).join("") : this.#toString = this.type + "(" + this.#parts.map((p) => String(p)).join("|") + ")";
+	}
+	#fillNegs() {
+		/* c8 ignore start */
+		if (this !== this.#root) throw new Error("should only call on root");
+		if (this.#filledNegs) return this;
+		/* c8 ignore stop */
+		this.toString();
+		this.#filledNegs = true;
+		let n;
+		while (n = this.#negs.pop()) {
+			if (n.type !== "!") continue;
+			let p = n;
+			let pp = p.#parent;
+			while (pp) {
+				for (let i = p.#parentIndex + 1; !pp.type && i < pp.#parts.length; i++) for (const part of n.#parts) {
+					/* c8 ignore start */
+					if (typeof part === "string") throw new Error("string part in extglob AST??");
+					/* c8 ignore stop */
+					part.copyIn(pp.#parts[i]);
+				}
+				p = pp;
+				pp = p.#parent;
+			}
+		}
+		return this;
+	}
+	push(...parts) {
+		for (const p of parts) {
+			if (p === "") continue;
+			/* c8 ignore start */
+			if (typeof p !== "string" && !(p instanceof _a && p.#parent === this)) throw new Error("invalid part: " + p);
+			/* c8 ignore stop */
+			this.#parts.push(p);
+		}
+	}
+	toJSON() {
+		const ret = this.type === null ? this.#parts.slice().map((p) => typeof p === "string" ? p : p.toJSON()) : [this.type, ...this.#parts.map((p) => p.toJSON())];
+		if (this.isStart() && !this.type) ret.unshift([]);
+		if (this.isEnd() && (this === this.#root || this.#root.#filledNegs && this.#parent?.type === "!")) ret.push({});
+		return ret;
+	}
+	isStart() {
+		if (this.#root === this) return true;
+		if (!this.#parent?.isStart()) return false;
+		if (this.#parentIndex === 0) return true;
+		const p = this.#parent;
+		for (let i = 0; i < this.#parentIndex; i++) {
+			const pp = p.#parts[i];
+			if (!(pp instanceof _a && pp.type === "!")) return false;
+		}
+		return true;
+	}
+	isEnd() {
+		if (this.#root === this) return true;
+		if (this.#parent?.type === "!") return true;
+		if (!this.#parent?.isEnd()) return false;
+		if (!this.type) return this.#parent?.isEnd();
+		/* c8 ignore start */
+		const pl = this.#parent ? this.#parent.#parts.length : 0;
+		/* c8 ignore stop */
+		return this.#parentIndex === pl - 1;
+	}
+	copyIn(part) {
+		if (typeof part === "string") this.push(part);
+		else this.push(part.clone(this));
+	}
+	clone(parent) {
+		const c = new _a(this.type, parent);
+		for (const p of this.#parts) c.copyIn(p);
+		return c;
+	}
+	static #parseAST(str, ast, pos, opt, extDepth) {
+		const maxDepth = opt.maxExtglobRecursion ?? 2;
+		let escaping = false;
+		let inBrace = false;
+		let braceStart = -1;
+		let braceNeg = false;
+		if (ast.type === null) {
+			let i = pos;
+			let acc = "";
+			while (i < str.length) {
+				const c = str.charAt(i++);
+				if (escaping || c === "\\") {
+					escaping = !escaping;
+					acc += c;
+					continue;
+				}
+				if (inBrace) {
+					if (i === braceStart + 1) {
+						if (c === "^" || c === "!") braceNeg = true;
+					} else if (c === "]" && !(i === braceStart + 2 && braceNeg)) inBrace = false;
+					acc += c;
+					continue;
+				} else if (c === "[") {
+					inBrace = true;
+					braceStart = i;
+					braceNeg = false;
+					acc += c;
+					continue;
+				}
+				if (!opt.noext && isExtglobType(c) && str.charAt(i) === "(" && extDepth <= maxDepth) {
+					ast.push(acc);
+					acc = "";
+					const ext = new _a(c, ast);
+					i = _a.#parseAST(str, ext, i, opt, extDepth + 1);
+					ast.push(ext);
+					continue;
+				}
+				acc += c;
+			}
+			ast.push(acc);
+			return i;
+		}
+		let i = pos + 1;
+		let part = new _a(null, ast);
+		const parts = [];
+		let acc = "";
+		while (i < str.length) {
+			const c = str.charAt(i++);
+			if (escaping || c === "\\") {
+				escaping = !escaping;
+				acc += c;
+				continue;
+			}
+			if (inBrace) {
+				if (i === braceStart + 1) {
+					if (c === "^" || c === "!") braceNeg = true;
+				} else if (c === "]" && !(i === braceStart + 2 && braceNeg)) inBrace = false;
+				acc += c;
+				continue;
+			} else if (c === "[") {
+				inBrace = true;
+				braceStart = i;
+				braceNeg = false;
+				acc += c;
+				continue;
+			}
+			/* c8 ignore stop */
+			if (!opt.noext && isExtglobType(c) && str.charAt(i) === "(" && (extDepth <= maxDepth || ast && ast.#canAdoptType(c))) {
+				const depthAdd = ast && ast.#canAdoptType(c) ? 0 : 1;
+				part.push(acc);
+				acc = "";
+				const ext = new _a(c, part);
+				part.push(ext);
+				i = _a.#parseAST(str, ext, i, opt, extDepth + depthAdd);
+				continue;
+			}
+			if (c === "|") {
+				part.push(acc);
+				acc = "";
+				parts.push(part);
+				part = new _a(null, ast);
+				continue;
+			}
+			if (c === ")") {
+				if (acc === "" && ast.#parts.length === 0) ast.#emptyExt = true;
+				part.push(acc);
+				acc = "";
+				ast.push(...parts, part);
+				return i;
+			}
+			acc += c;
+		}
+		ast.type = null;
+		ast.#hasMagic = void 0;
+		ast.#parts = [str.substring(pos - 1)];
+		return i;
+	}
+	#canAdoptWithSpace(child) {
+		return this.#canAdopt(child, adoptionWithSpaceMap);
+	}
+	#canAdopt(child, map = adoptionMap) {
+		if (!child || typeof child !== "object" || child.type !== null || child.#parts.length !== 1 || this.type === null) return false;
+		const gc = child.#parts[0];
+		if (!gc || typeof gc !== "object" || gc.type === null) return false;
+		return this.#canAdoptType(gc.type, map);
+	}
+	#canAdoptType(c, map = adoptionAnyMap) {
+		return !!map.get(this.type)?.includes(c);
+	}
+	#adoptWithSpace(child, index) {
+		const gc = child.#parts[0];
+		const blank = new _a(null, gc, this.options);
+		blank.#parts.push("");
+		gc.push(blank);
+		this.#adopt(child, index);
+	}
+	#adopt(child, index) {
+		const gc = child.#parts[0];
+		this.#parts.splice(index, 1, ...gc.#parts);
+		for (const p of gc.#parts) if (typeof p === "object") p.#parent = this;
+		this.#toString = void 0;
+	}
+	#canUsurpType(c) {
+		return !!usurpMap.get(this.type)?.has(c);
+	}
+	#canUsurp(child) {
+		if (!child || typeof child !== "object" || child.type !== null || child.#parts.length !== 1 || this.type === null || this.#parts.length !== 1) return false;
+		const gc = child.#parts[0];
+		if (!gc || typeof gc !== "object" || gc.type === null) return false;
+		return this.#canUsurpType(gc.type);
+	}
+	#usurp(child) {
+		const m = usurpMap.get(this.type);
+		const gc = child.#parts[0];
+		const nt = m?.get(gc.type);
+		/* c8 ignore start - impossible */
+		if (!nt) return false;
+		/* c8 ignore stop */
+		this.#parts = gc.#parts;
+		for (const p of this.#parts) if (typeof p === "object") p.#parent = this;
+		this.type = nt;
+		this.#toString = void 0;
+		this.#emptyExt = false;
+	}
+	static fromGlob(pattern, options = {}) {
+		const ast = new _a(null, void 0, options);
+		_a.#parseAST(pattern, ast, 0, options, 0);
+		return ast;
+	}
+	toMMPattern() {
+		/* c8 ignore start */
+		if (this !== this.#root) return this.#root.toMMPattern();
+		/* c8 ignore stop */
+		const glob = this.toString();
+		const [re, body, hasMagic, uflag] = this.toRegExpSource();
+		if (!(hasMagic || this.#hasMagic || this.#options.nocase && !this.#options.nocaseMagicOnly && glob.toUpperCase() !== glob.toLowerCase())) return body;
+		const flags = (this.#options.nocase ? "i" : "") + (uflag ? "u" : "");
+		return Object.assign(new RegExp(`^${re}$`, flags), {
+			_src: re,
+			_glob: glob
+		});
+	}
+	get options() {
+		return this.#options;
+	}
+	toRegExpSource(allowDot) {
+		const dot = allowDot ?? !!this.#options.dot;
+		if (this.#root === this) {
+			this.#flatten();
+			this.#fillNegs();
+		}
+		if (!isExtglobAST(this)) {
+			const noEmpty = this.isStart() && this.isEnd() && !this.#parts.some((s) => typeof s !== "string");
+			const src = this.#parts.map((p) => {
+				const [re, _, hasMagic, uflag] = typeof p === "string" ? _a.#parseGlob(p, this.#hasMagic, noEmpty) : p.toRegExpSource(allowDot);
+				this.#hasMagic = this.#hasMagic || hasMagic;
+				this.#uflag = this.#uflag || uflag;
+				return re;
+			}).join("");
+			let start = "";
+			if (this.isStart()) {
+				if (typeof this.#parts[0] === "string") {
+					if (!(this.#parts.length === 1 && justDots.has(this.#parts[0]))) {
+						const aps = addPatternStart;
+						const needNoTrav = dot && aps.has(src.charAt(0)) || src.startsWith("\\.") && aps.has(src.charAt(2)) || src.startsWith("\\.\\.") && aps.has(src.charAt(4));
+						const needNoDot = !dot && !allowDot && aps.has(src.charAt(0));
+						start = needNoTrav ? startNoTraversal : needNoDot ? startNoDot : "";
+					}
+				}
+			}
+			let end = "";
+			if (this.isEnd() && this.#root.#filledNegs && this.#parent?.type === "!") end = "(?:$|\\/)";
+			return [
+				start + src + end,
+				unescape(src),
+				this.#hasMagic = !!this.#hasMagic,
+				this.#uflag
+			];
+		}
+		const repeated = this.type === "*" || this.type === "+";
+		const start = this.type === "!" ? "(?:(?!(?:" : "(?:";
+		let body = this.#partsToRegExp(dot);
+		if (this.isStart() && this.isEnd() && !body && this.type !== "!") {
+			const s = this.toString();
+			const me = this;
+			me.#parts = [s];
+			me.type = null;
+			me.#hasMagic = void 0;
+			return [
+				s,
+				unescape(this.toString()),
+				false,
+				false
+			];
+		}
+		let bodyDotAllowed = !repeated || allowDot || dot || false ? "" : this.#partsToRegExp(true);
+		if (bodyDotAllowed === body) bodyDotAllowed = "";
+		if (bodyDotAllowed) body = `(?:${body})(?:${bodyDotAllowed})*?`;
+		let final = "";
+		if (this.type === "!" && this.#emptyExt) final = (this.isStart() && !dot ? startNoDot : "") + starNoEmpty;
+		else {
+			const close = this.type === "!" ? "))" + (this.isStart() && !dot && !allowDot ? startNoDot : "") + "[^/]*?)" : this.type === "@" ? ")" : this.type === "?" ? ")?" : this.type === "+" && bodyDotAllowed ? ")" : this.type === "*" && bodyDotAllowed ? `)?` : `)${this.type}`;
+			final = start + body + close;
+		}
+		return [
+			final,
+			unescape(body),
+			this.#hasMagic = !!this.#hasMagic,
+			this.#uflag
+		];
+	}
+	#flatten() {
+		if (!isExtglobAST(this)) {
+			for (const p of this.#parts) if (typeof p === "object") p.#flatten();
+		} else {
+			let iterations = 0;
+			let done = false;
+			do {
+				done = true;
+				for (let i = 0; i < this.#parts.length; i++) {
+					const c = this.#parts[i];
+					if (typeof c === "object") {
+						c.#flatten();
+						if (this.#canAdopt(c)) {
+							done = false;
+							this.#adopt(c, i);
+						} else if (this.#canAdoptWithSpace(c)) {
+							done = false;
+							this.#adoptWithSpace(c, i);
+						} else if (this.#canUsurp(c)) {
+							done = false;
+							this.#usurp(c);
+						}
+					}
+				}
+			} while (!done && ++iterations < 10);
+		}
+		this.#toString = void 0;
+	}
+	#partsToRegExp(dot) {
+		return this.#parts.map((p) => {
+			/* c8 ignore start */
+			if (typeof p === "string") throw new Error("string type in extglob ast??");
+			/* c8 ignore stop */
+			const [re, _, _hasMagic, uflag] = p.toRegExpSource(dot);
+			this.#uflag = this.#uflag || uflag;
+			return re;
+		}).filter((p) => !(this.isStart() && this.isEnd()) || !!p).join("|");
+	}
+	static #parseGlob(glob, hasMagic, noEmpty = false) {
+		let escaping = false;
+		let re = "";
+		let uflag = false;
+		let inStar = false;
+		for (let i = 0; i < glob.length; i++) {
+			const c = glob.charAt(i);
+			if (escaping) {
+				escaping = false;
+				re += (reSpecials.has(c) ? "\\" : "") + c;
+				continue;
+			}
+			if (c === "*") {
+				if (inStar) continue;
+				inStar = true;
+				re += noEmpty && /^[*]+$/.test(glob) ? starNoEmpty : star$1;
+				hasMagic = true;
+				continue;
+			} else inStar = false;
+			if (c === "\\") {
+				if (i === glob.length - 1) re += "\\\\";
+				else escaping = true;
+				continue;
+			}
+			if (c === "[") {
+				const [src, needUflag, consumed, magic] = parseClass(glob, i);
+				if (consumed) {
+					re += src;
+					uflag = uflag || needUflag;
+					i += consumed - 1;
+					hasMagic = hasMagic || magic;
+					continue;
+				}
+			}
+			if (c === "?") {
+				re += qmark;
+				hasMagic = true;
+				continue;
+			}
+			re += regExpEscape$1(c);
+		}
+		return [
+			re,
+			unescape(glob),
+			!!hasMagic,
+			uflag
+		];
+	}
+};
+_a = AST;
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/minimatch/dist/esm/escape.js
+/**
+* Escape all magic characters in a glob pattern.
+*
+* If the {@link MinimatchOptions.windowsPathsNoEscape}
+* option is used, then characters are escaped by wrapping in `[]`, because
+* a magic character wrapped in a character class can only be satisfied by
+* that exact character.  In this mode, `\` is _not_ escaped, because it is
+* not interpreted as a magic character, but instead as a path separator.
+*
+* If the {@link MinimatchOptions.magicalBraces} option is used,
+* then braces (`{` and `}`) will be escaped.
+*/
+const escape = (s, { windowsPathsNoEscape = false, magicalBraces = false } = {}) => {
+	if (magicalBraces) return windowsPathsNoEscape ? s.replace(/[?*()[\]{}]/g, "[$&]") : s.replace(/[?*()[\]\\{}]/g, "\\$&");
+	return windowsPathsNoEscape ? s.replace(/[?*()[\]]/g, "[$&]") : s.replace(/[?*()[\]\\]/g, "\\$&");
+};
+
+//#endregion
+//#region node_modules/@actions/glob/node_modules/minimatch/dist/esm/index.js
+const minimatch = (p, pattern, options = {}) => {
+	assertValidPattern(pattern);
+	if (!options.nocomment && pattern.charAt(0) === "#") return false;
+	return new Minimatch(pattern, options).match(p);
+};
+const starDotExtRE = /^\*+([^+@!?*[(]*)$/;
+const starDotExtTest = (ext) => (f) => !f.startsWith(".") && f.endsWith(ext);
+const starDotExtTestDot = (ext) => (f) => f.endsWith(ext);
+const starDotExtTestNocase = (ext) => {
+	ext = ext.toLowerCase();
+	return (f) => !f.startsWith(".") && f.toLowerCase().endsWith(ext);
+};
+const starDotExtTestNocaseDot = (ext) => {
+	ext = ext.toLowerCase();
+	return (f) => f.toLowerCase().endsWith(ext);
+};
+const starDotStarRE = /^\*+\.\*+$/;
+const starDotStarTest = (f) => !f.startsWith(".") && f.includes(".");
+const starDotStarTestDot = (f) => f !== "." && f !== ".." && f.includes(".");
+const dotStarRE = /^\.\*+$/;
+const dotStarTest = (f) => f !== "." && f !== ".." && f.startsWith(".");
+const starRE = /^\*+$/;
+const starTest = (f) => f.length !== 0 && !f.startsWith(".");
+const starTestDot = (f) => f.length !== 0 && f !== "." && f !== "..";
+const qmarksRE = /^\?+([^+@!?*[(]*)?$/;
+const qmarksTestNocase = ([$0, ext = ""]) => {
+	const noext = qmarksTestNoExt([$0]);
+	if (!ext) return noext;
+	ext = ext.toLowerCase();
+	return (f) => noext(f) && f.toLowerCase().endsWith(ext);
+};
+const qmarksTestNocaseDot = ([$0, ext = ""]) => {
+	const noext = qmarksTestNoExtDot([$0]);
+	if (!ext) return noext;
+	ext = ext.toLowerCase();
+	return (f) => noext(f) && f.toLowerCase().endsWith(ext);
+};
+const qmarksTestDot = ([$0, ext = ""]) => {
+	const noext = qmarksTestNoExtDot([$0]);
+	return !ext ? noext : (f) => noext(f) && f.endsWith(ext);
+};
+const qmarksTest = ([$0, ext = ""]) => {
+	const noext = qmarksTestNoExt([$0]);
+	return !ext ? noext : (f) => noext(f) && f.endsWith(ext);
+};
+const qmarksTestNoExt = ([$0]) => {
+	const len = $0.length;
+	return (f) => f.length === len && !f.startsWith(".");
+};
+const qmarksTestNoExtDot = ([$0]) => {
+	const len = $0.length;
+	return (f) => f.length === len && f !== "." && f !== "..";
+};
+/* c8 ignore start */
+const defaultPlatform = typeof process === "object" && process ? typeof process.env === "object" && process.env && process.env.__MINIMATCH_TESTING_PLATFORM__ || process.platform : "posix";
+const path$1 = {
+	win32: { sep: "\\" },
+	posix: { sep: "/" }
+};
+/* c8 ignore stop */
+const sep = defaultPlatform === "win32" ? path$1.win32.sep : path$1.posix.sep;
+minimatch.sep = sep;
+const GLOBSTAR = Symbol("globstar **");
+minimatch.GLOBSTAR = GLOBSTAR;
+const star = "[^/]*?";
+const twoStarDot = "(?:(?!(?:\\/|^)(?:\\.{1,2})($|\\/)).)*?";
+const twoStarNoDot = "(?:(?!(?:\\/|^)\\.).)*?";
+const filter = (pattern, options = {}) => (p) => minimatch(p, pattern, options);
+minimatch.filter = filter;
+const ext = (a, b = {}) => Object.assign({}, a, b);
+const defaults = (def) => {
+	if (!def || typeof def !== "object" || !Object.keys(def).length) return minimatch;
+	const orig = minimatch;
+	const m = (p, pattern, options = {}) => orig(p, pattern, ext(def, options));
+	return Object.assign(m, {
+		Minimatch: class Minimatch extends orig.Minimatch {
+			constructor(pattern, options = {}) {
+				super(pattern, ext(def, options));
+			}
+			static defaults(options) {
+				return orig.defaults(ext(def, options)).Minimatch;
+			}
+		},
+		AST: class AST extends orig.AST {
+			/* c8 ignore start */
+			constructor(type, parent, options = {}) {
+				super(type, parent, ext(def, options));
+			}
+			/* c8 ignore stop */
+			static fromGlob(pattern, options = {}) {
+				return orig.AST.fromGlob(pattern, ext(def, options));
+			}
+		},
+		unescape: (s, options = {}) => orig.unescape(s, ext(def, options)),
+		escape: (s, options = {}) => orig.escape(s, ext(def, options)),
+		filter: (pattern, options = {}) => orig.filter(pattern, ext(def, options)),
+		defaults: (options) => orig.defaults(ext(def, options)),
+		makeRe: (pattern, options = {}) => orig.makeRe(pattern, ext(def, options)),
+		braceExpand: (pattern, options = {}) => orig.braceExpand(pattern, ext(def, options)),
+		match: (list, pattern, options = {}) => orig.match(list, pattern, ext(def, options)),
+		sep: orig.sep,
+		GLOBSTAR
+	});
+};
+minimatch.defaults = defaults;
+const braceExpand = (pattern, options = {}) => {
+	assertValidPattern(pattern);
+	if (options.nobrace || !/\{(?:(?!\{).)*\}/.test(pattern)) return [pattern];
+	return expand(pattern, { max: options.braceExpandMax });
+};
+minimatch.braceExpand = braceExpand;
+const makeRe = (pattern, options = {}) => new Minimatch(pattern, options).makeRe();
+minimatch.makeRe = makeRe;
+const match = (list, pattern, options = {}) => {
+	const mm = new Minimatch(pattern, options);
+	list = list.filter((f) => mm.match(f));
+	if (mm.options.nonull && !list.length) list.push(pattern);
+	return list;
+};
+minimatch.match = match;
+const globMagic = /[?*]|[+@!]\(.*?\)|\[|\]/;
+const regExpEscape = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+var Minimatch = class {
+	options;
+	set;
+	pattern;
+	windowsPathsNoEscape;
+	nonegate;
+	negate;
+	comment;
+	empty;
+	preserveMultipleSlashes;
+	partial;
+	globSet;
+	globParts;
+	nocase;
+	isWindows;
+	platform;
+	windowsNoMagicRoot;
+	maxGlobstarRecursion;
+	regexp;
+	constructor(pattern, options = {}) {
+		assertValidPattern(pattern);
+		options = options || {};
+		this.options = options;
+		this.maxGlobstarRecursion = options.maxGlobstarRecursion ?? 200;
+		this.pattern = pattern;
+		this.platform = options.platform || defaultPlatform;
+		this.isWindows = this.platform === "win32";
+		const awe = "allowWindowsEscape";
+		this.windowsPathsNoEscape = !!options.windowsPathsNoEscape || options[awe] === false;
+		if (this.windowsPathsNoEscape) this.pattern = this.pattern.replace(/\\/g, "/");
+		this.preserveMultipleSlashes = !!options.preserveMultipleSlashes;
+		this.regexp = null;
+		this.negate = false;
+		this.nonegate = !!options.nonegate;
+		this.comment = false;
+		this.empty = false;
+		this.partial = !!options.partial;
+		this.nocase = !!this.options.nocase;
+		this.windowsNoMagicRoot = options.windowsNoMagicRoot !== void 0 ? options.windowsNoMagicRoot : !!(this.isWindows && this.nocase);
+		this.globSet = [];
+		this.globParts = [];
+		this.set = [];
+		this.make();
+	}
+	hasMagic() {
+		if (this.options.magicalBraces && this.set.length > 1) return true;
+		for (const pattern of this.set) for (const part of pattern) if (typeof part !== "string") return true;
+		return false;
+	}
+	debug(..._) {}
+	make() {
+		const pattern = this.pattern;
+		const options = this.options;
+		if (!options.nocomment && pattern.charAt(0) === "#") {
+			this.comment = true;
+			return;
+		}
+		if (!pattern) {
+			this.empty = true;
+			return;
+		}
+		this.parseNegate();
+		this.globSet = [...new Set(this.braceExpand())];
+		if (options.debug) this.debug = (...args) => console.error(...args);
+		this.debug(this.pattern, this.globSet);
+		const rawGlobParts = this.globSet.map((s) => this.slashSplit(s));
+		this.globParts = this.preprocess(rawGlobParts);
+		this.debug(this.pattern, this.globParts);
+		let set = this.globParts.map((s, _, __) => {
+			if (this.isWindows && this.windowsNoMagicRoot) {
+				const isUNC = s[0] === "" && s[1] === "" && (s[2] === "?" || !globMagic.test(s[2])) && !globMagic.test(s[3]);
+				const isDrive = /^[a-z]:/i.test(s[0]);
+				if (isUNC) return [...s.slice(0, 4), ...s.slice(4).map((ss) => this.parse(ss))];
+				else if (isDrive) return [s[0], ...s.slice(1).map((ss) => this.parse(ss))];
+			}
+			return s.map((ss) => this.parse(ss));
+		});
+		this.debug(this.pattern, set);
+		this.set = set.filter((s) => s.indexOf(false) === -1);
+		if (this.isWindows) for (let i = 0; i < this.set.length; i++) {
+			const p = this.set[i];
+			if (p[0] === "" && p[1] === "" && this.globParts[i][2] === "?" && typeof p[3] === "string" && /^[a-z]:$/i.test(p[3])) p[2] = "?";
+		}
+		this.debug(this.pattern, this.set);
+	}
+	preprocess(globParts) {
+		if (this.options.noglobstar) {
+			for (const partset of globParts) for (let j = 0; j < partset.length; j++) if (partset[j] === "**") partset[j] = "*";
+		}
+		const { optimizationLevel = 1 } = this.options;
+		if (optimizationLevel >= 2) {
+			globParts = this.firstPhasePreProcess(globParts);
+			globParts = this.secondPhasePreProcess(globParts);
+		} else if (optimizationLevel >= 1) globParts = this.levelOneOptimize(globParts);
+		else globParts = this.adjascentGlobstarOptimize(globParts);
+		return globParts;
+	}
+	adjascentGlobstarOptimize(globParts) {
+		return globParts.map((parts) => {
+			let gs = -1;
+			while (-1 !== (gs = parts.indexOf("**", gs + 1))) {
+				let i = gs;
+				while (parts[i + 1] === "**") i++;
+				if (i !== gs) parts.splice(gs, i - gs);
+			}
+			return parts;
+		});
+	}
+	levelOneOptimize(globParts) {
+		return globParts.map((parts) => {
+			parts = parts.reduce((set, part) => {
+				const prev = set[set.length - 1];
+				if (part === "**" && prev === "**") return set;
+				if (part === "..") {
+					if (prev && prev !== ".." && prev !== "." && prev !== "**") {
+						set.pop();
+						return set;
+					}
+				}
+				set.push(part);
+				return set;
+			}, []);
+			return parts.length === 0 ? [""] : parts;
+		});
+	}
+	levelTwoFileOptimize(parts) {
+		if (!Array.isArray(parts)) parts = this.slashSplit(parts);
+		let didSomething = false;
+		do {
+			didSomething = false;
+			if (!this.preserveMultipleSlashes) {
+				for (let i = 1; i < parts.length - 1; i++) {
+					const p = parts[i];
+					if (i === 1 && p === "" && parts[0] === "") continue;
+					if (p === "." || p === "") {
+						didSomething = true;
+						parts.splice(i, 1);
+						i--;
+					}
+				}
+				if (parts[0] === "." && parts.length === 2 && (parts[1] === "." || parts[1] === "")) {
+					didSomething = true;
+					parts.pop();
+				}
+			}
+			let dd = 0;
+			while (-1 !== (dd = parts.indexOf("..", dd + 1))) {
+				const p = parts[dd - 1];
+				if (p && p !== "." && p !== ".." && p !== "**" && !(this.isWindows && /^[a-z]:$/i.test(p))) {
+					didSomething = true;
+					parts.splice(dd - 1, 2);
+					dd -= 2;
+				}
+			}
+		} while (didSomething);
+		return parts.length === 0 ? [""] : parts;
+	}
+	firstPhasePreProcess(globParts) {
+		let didSomething = false;
+		do {
+			didSomething = false;
+			for (let parts of globParts) {
+				let gs = -1;
+				while (-1 !== (gs = parts.indexOf("**", gs + 1))) {
+					let gss = gs;
+					while (parts[gss + 1] === "**") gss++;
+					if (gss > gs) parts.splice(gs + 1, gss - gs);
+					let next = parts[gs + 1];
+					const p = parts[gs + 2];
+					const p2 = parts[gs + 3];
+					if (next !== "..") continue;
+					if (!p || p === "." || p === ".." || !p2 || p2 === "." || p2 === "..") continue;
+					didSomething = true;
+					parts.splice(gs, 1);
+					const other = parts.slice(0);
+					other[gs] = "**";
+					globParts.push(other);
+					gs--;
+				}
+				if (!this.preserveMultipleSlashes) {
+					for (let i = 1; i < parts.length - 1; i++) {
+						const p = parts[i];
+						if (i === 1 && p === "" && parts[0] === "") continue;
+						if (p === "." || p === "") {
+							didSomething = true;
+							parts.splice(i, 1);
+							i--;
+						}
+					}
+					if (parts[0] === "." && parts.length === 2 && (parts[1] === "." || parts[1] === "")) {
+						didSomething = true;
+						parts.pop();
+					}
+				}
+				let dd = 0;
+				while (-1 !== (dd = parts.indexOf("..", dd + 1))) {
+					const p = parts[dd - 1];
+					if (p && p !== "." && p !== ".." && p !== "**") {
+						didSomething = true;
+						const splin = dd === 1 && parts[dd + 1] === "**" ? ["."] : [];
+						parts.splice(dd - 1, 2, ...splin);
+						if (parts.length === 0) parts.push("");
+						dd -= 2;
+					}
+				}
+			}
+		} while (didSomething);
+		return globParts;
+	}
+	secondPhasePreProcess(globParts) {
+		for (let i = 0; i < globParts.length - 1; i++) for (let j = i + 1; j < globParts.length; j++) {
+			const matched = this.partsMatch(globParts[i], globParts[j], !this.preserveMultipleSlashes);
+			if (matched) {
+				globParts[i] = [];
+				globParts[j] = matched;
+				break;
+			}
+		}
+		return globParts.filter((gs) => gs.length);
+	}
+	partsMatch(a, b, emptyGSMatch = false) {
+		let ai = 0;
+		let bi = 0;
+		let result = [];
+		let which = "";
+		while (ai < a.length && bi < b.length) if (a[ai] === b[bi]) {
+			result.push(which === "b" ? b[bi] : a[ai]);
+			ai++;
+			bi++;
+		} else if (emptyGSMatch && a[ai] === "**" && b[bi] === a[ai + 1]) {
+			result.push(a[ai]);
+			ai++;
+		} else if (emptyGSMatch && b[bi] === "**" && a[ai] === b[bi + 1]) {
+			result.push(b[bi]);
+			bi++;
+		} else if (a[ai] === "*" && b[bi] && (this.options.dot || !b[bi].startsWith(".")) && b[bi] !== "**") {
+			if (which === "b") return false;
+			which = "a";
+			result.push(a[ai]);
+			ai++;
+			bi++;
+		} else if (b[bi] === "*" && a[ai] && (this.options.dot || !a[ai].startsWith(".")) && a[ai] !== "**") {
+			if (which === "a") return false;
+			which = "b";
+			result.push(b[bi]);
+			ai++;
+			bi++;
+		} else return false;
+		return a.length === b.length && result;
+	}
+	parseNegate() {
+		if (this.nonegate) return;
+		const pattern = this.pattern;
+		let negate = false;
+		let negateOffset = 0;
+		for (let i = 0; i < pattern.length && pattern.charAt(i) === "!"; i++) {
+			negate = !negate;
+			negateOffset++;
+		}
+		if (negateOffset) this.pattern = pattern.slice(negateOffset);
+		this.negate = negate;
+	}
+	matchOne(file, pattern, partial = false) {
+		let fileStartIndex = 0;
+		let patternStartIndex = 0;
+		if (this.isWindows) {
+			const fileDrive = typeof file[0] === "string" && /^[a-z]:$/i.test(file[0]);
+			const fileUNC = !fileDrive && file[0] === "" && file[1] === "" && file[2] === "?" && /^[a-z]:$/i.test(file[3]);
+			const patternDrive = typeof pattern[0] === "string" && /^[a-z]:$/i.test(pattern[0]);
+			const patternUNC = !patternDrive && pattern[0] === "" && pattern[1] === "" && pattern[2] === "?" && typeof pattern[3] === "string" && /^[a-z]:$/i.test(pattern[3]);
+			const fdi = fileUNC ? 3 : fileDrive ? 0 : void 0;
+			const pdi = patternUNC ? 3 : patternDrive ? 0 : void 0;
+			if (typeof fdi === "number" && typeof pdi === "number") {
+				const [fd, pd] = [file[fdi], pattern[pdi]];
+				if (fd.toLowerCase() === pd.toLowerCase()) {
+					pattern[pdi] = fd;
+					patternStartIndex = pdi;
+					fileStartIndex = fdi;
+				}
+			}
+		}
+		const { optimizationLevel = 1 } = this.options;
+		if (optimizationLevel >= 2) file = this.levelTwoFileOptimize(file);
+		if (pattern.includes(GLOBSTAR)) return this.#matchGlobstar(file, pattern, partial, fileStartIndex, patternStartIndex);
+		return this.#matchOne(file, pattern, partial, fileStartIndex, patternStartIndex);
+	}
+	#matchGlobstar(file, pattern, partial, fileIndex, patternIndex) {
+		const firstgs = pattern.indexOf(GLOBSTAR, patternIndex);
+		const lastgs = pattern.lastIndexOf(GLOBSTAR);
+		const [head, body, tail] = partial ? [
+			pattern.slice(patternIndex, firstgs),
+			pattern.slice(firstgs + 1),
+			[]
+		] : [
+			pattern.slice(patternIndex, firstgs),
+			pattern.slice(firstgs + 1, lastgs),
+			pattern.slice(lastgs + 1)
+		];
+		if (head.length) {
+			const fileHead = file.slice(fileIndex, fileIndex + head.length);
+			if (!this.#matchOne(fileHead, head, partial, 0, 0)) return false;
+			fileIndex += head.length;
+			patternIndex += head.length;
+		}
+		let fileTailMatch = 0;
+		if (tail.length) {
+			if (tail.length + fileIndex > file.length) return false;
+			let tailStart = file.length - tail.length;
+			if (this.#matchOne(file, tail, partial, tailStart, 0)) fileTailMatch = tail.length;
+			else {
+				if (file[file.length - 1] !== "" || fileIndex + tail.length === file.length) return false;
+				tailStart--;
+				if (!this.#matchOne(file, tail, partial, tailStart, 0)) return false;
+				fileTailMatch = tail.length + 1;
+			}
+		}
+		if (!body.length) {
+			let sawSome = !!fileTailMatch;
+			for (let i = fileIndex; i < file.length - fileTailMatch; i++) {
+				const f = String(file[i]);
+				sawSome = true;
+				if (f === "." || f === ".." || !this.options.dot && f.startsWith(".")) return false;
+			}
+			return partial || sawSome;
+		}
+		const bodySegments = [[[], 0]];
+		let currentBody = bodySegments[0];
+		let nonGsParts = 0;
+		const nonGsPartsSums = [0];
+		for (const b of body) if (b === GLOBSTAR) {
+			nonGsPartsSums.push(nonGsParts);
+			currentBody = [[], 0];
+			bodySegments.push(currentBody);
+		} else {
+			currentBody[0].push(b);
+			nonGsParts++;
+		}
+		let i = bodySegments.length - 1;
+		const fileLength = file.length - fileTailMatch;
+		for (const b of bodySegments) b[1] = fileLength - (nonGsPartsSums[i--] + b[0].length);
+		return !!this.#matchGlobStarBodySections(file, bodySegments, fileIndex, 0, partial, 0, !!fileTailMatch);
+	}
+	#matchGlobStarBodySections(file, bodySegments, fileIndex, bodyIndex, partial, globStarDepth, sawTail) {
+		const bs = bodySegments[bodyIndex];
+		if (!bs) {
+			for (let i = fileIndex; i < file.length; i++) {
+				sawTail = true;
+				const f = file[i];
+				if (f === "." || f === ".." || !this.options.dot && f.startsWith(".")) return false;
+			}
+			return sawTail;
+		}
+		const [body, after] = bs;
+		while (fileIndex <= after) {
+			if (this.#matchOne(file.slice(0, fileIndex + body.length), body, partial, fileIndex, 0) && globStarDepth < this.maxGlobstarRecursion) {
+				const sub = this.#matchGlobStarBodySections(file, bodySegments, fileIndex + body.length, bodyIndex + 1, partial, globStarDepth + 1, sawTail);
+				if (sub !== false) return sub;
+			}
+			const f = file[fileIndex];
+			if (f === "." || f === ".." || !this.options.dot && f.startsWith(".")) return false;
+			fileIndex++;
+		}
+		return partial || null;
+	}
+	#matchOne(file, pattern, partial, fileIndex, patternIndex) {
+		let fi;
+		let pi;
+		let pl;
+		let fl;
+		for (fi = fileIndex, pi = patternIndex, fl = file.length, pl = pattern.length; fi < fl && pi < pl; fi++, pi++) {
+			this.debug("matchOne loop");
+			let p = pattern[pi];
+			let f = file[fi];
+			this.debug(pattern, p, f);
+			/* c8 ignore start */
+			if (p === false || p === GLOBSTAR) return false;
+			/* c8 ignore stop */
+			let hit;
+			if (typeof p === "string") {
+				hit = f === p;
+				this.debug("string match", p, f, hit);
+			} else {
+				hit = p.test(f);
+				this.debug("pattern match", p, f, hit);
+			}
+			if (!hit) return false;
+		}
+		if (fi === fl && pi === pl) return true;
+		else if (fi === fl) return partial;
+		else if (pi === pl) return fi === fl - 1 && file[fi] === "";
+		else throw new Error("wtf?");
+		/* c8 ignore stop */
+	}
+	braceExpand() {
+		return braceExpand(this.pattern, this.options);
+	}
+	parse(pattern) {
+		assertValidPattern(pattern);
+		const options = this.options;
+		if (pattern === "**") return GLOBSTAR;
+		if (pattern === "") return "";
+		let m;
+		let fastTest = null;
+		if (m = pattern.match(starRE)) fastTest = options.dot ? starTestDot : starTest;
+		else if (m = pattern.match(starDotExtRE)) fastTest = (options.nocase ? options.dot ? starDotExtTestNocaseDot : starDotExtTestNocase : options.dot ? starDotExtTestDot : starDotExtTest)(m[1]);
+		else if (m = pattern.match(qmarksRE)) fastTest = (options.nocase ? options.dot ? qmarksTestNocaseDot : qmarksTestNocase : options.dot ? qmarksTestDot : qmarksTest)(m);
+		else if (m = pattern.match(starDotStarRE)) fastTest = options.dot ? starDotStarTestDot : starDotStarTest;
+		else if (m = pattern.match(dotStarRE)) fastTest = dotStarTest;
+		const re = AST.fromGlob(pattern, this.options).toMMPattern();
+		if (fastTest && typeof re === "object") Reflect.defineProperty(re, "test", { value: fastTest });
+		return re;
+	}
+	makeRe() {
+		if (this.regexp || this.regexp === false) return this.regexp;
+		const set = this.set;
+		if (!set.length) {
+			this.regexp = false;
+			return this.regexp;
+		}
+		const options = this.options;
+		const twoStar = options.noglobstar ? star : options.dot ? twoStarDot : twoStarNoDot;
+		const flags = new Set(options.nocase ? ["i"] : []);
+		let re = set.map((pattern) => {
+			const pp = pattern.map((p) => {
+				if (p instanceof RegExp) for (const f of p.flags.split("")) flags.add(f);
+				return typeof p === "string" ? regExpEscape(p) : p === GLOBSTAR ? GLOBSTAR : p._src;
+			});
+			pp.forEach((p, i) => {
+				const next = pp[i + 1];
+				const prev = pp[i - 1];
+				if (p !== GLOBSTAR || prev === GLOBSTAR) return;
+				if (prev === void 0) if (next !== void 0 && next !== GLOBSTAR) pp[i + 1] = "(?:\\/|" + twoStar + "\\/)?" + next;
+				else pp[i] = twoStar;
+				else if (next === void 0) pp[i - 1] = prev + "(?:\\/|\\/" + twoStar + ")?";
+				else if (next !== GLOBSTAR) {
+					pp[i - 1] = prev + "(?:\\/|\\/" + twoStar + "\\/)" + next;
+					pp[i + 1] = GLOBSTAR;
+				}
+			});
+			const filtered = pp.filter((p) => p !== GLOBSTAR);
+			if (this.partial && filtered.length >= 1) {
+				const prefixes = [];
+				for (let i = 1; i <= filtered.length; i++) prefixes.push(filtered.slice(0, i).join("/"));
+				return "(?:" + prefixes.join("|") + ")";
+			}
+			return filtered.join("/");
+		}).join("|");
+		const [open, close] = set.length > 1 ? ["(?:", ")"] : ["", ""];
+		re = "^" + open + re + close + "$";
+		if (this.partial) re = "^(?:\\/|" + open + re.slice(1, -1) + close + ")$";
+		if (this.negate) re = "^(?!" + re + ").+$";
+		try {
+			this.regexp = new RegExp(re, [...flags].join(""));
+		} catch {
+			this.regexp = false;
+		}
+		/* c8 ignore stop */
+		return this.regexp;
+	}
+	slashSplit(p) {
+		if (this.preserveMultipleSlashes) return p.split("/");
+		else if (this.isWindows && /^\/\/[^/]+/.test(p)) return ["", ...p.split(/\/+/)];
+		else return p.split(/\/+/);
+	}
+	match(f, partial = this.partial) {
+		this.debug("match", f, this.pattern);
+		if (this.comment) return false;
+		if (this.empty) return f === "";
+		if (f === "/" && partial) return true;
+		const options = this.options;
+		if (this.isWindows) f = f.split("\\").join("/");
+		const ff = this.slashSplit(f);
+		this.debug(this.pattern, "split", ff);
+		const set = this.set;
+		this.debug(this.pattern, "set", set);
+		let filename = ff[ff.length - 1];
+		if (!filename) for (let i = ff.length - 2; !filename && i >= 0; i--) filename = ff[i];
+		for (const pattern of set) {
+			let file = ff;
+			if (options.matchBase && pattern.length === 1) file = [filename];
+			if (this.matchOne(file, pattern, partial)) {
+				if (options.flipNegate) return true;
+				return !this.negate;
+			}
+		}
+		if (options.flipNegate) return false;
+		return this.negate;
+	}
+	static defaults(def) {
+		return minimatch.defaults(def).Minimatch;
+	}
+};
+/* c8 ignore stop */
+minimatch.AST = AST;
+minimatch.Minimatch = Minimatch;
+minimatch.escape = escape;
+minimatch.unescape = unescape;
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-path.js
+const IS_WINDOWS$2 = process.platform === "win32";
+/**
+* Helper class for parsing paths into segments
+*/
+var Path = class {
+	/**
+	* Constructs a Path
+	* @param itemPath Path or array of segments
+	*/
+	constructor(itemPath) {
+		this.segments = [];
+		if (typeof itemPath === "string") {
+			assert(itemPath, `Parameter 'itemPath' must not be empty`);
+			itemPath = safeTrimTrailingSeparator(itemPath);
+			if (!hasRoot(itemPath)) this.segments = itemPath.split(path$2.sep);
+			else {
+				let remaining = itemPath;
+				let dir = dirname(remaining);
+				while (dir !== remaining) {
+					const basename = path$2.basename(remaining);
+					this.segments.unshift(basename);
+					remaining = dir;
+					dir = dirname(remaining);
+				}
+				this.segments.unshift(remaining);
+			}
+		} else {
+			assert(itemPath.length > 0, `Parameter 'itemPath' must not be an empty array`);
+			for (let i = 0; i < itemPath.length; i++) {
+				let segment = itemPath[i];
+				assert(segment, `Parameter 'itemPath' must not contain any empty segments`);
+				segment = normalizeSeparators(itemPath[i]);
+				if (i === 0 && hasRoot(segment)) {
+					segment = safeTrimTrailingSeparator(segment);
+					assert(segment === dirname(segment), `Parameter 'itemPath' root segment contains information for multiple segments`);
+					this.segments.push(segment);
+				} else {
+					assert(!segment.includes(path$2.sep), `Parameter 'itemPath' contains unexpected path separators`);
+					this.segments.push(segment);
+				}
+			}
+		}
+	}
+	/**
+	* Converts the path to it's string representation
+	*/
+	toString() {
+		let result = this.segments[0];
+		let skipSlash = result.endsWith(path$2.sep) || IS_WINDOWS$2 && /^[A-Z]:$/i.test(result);
+		for (let i = 1; i < this.segments.length; i++) {
+			if (skipSlash) skipSlash = false;
+			else result += path$2.sep;
+			result += this.segments[i];
+		}
+		return result;
+	}
+};
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-pattern.js
+const IS_WINDOWS$1 = process.platform === "win32";
+var Pattern = class Pattern {
+	constructor(patternOrNegate, isImplicitPattern = false, segments, homedir) {
+		/**
+		* Indicates whether matches should be excluded from the result set
+		*/
+		this.negate = false;
+		let pattern;
+		if (typeof patternOrNegate === "string") pattern = patternOrNegate.trim();
+		else {
+			segments = segments || [];
+			assert(segments.length, `Parameter 'segments' must not empty`);
+			const root = Pattern.getLiteral(segments[0]);
+			assert(root && hasAbsoluteRoot(root), `Parameter 'segments' first element must be a root path`);
+			pattern = new Path(segments).toString().trim();
+			if (patternOrNegate) pattern = `!${pattern}`;
+		}
+		while (pattern.startsWith("!")) {
+			this.negate = !this.negate;
+			pattern = pattern.substr(1).trim();
+		}
+		pattern = Pattern.fixupPattern(pattern, homedir);
+		this.segments = new Path(pattern).segments;
+		this.trailingSeparator = normalizeSeparators(pattern).endsWith(path$2.sep);
+		pattern = safeTrimTrailingSeparator(pattern);
+		let foundGlob = false;
+		const searchSegments = this.segments.map((x) => Pattern.getLiteral(x)).filter((x) => !foundGlob && !(foundGlob = x === ""));
+		this.searchPath = new Path(searchSegments).toString();
+		this.rootRegExp = new RegExp(Pattern.regExpEscape(searchSegments[0]), IS_WINDOWS$1 ? "i" : "");
+		this.isImplicitPattern = isImplicitPattern;
+		const minimatchOptions = {
+			dot: true,
+			nobrace: true,
+			nocase: IS_WINDOWS$1,
+			nocomment: true,
+			noext: true,
+			nonegate: true
+		};
+		pattern = IS_WINDOWS$1 ? pattern.replace(/\\/g, "/") : pattern;
+		this.minimatch = new Minimatch(pattern, minimatchOptions);
+	}
+	/**
+	* Matches the pattern against the specified path
+	*/
+	match(itemPath) {
+		if (this.segments[this.segments.length - 1] === "**") {
+			itemPath = normalizeSeparators(itemPath);
+			if (!itemPath.endsWith(path$2.sep) && this.isImplicitPattern === false) itemPath = `${itemPath}${path$2.sep}`;
+		} else itemPath = safeTrimTrailingSeparator(itemPath);
+		if (this.minimatch.match(itemPath)) return this.trailingSeparator ? MatchKind.Directory : MatchKind.All;
+		return MatchKind.None;
+	}
+	/**
+	* Indicates whether the pattern may match descendants of the specified path
+	*/
+	partialMatch(itemPath) {
+		itemPath = safeTrimTrailingSeparator(itemPath);
+		if (dirname(itemPath) === itemPath) return this.rootRegExp.test(itemPath);
+		return this.minimatch.matchOne(itemPath.split(IS_WINDOWS$1 ? /\\+/ : /\/+/), this.minimatch.set[0], true);
+	}
+	/**
+	* Escapes glob patterns within a path
+	*/
+	static globEscape(s) {
+		return (IS_WINDOWS$1 ? s : s.replace(/\\/g, "\\\\")).replace(/(\[)(?=[^/]+\])/g, "[[]").replace(/\?/g, "[?]").replace(/\*/g, "[*]");
+	}
+	/**
+	* Normalizes slashes and ensures absolute root
+	*/
+	static fixupPattern(pattern, homedir) {
+		assert(pattern, "pattern cannot be empty");
+		const literalSegments = new Path(pattern).segments.map((x) => Pattern.getLiteral(x));
+		assert(literalSegments.every((x, i) => (x !== "." || i === 0) && x !== ".."), `Invalid pattern '${pattern}'. Relative pathing '.' and '..' is not allowed.`);
+		assert(!hasRoot(pattern) || literalSegments[0], `Invalid pattern '${pattern}'. Root segment must not contain globs.`);
+		pattern = normalizeSeparators(pattern);
+		if (pattern === "." || pattern.startsWith(`.${path$2.sep}`)) pattern = Pattern.globEscape(process.cwd()) + pattern.substr(1);
+		else if (pattern === "~" || pattern.startsWith(`~${path$2.sep}`)) {
+			homedir = homedir || os$3.homedir();
+			assert(homedir, "Unable to determine HOME directory");
+			assert(hasAbsoluteRoot(homedir), `Expected HOME directory to be a rooted path. Actual '${homedir}'`);
+			pattern = Pattern.globEscape(homedir) + pattern.substr(1);
+		} else if (IS_WINDOWS$1 && (pattern.match(/^[A-Z]:$/i) || pattern.match(/^[A-Z]:[^\\]/i))) {
+			let root = ensureAbsoluteRoot("C:\\dummy-root", pattern.substr(0, 2));
+			if (pattern.length > 2 && !root.endsWith("\\")) root += "\\";
+			pattern = Pattern.globEscape(root) + pattern.substr(2);
+		} else if (IS_WINDOWS$1 && (pattern === "\\" || pattern.match(/^\\[^\\]/))) {
+			let root = ensureAbsoluteRoot("C:\\dummy-root", "\\");
+			if (!root.endsWith("\\")) root += "\\";
+			pattern = Pattern.globEscape(root) + pattern.substr(1);
+		} else pattern = ensureAbsoluteRoot(Pattern.globEscape(process.cwd()), pattern);
+		return normalizeSeparators(pattern);
+	}
+	/**
+	* Attempts to unescape a pattern segment to create a literal path segment.
+	* Otherwise returns empty string.
+	*/
+	static getLiteral(segment) {
+		let literal = "";
+		for (let i = 0; i < segment.length; i++) {
+			const c = segment[i];
+			if (c === "\\" && !IS_WINDOWS$1 && i + 1 < segment.length) {
+				literal += segment[++i];
+				continue;
+			} else if (c === "*" || c === "?") return "";
+			else if (c === "[" && i + 1 < segment.length) {
+				let set = "";
+				let closed = -1;
+				for (let i2 = i + 1; i2 < segment.length; i2++) {
+					const c2 = segment[i2];
+					if (c2 === "\\" && !IS_WINDOWS$1 && i2 + 1 < segment.length) {
+						set += segment[++i2];
+						continue;
+					} else if (c2 === "]") {
+						closed = i2;
+						break;
+					} else set += c2;
+				}
+				if (closed >= 0) {
+					if (set.length > 1) return "";
+					if (set) {
+						literal += set;
+						i = closed;
+						continue;
+					}
+				}
+			}
+			literal += c;
+		}
+		return literal;
+	}
+	/**
+	* Escapes regexp special characters
+	* https://javascript.info/regexp-escaping
+	*/
+	static regExpEscape(s) {
+		return s.replace(/[[\\^$.|?*+()]/g, "\\$&");
+	}
+};
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-search-state.js
+var SearchState = class {
+	constructor(path, level) {
+		this.path = path;
+		this.level = level;
+	}
+};
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-globber.js
+var __awaiter$2 = void 0 && (void 0).__awaiter || function(thisArg, _arguments, P, generator) {
+	function adopt(value) {
+		return value instanceof P ? value : new P(function(resolve) {
+			resolve(value);
+		});
+	}
+	return new (P || (P = Promise))(function(resolve, reject) {
+		function fulfilled(value) {
+			try {
+				step(generator.next(value));
+			} catch (e) {
+				reject(e);
+			}
+		}
+		function rejected(value) {
+			try {
+				step(generator["throw"](value));
+			} catch (e) {
+				reject(e);
+			}
+		}
+		function step(result) {
+			result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+		}
+		step((generator = generator.apply(thisArg, _arguments || [])).next());
+	});
+};
+var __asyncValues$1 = void 0 && (void 0).__asyncValues || function(o) {
+	if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+	var m = o[Symbol.asyncIterator], i;
+	return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
+		return this;
+	}, i);
+	function verb(n) {
+		i[n] = o[n] && function(v) {
+			return new Promise(function(resolve, reject) {
+				v = o[n](v), settle(resolve, reject, v.done, v.value);
+			});
+		};
+	}
+	function settle(resolve, reject, d, v) {
+		Promise.resolve(v).then(function(v) {
+			resolve({
+				value: v,
+				done: d
+			});
+		}, reject);
+	}
+};
+var __await = void 0 && (void 0).__await || function(v) {
+	return this instanceof __await ? (this.v = v, this) : new __await(v);
+};
+var __asyncGenerator = void 0 && (void 0).__asyncGenerator || function(thisArg, _arguments, generator) {
+	if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+	var g = generator.apply(thisArg, _arguments || []), i, q = [];
+	return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function() {
+		return this;
+	}, i;
+	function awaitReturn(f) {
+		return function(v) {
+			return Promise.resolve(v).then(f, reject);
+		};
+	}
+	function verb(n, f) {
+		if (g[n]) {
+			i[n] = function(v) {
+				return new Promise(function(a, b) {
+					q.push([
+						n,
+						v,
+						a,
+						b
+					]) > 1 || resume(n, v);
+				});
+			};
+			if (f) i[n] = f(i[n]);
+		}
+	}
+	function resume(n, v) {
+		try {
+			step(g[n](v));
+		} catch (e) {
+			settle(q[0][3], e);
+		}
+	}
+	function step(r) {
+		r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
+	}
+	function fulfill(value) {
+		resume("next", value);
+	}
+	function reject(value) {
+		resume("throw", value);
+	}
+	function settle(f, v) {
+		if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]);
+	}
+};
+const IS_WINDOWS = process.platform === "win32";
+var DefaultGlobber = class DefaultGlobber {
+	constructor(options) {
+		this.patterns = [];
+		this.searchPaths = [];
+		this.options = getOptions(options);
+	}
+	getSearchPaths() {
+		return this.searchPaths.slice();
+	}
+	glob() {
+		return __awaiter$2(this, void 0, void 0, function* () {
+			var _a, e_1, _b, _c;
+			const result = [];
+			try {
+				for (var _d = true, _e = __asyncValues$1(this.globGenerator()), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
+					_c = _f.value;
+					_d = false;
+					const itemPath = _c;
+					result.push(itemPath);
+				}
+			} catch (e_1_1) {
+				e_1 = { error: e_1_1 };
+			} finally {
+				try {
+					if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
+				} finally {
+					if (e_1) throw e_1.error;
+				}
+			}
+			return result;
+		});
+	}
+	globGenerator() {
+		return __asyncGenerator(this, arguments, function* globGenerator_1() {
+			const options = getOptions(this.options);
+			const patterns = [];
+			for (const pattern of this.patterns) {
+				patterns.push(pattern);
+				if (options.implicitDescendants && (pattern.trailingSeparator || pattern.segments[pattern.segments.length - 1] !== "**")) patterns.push(new Pattern(pattern.negate, true, pattern.segments.concat("**")));
+			}
+			const stack = [];
+			for (const searchPath of getSearchPaths(patterns)) {
+				debug(`Search path '${searchPath}'`);
+				try {
+					yield __await(fs$1.promises.lstat(searchPath));
+				} catch (err) {
+					if (err.code === "ENOENT") continue;
+					throw err;
+				}
+				stack.unshift(new SearchState(searchPath, 1));
+			}
+			const traversalChain = [];
+			while (stack.length) {
+				const item = stack.pop();
+				const match = match$1(patterns, item.path);
+				const partialMatch$1 = !!match || partialMatch(patterns, item.path);
+				if (!match && !partialMatch$1) continue;
+				const stats = yield __await(DefaultGlobber.stat(item, options, traversalChain));
+				if (!stats) continue;
+				if (options.excludeHiddenFiles && path$2.basename(item.path).match(/^\./)) continue;
+				if (stats.isDirectory()) {
+					if (match & MatchKind.Directory && options.matchDirectories) yield yield __await(item.path);
+					else if (!partialMatch$1) continue;
+					const childLevel = item.level + 1;
+					const childItems = (yield __await(fs$1.promises.readdir(item.path))).map((x) => new SearchState(path$2.join(item.path, x), childLevel));
+					stack.push(...childItems.reverse());
+				} else if (match & MatchKind.File) yield yield __await(item.path);
+			}
+		});
+	}
+	/**
+	* Constructs a DefaultGlobber
+	*/
+	static create(patterns, options) {
+		return __awaiter$2(this, void 0, void 0, function* () {
+			const result = new DefaultGlobber(options);
+			if (IS_WINDOWS) {
+				patterns = patterns.replace(/\r\n/g, "\n");
+				patterns = patterns.replace(/\r/g, "\n");
+			}
+			const lines = patterns.split("\n").map((x) => x.trim());
+			for (const line of lines) if (!line || line.startsWith("#")) continue;
+			else result.patterns.push(new Pattern(line));
+			result.searchPaths.push(...getSearchPaths(result.patterns));
+			return result;
+		});
+	}
+	static stat(item, options, traversalChain) {
+		return __awaiter$2(this, void 0, void 0, function* () {
+			let stats;
+			if (options.followSymbolicLinks) try {
+				stats = yield fs$1.promises.stat(item.path);
+			} catch (err) {
+				if (err.code === "ENOENT") {
+					if (options.omitBrokenSymbolicLinks) {
+						debug(`Broken symlink '${item.path}'`);
+						return;
+					}
+					throw new Error(`No information found for the path '${item.path}'. This may indicate a broken symbolic link.`);
+				}
+				throw err;
+			}
+			else stats = yield fs$1.promises.lstat(item.path);
+			if (stats.isDirectory() && options.followSymbolicLinks) {
+				const realPath = yield fs$1.promises.realpath(item.path);
+				while (traversalChain.length >= item.level) traversalChain.pop();
+				if (traversalChain.some((x) => x === realPath)) {
+					debug(`Symlink cycle detected for path '${item.path}' and realpath '${realPath}'`);
+					return;
+				}
+				traversalChain.push(realPath);
+			}
+			return stats;
+		});
+	}
+};
+
+//#endregion
+//#region node_modules/@actions/glob/lib/internal-hash-files.js
+var __awaiter$1 = void 0 && (void 0).__awaiter || function(thisArg, _arguments, P, generator) {
+	function adopt(value) {
+		return value instanceof P ? value : new P(function(resolve) {
+			resolve(value);
+		});
+	}
+	return new (P || (P = Promise))(function(resolve, reject) {
+		function fulfilled(value) {
+			try {
+				step(generator.next(value));
+			} catch (e) {
+				reject(e);
+			}
+		}
+		function rejected(value) {
+			try {
+				step(generator["throw"](value));
+			} catch (e) {
+				reject(e);
+			}
+		}
+		function step(result) {
+			result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+		}
+		step((generator = generator.apply(thisArg, _arguments || [])).next());
+	});
+};
+var __asyncValues = void 0 && (void 0).__asyncValues || function(o) {
+	if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+	var m = o[Symbol.asyncIterator], i;
+	return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
+		return this;
+	}, i);
+	function verb(n) {
+		i[n] = o[n] && function(v) {
+			return new Promise(function(resolve, reject) {
+				v = o[n](v), settle(resolve, reject, v.done, v.value);
+			});
+		};
+	}
+	function settle(resolve, reject, d, v) {
+		Promise.resolve(v).then(function(v) {
+			resolve({
+				value: v,
+				done: d
+			});
+		}, reject);
+	}
+};
+
+//#endregion
+//#region node_modules/@actions/glob/lib/glob.js
+var __awaiter = void 0 && (void 0).__awaiter || function(thisArg, _arguments, P, generator) {
+	function adopt(value) {
+		return value instanceof P ? value : new P(function(resolve) {
+			resolve(value);
+		});
+	}
+	return new (P || (P = Promise))(function(resolve, reject) {
+		function fulfilled(value) {
+			try {
+				step(generator.next(value));
+			} catch (e) {
+				reject(e);
+			}
+		}
+		function rejected(value) {
+			try {
+				step(generator["throw"](value));
+			} catch (e) {
+				reject(e);
+			}
+		}
+		function step(result) {
+			result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+		}
+		step((generator = generator.apply(thisArg, _arguments || [])).next());
+	});
+};
+/**
+* Constructs a globber
+*
+* @param patterns  Patterns separated by newlines
+* @param options   Glob options
+*/
+function create(patterns, options) {
+	return __awaiter(this, void 0, void 0, function* () {
+		return yield DefaultGlobber.create(patterns, options);
+	});
+}
+
+//#endregion
+//#region src/installer.ts
+const OPAM_SOLVER_TIMEOUT = 600;
+async function installer() {
+	if (isDebug()) exportVariable("OPAMVERBOSE", 1);
+	exportVariable("OPAMCOLOR", "always");
+	exportVariable("OPAMCONFIRMLEVEL", "unsafe-yes");
+	exportVariable("OPAMDOWNLOADJOBS", os$2.availableParallelism());
+	exportVariable("OPAMERRLOGLEN", 0);
+	exportVariable("OPAMEXTERNALSOLVER", "builtin-0install");
+	exportVariable("OPAMPRECISETRACKING", 1);
+	exportVariable("OPAMRETRIES", 10);
+	exportVariable("OPAMROOT", OPAM_ROOT);
+	exportVariable("OPAMSOLVERTIMEOUT", OPAM_SOLVER_TIMEOUT);
+	exportVariable("OPAMYES", 1);
+	if (PLATFORM === "windows") {
+		exportVariable("HOME", process$2.env.USERPROFILE);
+		exportVariable("MSYS", "winsymlinks:native");
+		if (WINDOWS_ENVIRONMENT === "cygwin") exportVariable("CYGWIN", "winsymlinks:native");
+		await group("Configuring Windows symlink settings", async () => {
+			await exec("fsutil", [
+				"behavior",
+				"query",
+				"SymlinkEvaluation"
+			]);
+			await exec("fsutil", [
+				"behavior",
+				"set",
+				"symlinkEvaluation",
+				"R2L:1",
+				"R2R:1"
+			]);
+			await exec("fsutil", [
+				"behavior",
+				"query",
+				"SymlinkEvaluation"
+			]);
+		});
+	}
+	const opamCacheHit = await restoreOpamCache();
+	const opamRootInitialized = await promises$1.access(path.join(OPAM_ROOT, "config")).then(() => true, () => false);
+	const useInitialRepository = !opamCacheHit && !opamRootInitialized;
+	await setupOpam(useInitialRepository ? OPAM_REPOSITORIES[0] : void 0);
+	if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin") {
+		await promises$1.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
+		exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
+		addPath(CYGWIN_ROOT_BIN);
+	}
+	if (!opamCacheHit) {
+		if (useInitialRepository) await repositoryAddAll(OPAM_REPOSITORIES.slice(1));
+		else {
+			await repositoryRemoveAll();
+			await repositoryAddAll(OPAM_REPOSITORIES);
+		}
+		const ocamlCompiler = await resolvedCompiler;
+		await installOcaml(ocamlCompiler);
+		await saveOpamCache();
+	} else await update();
+	if (DUNE_CACHE) {
+		await restoreDuneCache();
+		await installDune();
+		exportVariable("DUNE_CACHE_ROOT", DUNE_CACHE_ROOT);
+	}
+	exportVariable("CLICOLOR_FORCE", "1");
+	if (OPAM_PIN) {
+		const fnames = await (await create(OPAM_LOCAL_PACKAGES)).glob();
+		await pin(fnames);
+	}
+	await exec("opam", ["config", "report"]);
+}
+
+//#endregion
+//#region src/index.ts
+async function run() {
+	try {
+		await installer();
+		process$2.exit(0);
+	} catch (error$1) {
+		if (error$1 instanceof Error) error(error$1.message);
+		process$2.exit(1);
+	}
+}
+run();
+
+//#endregion
+export {  };

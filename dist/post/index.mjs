@@ -1,1 +1,20 @@
-import{E as e,a as t,g as n,n as r}from"../dune.mjs";import*as i from"node:process";async function a(){try{n&&(await r(),await t()),i.exit(0)}catch(t){t instanceof Error&&e(t.message),i.exit(0)}}a();export{};
+import { E as error, a as saveDuneCache, g as DUNE_CACHE, n as trimDuneCache } from "../dune.mjs";
+import * as process$1 from "node:process";
+
+//#region src/post.ts
+async function run() {
+	try {
+		if (DUNE_CACHE) {
+			await trimDuneCache();
+			await saveDuneCache();
+		}
+		process$1.exit(0);
+	} catch (error$1) {
+		if (error$1 instanceof Error) error(error$1.message);
+		process$1.exit(0);
+	}
+}
+run();
+
+//#endregion
+export {  };
