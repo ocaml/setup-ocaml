@@ -9,12 +9,12 @@
     "@actions/github": "9.1.1",
     "@actions/glob": "0.7.0",
     "@github/dependency-submission-toolkit": "2.0.5",
-    "@tsconfig/node24": "24.0.4",
+    "@tsconfig/node24": "24.0.5",
     "@tsconfig/strictest": "2.0.8",
     "@types/node": "24.13.3",
     "packageurl-js": "2.0.1",
     "strip-ansi": "7.2.0",
     "typescript": "7.0.2",
-    "vite-plus": "0.2.4"
+    "vite-plus": "0.2.9"
   }
 }

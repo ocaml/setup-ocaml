@@ -1036,20 +1036,22 @@ var require_tree = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			while (true) {
 				const code = key.charCodeAt(index);
 				if (code > 127) throw new TypeError("key must be ascii string");
-				if (node.code === code) if (length === ++index) {
-					node.value = value;
-					break;
-				} else if (node.middle !== null) node = node.middle;
-				else {
-					node.middle = new TstNode(key, value, index);
-					break;
-				}
-				else if (node.code < code) if (node.left !== null) node = node.left;
-				else {
-					node.left = new TstNode(key, value, index);
-					break;
-				}
-				else if (node.right !== null) node = node.right;
+				if (node.code === code) {
+					if (length === ++index) {
+						node.value = value;
+						break;
+					} else if (node.middle !== null) node = node.middle;
+					else {
+						node.middle = new TstNode(key, value, index);
+						break;
+					}
+				} else if (node.code < code) {
+					if (node.left !== null) node = node.left;
+					else {
+						node.left = new TstNode(key, value, index);
+						break;
+					}
+				} else if (node.right !== null) node = node.right;
 				else {
 					node.right = new TstNode(key, value, index);
 					break;
@@ -1727,15 +1729,16 @@ var require_request$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (Array.isArray(headers)) {
 				if (headers.length % 2 !== 0) throw new InvalidArgumentError("headers array must be even");
 				for (let i = 0; i < headers.length; i += 2) processHeader(this, headers[i], headers[i + 1]);
-			} else if (headers && typeof headers === "object") if (headers[Symbol.iterator]) for (const header of headers) {
-				if (!Array.isArray(header) || header.length !== 2) throw new InvalidArgumentError("headers must be in key-value pair format");
-				processHeader(this, header[0], header[1]);
-			}
-			else {
-				const keys = Object.keys(headers);
-				for (let i = 0; i < keys.length; ++i) processHeader(this, keys[i], headers[keys[i]]);
-			}
-			else if (headers != null) throw new InvalidArgumentError("headers must be an object or an array");
+			} else if (headers && typeof headers === "object") {
+				if (headers[Symbol.iterator]) for (const header of headers) {
+					if (!Array.isArray(header) || header.length !== 2) throw new InvalidArgumentError("headers must be in key-value pair format");
+					processHeader(this, header[0], header[1]);
+				}
+				else {
+					const keys = Object.keys(headers);
+					for (let i = 0; i < keys.length; ++i) processHeader(this, keys[i], headers[keys[i]]);
+				}
+			} else if (headers != null) throw new InvalidArgumentError("headers must be an object or an array");
 			validateHandler(handler, method, upgrade);
 			this.servername = servername || getServerName(this.host);
 			this[kHandler] = handler;
@@ -4103,8 +4106,10 @@ var require_util$7 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			const algorithm = item.algo;
 			const expectedValue = item.hash;
 			let actualValue = crypto.createHash(algorithm).update(bytes).digest("base64");
-			if (actualValue[actualValue.length - 1] === "=") if (actualValue[actualValue.length - 2] === "=") actualValue = actualValue.slice(0, -2);
-			else actualValue = actualValue.slice(0, -1);
+			if (actualValue[actualValue.length - 1] === "=") {
+				if (actualValue[actualValue.length - 2] === "=") actualValue = actualValue.slice(0, -2);
+				else actualValue = actualValue.slice(0, -1);
+			}
 			if (compareBase64Mixed(actualValue, expectedValue)) return true;
 		}
 		return false;
@@ -4547,12 +4552,14 @@ var require_util$7 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		let temporaryValue = "";
 		while (position.position < input.length) {
 			temporaryValue += collectASequenceOfCodePoints((char) => char !== "\"" && char !== ",", input, position);
-			if (position.position < input.length) if (input.charCodeAt(position.position) === 34) {
-				temporaryValue += collectAnHTTPQuotedString(input, position);
-				if (position.position < input.length) continue;
-			} else {
-				assert$23(input.charCodeAt(position.position) === 44);
-				position.position++;
+			if (position.position < input.length) {
+				if (input.charCodeAt(position.position) === 34) {
+					temporaryValue += collectAnHTTPQuotedString(input, position);
+					if (position.position < input.length) continue;
+				} else {
+					assert$23(input.charCodeAt(position.position) === 44);
+					position.position++;
+				}
 			}
 			temporaryValue = removeChars(temporaryValue, true, true, (char) => char === 9 || char === 32);
 			values.push(temporaryValue);
@@ -4806,9 +4813,10 @@ var require_formdata = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		}
 		[nodeUtil$2.inspect.custom](depth, options) {
 			const state = this[kState].reduce((a, b) => {
-				if (a[b.name]) if (Array.isArray(a[b.name])) a[b.name].push(b.value);
-				else a[b.name] = [a[b.name], b.value];
-				else a[b.name] = b.value;
+				if (a[b.name]) {
+					if (Array.isArray(a[b.name])) a[b.name].push(b.value);
+					else a[b.name] = [a[b.name], b.value];
+				} else a[b.name] = b.value;
 				return a;
 			}, { __proto__: null });
 			options.depth ??= depth;
@@ -5426,10 +5434,12 @@ var require_client_h1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 					timers.clearTimeout(this.timeout);
 					this.timeout = null;
 				}
-				if (delay) if (type & USE_FAST_TIMER) this.timeout = timers.setFastTimeout(onParserTimeout, delay, new WeakRef(this));
-				else {
-					this.timeout = setTimeout(onParserTimeout, delay, new WeakRef(this));
-					this.timeout.unref();
+				if (delay) {
+					if (type & USE_FAST_TIMER) this.timeout = timers.setFastTimeout(onParserTimeout, delay, new WeakRef(this));
+					else {
+						this.timeout = setTimeout(onParserTimeout, delay, new WeakRef(this));
+						this.timeout.unref();
+					}
 				}
 				this.timeoutValue = delay;
 			} else if (this.timeout) {
@@ -5977,9 +5987,10 @@ var require_client_h1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		/* istanbul ignore else: assertion */
 		if (!body || bodyLength === 0) writeBuffer(abort, null, client, request, socket, contentLength, header, expectsPayload);
 		else if (util.isBuffer(body)) writeBuffer(abort, body, client, request, socket, contentLength, header, expectsPayload);
-		else if (util.isBlobLike(body)) if (typeof body.stream === "function") writeIterable(abort, body.stream(), client, request, socket, contentLength, header, expectsPayload);
-		else writeBlob(abort, body, client, request, socket, contentLength, header, expectsPayload);
-		else if (util.isStream(body)) writeStream(abort, body, client, request, socket, contentLength, header, expectsPayload);
+		else if (util.isBlobLike(body)) {
+			if (typeof body.stream === "function") writeIterable(abort, body.stream(), client, request, socket, contentLength, header, expectsPayload);
+			else writeBlob(abort, body, client, request, socket, contentLength, header, expectsPayload);
+		} else if (util.isStream(body)) writeStream(abort, body, client, request, socket, contentLength, header, expectsPayload);
 		else if (util.isIterable(body)) writeIterable(abort, body, client, request, socket, contentLength, header, expectsPayload);
 		else assert$20(false);
 		return true;
@@ -6041,12 +6052,13 @@ var require_client_h1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	}
 	function writeBuffer(abort, body, client, request, socket, contentLength, header, expectsPayload) {
 		try {
-			if (!body) if (contentLength === 0) socket.write(`${header}content-length: 0\r\n\r\n`, "latin1");
-			else {
-				assert$20(contentLength === null, "no body must not have content length");
-				socket.write(`${header}\r\n`, "latin1");
-			}
-			else if (util.isBuffer(body)) {
+			if (!body) {
+				if (contentLength === 0) socket.write(`${header}content-length: 0\r\n\r\n`, "latin1");
+				else {
+					assert$20(contentLength === null, "no body must not have content length");
+					socket.write(`${header}\r\n`, "latin1");
+				}
+			} else if (util.isBuffer(body)) {
 				assert$20(contentLength === body.byteLength, "buffer body must have content length");
 				socket.cork();
 				socket.write(`${header}content-length: ${contentLength}\r\n\r\n`, "latin1");
@@ -6162,11 +6174,14 @@ var require_client_h1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			socket[kWriting] = false;
 			if (socket[kError]) throw socket[kError];
 			if (socket.destroyed) return;
-			if (bytesWritten === 0) if (expectsPayload) socket.write(`${header}content-length: 0\r\n\r\n`, "latin1");
-			else socket.write(`${header}\r\n`, "latin1");
-			else if (contentLength === null) socket.write("\r\n0\r\n\r\n", "latin1");
-			if (contentLength !== null && bytesWritten !== contentLength) if (client[kStrictContentLength]) throw new RequestContentLengthMismatchError();
-			else process.emitWarning(new RequestContentLengthMismatchError());
+			if (bytesWritten === 0) {
+				if (expectsPayload) socket.write(`${header}content-length: 0\r\n\r\n`, "latin1");
+				else socket.write(`${header}\r\n`, "latin1");
+			} else if (contentLength === null) socket.write("\r\n0\r\n\r\n", "latin1");
+			if (contentLength !== null && bytesWritten !== contentLength) {
+				if (client[kStrictContentLength]) throw new RequestContentLengthMismatchError();
+				else process.emitWarning(new RequestContentLengthMismatchError());
+			}
 			if (socket[kParser].timeout && socket[kParser].timeoutType === TIMEOUT_HEADERS) {
 				// istanbul ignore else: only for jest
 				if (socket[kParser].timeout.refresh) socket[kParser].timeout.refresh();
@@ -6288,12 +6303,14 @@ var require_client_h2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	}
 	function resumeH2(client) {
 		const socket = client[kSocket];
-		if (socket?.destroyed === false) if (client[kSize] === 0 && client[kMaxConcurrentStreams] === 0) {
-			socket.unref();
-			client[kHTTP2Session].unref();
-		} else {
-			socket.ref();
-			client[kHTTP2Session].ref();
+		if (socket?.destroyed === false) {
+			if (client[kSize] === 0 && client[kMaxConcurrentStreams] === 0) {
+				socket.unref();
+				client[kHTTP2Session].unref();
+			} else {
+				socket.ref();
+				client[kHTTP2Session].ref();
+			}
 		}
 	}
 	function onHttp2SessionError(err) {
@@ -6477,9 +6494,10 @@ var require_client_h2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			/* istanbul ignore else: assertion */
 			if (!body || contentLength === 0) writeBuffer(abort, stream, null, client, request, client[kSocket], contentLength, expectsPayload);
 			else if (util.isBuffer(body)) writeBuffer(abort, stream, body, client, request, client[kSocket], contentLength, expectsPayload);
-			else if (util.isBlobLike(body)) if (typeof body.stream === "function") writeIterable(abort, stream, body.stream(), client, request, client[kSocket], contentLength, expectsPayload);
-			else writeBlob(abort, stream, body, client, request, client[kSocket], contentLength, expectsPayload);
-			else if (util.isStream(body)) writeStream(abort, client[kSocket], expectsPayload, stream, body, client, request, contentLength);
+			else if (util.isBlobLike(body)) {
+				if (typeof body.stream === "function") writeIterable(abort, stream, body.stream(), client, request, client[kSocket], contentLength, expectsPayload);
+				else writeBlob(abort, stream, body, client, request, client[kSocket], contentLength, expectsPayload);
+			} else if (util.isStream(body)) writeStream(abort, client[kSocket], expectsPayload, stream, body, client, request, contentLength);
 			else if (util.isIterable(body)) writeIterable(abort, stream, body, client, request, client[kSocket], contentLength, expectsPayload);
 			else assert$19(false);
 		}
@@ -7954,13 +7972,15 @@ var require_retry_handler = /* @__PURE__ */ __commonJSMin(((exports, module) => 
 		onHeaders(statusCode, rawHeaders, resume, statusMessage) {
 			const headers = parseHeaders(rawHeaders);
 			this.retryCount += 1;
-			if (statusCode >= 300) if (this.retryOpts.statusCodes.includes(statusCode) === false) return this.handler.onHeaders(statusCode, rawHeaders, resume, statusMessage);
-			else {
-				this.abort(new RequestRetryError("Request failed", statusCode, {
-					headers,
-					data: { count: this.retryCount }
-				}));
-				return false;
+			if (statusCode >= 300) {
+				if (this.retryOpts.statusCodes.includes(statusCode) === false) return this.handler.onHeaders(statusCode, rawHeaders, resume, statusMessage);
+				else {
+					this.abort(new RequestRetryError("Request failed", statusCode, {
+						headers,
+						data: { count: this.retryCount }
+					}));
+					return false;
+				}
 			}
 			if (this.resume != null) {
 				this.resume = null;
@@ -8432,17 +8452,19 @@ var require_api_request = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (util.isStream(body)) body.on("error", (err) => {
 				this.onError(err);
 			});
-			if (this.signal) if (this.signal.aborted) this.reason = this.signal.reason ?? new RequestAbortedError();
-			else this.removeAbortListener = util.addAbortListener(this.signal, () => {
-				this.reason = this.signal.reason ?? new RequestAbortedError();
-				if (this.res) util.destroy(this.res.on("error", util.nop), this.reason);
-				else if (this.abort) this.abort(this.reason);
-				if (this.removeAbortListener) {
-					this.res?.off("close", this.removeAbortListener);
-					this.removeAbortListener();
-					this.removeAbortListener = null;
-				}
-			});
+			if (this.signal) {
+				if (this.signal.aborted) this.reason = this.signal.reason ?? new RequestAbortedError();
+				else this.removeAbortListener = util.addAbortListener(this.signal, () => {
+					this.reason = this.signal.reason ?? new RequestAbortedError();
+					if (this.res) util.destroy(this.res.on("error", util.nop), this.reason);
+					else if (this.abort) this.abort(this.reason);
+					if (this.removeAbortListener) {
+						this.res?.off("close", this.removeAbortListener);
+						this.removeAbortListener();
+						this.removeAbortListener = null;
+					}
+				});
+			}
 		}
 		onConnect(abort, context) {
 			if (this.reason) {
@@ -8476,22 +8498,24 @@ var require_api_request = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (this.removeAbortListener) res.on("close", this.removeAbortListener);
 			this.callback = null;
 			this.res = res;
-			if (callback !== null) if (this.throwOnError && statusCode >= 400) this.runInAsyncScope(getResolveErrorBodyCallback, null, {
-				callback,
-				body: res,
-				contentType,
-				statusCode,
-				statusMessage,
-				headers
-			});
-			else this.runInAsyncScope(callback, null, null, {
-				statusCode,
-				headers,
-				trailers: this.trailers,
-				opaque,
-				body: res,
-				context
-			});
+			if (callback !== null) {
+				if (this.throwOnError && statusCode >= 400) this.runInAsyncScope(getResolveErrorBodyCallback, null, {
+					callback,
+					body: res,
+					contentType,
+					statusCode,
+					statusMessage,
+					headers
+				});
+				else this.runInAsyncScope(callback, null, null, {
+					statusCode,
+					headers,
+					trailers: this.trailers,
+					opaque,
+					body: res,
+					context
+				});
+			}
 		}
 		onData(chunk) {
 			return this.res.push(chunk);
@@ -9404,10 +9428,12 @@ var require_mock_interceptor = /* @__PURE__ */ __commonJSMin(((exports, module) 
 			if (typeof opts !== "object") throw new InvalidArgumentError("opts must be an object");
 			if (typeof opts.path === "undefined") throw new InvalidArgumentError("opts.path must be defined");
 			if (typeof opts.method === "undefined") opts.method = "GET";
-			if (typeof opts.path === "string") if (opts.query) opts.path = buildURL(opts.path, opts.query);
-			else {
-				const parsedURL = new URL(opts.path, "data://");
-				opts.path = parsedURL.pathname + parsedURL.search;
+			if (typeof opts.path === "string") {
+				if (opts.query) opts.path = buildURL(opts.path, opts.query);
+				else {
+					const parsedURL = new URL(opts.path, "data://");
+					opts.path = parsedURL.pathname + parsedURL.search;
+				}
 			}
 			if (typeof opts.method === "string") opts.method = opts.method.toUpperCase();
 			this[kDispatchKey] = buildKey(opts);
@@ -9706,9 +9732,10 @@ var require_mock_agent = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			this[kIsMockActive] = true;
 		}
 		enableNetConnect(matcher) {
-			if (typeof matcher === "string" || typeof matcher === "function" || matcher instanceof RegExp) if (Array.isArray(this[kNetConnect])) this[kNetConnect].push(matcher);
-			else this[kNetConnect] = [matcher];
-			else if (typeof matcher === "undefined") this[kNetConnect] = true;
+			if (typeof matcher === "string" || typeof matcher === "function" || matcher instanceof RegExp) {
+				if (Array.isArray(this[kNetConnect])) this[kNetConnect].push(matcher);
+				else this[kNetConnect] = [matcher];
+			} else if (typeof matcher === "undefined") this[kNetConnect] = true;
 			else throw new InvalidArgumentError("Unsupported matcher. Must be one of String|Function|RegExp.");
 		}
 		disableNetConnect() {
@@ -10017,12 +10044,14 @@ var require_dns = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			const { records, offset } = hostnameRecords;
 			let family;
 			if (this.dualStack) {
-				if (affinity == null) if (offset == null || offset === maxInt) {
-					hostnameRecords.offset = 0;
-					affinity = 4;
-				} else {
-					hostnameRecords.offset++;
-					affinity = (hostnameRecords.offset & 1) === 1 ? 6 : 4;
+				if (affinity == null) {
+					if (offset == null || offset === maxInt) {
+						hostnameRecords.offset = 0;
+						affinity = 4;
+					} else {
+						hostnameRecords.offset++;
+						affinity = (hostnameRecords.offset & 1) === 1 ? 6 : 4;
+					}
 				}
 				if (records[affinity] != null && records[affinity].ips.length > 0) family = records[affinity];
 				else family = records[affinity === 4 ? 6 : 4];
@@ -11524,8 +11553,10 @@ var require_fetch = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		assert$5(!request.body || request.body.stream);
 		if (request.window === "client") request.window = request.client?.globalObject?.constructor?.name === "Window" ? request.client : "no-window";
 		if (request.origin === "client") request.origin = request.client.origin;
-		if (request.policyContainer === "client") if (request.client != null) request.policyContainer = clonePolicyContainer(request.client.policyContainer);
-		else request.policyContainer = makePolicyContainer();
+		if (request.policyContainer === "client") {
+			if (request.client != null) request.policyContainer = clonePolicyContainer(request.client.policyContainer);
+			else request.policyContainer = makePolicyContainer();
+		}
 		if (!request.headersList.contains("accept", true)) request.headersList.append("accept", "*/*", true);
 		if (!request.headersList.contains("accept-language", true)) request.headersList.append("accept-language", "*", true);
 		if (request.priority === null) {}
@@ -11794,8 +11825,10 @@ var require_fetch = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (!httpRequest.headersList.contains("cache-control", true)) httpRequest.headersList.append("cache-control", "no-cache", true);
 		}
 		if (httpRequest.headersList.contains("range", true)) httpRequest.headersList.append("accept-encoding", "identity", true);
-		if (!httpRequest.headersList.contains("accept-encoding", true)) if (urlHasHttpsScheme(requestCurrentURL(httpRequest))) httpRequest.headersList.append("accept-encoding", "br, gzip, deflate", true);
-		else httpRequest.headersList.append("accept-encoding", "gzip, deflate", true);
+		if (!httpRequest.headersList.contains("accept-encoding", true)) {
+			if (urlHasHttpsScheme(requestCurrentURL(httpRequest))) httpRequest.headersList.append("accept-encoding", "br, gzip, deflate", true);
+			else httpRequest.headersList.append("accept-encoding", "gzip, deflate", true);
+		}
 		httpRequest.headersList.delete("host", true);
 		if (includeCredentials) {}
 		httpRequest.cache = "no-store";
@@ -14278,8 +14311,10 @@ var require_util$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			failWebsocketConnection(ws, "Received invalid UTF-8 in text frame.");
 			return;
 		}
-		else if (type === opcodes.BINARY) if (ws[kBinaryType] === "blob") dataForEvent = new Blob([data]);
-		else dataForEvent = toArrayBuffer(data);
+		else if (type === opcodes.BINARY) {
+			if (ws[kBinaryType] === "blob") dataForEvent = new Blob([data]);
+			else dataForEvent = toArrayBuffer(data);
+		}
 		fireEvent("message", ws, createFastMessageEvent, {
 			origin: ws[kWebSocketURL].origin,
 			data: dataForEvent
@@ -15849,13 +15884,15 @@ var require_eventsource = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			};
 			fetchParams.processResponseEndOfBody = processEventSourceEndOfBody;
 			fetchParams.processResponse = (response) => {
-				if (isNetworkError(response)) if (response.aborted) {
-					this.close();
-					this.dispatchEvent(new Event("error"));
-					return;
-				} else {
-					this.#reconnect();
-					return;
+				if (isNetworkError(response)) {
+					if (response.aborted) {
+						this.close();
+						this.dispatchEvent(new Event("error"));
+						return;
+					} else {
+						this.#reconnect();
+						return;
+					}
 				}
 				const contentType = response.headersList.get("content-type", true);
 				const mimeType = contentType !== null ? parseMIMEType(contentType) : "failure";
@@ -16520,14 +16557,18 @@ var HttpClient = class {
 		let clientHeader;
 		if (this.requestOptions && this.requestOptions.headers) {
 			const headerValue = lowercaseKeys$1(this.requestOptions.headers)[Headers.ContentType];
-			if (headerValue) if (typeof headerValue === "number") clientHeader = String(headerValue);
-			else if (Array.isArray(headerValue)) clientHeader = headerValue.join(", ");
-			else clientHeader = headerValue;
+			if (headerValue) {
+				if (typeof headerValue === "number") clientHeader = String(headerValue);
+				else if (Array.isArray(headerValue)) clientHeader = headerValue.join(", ");
+				else clientHeader = headerValue;
+			}
 		}
 		const additionalValue = additionalHeaders[Headers.ContentType];
-		if (additionalValue !== void 0) if (typeof additionalValue === "number") return String(additionalValue);
-		else if (Array.isArray(additionalValue)) return additionalValue.join(", ");
-		else return additionalValue;
+		if (additionalValue !== void 0) {
+			if (typeof additionalValue === "number") return String(additionalValue);
+			else if (Array.isArray(additionalValue)) return additionalValue.join(", ");
+			else return additionalValue;
+		}
 		if (clientHeader !== void 0) return clientHeader;
 		return _default;
 	}
@@ -17173,9 +17214,10 @@ function cp(source_1, dest_1) {
 		if (destStat && destStat.isFile() && !force) return;
 		const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path$6.join(dest, path$6.basename(source)) : dest;
 		if (!(yield exists(source))) throw new Error(`no such file or directory: ${source}`);
-		if ((yield stat(source)).isDirectory()) if (!recursive) throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
-		else yield cpDirRecursive(source, newDest, 0, force);
-		else {
+		if ((yield stat(source)).isDirectory()) {
+			if (!recursive) throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
+			else yield cpDirRecursive(source, newDest, 0, force);
+		} else {
 			if (path$6.relative(source, newDest) === "") throw new Error(`'${newDest}' and '${source}' are the same file`);
 			yield copyFile(source, newDest, force);
 		}
@@ -17229,8 +17271,10 @@ function which(tool, check) {
 		if (!tool) throw new Error("parameter 'tool' is required");
 		if (check) {
 			const result = yield which(tool, false);
-			if (!result) if (IS_WINDOWS$8) throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
-			else throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
+			if (!result) {
+				if (IS_WINDOWS$8) throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
+				else throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
+			}
 			return result;
 		}
 		const matches = yield findInPath(tool);
@@ -17353,17 +17397,18 @@ var ToolRunner = class extends events.EventEmitter {
 		const toolPath = this._getSpawnFileName();
 		const args = this._getSpawnArgs(options);
 		let cmd = noPrefix ? "" : "[command]";
-		if (IS_WINDOWS$7) if (this._isCmdFile()) {
-			cmd += toolPath;
-			for (const a of args) cmd += ` ${a}`;
-		} else if (options.windowsVerbatimArguments) {
-			cmd += `"${toolPath}"`;
-			for (const a of args) cmd += ` ${a}`;
+		if (IS_WINDOWS$7) {
+			if (this._isCmdFile()) {
+				cmd += toolPath;
+				for (const a of args) cmd += ` ${a}`;
+			} else if (options.windowsVerbatimArguments) {
+				cmd += `"${toolPath}"`;
+				for (const a of args) cmd += ` ${a}`;
+			} else {
+				cmd += this._windowsQuoteCmdArg(toolPath);
+				for (const a of args) cmd += ` ${this._windowsQuoteCmdArg(a)}`;
+			}
 		} else {
-			cmd += this._windowsQuoteCmdArg(toolPath);
-			for (const a of args) cmd += ` ${this._windowsQuoteCmdArg(a)}`;
-		}
-		else {
 			cmd += toolPath;
 			for (const a of args) cmd += ` ${a}`;
 		}
@@ -18082,12 +18127,13 @@ function ensureAbsoluteRoot(root, itemPath) {
 		if (itemPath.match(/^[A-Z]:[^\\/]|^[A-Z]:$/i)) {
 			let cwd = process.cwd();
 			assert(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
-			if (itemPath[0].toUpperCase() === cwd[0].toUpperCase()) if (itemPath.length === 2) return `${itemPath[0]}:\\${cwd.substr(3)}`;
-			else {
-				if (!cwd.endsWith("\\")) cwd += "\\";
-				return `${itemPath[0]}:\\${cwd.substr(3)}${itemPath.substr(2)}`;
-			}
-			else return `${itemPath[0]}:\\${itemPath.substr(2)}`;
+			if (itemPath[0].toUpperCase() === cwd[0].toUpperCase()) {
+				if (itemPath.length === 2) return `${itemPath[0]}:\\${cwd.substr(3)}`;
+				else {
+					if (!cwd.endsWith("\\")) cwd += "\\";
+					return `${itemPath[0]}:\\${cwd.substr(3)}${itemPath.substr(2)}`;
+				}
+			} else return `${itemPath[0]}:\\${itemPath.substr(2)}`;
 		} else if (normalizeSeparators(itemPath).match(/^\\$|^\\[^\\]/)) {
 			const cwd = process.cwd();
 			assert(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
@@ -18636,8 +18682,10 @@ var require_minimatch = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	};
 	Minimatch.prototype.braceExpand = braceExpand;
 	function braceExpand(pattern, options) {
-		if (!options) if (this instanceof Minimatch) options = this.options;
-		else options = {};
+		if (!options) {
+			if (this instanceof Minimatch) options = this.options;
+			else options = {};
+		}
 		pattern = typeof pattern === "undefined" ? this.pattern : pattern;
 		assertValidPattern(pattern);
 		if (options.nobrace || !/\{(?:(?!\{).)*\}/.test(pattern)) return [pattern];
@@ -18653,8 +18701,10 @@ var require_minimatch = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function parse(pattern, isSub) {
 		assertValidPattern(pattern);
 		var options = this.options;
-		if (pattern === "**") if (!options.noglobstar) return GLOBSTAR;
-		else pattern = "*";
+		if (pattern === "**") {
+			if (!options.noglobstar) return GLOBSTAR;
+			else pattern = "*";
+		}
 		if (pattern === "") return "";
 		var re = "";
 		var hasMagic = !!options.nocase;
@@ -19729,9 +19779,10 @@ var require_semver$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var SemVer = class SemVer {
 		constructor(version, options) {
 			options = parseOptions(options);
-			if (version instanceof SemVer) if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) return version;
-			else version = version.version;
-			else if (typeof version !== "string") throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
+			if (version instanceof SemVer) {
+				if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) return version;
+				else version = version.version;
+			} else if (typeof version !== "string") throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
 			if (version.length > MAX_LENGTH) throw new TypeError(`version is longer than ${MAX_LENGTH} characters`);
 			debug("SemVer", version, options);
 			this.options = options;
@@ -20260,8 +20311,10 @@ var require_range = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var Range = class Range {
 		constructor(range, options) {
 			options = parseOptions(options);
-			if (range instanceof Range) if (range.loose === !!options.loose && range.includePrerelease === !!options.includePrerelease) return range;
-			else return new Range(range.raw, options);
+			if (range instanceof Range) {
+				if (range.loose === !!options.loose && range.includePrerelease === !!options.includePrerelease) return range;
+				else return new Range(range.raw, options);
+			}
 			if (range instanceof Comparator) {
 				this.raw = range.value;
 				this.set = [[range]];
@@ -20432,18 +20485,21 @@ var require_range = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			let ret;
 			if (isX(M)) ret = "";
 			else if (isX(m)) ret = `>=${M}.0.0${z} <${+M + 1}.0.0-0`;
-			else if (isX(p)) if (M === "0") ret = `>=${M}.${m}.0${z} <${M}.${+m + 1}.0-0`;
-			else ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
-			else if (pr) {
+			else if (isX(p)) {
+				if (M === "0") ret = `>=${M}.${m}.0${z} <${M}.${+m + 1}.0-0`;
+				else ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
+			} else if (pr) {
 				debug("replaceCaret pr", pr);
-				if (M === "0") if (m === "0") ret = `>=${M}.${m}.${p}-${pr} <${M}.${m}.${+p + 1}-0`;
-				else ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
-				else ret = `>=${M}.${m}.${p}-${pr} <${+M + 1}.0.0-0`;
+				if (M === "0") {
+					if (m === "0") ret = `>=${M}.${m}.${p}-${pr} <${M}.${m}.${+p + 1}-0`;
+					else ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
+				} else ret = `>=${M}.${m}.${p}-${pr} <${+M + 1}.0.0-0`;
 			} else {
 				debug("no pr");
-				if (M === "0") if (m === "0") ret = `>=${M}.${m}.${p} <${M}.${m}.${+p + 1}-0`;
-				else ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
-				else ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
+				if (M === "0") {
+					if (m === "0") ret = `>=${M}.${m}.${p} <${M}.${m}.${+p + 1}-0`;
+					else ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
+				} else ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
 			}
 			debug("caret return", ret);
 			return ret;
@@ -20465,9 +20521,10 @@ var require_range = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			const anyX = xp;
 			if (gtlt === "=" && anyX) gtlt = "";
 			pr = options.includePrerelease ? "-0" : "";
-			if (xM) if (gtlt === ">" || gtlt === "<") ret = "<0.0.0-0";
-			else ret = "*";
-			else if (gtlt && anyX) {
+			if (xM) {
+				if (gtlt === ">" || gtlt === "<") ret = "<0.0.0-0";
+				else ret = "*";
+			} else if (gtlt && anyX) {
 				if (xm) m = 0;
 				p = 0;
 				if (gtlt === ">") {
@@ -20542,8 +20599,10 @@ var require_comparator = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		}
 		constructor(comp, options) {
 			options = parseOptions(options);
-			if (comp instanceof Comparator) if (comp.loose === !!options.loose) return comp;
-			else comp = comp.value;
+			if (comp instanceof Comparator) {
+				if (comp.loose === !!options.loose) return comp;
+				else comp = comp.value;
+			}
 			comp = comp.trim().split(/\s+/).join(" ");
 			debug("comparator", comp, options);
 			this.options = options;
@@ -20876,11 +20935,15 @@ var require_subset = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const minimumVersion = [new Comparator(">=0.0.0")];
 	const simpleSubset = (sub, dom, options) => {
 		if (sub === dom) return true;
-		if (sub.length === 1 && sub[0].semver === ANY) if (dom.length === 1 && dom[0].semver === ANY) return true;
-		else if (options.includePrerelease) sub = minimumVersionWithPreRelease;
-		else sub = minimumVersion;
-		if (dom.length === 1 && dom[0].semver === ANY) if (options.includePrerelease) return true;
-		else dom = minimumVersion;
+		if (sub.length === 1 && sub[0].semver === ANY) {
+			if (dom.length === 1 && dom[0].semver === ANY) return true;
+			else if (options.includePrerelease) sub = minimumVersionWithPreRelease;
+			else sub = minimumVersion;
+		}
+		if (dom.length === 1 && dom[0].semver === ANY) {
+			if (options.includePrerelease) return true;
+			else dom = minimumVersion;
+		}
 		const eqSet = /* @__PURE__ */ new Set();
 		let gt, lt;
 		for (const c of sub) if (c.operator === ">" || c.operator === ">=") gt = higherGT(gt, c, options);
@@ -21458,8 +21521,10 @@ function createLoggerContext(options) {
 		for (const logger of registeredLoggers) if (shouldEnable(logger)) enabledNamespaces.push(logger.namespace);
 		debugObj.enable(enabledNamespaces.join(","));
 	}
-	if (logLevelFromEnv) if (isTypeSpecRuntimeLogLevel(logLevelFromEnv)) contextSetLogLevel(logLevelFromEnv);
-	else console.error(`${options.logLevelEnvVarName} set to unknown log level '${logLevelFromEnv}'; logging is not enabled. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(", ")}.`);
+	if (logLevelFromEnv) {
+		if (isTypeSpecRuntimeLogLevel(logLevelFromEnv)) contextSetLogLevel(logLevelFromEnv);
+		else console.error(`${options.logLevelEnvVarName} set to unknown log level '${logLevelFromEnv}'; logging is not enabled. Acceptable values: ${TYPESPEC_RUNTIME_LOG_LEVELS.join(", ")}.`);
+	}
 	function shouldEnable(logger) {
 		return Boolean(logLevel && levelMap[logger.level] <= levelMap[logLevel]);
 	}
@@ -22265,13 +22330,14 @@ var NodeHttpClient = class {
 				reject(abortError);
 			});
 			if (body && isReadableStream(body)) body.pipe(req);
-			else if (body) if (typeof body === "string" || Buffer.isBuffer(body)) req.end(body);
-			else if (isArrayBuffer(body)) req.end(ArrayBuffer.isView(body) ? Buffer.from(body.buffer, body.byteOffset, body.byteLength) : Buffer.from(body));
-			else {
-				logger$4.error("Unrecognized body type", body);
-				reject(new RestError$1("Unrecognized body type"));
-			}
-			else req.end();
+			else if (body) {
+				if (typeof body === "string" || Buffer.isBuffer(body)) req.end(body);
+				else if (isArrayBuffer(body)) req.end(ArrayBuffer.isView(body) ? Buffer.from(body.buffer, body.byteOffset, body.byteLength) : Buffer.from(body));
+				else {
+					logger$4.error("Unrecognized body type", body);
+					reject(new RestError$1("Unrecognized body type"));
+				}
+			} else req.end();
 		});
 	}
 	getOrCreateAgent(request, isInsecure) {
@@ -23049,15 +23115,16 @@ var require_common = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			let templateIndex = 0;
 			let starIndex = -1;
 			let matchIndex = 0;
-			while (searchIndex < search.length) if (templateIndex < template.length && (template[templateIndex] === search[searchIndex] || template[templateIndex] === "*")) if (template[templateIndex] === "*") {
-				starIndex = templateIndex;
-				matchIndex = searchIndex;
-				templateIndex++;
-			} else {
-				searchIndex++;
-				templateIndex++;
-			}
-			else if (starIndex !== -1) {
+			while (searchIndex < search.length) if (templateIndex < template.length && (template[templateIndex] === search[searchIndex] || template[templateIndex] === "*")) {
+				if (template[templateIndex] === "*") {
+					starIndex = templateIndex;
+					matchIndex = searchIndex;
+					templateIndex++;
+				} else {
+					searchIndex++;
+					templateIndex++;
+				}
+			} else if (starIndex !== -1) {
 				templateIndex = starIndex + 1;
 				matchIndex++;
 				searchIndex = matchIndex;
@@ -25831,10 +25898,11 @@ var SerializerImpl = class {
 			if (mapperType.match(/^Number$/i) !== null) {
 				payload = parseFloat(responseBody);
 				if (isNaN(payload)) payload = responseBody;
-			} else if (mapperType.match(/^Boolean$/i) !== null) if (responseBody === "true") payload = true;
-			else if (responseBody === "false") payload = false;
-			else payload = responseBody;
-			else if (mapperType.match(/^(String|Enum|Object|Stream|Uuid|TimeSpan|any)$/i) !== null) payload = responseBody;
+			} else if (mapperType.match(/^Boolean$/i) !== null) {
+				if (responseBody === "true") payload = true;
+				else if (responseBody === "false") payload = false;
+				else payload = responseBody;
+			} else if (mapperType.match(/^(String|Enum|Object|Stream|Uuid|TimeSpan|any)$/i) !== null) payload = responseBody;
 			else if (mapperType.match(/^(Date|DateTime|DateTimeRfc1123)$/i) !== null) payload = new Date(responseBody);
 			else if (mapperType.match(/^UnixTime$/i) !== null) payload = unixTimeToDate(responseBody);
 			else if (mapperType.match(/^ByteArray$/i) !== null) payload = decodeString(responseBody);
@@ -26035,9 +26103,10 @@ function serializeCompositeType(serializer, mapper, object, objectName, isXml, o
 			if (propertyMapper.readOnly) continue;
 			let propName;
 			let parentObject = payload;
-			if (serializer.isXML) if (propertyMapper.xmlIsWrapped) propName = propertyMapper.xmlName;
-			else propName = propertyMapper.xmlElementName || propertyMapper.xmlName;
-			else {
+			if (serializer.isXML) {
+				if (propertyMapper.xmlIsWrapped) propName = propertyMapper.xmlName;
+				else propName = propertyMapper.xmlElementName || propertyMapper.xmlName;
+			} else {
 				const paths = splitSerializeName(propertyMapper.serializedName);
 				propName = paths.pop();
 				for (const pathName of paths) {
@@ -26086,11 +26155,13 @@ function serializeCompositeType(serializer, mapper, object, objectName, isXml, o
 function getXmlObjectValue(propertyMapper, serializedValue, isXml, options) {
 	if (!isXml || !propertyMapper.xmlNamespace) return serializedValue;
 	const xmlNamespace = { [propertyMapper.xmlNamespacePrefix ? `xmlns:${propertyMapper.xmlNamespacePrefix}` : "xmlns"]: propertyMapper.xmlNamespace };
-	if (["Composite"].includes(propertyMapper.type.name)) if (serializedValue["$"]) return serializedValue;
-	else {
-		const result = { ...serializedValue };
-		result["$"] = xmlNamespace;
-		return result;
+	if (["Composite"].includes(propertyMapper.type.name)) {
+		if (serializedValue["$"]) return serializedValue;
+		else {
+			const result = { ...serializedValue };
+			result["$"] = xmlNamespace;
+			return result;
+		}
 	}
 	const result = {};
 	result[options.xml.xmlCharKey] = serializedValue;
@@ -26121,28 +26192,29 @@ function deserializeCompositeType(serializer, mapper, responseBody, objectName, 
 				handledPropertyNames.push(headerKey);
 			}
 			instance[key] = dictionary;
-		} else if (serializer.isXML) if (propertyMapper.xmlIsAttribute && responseBody["$"]) instance[key] = serializer.deserialize(propertyMapper, responseBody["$"][xmlName], propertyObjectName, options);
-		else if (propertyMapper.xmlIsMsText) {
-			if (responseBody[xmlCharKey] !== void 0) instance[key] = responseBody[xmlCharKey];
-			else if (typeof responseBody === "string") instance[key] = responseBody;
-		} else {
-			const propertyName = xmlElementName || xmlName || serializedName;
-			if (propertyMapper.xmlIsWrapped) {
-				const elementList = responseBody[xmlName]?.[xmlElementName] ?? [];
-				Object.defineProperty(instance, key, {
-					value: serializer.deserialize(propertyMapper, elementList, propertyObjectName, options),
-					enumerable: true,
-					configurable: true,
-					writable: true
-				});
-				handledPropertyNames.push(xmlName);
+		} else if (serializer.isXML) {
+			if (propertyMapper.xmlIsAttribute && responseBody["$"]) instance[key] = serializer.deserialize(propertyMapper, responseBody["$"][xmlName], propertyObjectName, options);
+			else if (propertyMapper.xmlIsMsText) {
+				if (responseBody[xmlCharKey] !== void 0) instance[key] = responseBody[xmlCharKey];
+				else if (typeof responseBody === "string") instance[key] = responseBody;
 			} else {
-				const property = responseBody[propertyName];
-				instance[key] = serializer.deserialize(propertyMapper, property, propertyObjectName, options);
-				handledPropertyNames.push(propertyName);
+				const propertyName = xmlElementName || xmlName || serializedName;
+				if (propertyMapper.xmlIsWrapped) {
+					const elementList = responseBody[xmlName]?.[xmlElementName] ?? [];
+					Object.defineProperty(instance, key, {
+						value: serializer.deserialize(propertyMapper, elementList, propertyObjectName, options),
+						enumerable: true,
+						configurable: true,
+						writable: true
+					});
+					handledPropertyNames.push(xmlName);
+				} else {
+					const property = responseBody[propertyName];
+					instance[key] = serializer.deserialize(propertyMapper, property, propertyObjectName, options);
+					handledPropertyNames.push(propertyName);
+				}
 			}
-		}
-		else {
+		} else {
 			let propertyInstance;
 			let res = responseBody;
 			let steps = 0;
@@ -26302,13 +26374,15 @@ function getOperationArgumentValueFromParameter(operationArguments, parameter, f
 	let value;
 	if (typeof parameterPath === "string") parameterPath = [parameterPath];
 	if (Array.isArray(parameterPath)) {
-		if (parameterPath.length > 0) if (parameterMapper.isConstant) value = parameterMapper.defaultValue;
-		else {
-			let propertySearchResult = getPropertyFromParameterPath(operationArguments, parameterPath);
-			if (!propertySearchResult.propertyFound && fallbackObject) propertySearchResult = getPropertyFromParameterPath(fallbackObject, parameterPath);
-			let useDefaultValue = false;
-			if (!propertySearchResult.propertyFound) useDefaultValue = parameterMapper.required || parameterPath[0] === "options" && parameterPath.length === 2;
-			value = useDefaultValue ? parameterMapper.defaultValue : propertySearchResult.propertyValue;
+		if (parameterPath.length > 0) {
+			if (parameterMapper.isConstant) value = parameterMapper.defaultValue;
+			else {
+				let propertySearchResult = getPropertyFromParameterPath(operationArguments, parameterPath);
+				if (!propertySearchResult.propertyFound && fallbackObject) propertySearchResult = getPropertyFromParameterPath(fallbackObject, parameterPath);
+				let useDefaultValue = false;
+				if (!propertySearchResult.propertyFound) useDefaultValue = parameterMapper.required || parameterPath[0] === "options" && parameterPath.length === 2;
+				value = useDefaultValue ? parameterMapper.defaultValue : propertySearchResult.propertyValue;
+			}
 		}
 	} else {
 		if (parameterMapper.required) value = {};
@@ -26393,8 +26467,10 @@ function getOperationResponseMap(parsedResponse) {
 	const request = parsedResponse.request;
 	const operationInfo = getOperationRequestInfo(request);
 	const operationSpec = operationInfo?.operationSpec;
-	if (operationSpec) if (!operationInfo?.operationResponseGetter) result = operationSpec.responses[parsedResponse.status];
-	else result = operationInfo?.operationResponseGetter(operationSpec, parsedResponse);
+	if (operationSpec) {
+		if (!operationInfo?.operationResponseGetter) result = operationSpec.responses[parsedResponse.status];
+		else result = operationInfo?.operationResponseGetter(operationSpec, parsedResponse);
+	}
 	return result;
 }
 function shouldDeserializeResponse(parsedResponse) {
@@ -26442,15 +26518,17 @@ function isOperationSpecEmpty(operationSpec) {
 }
 function handleErrorResponse(parsedResponse, operationSpec, responseSpec, options) {
 	const isSuccessByStatus = 200 <= parsedResponse.status && parsedResponse.status < 300;
-	if (isOperationSpecEmpty(operationSpec) ? isSuccessByStatus : !!responseSpec) if (responseSpec) {
-		if (!responseSpec.isError) return {
+	if (isOperationSpecEmpty(operationSpec) ? isSuccessByStatus : !!responseSpec) {
+		if (responseSpec) {
+			if (!responseSpec.isError) return {
+				error: null,
+				shouldReturnResponse: false
+			};
+		} else return {
 			error: null,
 			shouldReturnResponse: false
 		};
-	} else return {
-		error: null,
-		shouldReturnResponse: false
-	};
+	}
 	const errorResponseSpec = responseSpec ?? operationSpec.responses.default;
 	const initialErrorMessage = parsedResponse.request.streamResponseStatusCodes?.has(parsedResponse.status) ? `Unexpected status code: ${parsedResponse.status}` : parsedResponse.bodyAsText;
 	const error = new RestError(initialErrorMessage, {
@@ -26767,10 +26845,12 @@ function calculateQueryParameters(operationSpec, operationArguments, fallbackObj
 			});
 			if (queryParameter.collectionFormat === "Multi" && queryParameterValue.length === 0) continue;
 			else if (Array.isArray(queryParameterValue) && (queryParameter.collectionFormat === "SSV" || queryParameter.collectionFormat === "TSV")) queryParameterValue = queryParameterValue.join(delimiter);
-			if (!queryParameter.skipEncoding) if (Array.isArray(queryParameterValue)) queryParameterValue = queryParameterValue.map((item) => {
-				return encodeURIComponent(item);
-			});
-			else queryParameterValue = encodeURIComponent(queryParameterValue);
+			if (!queryParameter.skipEncoding) {
+				if (Array.isArray(queryParameterValue)) queryParameterValue = queryParameterValue.map((item) => {
+					return encodeURIComponent(item);
+				});
+				else queryParameterValue = encodeURIComponent(queryParameterValue);
+			}
 			if (Array.isArray(queryParameterValue) && (queryParameter.collectionFormat === "CSV" || queryParameter.collectionFormat === "Pipes")) queryParameterValue = queryParameterValue.join(delimiter);
 			result.set(queryParameter.mapper.serializedName || getPathStringFromParameter(queryParameter), queryParameterValue);
 		}
@@ -26788,9 +26868,10 @@ function simpleParseQueryParams(queryString) {
 	for (const pair of pairs) {
 		const [name, value] = pair.split("=", 2);
 		const existingValue = result.get(name);
-		if (existingValue) if (Array.isArray(existingValue)) existingValue.push(value);
-		else result.set(name, [existingValue, value]);
-		else result.set(name, value);
+		if (existingValue) {
+			if (Array.isArray(existingValue)) existingValue.push(value);
+			else result.set(name, [existingValue, value]);
+		} else result.set(name, value);
 	}
 	return result;
 }
@@ -26801,12 +26882,13 @@ function appendQueryParams(url, queryParams, sequenceParams, noOverwrite = false
 	const combinedParams = simpleParseQueryParams(parsedUrl.search);
 	for (const [name, value] of queryParams) {
 		const existingValue = combinedParams.get(name);
-		if (Array.isArray(existingValue)) if (Array.isArray(value)) {
-			existingValue.push(...value);
-			const valueSet = new Set(existingValue);
-			combinedParams.set(name, Array.from(valueSet));
-		} else existingValue.push(value);
-		else if (existingValue) {
+		if (Array.isArray(existingValue)) {
+			if (Array.isArray(value)) {
+				existingValue.push(...value);
+				const valueSet = new Set(existingValue);
+				combinedParams.set(name, Array.from(valueSet));
+			} else existingValue.push(value);
+		} else if (existingValue) {
 			if (Array.isArray(value)) value.unshift(existingValue);
 			else if (sequenceParams.has(name)) combinedParams.set(name, [existingValue, value]);
 			if (!noOverwrite) combinedParams.set(name, value);
@@ -27489,18 +27571,19 @@ function validate(xmlData, options) {
 				const isValid = validateAttributeString(attrStr, options);
 				if (isValid === true) tagFound = true;
 				else return getErrorObject(isValid.err.code, isValid.err.msg, getLineNumberForPosition(xmlData, attrStrStart + isValid.err.line));
-			} else if (closingTag) if (!result.tagClosed) return getErrorObject("InvalidTag", "Closing tag '" + tagName + "' doesn't have proper closing.", getLineNumberForPosition(xmlData, i));
-			else if (attrStr.trim().length > 0) return getErrorObject("InvalidTag", "Closing tag '" + tagName + "' can't have attributes or invalid starting.", getLineNumberForPosition(xmlData, tagStartPos));
-			else if (tags.length === 0) return getErrorObject("InvalidTag", "Closing tag '" + tagName + "' has not been opened.", getLineNumberForPosition(xmlData, tagStartPos));
-			else {
-				const otg = tags.pop();
-				if (tagName !== otg.tagName) {
-					let openPos = getLineNumberForPosition(xmlData, otg.tagStartPos);
-					return getErrorObject("InvalidTag", "Expected closing tag '" + otg.tagName + "' (opened in line " + openPos.line + ", col " + openPos.col + ") instead of closing tag '" + tagName + "'.", getLineNumberForPosition(xmlData, tagStartPos));
+			} else if (closingTag) {
+				if (!result.tagClosed) return getErrorObject("InvalidTag", "Closing tag '" + tagName + "' doesn't have proper closing.", getLineNumberForPosition(xmlData, i));
+				else if (attrStr.trim().length > 0) return getErrorObject("InvalidTag", "Closing tag '" + tagName + "' can't have attributes or invalid starting.", getLineNumberForPosition(xmlData, tagStartPos));
+				else if (tags.length === 0) return getErrorObject("InvalidTag", "Closing tag '" + tagName + "' has not been opened.", getLineNumberForPosition(xmlData, tagStartPos));
+				else {
+					const otg = tags.pop();
+					if (tagName !== otg.tagName) {
+						let openPos = getLineNumberForPosition(xmlData, otg.tagStartPos);
+						return getErrorObject("InvalidTag", "Expected closing tag '" + otg.tagName + "' (opened in line " + openPos.line + ", col " + openPos.col + ") instead of closing tag '" + tagName + "'.", getLineNumberForPosition(xmlData, tagStartPos));
+					}
+					if (tags.length == 0) reachedRoot = true;
 				}
-				if (tags.length == 0) reachedRoot = true;
-			}
-			else {
+			} else {
 				const isValid = validateAttributeString(attrStr, options);
 				if (isValid !== true) return getErrorObject(isValid.err.code, isValid.err.msg, getLineNumberForPosition(xmlData, i - attrStr.length + isValid.err.line));
 				if (reachedRoot === true) return getErrorObject("InvalidXml", "Multiple possible root nodes found.", getLineNumberForPosition(xmlData, i));
@@ -27510,15 +27593,16 @@ function validate(xmlData, options) {
 				});
 				tagFound = true;
 			}
-			for (i++; i < xmlData.length; i++) if (xmlData[i] === "<") if (xmlData[i + 1] === "!") {
-				i++;
-				i = readCommentAndCDATA(xmlData, i);
-				continue;
-			} else if (xmlData[i + 1] === "?") {
-				i = readPI(xmlData, ++i);
-				if (i.err) return i;
-			} else break;
-			else if (xmlData[i] === "&") {
+			for (i++; i < xmlData.length; i++) if (xmlData[i] === "<") {
+				if (xmlData[i + 1] === "!") {
+					i++;
+					i = readCommentAndCDATA(xmlData, i);
+					continue;
+				} else if (xmlData[i + 1] === "?") {
+					i = readPI(xmlData, ++i);
+					if (i.err) return i;
+				} else break;
+			} else if (xmlData[i] === "&") {
 				const afterAmp = validateAmpersand(xmlData, i);
 				if (afterAmp == -1) return getErrorObject("InvalidChar", "char '&' is not expected.", getLineNumberForPosition(xmlData, i));
 				i = afterAmp;
@@ -27590,9 +27674,10 @@ function readAttributeStr(xmlData, i) {
 	let startChar = "";
 	let tagClosed = false;
 	for (; i < xmlData.length; i++) {
-		if (xmlData[i] === doubleQuote || xmlData[i] === singleQuote) if (startChar === "") startChar = xmlData[i];
-		else if (startChar !== xmlData[i]) {} else startChar = "";
-		else if (xmlData[i] === ">") {
+		if (xmlData[i] === doubleQuote || xmlData[i] === singleQuote) {
+			if (startChar === "") startChar = xmlData[i];
+			else if (startChar !== xmlData[i]) {} else startChar = "";
+		} else if (xmlData[i] === ">") {
 			if (startChar === "") {
 				tagClosed = true;
 				break;
@@ -28346,7 +28431,14 @@ var XmlNode = class {
 			[":@"]: node[":@"]
 		});
 		else this.child.push({ [node.tagname]: node.child });
+		this.addStartIndex(startIndex);
+	}
+	addStartIndex(startIndex) {
 		if (startIndex !== void 0) this.child[this.child.length - 1][METADATA_SYMBOL$1] = { startIndex };
+	}
+	addEndIndex(endIndex) {
+		const lastChild = this.child[this.child.length - 1];
+		if (lastChild !== void 0 && lastChild[METADATA_SYMBOL$1] !== void 0 && lastChild[METADATA_SYMBOL$1].endIndex === void 0) lastChild[METADATA_SYMBOL$1].endIndex = endIndex;
 	}
 	/** symbol used for metadata */
 	static getMetaDataSymbol() {
@@ -28448,41 +28540,54 @@ var DocTypeReader = class {
 			i = i + 9;
 			let angleBracketsCount = 1;
 			let hasBody = false, comment = false;
+			let quoteChar = null;
 			let exp = "";
-			for (; i < xmlData.length; i++) if (xmlData[i] === "<" && !comment) {
-				if (hasBody && hasSeq(xmlData, "!ENTITY", i)) {
-					i += 7;
-					let entityName, val;
-					[entityName, val, i] = this.readEntityExp(xmlData, i + 1, this.suppressValidationErr);
-					if (val.indexOf("&") === -1) {
-						if (this.options.enabled !== false && this.options.maxEntityCount != null && entityCount >= this.options.maxEntityCount) throw new Error(`Entity count (${entityCount + 1}) exceeds maximum allowed (${this.options.maxEntityCount})`);
-						entities[entityName] = val;
-						entityCount++;
-					}
-				} else if (hasBody && hasSeq(xmlData, "!ELEMENT", i)) {
-					i += 8;
-					const { index } = this.readElementExp(xmlData, i + 1);
-					i = index;
-				} else if (hasBody && hasSeq(xmlData, "!ATTLIST", i)) i += 8;
-				else if (hasBody && hasSeq(xmlData, "!NOTATION", i)) {
-					i += 9;
-					const { index } = this.readNotationExp(xmlData, i + 1, this.suppressValidationErr);
-					i = index;
-				} else if (hasSeq(xmlData, "!--", i)) comment = true;
-				else throw new Error(`Invalid DOCTYPE`);
-				angleBracketsCount++;
-				exp = "";
-			} else if (xmlData[i] === ">") {
-				if (comment) {
-					if (xmlData[i - 1] === "-" && xmlData[i - 2] === "-") {
-						comment = false;
-						angleBracketsCount--;
-					}
-				} else angleBracketsCount--;
-				if (angleBracketsCount === 0) break;
-			} else if (xmlData[i] === "[") hasBody = true;
-			else exp += xmlData[i];
-			if (angleBracketsCount !== 0) throw new Error(`Unclosed DOCTYPE`);
+			for (; i < xmlData.length; i++) {
+				if (quoteChar !== null) {
+					if (xmlData[i] === quoteChar) quoteChar = null;
+					exp += xmlData[i];
+					continue;
+				}
+				if (!hasBody && !comment && (xmlData[i] === "\"" || xmlData[i] === "'")) {
+					quoteChar = xmlData[i];
+					exp += xmlData[i];
+					continue;
+				}
+				if (xmlData[i] === "<" && !comment) {
+					if (hasBody && hasSeq(xmlData, "!ENTITY", i)) {
+						i += 7;
+						let entityName, val;
+						[entityName, val, i] = this.readEntityExp(xmlData, i + 1, this.suppressValidationErr);
+						if (val.indexOf("&") === -1) {
+							if (this.options.enabled !== false && this.options.maxEntityCount != null && entityCount >= this.options.maxEntityCount) throw new Error(`Entity count (${entityCount + 1}) exceeds maximum allowed (${this.options.maxEntityCount})`);
+							entities[entityName] = val;
+							entityCount++;
+						}
+					} else if (hasBody && hasSeq(xmlData, "!ELEMENT", i)) {
+						i += 8;
+						const { index } = this.readElementExp(xmlData, i + 1);
+						i = index;
+					} else if (hasBody && hasSeq(xmlData, "!ATTLIST", i)) i += 8;
+					else if (hasBody && hasSeq(xmlData, "!NOTATION", i)) {
+						i += 9;
+						const { index } = this.readNotationExp(xmlData, i + 1, this.suppressValidationErr);
+						i = index;
+					} else if (hasSeq(xmlData, "!--", i)) comment = true;
+					else throw new Error(`Invalid DOCTYPE`);
+					angleBracketsCount++;
+					exp = "";
+				} else if (xmlData[i] === ">") {
+					if (comment) {
+						if (xmlData[i - 1] === "-" && xmlData[i - 2] === "-") {
+							comment = false;
+							angleBracketsCount--;
+						}
+					} else angleBracketsCount--;
+					if (angleBracketsCount === 0) break;
+				} else if (xmlData[i] === "[") hasBody = true;
+				else exp += xmlData[i];
+			}
+			if (quoteChar !== null || angleBracketsCount !== 0) throw new Error(`Unclosed DOCTYPE`);
 		} else throw new Error(`Invalid Tag instead of DOCTYPE`);
 		return {
 			entities,
@@ -28883,12 +28988,15 @@ function toNumber(str, options = {}) {
 				const num = Number(trimmedStr);
 				const parsedStr = String(num);
 				if (num === 0) return num;
-				if (parsedStr.search(/[eE]/) !== -1) if (options.eNotation) return num;
-				else return str;
-				else if (trimmedStr.indexOf(".") !== -1) if (parsedStr === "0") return num;
-				else if (parsedStr === numTrimmedByZeros) return num;
-				else if (parsedStr === `${sign}${numTrimmedByZeros}`) return num;
-				else return str;
+				if (parsedStr.search(/[eE]/) !== -1) {
+					if (options.eNotation) return num;
+					else return str;
+				} else if (trimmedStr.indexOf(".") !== -1) {
+					if (parsedStr === "0") return num;
+					else if (parsedStr === numTrimmedByZeros) return num;
+					else if (parsedStr === `${sign}${numTrimmedByZeros}`) return num;
+					else return str;
+				}
 				let n = leadingZeros ? numTrimmedByZeros : trimmedStr;
 				if (leadingZeros) return n === parsedStr || sign + n === parsedStr ? num : str;
 				else return n === parsedStr || n === sign + parsedStr ? num : str;
@@ -28907,11 +29015,12 @@ function resolveEnotation(str, trimmedStr, options) {
 		const eAdjacentToLeadingZeros = sign ? str[leadingZeros.length + 1] === eChar : str[leadingZeros.length] === eChar;
 		if (leadingZeros.length > 1 && eAdjacentToLeadingZeros) return str;
 		else if (leadingZeros.length === 1 && (notation[3].startsWith(`.${eChar}`) || notation[3][0] === eChar)) return Number(trimmedStr);
-		else if (leadingZeros.length > 0) if (options.leadingZeros && !eAdjacentToLeadingZeros) {
-			trimmedStr = (notation[1] || "") + notation[3];
-			return Number(trimmedStr);
-		} else return str;
-		else return Number(trimmedStr);
+		else if (leadingZeros.length > 0) {
+			if (options.leadingZeros && !eAdjacentToLeadingZeros) {
+				trimmedStr = (notation[1] || "") + notation[3];
+				return Number(trimmedStr);
+			} else return str;
+		} else return Number(trimmedStr);
 	} else return str;
 }
 /**
@@ -28921,7 +29030,9 @@ function resolveEnotation(str, trimmedStr, options) {
 */
 function trimZeros(numStr) {
 	if (numStr && numStr.indexOf(".") !== -1) {
-		numStr = numStr.replace(/0+$/, "");
+		let end = numStr.length;
+		while (end > 0 && numStr.charCodeAt(end - 1) === 48) end--;
+		numStr = numStr.slice(0, end);
 		if (numStr === ".") numStr = "0";
 		else if (numStr[0] === ".") numStr = "0" + numStr;
 		else if (numStr[numStr.length - 1] === ".") numStr = numStr.substring(0, numStr.length - 1);
@@ -29005,19 +29116,20 @@ var Expression = class {
 		const segments = [];
 		let i = 0;
 		let currentPart = "";
-		while (i < pattern.length) if (pattern[i] === this.separator) if (i + 1 < pattern.length && pattern[i + 1] === this.separator) {
-			if (currentPart.trim()) {
-				segments.push(this._parseSegment(currentPart.trim()));
+		while (i < pattern.length) if (pattern[i] === this.separator) {
+			if (i + 1 < pattern.length && pattern[i + 1] === this.separator) {
+				if (currentPart.trim()) {
+					segments.push(this._parseSegment(currentPart.trim()));
+					currentPart = "";
+				}
+				segments.push({ type: "deep-wildcard" });
+				i += 2;
+			} else {
+				if (currentPart.trim()) segments.push(this._parseSegment(currentPart.trim()));
 				currentPart = "";
+				i++;
 			}
-			segments.push({ type: "deep-wildcard" });
-			i += 2;
 		} else {
-			if (currentPart.trim()) segments.push(this._parseSegment(currentPart.trim()));
-			currentPart = "";
-			i++;
-		}
-		else {
 			currentPart += pattern[i];
 			i++;
 		}
@@ -29069,11 +29181,13 @@ var Expression = class {
 		if (!tag) throw new Error(`Invalid segment pattern: ${part}`);
 		segment.tag = tag;
 		if (namespace) segment.namespace = namespace;
-		if (bracketContent) if (bracketContent.includes("=")) {
-			const eqIndex = bracketContent.indexOf("=");
-			segment.attrName = bracketContent.substring(0, eqIndex).trim();
-			segment.attrValue = bracketContent.substring(eqIndex + 1).trim();
-		} else segment.attrName = bracketContent.trim();
+		if (bracketContent) {
+			if (bracketContent.includes("=")) {
+				const eqIndex = bracketContent.indexOf("=");
+				segment.attrName = bracketContent.substring(0, eqIndex).trim();
+				segment.attrValue = bracketContent.substring(eqIndex + 1).trim();
+			} else segment.attrName = bracketContent.trim();
+		}
 		if (positionMatch) {
 			const nthMatch = positionMatch.match(/^nth\((\d+)\)$/);
 			if (nthMatch) {
@@ -29968,7 +30082,7 @@ const XML_PATTERNS = [
 	{
 		id: "xml-namespace-confusion",
 		description: "xmlns: attribute injection — can redefine namespaces to confuse parsers",
-		pattern: /\bxmlns\s*(?::\w{1,40})?\s*=/i
+		pattern: /\bxmlns(?::\w{1,40})?\s*=/i
 	},
 	{
 		id: "xml-comment-injection",
@@ -30857,7 +30971,8 @@ const parseXml = function(xmlData) {
 			}
 			this.matcher.pop();
 			this.isCurrentNodeStopNode = false;
-			currentNode = this.tagsNodeStack.pop();
+			currentNode = this.tagsNodeStack.pop() || xmlObj;
+			if (options.captureMetaData && currentNode) currentNode.addEndIndex(closeIndex + 1);
 			textData = "";
 			i = closeIndex;
 		} else if (c1 === 63) {
@@ -30875,6 +30990,7 @@ const parseXml = function(xmlData) {
 				childNode.add(options.textNodeName, "");
 				if (tagData.tagName !== tagData.tagExp && tagData.attrExpPresent && options.ignoreAttributes !== true) childNode[":@"] = attsMap;
 				this.addChild(currentNode, childNode, this.readonlyMatcher, i);
+				if (options.captureMetaData) currentNode.addEndIndex(tagData.closeIndex + 2);
 			}
 			i = tagData.closeIndex + 1;
 		} else if (c1 === 33 && xmlData.charCodeAt(i + 2) === 45 && xmlData.charCodeAt(i + 3) === 45) {
@@ -30956,18 +31072,21 @@ const parseXml = function(xmlData) {
 				this.matcher.pop();
 				this.isCurrentNodeStopNode = false;
 				this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
+				if (options.captureMetaData) currentNode.addEndIndex(i + 1);
 			} else {
 				if (isSelfClosing) {
 					({tagName, tagExp} = transformTagName(options.transformTagName, tagName, tagExp, options));
 					const childNode = new XmlNode(tagName);
 					if (prefixedAttrs) childNode[":@"] = prefixedAttrs;
 					this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
+					if (options.captureMetaData) currentNode.addEndIndex(closeIndex + 1);
 					this.matcher.pop();
 					this.isCurrentNodeStopNode = false;
 				} else if (options.unpairedTagsSet.has(tagName)) {
 					const childNode = new XmlNode(tagName);
 					if (prefixedAttrs) childNode[":@"] = prefixedAttrs;
 					this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
+					if (options.captureMetaData) currentNode.addEndIndex(result.closeIndex + 1);
 					this.matcher.pop();
 					this.isCurrentNodeStopNode = false;
 					i = result.closeIndex;
@@ -31049,22 +31168,23 @@ function tagExpWithClosingIndex(xmlData, i, closingChar = ">") {
 		if (attrBoundary) {
 			if (code === attrBoundary) attrBoundary = 0;
 		} else if (code === 34 || code === 39) attrBoundary = code;
-		else if (code === closeCode0) if (closeCode1 !== -1) {
-			if (xmlData.charCodeAt(index + 1) === closeCode1) {
+		else if (code === closeCode0) {
+			if (closeCode1 !== -1) {
+				if (xmlData.charCodeAt(index + 1) === closeCode1) {
+					result += xmlData.substring(segmentStart, index);
+					return {
+						data: result,
+						index
+					};
+				}
+			} else {
 				result += xmlData.substring(segmentStart, index);
 				return {
 					data: result,
 					index
 				};
 			}
-		} else {
-			result += xmlData.substring(segmentStart, index);
-			return {
-				data: result,
-				index
-			};
-		}
-		else if (code === 9 && !attrBoundary) {
+		} else if (code === 9 && !attrBoundary) {
 			result += xmlData.substring(segmentStart, index) + " ";
 			segmentStart = index + 1;
 		}
@@ -31214,17 +31334,20 @@ function compress(arr, options, matcher, readonlyMatcher) {
 			const rawAttrs = stripAttributePrefix(tagObj[":@"] || {}, options.attributeNamePrefix);
 			matcher.push(property, rawAttrs);
 		}
-		if (property === options.textNodeName) if (text === void 0) text = tagObj[property];
-		else text += "" + tagObj[property];
-		else if (property === void 0) continue;
+		if (property === options.textNodeName) {
+			if (text === void 0) text = tagObj[property];
+			else text += "" + tagObj[property];
+		} else if (property === void 0) continue;
 		else if (tagObj[property]) {
 			let val = compress(tagObj[property], options, matcher, readonlyMatcher);
 			const isLeaf = isLeafTag(val, options);
 			if (Object.keys(val).length === 0 && options.alwaysCreateTextNode) val[options.textNodeName] = "";
 			if (tagObj[":@"]) assignAttributes(val, tagObj[":@"], readonlyMatcher, options);
 			else if (Object.keys(val).length === 1 && val[options.textNodeName] !== void 0 && !options.alwaysCreateTextNode) val = val[options.textNodeName];
-			else if (Object.keys(val).length === 0) if (options.alwaysCreateTextNode) val[options.textNodeName] = "";
-			else val = "";
+			else if (Object.keys(val).length === 0) {
+				if (options.alwaysCreateTextNode) val[options.textNodeName] = "";
+				else val = "";
+			}
 			if (tagObj[METADATA_SYMBOL] !== void 0 && typeof val === "object" && val !== null) val[METADATA_SYMBOL] = tagObj[METADATA_SYMBOL];
 			if (compressedObj[property] !== void 0 && Object.prototype.hasOwnProperty.call(compressedObj, property)) {
 				if (!Array.isArray(compressedObj[property])) compressedObj[property] = [compressedObj[property]];
@@ -31323,14 +31446,17 @@ var XMLParser = class {
 
 //#endregion
 //#region node_modules/fast-xml-builder/src/util.js
+function valToStr(val) {
+	return typeof val === "number" && Object.is(val, -0) ? "-0" : String(val);
+}
 function safeComment(val) {
-	return String(val).replace(/--/g, "- -").replace(/--/g, "- -").replace(/-$/, "- ");
+	return valToStr(val).replace(/--/g, "- -").replace(/--/g, "- -").replace(/-$/, "- ");
 }
 function safeCdata(val) {
-	return String(val).replace(/\]\]>/g, "]]]]><![CDATA[>");
+	return valToStr(val).replace(/\]\]>/g, "]]]]><![CDATA[>");
 }
 function escapeAttribute(val) {
-	return String(val).replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+	return valToStr(val).replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
 
 //#endregion
@@ -31401,7 +31527,7 @@ function arrToStr(arr, options, indentation, matcher, stopNodeExpressions, qName
 	if (options.maxNestedTags && matcher.getDepth() > options.maxNestedTags) throw new Error("Maximum nested tags exceeded");
 	if (!Array.isArray(arr)) {
 		if (arr !== void 0 && arr !== null) {
-			let text = arr.toString();
+			let text = valToStr(arr);
 			text = replaceEntitiesValue(text, options);
 			return text;
 		}
@@ -31421,6 +31547,7 @@ function arrToStr(arr, options, indentation, matcher, stopNodeExpressions, qName
 				tagText = options.tagValueProcessor(tagName, tagText);
 				tagText = replaceEntitiesValue(tagText, options);
 			}
+			tagText = valToStr(tagText);
 			if (isPreviousElementTag) xmlStr += indentation;
 			xmlStr += tagText;
 			isPreviousElementTag = false;
@@ -31454,9 +31581,10 @@ function arrToStr(arr, options, indentation, matcher, stopNodeExpressions, qName
 		let tagValue;
 		if (isStopNode) tagValue = getRawContent(tagObj[rawTagName], options);
 		else tagValue = arrToStr(tagObj[rawTagName], options, newIdentation, matcher, stopNodeExpressions, qNameValidator);
-		if (options.unpairedTags.indexOf(tagName) !== -1) if (options.suppressUnpairedNode) xmlStr += tagStart + ">";
-		else xmlStr += tagStart + "/>";
-		else if ((!tagValue || tagValue.length === 0) && options.suppressEmptyNode) xmlStr += tagStart + "/>";
+		if (options.unpairedTags.indexOf(tagName) !== -1) {
+			if (options.suppressUnpairedNode) xmlStr += tagStart + ">";
+			else xmlStr += tagStart + "/>";
+		} else if ((!tagValue || tagValue.length === 0) && options.suppressEmptyNode) xmlStr += tagStart + "/>";
 		else if (tagValue && tagValue.endsWith(">")) xmlStr += tagStart + `>${tagValue}${indentation}</${tagName}>`;
 		else {
 			xmlStr += tagStart + ">";
@@ -31491,14 +31619,14 @@ function extractAttributeValues(attrMap, options) {
 */
 function getRawContent(arr, options) {
 	if (!Array.isArray(arr)) {
-		if (arr !== void 0 && arr !== null) return arr.toString();
+		if (arr !== void 0 && arr !== null) return valToStr(arr);
 		return "";
 	}
 	let content = "";
 	for (let i = 0; i < arr.length; i++) {
 		const item = arr[i];
 		const tagName = propName(item);
-		if (tagName === options.textNodeName) content += item[tagName];
+		if (tagName === options.textNodeName) content += valToStr(item[tagName]);
 		else if (tagName === options.cdataPropName) content += item[tagName][0][options.textNodeName];
 		else if (tagName === options.commentPropName) content += item[tagName][0][options.textNodeName];
 		else if (tagName && tagName[0] === "?") continue;
@@ -31721,28 +31849,31 @@ Builder.prototype.j2x = function(jObj, level, matcher, qNameValidator) {
 		const resolvedKey = key === this.options.textNodeName || key === this.options.cdataPropName || key === this.options.commentPropName || this.options.attributesGroupName && key === this.options.attributesGroupName || this.isAttribute(key) || key[0] === "?" ? key : resolveTagName(key, false, this.options, matcher, qNameValidator);
 		if (typeof jObj[key] === "undefined") {
 			if (this.isAttribute(key)) val += "";
-		} else if (jObj[key] === null) if (this.isAttribute(key)) val += "";
-		else if (resolvedKey === this.options.cdataPropName || resolvedKey === this.options.commentPropName) val += "";
-		else if (resolvedKey[0] === "?") val += this.indentate(level) + "<" + resolvedKey + "?" + this.tagEndChar;
-		else val += this.indentate(level) + "<" + resolvedKey + "/" + this.tagEndChar;
-		else if (jObj[key] instanceof Date) val += this.buildTextValNode(jObj[key], resolvedKey, "", level, matcher);
+		} else if (jObj[key] === null) {
+			if (this.isAttribute(key)) val += "";
+			else if (resolvedKey === this.options.cdataPropName || resolvedKey === this.options.commentPropName) val += "";
+			else if (resolvedKey[0] === "?") val += this.indentate(level) + "<" + resolvedKey + "?" + this.tagEndChar;
+			else val += this.indentate(level) + "<" + resolvedKey + "/" + this.tagEndChar;
+		} else if (jObj[key] instanceof Date) val += this.buildTextValNode(jObj[key], resolvedKey, "", level, matcher);
 		else if (typeof jObj[key] !== "object") {
 			const attr = this.isAttribute(key);
 			if (attr && !this.ignoreAttributesFn(attr, jPath)) {
 				const resolvedAttr = resolveTagName(attr, true, this.options, matcher, qNameValidator);
-				attrStr += this.buildAttrPairStr(resolvedAttr, "" + jObj[key], isCurrentStopNode);
-			} else if (!attr) if (key === this.options.textNodeName) {
-				let newval = this.options.tagValueProcessor(key, "" + jObj[key]);
-				val += this.replaceEntitiesValue(newval);
-			} else {
-				matcher.push(resolvedKey);
-				const isStopNode = this.checkStopNode(matcher);
-				matcher.pop();
-				if (isStopNode) {
-					const textValue = "" + jObj[key];
-					if (textValue === "") val += this.indentate(level) + "<" + resolvedKey + this.closeTag(resolvedKey) + this.tagEndChar;
-					else val += this.indentate(level) + "<" + resolvedKey + ">" + textValue + "</" + resolvedKey + this.tagEndChar;
-				} else val += this.buildTextValNode(jObj[key], resolvedKey, "", level, matcher);
+				attrStr += this.buildAttrPairStr(resolvedAttr, valToStr(jObj[key]), isCurrentStopNode);
+			} else if (!attr) {
+				if (key === this.options.textNodeName) {
+					let newval = this.options.tagValueProcessor(key, valToStr(jObj[key]));
+					val += this.replaceEntitiesValue(newval);
+				} else {
+					matcher.push(resolvedKey);
+					const isStopNode = this.checkStopNode(matcher);
+					matcher.pop();
+					if (isStopNode) {
+						const textValue = valToStr(jObj[key]);
+						if (textValue === "") val += this.indentate(level) + "<" + resolvedKey + this.closeTag(resolvedKey) + this.tagEndChar;
+						else val += this.indentate(level) + "<" + resolvedKey + ">" + textValue + "</" + resolvedKey + this.tagEndChar;
+					} else val += this.buildTextValNode(jObj[key], resolvedKey, "", level, matcher);
+				}
 			}
 		} else if (Array.isArray(jObj[key])) {
 			const arrLen = jObj[key].length;
@@ -31750,25 +31881,28 @@ Builder.prototype.j2x = function(jObj, level, matcher, qNameValidator) {
 			let listTagAttr = "";
 			for (let j = 0; j < arrLen; j++) {
 				const item = jObj[key][j];
-				if (typeof item === "undefined") {} else if (item === null) if (resolvedKey[0] === "?") val += this.indentate(level) + "<" + resolvedKey + "?" + this.tagEndChar;
-				else val += this.indentate(level) + "<" + resolvedKey + "/" + this.tagEndChar;
-				else if (typeof item === "object") if (this.options.oneListGroup) {
-					matcher.push(resolvedKey);
-					const result = this.j2x(item, level + 1, matcher, qNameValidator);
-					matcher.pop();
-					listTagVal += result.val;
-					if (this.options.attributesGroupName && item.hasOwnProperty(this.options.attributesGroupName)) listTagAttr += result.attrStr;
-				} else listTagVal += this.processTextOrObjNode(item, resolvedKey, level, matcher, qNameValidator);
-				else if (this.options.oneListGroup) {
+				if (typeof item === "undefined") {} else if (item === null) {
+					if (resolvedKey[0] === "?") val += this.indentate(level) + "<" + resolvedKey + "?" + this.tagEndChar;
+					else val += this.indentate(level) + "<" + resolvedKey + "/" + this.tagEndChar;
+				} else if (typeof item === "object") {
+					if (this.options.oneListGroup) {
+						matcher.push(resolvedKey);
+						const result = this.j2x(item, level + 1, matcher, qNameValidator);
+						matcher.pop();
+						listTagVal += result.val;
+						if (this.options.attributesGroupName && item.hasOwnProperty(this.options.attributesGroupName)) listTagAttr += result.attrStr;
+					} else listTagVal += this.processTextOrObjNode(item, resolvedKey, level, matcher, qNameValidator);
+				} else if (this.options.oneListGroup) {
 					let textValue = this.options.tagValueProcessor(resolvedKey, item);
 					textValue = this.replaceEntitiesValue(textValue);
+					textValue = valToStr(textValue);
 					listTagVal += textValue;
 				} else {
 					matcher.push(resolvedKey);
 					const isStopNode = this.checkStopNode(matcher);
 					matcher.pop();
 					if (isStopNode) {
-						const textValue = "" + item;
+						const textValue = valToStr(item);
 						if (textValue === "") listTagVal += this.indentate(level) + "<" + resolvedKey + this.closeTag(resolvedKey) + this.tagEndChar;
 						else listTagVal += this.indentate(level) + "<" + resolvedKey + ">" + textValue + "</" + resolvedKey + this.tagEndChar;
 					} else listTagVal += this.buildTextValNode(item, resolvedKey, "", level, matcher);
@@ -31781,7 +31915,7 @@ Builder.prototype.j2x = function(jObj, level, matcher, qNameValidator) {
 			const L = Ks.length;
 			for (let j = 0; j < L; j++) {
 				const resolvedAttr = resolveTagName(Ks[j], true, this.options, matcher, qNameValidator);
-				attrStr += this.buildAttrPairStr(resolvedAttr, "" + jObj[key][Ks[j]], isCurrentStopNode);
+				attrStr += this.buildAttrPairStr(resolvedAttr, valToStr(jObj[key][Ks[j]]), isCurrentStopNode);
 			}
 		} else val += this.processTextOrObjNode(jObj[key], resolvedKey, level, matcher, qNameValidator);
 	}
@@ -31792,7 +31926,7 @@ Builder.prototype.j2x = function(jObj, level, matcher, qNameValidator) {
 };
 Builder.prototype.buildAttrPairStr = function(attrName, val, isStopNode) {
 	if (!isStopNode) {
-		val = this.options.attributeValueProcessor(attrName, "" + val);
+		val = this.options.attributeValueProcessor(attrName, valToStr(val));
 		val = this.replaceEntitiesValue(val);
 	}
 	if (this.options.suppressBooleanAttributes && val === "true") return " " + attrName;
@@ -31887,9 +32021,10 @@ Builder.prototype.buildAttributesForStopNode = function(obj) {
 	return attrStr;
 };
 Builder.prototype.buildObjectNode = function(val, key, attrStr, level) {
-	if (val === "") if (key[0] === "?") return this.indentate(level) + "<" + key + attrStr + "?" + this.tagEndChar;
-	else return this.indentate(level) + "<" + key + attrStr + this.closeTag(key) + this.tagEndChar;
-	else if (key[0] === "?") return this.indentate(level) + "<" + key + attrStr + "?" + this.tagEndChar;
+	if (val === "") {
+		if (key[0] === "?") return this.indentate(level) + "<" + key + attrStr + "?" + this.tagEndChar;
+		else return this.indentate(level) + "<" + key + attrStr + this.closeTag(key) + this.tagEndChar;
+	} else if (key[0] === "?") return this.indentate(level) + "<" + key + attrStr + "?" + this.tagEndChar;
 	else {
 		let tagEndExp = "</" + key + this.tagEndChar;
 		let piClosingChar = "";
@@ -31926,6 +32061,7 @@ Builder.prototype.buildTextValNode = function(val, key, attrStr, level, matcher)
 	else {
 		let textValue = this.options.tagValueProcessor(key, val);
 		textValue = this.replaceEntitiesValue(textValue);
+		textValue = valToStr(textValue);
 		if (textValue === "") return this.indentate(level) + "<" + key + attrStr + this.closeTag(key) + this.tagEndChar;
 		else return this.indentate(level) + "<" + key + attrStr + ">" + textValue + "</" + key + this.tagEndChar;
 	}
@@ -32333,11 +32469,13 @@ var BufferScheduler = class {
 					this.triggerOutgoingHandlers();
 					return;
 				}
-				if (this.isStreamEnd && this.executingOutgoingHandlers === 0) if (this.unresolvedLength > 0 && this.unresolvedLength < this.bufferSize) {
-					const buffer = this.shiftBufferFromUnresolvedDataArray();
-					this.outgoingHandler(() => buffer.getReadableStream(), buffer.size, this.offset).then(resolve).catch(reject);
-				} else if (this.unresolvedLength >= this.bufferSize) return;
-				else resolve();
+				if (this.isStreamEnd && this.executingOutgoingHandlers === 0) {
+					if (this.unresolvedLength > 0 && this.unresolvedLength < this.bufferSize) {
+						const buffer = this.shiftBufferFromUnresolvedDataArray();
+						this.outgoingHandler(() => buffer.getReadableStream(), buffer.size, this.offset).then(resolve).catch(reject);
+					} else if (this.unresolvedLength >= this.bufferSize) return;
+					else resolve();
+				}
 			});
 		});
 	}
@@ -49430,16 +49568,23 @@ function generateBlobSASQueryParametersInternal(blobSASSignatureValues, sharedKe
 	let userDelegationKeyCredential;
 	if (sharedKeyCredential === void 0 && accountName !== void 0) userDelegationKeyCredential = new UserDelegationKeyCredential(accountName, sharedKeyCredentialOrUserDelegationKey);
 	if (sharedKeyCredential === void 0 && userDelegationKeyCredential === void 0) throw TypeError("Invalid sharedKeyCredential, userDelegationKey or accountName.");
-	if (version >= "2020-12-06") if (sharedKeyCredential !== void 0) return generateBlobSASQueryParameters20201206(blobSASSignatureValues, sharedKeyCredential);
-	else if (version >= "2026-04-06") return generateBlobSASQueryParametersUDK20260406(blobSASSignatureValues, userDelegationKeyCredential);
-	else if (version >= "2025-07-05") return generateBlobSASQueryParametersUDK20250705(blobSASSignatureValues, userDelegationKeyCredential);
-	else return generateBlobSASQueryParametersUDK20201206(blobSASSignatureValues, userDelegationKeyCredential);
-	if (version >= "2018-11-09") if (sharedKeyCredential !== void 0) if (version >= "2020-02-10") return generateBlobSASQueryParameters20200210(blobSASSignatureValues, sharedKeyCredential);
-	else return generateBlobSASQueryParameters20181109(blobSASSignatureValues, sharedKeyCredential);
-	else if (version >= "2020-02-10") return generateBlobSASQueryParametersUDK20200210(blobSASSignatureValues, userDelegationKeyCredential);
-	else return generateBlobSASQueryParametersUDK20181109(blobSASSignatureValues, userDelegationKeyCredential);
-	if (version >= "2015-04-05") if (sharedKeyCredential !== void 0) return generateBlobSASQueryParameters20150405(blobSASSignatureValues, sharedKeyCredential);
-	else throw new RangeError("'version' must be >= '2018-11-09' when generating user delegation SAS using user delegation key.");
+	if (version >= "2020-12-06") {
+		if (sharedKeyCredential !== void 0) return generateBlobSASQueryParameters20201206(blobSASSignatureValues, sharedKeyCredential);
+		else if (version >= "2026-04-06") return generateBlobSASQueryParametersUDK20260406(blobSASSignatureValues, userDelegationKeyCredential);
+		else if (version >= "2025-07-05") return generateBlobSASQueryParametersUDK20250705(blobSASSignatureValues, userDelegationKeyCredential);
+		else return generateBlobSASQueryParametersUDK20201206(blobSASSignatureValues, userDelegationKeyCredential);
+	}
+	if (version >= "2018-11-09") {
+		if (sharedKeyCredential !== void 0) {
+			if (version >= "2020-02-10") return generateBlobSASQueryParameters20200210(blobSASSignatureValues, sharedKeyCredential);
+			else return generateBlobSASQueryParameters20181109(blobSASSignatureValues, sharedKeyCredential);
+		} else if (version >= "2020-02-10") return generateBlobSASQueryParametersUDK20200210(blobSASSignatureValues, userDelegationKeyCredential);
+		else return generateBlobSASQueryParametersUDK20181109(blobSASSignatureValues, userDelegationKeyCredential);
+	}
+	if (version >= "2015-04-05") {
+		if (sharedKeyCredential !== void 0) return generateBlobSASQueryParameters20150405(blobSASSignatureValues, sharedKeyCredential);
+		else throw new RangeError("'version' must be >= '2018-11-09' when generating user delegation SAS using user delegation key.");
+	}
 	throw new RangeError("'version' must be >= '2015-04-05'.");
 }
 /**
@@ -49464,8 +49609,10 @@ function generateBlobSASQueryParameters20150405(blobSASSignatureValues, sharedKe
 	let resource = "c";
 	if (blobSASSignatureValues.blobName) resource = "b";
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49517,8 +49664,10 @@ function generateBlobSASQueryParameters20181109(blobSASSignatureValues, sharedKe
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49564,20 +49713,24 @@ function generateBlobSASQueryParameters20200210(blobSASSignatureValues, sharedKe
 	let resource = "c";
 	let timestamp = blobSASSignatureValues.snapshotTime;
 	let directoryDepth = void 0;
-	if (blobSASSignatureValues.blobName) if (blobSASSignatureValues.isDirectory === true) {
-		resource = "d";
-		directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
-	} else {
-		resource = "b";
-		if (blobSASSignatureValues.snapshotTime) resource = "bs";
-		else if (blobSASSignatureValues.versionId) {
-			resource = "bv";
-			timestamp = blobSASSignatureValues.versionId;
+	if (blobSASSignatureValues.blobName) {
+		if (blobSASSignatureValues.isDirectory === true) {
+			resource = "d";
+			directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
+		} else {
+			resource = "b";
+			if (blobSASSignatureValues.snapshotTime) resource = "bs";
+			else if (blobSASSignatureValues.versionId) {
+				resource = "bv";
+				timestamp = blobSASSignatureValues.versionId;
+			}
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49623,20 +49776,24 @@ function generateBlobSASQueryParameters20201206(blobSASSignatureValues, sharedKe
 	let resource = "c";
 	let timestamp = blobSASSignatureValues.snapshotTime;
 	let directoryDepth = void 0;
-	if (blobSASSignatureValues.blobName) if (blobSASSignatureValues.isDirectory === true) {
-		resource = "d";
-		directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
-	} else {
-		resource = "b";
-		if (blobSASSignatureValues.snapshotTime) resource = "bs";
-		else if (blobSASSignatureValues.versionId) {
-			resource = "bv";
-			timestamp = blobSASSignatureValues.versionId;
+	if (blobSASSignatureValues.blobName) {
+		if (blobSASSignatureValues.isDirectory === true) {
+			resource = "d";
+			directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
+		} else {
+			resource = "b";
+			if (blobSASSignatureValues.snapshotTime) resource = "bs";
+			else if (blobSASSignatureValues.versionId) {
+				resource = "bv";
+				timestamp = blobSASSignatureValues.versionId;
+			}
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49689,8 +49846,10 @@ function generateBlobSASQueryParametersUDK20181109(blobSASSignatureValues, userD
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49739,20 +49898,24 @@ function generateBlobSASQueryParametersUDK20200210(blobSASSignatureValues, userD
 	let resource = "c";
 	let timestamp = blobSASSignatureValues.snapshotTime;
 	let directoryDepth = void 0;
-	if (blobSASSignatureValues.blobName) if (blobSASSignatureValues.isDirectory === true) {
-		resource = "d";
-		directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
-	} else {
-		resource = "b";
-		if (blobSASSignatureValues.snapshotTime) resource = "bs";
-		else if (blobSASSignatureValues.versionId) {
-			resource = "bv";
-			timestamp = blobSASSignatureValues.versionId;
+	if (blobSASSignatureValues.blobName) {
+		if (blobSASSignatureValues.isDirectory === true) {
+			resource = "d";
+			directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
+		} else {
+			resource = "b";
+			if (blobSASSignatureValues.snapshotTime) resource = "bs";
+			else if (blobSASSignatureValues.versionId) {
+				resource = "bv";
+				timestamp = blobSASSignatureValues.versionId;
+			}
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49804,20 +49967,24 @@ function generateBlobSASQueryParametersUDK20201206(blobSASSignatureValues, userD
 	let resource = "c";
 	let timestamp = blobSASSignatureValues.snapshotTime;
 	let directoryDepth = void 0;
-	if (blobSASSignatureValues.blobName) if (blobSASSignatureValues.isDirectory === true) {
-		resource = "d";
-		directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
-	} else {
-		resource = "b";
-		if (blobSASSignatureValues.snapshotTime) resource = "bs";
-		else if (blobSASSignatureValues.versionId) {
-			resource = "bv";
-			timestamp = blobSASSignatureValues.versionId;
+	if (blobSASSignatureValues.blobName) {
+		if (blobSASSignatureValues.isDirectory === true) {
+			resource = "d";
+			directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
+		} else {
+			resource = "b";
+			if (blobSASSignatureValues.snapshotTime) resource = "bs";
+			else if (blobSASSignatureValues.versionId) {
+				resource = "bv";
+				timestamp = blobSASSignatureValues.versionId;
+			}
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49870,20 +50037,24 @@ function generateBlobSASQueryParametersUDK20250705(blobSASSignatureValues, userD
 	let resource = "c";
 	let timestamp = blobSASSignatureValues.snapshotTime;
 	let directoryDepth = void 0;
-	if (blobSASSignatureValues.blobName) if (blobSASSignatureValues.isDirectory === true) {
-		resource = "d";
-		directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
-	} else {
-		resource = "b";
-		if (blobSASSignatureValues.snapshotTime) resource = "bs";
-		else if (blobSASSignatureValues.versionId) {
-			resource = "bv";
-			timestamp = blobSASSignatureValues.versionId;
+	if (blobSASSignatureValues.blobName) {
+		if (blobSASSignatureValues.isDirectory === true) {
+			resource = "d";
+			directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
+		} else {
+			resource = "b";
+			if (blobSASSignatureValues.snapshotTime) resource = "bs";
+			else if (blobSASSignatureValues.versionId) {
+				resource = "bv";
+				timestamp = blobSASSignatureValues.versionId;
+			}
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -49938,20 +50109,24 @@ function generateBlobSASQueryParametersUDK20260406(blobSASSignatureValues, userD
 	let resource = "c";
 	let timestamp = blobSASSignatureValues.snapshotTime;
 	let directoryDepth = void 0;
-	if (blobSASSignatureValues.blobName) if (blobSASSignatureValues.isDirectory === true) {
-		resource = "d";
-		directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
-	} else {
-		resource = "b";
-		if (blobSASSignatureValues.snapshotTime) resource = "bs";
-		else if (blobSASSignatureValues.versionId) {
-			resource = "bv";
-			timestamp = blobSASSignatureValues.versionId;
+	if (blobSASSignatureValues.blobName) {
+		if (blobSASSignatureValues.isDirectory === true) {
+			resource = "d";
+			directoryDepth = trimBlobName(blobSASSignatureValues.blobName).split("/").length;
+		} else {
+			resource = "b";
+			if (blobSASSignatureValues.snapshotTime) resource = "bs";
+			else if (blobSASSignatureValues.versionId) {
+				resource = "bv";
+				timestamp = blobSASSignatureValues.versionId;
+			}
 		}
 	}
 	let verifiedPermissions;
-	if (blobSASSignatureValues.permissions) if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
-	else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	if (blobSASSignatureValues.permissions) {
+		if (blobSASSignatureValues.blobName) verifiedPermissions = BlobSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+		else verifiedPermissions = ContainerSASPermissions.parse(blobSASSignatureValues.permissions.toString()).toString();
+	}
 	const stringToSign = [
 		verifiedPermissions ? verifiedPermissions : "",
 		blobSASSignatureValues.startsOn ? truncatedISO8061Date(blobSASSignatureValues.startsOn, false) : "",
@@ -50290,16 +50465,17 @@ var RetriableReadableStream = class extends Readable {
 		}
 		this.removeSourceEventHandlers();
 		if (this.offset - 1 === this.end) this.push(null);
-		else if (this.offset <= this.end) if (this.retries < this.maxRetryRequests) {
-			this.retries += 1;
-			this.getter(this.offset).then((newSource) => {
-				this.source = newSource;
-				this.setSourceEventHandlers();
-			}).catch((error) => {
-				this.destroy(error);
-			});
-		} else this.destroy(/* @__PURE__ */ new Error(`Data corruption failure: received less data than required and reached maxRetires limitation. Received data offset: ${this.offset - 1}, data needed offset: ${this.end}, retries: ${this.retries}, max retries: ${this.maxRetryRequests}`));
-		else this.destroy(/* @__PURE__ */ new Error(`Data corruption failure: Received more data than original request, data needed offset is ${this.end}, received offset: ${this.offset - 1}`));
+		else if (this.offset <= this.end) {
+			if (this.retries < this.maxRetryRequests) {
+				this.retries += 1;
+				this.getter(this.offset).then((newSource) => {
+					this.source = newSource;
+					this.setSourceEventHandlers();
+				}).catch((error) => {
+					this.destroy(error);
+				});
+			} else this.destroy(/* @__PURE__ */ new Error(`Data corruption failure: received less data than required and reached maxRetires limitation. Received data offset: ${this.offset - 1}, data needed offset: ${this.end}, retries: ${this.retries}, max retries: ${this.maxRetryRequests}`));
+		} else this.destroy(/* @__PURE__ */ new Error(`Data corruption failure: Received more data than original request, data needed offset is ${this.end}, received offset: ${this.offset - 1}`));
 	};
 	_destroy(error, callback) {
 		this.removeSourceEventHandlers();
@@ -52496,13 +52672,14 @@ var BlobClient = class BlobClient extends StorageClient {
 			const containerName = credentialOrPipelineOrContainerName;
 			const blobName = blobNameOrOptions;
 			const extractedCreds = extractConnectionStringParts(urlOrConnectionString);
-			if (extractedCreds.kind === "AccountConnString") if (isNodeLike) {
-				const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
-				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
-				if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
-				pipeline = newPipeline(sharedKeyCredential, options);
-			} else throw new Error("Account connection string is only supported in Node.js environment");
-			else if (extractedCreds.kind === "SASConnString") {
+			if (extractedCreds.kind === "AccountConnString") {
+				if (isNodeLike) {
+					const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
+					url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
+					if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
+					pipeline = newPipeline(sharedKeyCredential, options);
+				} else throw new Error("Account connection string is only supported in Node.js environment");
+			} else if (extractedCreds.kind === "SASConnString") {
 				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName)) + "?" + extractedCreds.accountSas;
 				pipeline = newPipeline(new AnonymousCredential(), options);
 			} else throw new Error("Connection string must be either an Account connection string or a SAS connection string");
@@ -53469,13 +53646,14 @@ var AppendBlobClient = class AppendBlobClient extends BlobClient {
 			const containerName = credentialOrPipelineOrContainerName;
 			const blobName = blobNameOrOptions;
 			const extractedCreds = extractConnectionStringParts(urlOrConnectionString);
-			if (extractedCreds.kind === "AccountConnString") if (isNodeLike) {
-				const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
-				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
-				if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
-				pipeline = newPipeline(sharedKeyCredential, options);
-			} else throw new Error("Account connection string is only supported in Node.js environment");
-			else if (extractedCreds.kind === "SASConnString") {
+			if (extractedCreds.kind === "AccountConnString") {
+				if (isNodeLike) {
+					const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
+					url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
+					if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
+					pipeline = newPipeline(sharedKeyCredential, options);
+				} else throw new Error("Account connection string is only supported in Node.js environment");
+			} else if (extractedCreds.kind === "SASConnString") {
 				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName)) + "?" + extractedCreds.accountSas;
 				pipeline = newPipeline(new AnonymousCredential(), options);
 			} else throw new Error("Connection string must be either an Account connection string or a SAS connection string");
@@ -53741,13 +53919,14 @@ var BlockBlobClient = class BlockBlobClient extends BlobClient {
 			const containerName = credentialOrPipelineOrContainerName;
 			const blobName = blobNameOrOptions;
 			const extractedCreds = extractConnectionStringParts(urlOrConnectionString);
-			if (extractedCreds.kind === "AccountConnString") if (isNodeLike) {
-				const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
-				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
-				if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
-				pipeline = newPipeline(sharedKeyCredential, options);
-			} else throw new Error("Account connection string is only supported in Node.js environment");
-			else if (extractedCreds.kind === "SASConnString") {
+			if (extractedCreds.kind === "AccountConnString") {
+				if (isNodeLike) {
+					const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
+					url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
+					if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
+					pipeline = newPipeline(sharedKeyCredential, options);
+				} else throw new Error("Account connection string is only supported in Node.js environment");
+			} else if (extractedCreds.kind === "SASConnString") {
 				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName)) + "?" + extractedCreds.accountSas;
 				pipeline = newPipeline(new AnonymousCredential(), options);
 			} else throw new Error("Connection string must be either an Account connection string or a SAS connection string");
@@ -54299,13 +54478,14 @@ var PageBlobClient = class PageBlobClient extends BlobClient {
 			const containerName = credentialOrPipelineOrContainerName;
 			const blobName = blobNameOrOptions;
 			const extractedCreds = extractConnectionStringParts(urlOrConnectionString);
-			if (extractedCreds.kind === "AccountConnString") if (isNodeLike) {
-				const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
-				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
-				if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
-				pipeline = newPipeline(sharedKeyCredential, options);
-			} else throw new Error("Account connection string is only supported in Node.js environment");
-			else if (extractedCreds.kind === "SASConnString") {
+			if (extractedCreds.kind === "AccountConnString") {
+				if (isNodeLike) {
+					const sharedKeyCredential = new StorageSharedKeyCredential(extractedCreds.accountName, extractedCreds.accountKey);
+					url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName));
+					if (!options.proxyOptions) options.proxyOptions = getDefaultProxySettings(extractedCreds.proxyUri);
+					pipeline = newPipeline(sharedKeyCredential, options);
+				} else throw new Error("Account connection string is only supported in Node.js environment");
+			} else if (extractedCreds.kind === "SASConnString") {
 				url = appendToURLPath(appendToURLPath(extractedCreds.url, encodeURIComponent(containerName)), encodeURIComponent(blobName)) + "?" + extractedCreds.accountSas;
 				pipeline = newPipeline(new AnonymousCredential(), options);
 			} else throw new Error("Connection string must be either an Account connection string or a SAS connection string");
@@ -55874,10 +56054,11 @@ function downloadCache(archiveLocation, archivePath, options) {
 	return __awaiter$7(this, void 0, void 0, function* () {
 		const archiveUrl = new URL$1(archiveLocation);
 		const downloadOptions = getDownloadOptions(options);
-		if (archiveUrl.hostname.endsWith(".blob.core.windows.net")) if (downloadOptions.useAzureSdk) yield downloadCacheStorageSDK(archiveLocation, archivePath, downloadOptions);
-		else if (downloadOptions.concurrentBlobDownloads) yield downloadCacheHttpClientConcurrent(archiveLocation, archivePath, downloadOptions);
-		else yield downloadCacheHttpClient(archiveLocation, archivePath);
-		else yield downloadCacheHttpClient(archiveLocation, archivePath);
+		if (archiveUrl.hostname.endsWith(".blob.core.windows.net")) {
+			if (downloadOptions.useAzureSdk) yield downloadCacheStorageSDK(archiveLocation, archivePath, downloadOptions);
+			else if (downloadOptions.concurrentBlobDownloads) yield downloadCacheHttpClientConcurrent(archiveLocation, archivePath, downloadOptions);
+			else yield downloadCacheHttpClient(archiveLocation, archivePath);
+		} else yield downloadCacheHttpClient(archiveLocation, archivePath);
 	});
 }
 function reserveCache(key, paths, options) {
@@ -57752,8 +57933,10 @@ var require_reflection_json_reader = /* @__PURE__ */ __commonJSMin(((exports) =>
 						let int32;
 						if (typeof json == "number") int32 = json;
 						else if (json === "") e = "empty string";
-						else if (typeof json == "string") if (json.trim().length !== json.length) e = "extra whitespace";
-						else int32 = Number(json);
+						else if (typeof json == "string") {
+							if (json.trim().length !== json.length) e = "extra whitespace";
+							else int32 = Number(json);
+						}
 						if (int32 === void 0) break;
 						if (type == reflection_info_1.ScalarType.UINT32) assert_1.assertUInt32(int32);
 						else assert_1.assertInt32(int32);
@@ -61823,10 +62006,12 @@ var Context = class {
 	constructor() {
 		var _a, _b, _c;
 		this.payload = {};
-		if (process.env.GITHUB_EVENT_PATH) if (existsSync(process.env.GITHUB_EVENT_PATH)) this.payload = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, { encoding: "utf8" }));
-		else {
-			const path = process.env.GITHUB_EVENT_PATH;
-			process.stdout.write(`GITHUB_EVENT_PATH ${path} does not exist${EOL}`);
+		if (process.env.GITHUB_EVENT_PATH) {
+			if (existsSync(process.env.GITHUB_EVENT_PATH)) this.payload = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, { encoding: "utf8" }));
+			else {
+				const path = process.env.GITHUB_EVENT_PATH;
+				process.stdout.write(`GITHUB_EVENT_PATH ${path} does not exist${EOL}`);
+			}
 		}
 		this.eventName = process.env.GITHUB_EVENT_NAME;
 		this.sha = process.env.GITHUB_SHA;
@@ -62386,14 +62571,18 @@ var require_lib$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 			let clientHeader;
 			if (this.requestOptions && this.requestOptions.headers) {
 				const headerValue = lowercaseKeys(this.requestOptions.headers)[Headers.ContentType];
-				if (headerValue) if (typeof headerValue === "number") clientHeader = String(headerValue);
-				else if (Array.isArray(headerValue)) clientHeader = headerValue.join(", ");
-				else clientHeader = headerValue;
+				if (headerValue) {
+					if (typeof headerValue === "number") clientHeader = String(headerValue);
+					else if (Array.isArray(headerValue)) clientHeader = headerValue.join(", ");
+					else clientHeader = headerValue;
+				}
 			}
 			const additionalValue = additionalHeaders[Headers.ContentType];
-			if (additionalValue !== void 0) if (typeof additionalValue === "number") return String(additionalValue);
-			else if (Array.isArray(additionalValue)) return additionalValue.join(", ");
-			else return additionalValue;
+			if (additionalValue !== void 0) {
+				if (typeof additionalValue === "number") return String(additionalValue);
+				else if (Array.isArray(additionalValue)) return additionalValue.join(", ");
+				else return additionalValue;
+			}
 			if (clientHeader !== void 0) return clientHeader;
 			return _default;
 		}
@@ -62699,9 +62888,10 @@ function isPlainObject$1(value) {
 function mergeDeep(defaults, options) {
 	const result = Object.assign({}, defaults);
 	Object.keys(options).forEach((key) => {
-		if (isPlainObject$1(options[key])) if (!(key in defaults)) Object.assign(result, { [key]: options[key] });
-		else result[key] = mergeDeep(defaults[key], options[key]);
-		else Object.assign(result, { [key]: options[key] });
+		if (isPlainObject$1(options[key])) {
+			if (!(key in defaults)) Object.assign(result, { [key]: options[key] });
+			else result[key] = mergeDeep(defaults[key], options[key]);
+		} else Object.assign(result, { [key]: options[key] });
 	});
 	return result;
 }
@@ -62774,31 +62964,33 @@ function isKeyOperator(operator) {
 }
 function getValues(context, operator, key, modifier) {
 	var value = context[key], result = [];
-	if (isDefined(value) && value !== "") if (typeof value === "string" || typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
-		value = value.toString();
-		if (modifier && modifier !== "*") value = value.substring(0, parseInt(modifier, 10));
-		result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : ""));
-	} else if (modifier === "*") if (Array.isArray(value)) value.filter(isDefined).forEach(function(value2) {
-		result.push(encodeValue(operator, value2, isKeyOperator(operator) ? key : ""));
-	});
-	else Object.keys(value).forEach(function(k) {
-		if (isDefined(value[k])) result.push(encodeValue(operator, value[k], k));
-	});
-	else {
-		const tmp = [];
-		if (Array.isArray(value)) value.filter(isDefined).forEach(function(value2) {
-			tmp.push(encodeValue(operator, value2));
-		});
-		else Object.keys(value).forEach(function(k) {
-			if (isDefined(value[k])) {
-				tmp.push(encodeUnreserved(k));
-				tmp.push(encodeValue(operator, value[k].toString()));
-			}
-		});
-		if (isKeyOperator(operator)) result.push(encodeUnreserved(key) + "=" + tmp.join(","));
-		else if (tmp.length !== 0) result.push(tmp.join(","));
-	}
-	else if (operator === ";") {
+	if (isDefined(value) && value !== "") {
+		if (typeof value === "string" || typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+			value = value.toString();
+			if (modifier && modifier !== "*") value = value.substring(0, parseInt(modifier, 10));
+			result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : ""));
+		} else if (modifier === "*") {
+			if (Array.isArray(value)) value.filter(isDefined).forEach(function(value2) {
+				result.push(encodeValue(operator, value2, isKeyOperator(operator) ? key : ""));
+			});
+			else Object.keys(value).forEach(function(k) {
+				if (isDefined(value[k])) result.push(encodeValue(operator, value[k], k));
+			});
+		} else {
+			const tmp = [];
+			if (Array.isArray(value)) value.filter(isDefined).forEach(function(value2) {
+				tmp.push(encodeValue(operator, value2));
+			});
+			else Object.keys(value).forEach(function(k) {
+				if (isDefined(value[k])) {
+					tmp.push(encodeUnreserved(k));
+					tmp.push(encodeValue(operator, value[k].toString()));
+				}
+			});
+			if (isKeyOperator(operator)) result.push(encodeUnreserved(key) + "=" + tmp.join(","));
+			else if (tmp.length !== 0) result.push(tmp.join(","));
+		}
+	} else if (operator === ";") {
 		if (isDefined(value)) result.push(encodeUnreserved(key));
 	} else if (value === "" && (operator === "&" || operator === "?")) result.push(encodeUnreserved(key) + "=");
 	else if (value === "") result.push("");
@@ -62913,15 +63105,19 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	* Parse a `Content-Type` header.
 	*/
 	function parse(header, options) {
+		const stopChar = options?.comma === true ? COMMA : 65536;
 		const len = header.length;
-		let index = skipOWS(header, 0, len);
+		let index = skipOWS(header, options?.start ?? 0, len);
 		const valueStart = index;
-		index = skipValue(header, index, len);
+		index = skipValue(header, index, len, stopChar);
 		const valueEnd = trailingOWS(header, valueStart, index);
-		return {
-			type: header.slice(valueStart, valueEnd).toLowerCase(),
-			parameters: options?.parameters === false ? new NullObject() : parseParameters(header, index, len)
+		const type = header.slice(valueStart, valueEnd).toLowerCase();
+		if (options?.parameters === false) return {
+			type,
+			index,
+			parameters: new NullObject()
 		};
+		return parseParameters(header, type, index, len, stopChar);
 	}
 	const SP = 32;
 	const HTAB = 9;
@@ -62929,16 +63125,19 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const EQ = 61;
 	const DQUOTE = 34;
 	const BSLASH = 92;
+	const COMMA = 44;
 	/**
 	* Parses the parameters of a `Content-Type` header starting at the given index.
 	*/
-	function parseParameters(header, index, len) {
+	function parseParameters(header, type, index, len, stopChar) {
 		const parameters = new NullObject();
 		parameter: while (index < len) {
+			if (header.charCodeAt(index) === stopChar) break;
 			index = skipOWS(header, index + 1, len);
 			const keyStart = index;
 			while (index < len) {
 				const code = header.charCodeAt(index);
+				if (code === stopChar) break parameter;
 				if (code === SEMI) continue parameter;
 				if (code === EQ) {
 					const keyEnd = trailingOWS(header, keyStart, index);
@@ -62950,7 +63149,7 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 						while (index < len) {
 							const code = header.charCodeAt(index++);
 							if (code === DQUOTE) {
-								index = skipValue(header, index, len);
+								index = skipValue(header, index, len, stopChar);
 								if (parameters[key] === void 0) parameters[key] = value;
 								break;
 							}
@@ -62963,7 +63162,7 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 						continue parameter;
 					}
 					const valueStart = index;
-					index = skipValue(header, index, len);
+					index = skipValue(header, index, len, stopChar);
 					if (parameters[key] === void 0) {
 						const valueEnd = trailingOWS(header, valueStart, index);
 						parameters[key] = header.slice(valueStart, valueEnd);
@@ -62973,14 +63172,19 @@ var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 				index++;
 			}
 		}
-		return parameters;
+		return {
+			type,
+			index,
+			parameters
+		};
 	}
 	/**
-	* Skip over characters until a semicolon.
+	* Skip over characters until a semicolon or other exit character.
 	*/
-	function skipValue(str, index, len) {
+	function skipValue(str, index, len, stopChar) {
 		while (index < len) {
-			if (str.charCodeAt(index) === SEMI) break;
+			const code = str.charCodeAt(index);
+			if (code === SEMI || code === stopChar) break;
 			index++;
 		}
 		return index;
@@ -63103,40 +63307,41 @@ const stringifyIteratively = (rootValue, replacer, spaceParam) => {
 			level++;
 		}
 		let isDone = false;
-		if (node.isArray) if (node.index < node.val.length) {
-			if (!node.first) chunks.push(",");
-			if (space) chunks.push("\n" + space.repeat(level));
-			const childRaw = node.val[node.index];
-			const childVal = prepareVal(node.val, String(node.index), childRaw);
-			if (isUnstringifiable(childVal)) {
-				chunks.push("null");
-				node.first = false;
-				node.index++;
-			} else {
-				const isComplexObject = childVal !== null && typeof childVal === "object";
-				const isNativeRaw = isRawJSON(childVal);
-				if (isComplexObject && !isNativeRaw) {
-					if (visited.has(childVal)) throw new TypeError("Converting circular structure to JSON");
-					visited.add(childVal);
-					stack.push({
-						parent: node.val,
-						key: String(node.index),
-						val: childVal,
-						isArray: Array.isArray(childVal),
-						keys: Array.isArray(childVal) ? null : Object.keys(childVal),
-						index: 0,
-						first: true
-					});
+		if (node.isArray) {
+			if (node.index < node.val.length) {
+				if (!node.first) chunks.push(",");
+				if (space) chunks.push("\n" + space.repeat(level));
+				const childRaw = node.val[node.index];
+				const childVal = prepareVal(node.val, String(node.index), childRaw);
+				if (isUnstringifiable(childVal)) {
+					chunks.push("null");
 					node.first = false;
 					node.index++;
 				} else {
-					chunks.push(originalStringify(childVal));
-					node.first = false;
-					node.index++;
+					const isComplexObject = childVal !== null && typeof childVal === "object";
+					const isNativeRaw = isRawJSON(childVal);
+					if (isComplexObject && !isNativeRaw) {
+						if (visited.has(childVal)) throw new TypeError("Converting circular structure to JSON");
+						visited.add(childVal);
+						stack.push({
+							parent: node.val,
+							key: String(node.index),
+							val: childVal,
+							isArray: Array.isArray(childVal),
+							keys: Array.isArray(childVal) ? null : Object.keys(childVal),
+							index: 0,
+							first: true
+						});
+						node.first = false;
+						node.index++;
+					} else {
+						chunks.push(originalStringify(childVal));
+						node.first = false;
+						node.index++;
+					}
 				}
-			}
-		} else isDone = true;
-		else {
+			} else isDone = true;
+		} else {
 			while (node.index < node.keys.length) {
 				const k = node.keys[node.index++];
 				if (propertyList && !propertyList.has(k)) continue;
@@ -63283,7 +63488,7 @@ const JSONParseV2 = (text, reviver) => {
 };
 const MAX_INT = Number.MAX_SAFE_INTEGER.toString();
 const MAX_DIGITS = MAX_INT.length;
-const stringsOrLargeNumbers = /"(?:\\.|[^"])*"|-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?/g;
+const stringsOrLargeNumbers = /"(?:[^"\\]|\\.)*"|-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?/g;
 const noiseValueWithQuotes = /^"-?\d+n+"$/;
 /**
 * Iteratively traverses the parsed object bottom-up (post-order),
@@ -63410,7 +63615,7 @@ var RequestError = class extends Error {
 
 //#endregion
 //#region node_modules/@octokit/request/dist-bundle/index.js
-var defaults_default = { headers: { "user-agent": `octokit-request.js/10.0.13 ${getUserAgent()}` } };
+var defaults_default = { headers: { "user-agent": `octokit-request.js/10.0.14 ${getUserAgent()}` } };
 function isPlainObject(value) {
 	if (typeof value !== "object" || value === null) return false;
 	if (Object.prototype.toString.call(value) !== "[object Object]") return false;
@@ -63737,13 +63942,14 @@ var Octokit = class {
 		this.graphql = withCustomRequest(this.request).defaults(requestDefaults);
 		this.log = createLogger(options.log);
 		this.hook = hook;
-		if (!options.authStrategy) if (!options.auth) this.auth = async () => ({ type: "unauthenticated" });
-		else {
-			const auth = createTokenAuth(options.auth);
-			hook.wrap("request", auth.hook);
-			this.auth = auth;
-		}
-		else {
+		if (!options.authStrategy) {
+			if (!options.auth) this.auth = async () => ({ type: "unauthenticated" });
+			else {
+				const auth = createTokenAuth(options.auth);
+				hook.wrap("request", auth.hook);
+				this.auth = auth;
+			}
+		} else {
 			const { authStrategy, ...otherOptions } = options;
 			const auth = authStrategy(Object.assign({
 				request: this.request,
@@ -66111,16 +66317,21 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (parts[0]) {
 			if (parts[0].indexOf("/") >= 0) {
 				const dtparts = parts[0].split("/");
-				if (dtparts.length === 3) if (dtparts[0].length === 4) result.date = dtparts[0] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[2]).substr(-2);
-				else if (dtparts[2].length === 2) if (dateFormat.indexOf("/d/") > -1 || dateFormat.indexOf("/dd/") > -1) result.date = "20" + dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
-				else result.date = "20" + dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
-				else if ((dt.toLowerCase().indexOf("pm") > -1 || dt.toLowerCase().indexOf("p.m.") > -1 || dt.toLowerCase().indexOf("p. m.") > -1 || dt.toLowerCase().indexOf("am") > -1 || dt.toLowerCase().indexOf("a.m.") > -1 || dt.toLowerCase().indexOf("a. m.") > -1 || dateFormat.indexOf("/d/") > -1 || dateFormat.indexOf("/dd/") > -1) && dateFormat.indexOf("dd/") !== 0) result.date = dtparts[2] + "-" + ("0" + dtparts[0]).substr(-2) + "-" + ("0" + dtparts[1]).substr(-2);
-				else result.date = dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
+				if (dtparts.length === 3) {
+					if (dtparts[0].length === 4) result.date = dtparts[0] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[2]).substr(-2);
+					else if (dtparts[2].length === 2) {
+						if (dateFormat.indexOf("/d/") > -1 || dateFormat.indexOf("/dd/") > -1) result.date = "20" + dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
+						else result.date = "20" + dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
+					} else if ((dt.toLowerCase().indexOf("pm") > -1 || dt.toLowerCase().indexOf("p.m.") > -1 || dt.toLowerCase().indexOf("p. m.") > -1 || dt.toLowerCase().indexOf("am") > -1 || dt.toLowerCase().indexOf("a.m.") > -1 || dt.toLowerCase().indexOf("a. m.") > -1 || dateFormat.indexOf("/d/") > -1 || dateFormat.indexOf("/dd/") > -1) && dateFormat.indexOf("dd/") !== 0) result.date = dtparts[2] + "-" + ("0" + dtparts[0]).substr(-2) + "-" + ("0" + dtparts[1]).substr(-2);
+					else result.date = dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
+				}
 			}
 			if (parts[0].indexOf(".") >= 0) {
 				const dtparts = parts[0].split(".");
-				if (dtparts.length === 3) if (dateFormat.indexOf(".d.") > -1 || dateFormat.indexOf(".dd.") > -1) result.date = dtparts[2] + "-" + ("0" + dtparts[0]).substr(-2) + "-" + ("0" + dtparts[1]).substr(-2);
-				else result.date = dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
+				if (dtparts.length === 3) {
+					if (dateFormat.indexOf(".d.") > -1 || dateFormat.indexOf(".dd.") > -1) result.date = dtparts[2] + "-" + ("0" + dtparts[0]).substr(-2) + "-" + ("0" + dtparts[1]).substr(-2);
+					else result.date = dtparts[2] + "-" + ("0" + dtparts[1]).substr(-2) + "-" + ("0" + dtparts[0]).substr(-2);
+				}
 			}
 			if (parts[0].indexOf("-") >= 0) {
 				const dtparts = parts[0].split("-");
@@ -66976,28 +67187,30 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
 				}
 				if (inTagEnd) {
 					inTagEnd = false;
-					if (metaData[depth].tagEnd && tags.indexOf(metaData[depth].tagEnd.substr(1)) >= 0) if (metaData[depth].tagEnd === "/dict" || metaData[depth].tagEnd === "/array") {
-						if (depth > 1 && metaData[depth - 2].tagStart === "array") metaData[depth - 2].data.push(metaData[depth - 1].data);
-						if (depth > 1 && metaData[depth - 2].tagStart === "dict" && !isProtoKey(metaData[depth - 1].key)) metaData[depth - 2].data[metaData[depth - 1].key] = metaData[depth - 1].data;
-						depth--;
-						metaData.pop();
-						metaData[depth].tagContent = "";
-						metaData[depth].tagStart = "";
-						metaData[depth].tagEnd = "";
-					} else {
-						if (metaData[depth].tagEnd === "/key" && metaData[depth].tagContent) metaData[depth].key = metaData[depth].tagContent;
-						else {
-							if (metaData[depth].tagEnd === "/real" && metaData[depth].tagContent) metaData[depth].data = parseFloat(metaData[depth].tagContent) || 0;
-							if (metaData[depth].tagEnd === "/integer" && metaData[depth].tagContent) metaData[depth].data = parseInt(metaData[depth].tagContent) || 0;
-							if (metaData[depth].tagEnd === "/string" && metaData[depth].tagContent) metaData[depth].data = metaData[depth].tagContent || "";
-							if (metaData[depth].tagEnd === "/boolean") metaData[depth].data = metaData[depth].tagContent || false;
-							if (metaData[depth].tagEnd === "/arrayEmpty") metaData[depth].data = metaData[depth].tagContent || [];
-							if (depth > 0 && metaData[depth - 1].tagStart === "array") metaData[depth - 1].data.push(metaData[depth].data);
-							if (depth > 0 && metaData[depth - 1].tagStart === "dict" && !isProtoKey(metaData[depth].key)) metaData[depth - 1].data[metaData[depth].key] = metaData[depth].data;
+					if (metaData[depth].tagEnd && tags.indexOf(metaData[depth].tagEnd.substr(1)) >= 0) {
+						if (metaData[depth].tagEnd === "/dict" || metaData[depth].tagEnd === "/array") {
+							if (depth > 1 && metaData[depth - 2].tagStart === "array") metaData[depth - 2].data.push(metaData[depth - 1].data);
+							if (depth > 1 && metaData[depth - 2].tagStart === "dict" && !isProtoKey(metaData[depth - 1].key)) metaData[depth - 2].data[metaData[depth - 1].key] = metaData[depth - 1].data;
+							depth--;
+							metaData.pop();
+							metaData[depth].tagContent = "";
+							metaData[depth].tagStart = "";
+							metaData[depth].tagEnd = "";
+						} else {
+							if (metaData[depth].tagEnd === "/key" && metaData[depth].tagContent) metaData[depth].key = metaData[depth].tagContent;
+							else {
+								if (metaData[depth].tagEnd === "/real" && metaData[depth].tagContent) metaData[depth].data = parseFloat(metaData[depth].tagContent) || 0;
+								if (metaData[depth].tagEnd === "/integer" && metaData[depth].tagContent) metaData[depth].data = parseInt(metaData[depth].tagContent) || 0;
+								if (metaData[depth].tagEnd === "/string" && metaData[depth].tagContent) metaData[depth].data = metaData[depth].tagContent || "";
+								if (metaData[depth].tagEnd === "/boolean") metaData[depth].data = metaData[depth].tagContent || false;
+								if (metaData[depth].tagEnd === "/arrayEmpty") metaData[depth].data = metaData[depth].tagContent || [];
+								if (depth > 0 && metaData[depth - 1].tagStart === "array") metaData[depth - 1].data.push(metaData[depth].data);
+								if (depth > 0 && metaData[depth - 1].tagStart === "dict" && !isProtoKey(metaData[depth].key)) metaData[depth - 1].data[metaData[depth].key] = metaData[depth].data;
+							}
+							metaData[depth].tagContent = "";
+							metaData[depth].tagStart = "";
+							metaData[depth].tagEnd = "";
 						}
-						metaData[depth].tagContent = "";
-						metaData[depth].tagStart = "";
-						metaData[depth].tagEnd = "";
 					}
 					metaData[depth].tagEnd = "";
 					inTagStart = false;
@@ -69521,9 +69734,19 @@ var require_osinfo = /* @__PURE__ */ __commonJSMin(((exports) => {
 							functionProcessed();
 						});
 					}
-					if ({}.hasOwnProperty.call(appsObj.versions, "git")) if (_darwin) {
-						const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/git") || fs$10.existsSync("/opt/homebrew/bin/git");
-						if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("git --version", (error, stdout) => {
+					if ({}.hasOwnProperty.call(appsObj.versions, "git")) {
+						if (_darwin) {
+							const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/git") || fs$10.existsSync("/opt/homebrew/bin/git");
+							if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("git --version", (error, stdout) => {
+								if (!error) {
+									let git = stdout.toString().split("\n")[0] || "";
+									git = (git.toLowerCase().split("version")[1] || "").trim();
+									appsObj.versions.git = (git.split(" ")[0] || "").trim();
+								}
+								functionProcessed();
+							});
+							else functionProcessed();
+						} else exec$14("git --version", (error, stdout) => {
 							if (!error) {
 								let git = stdout.toString().split("\n")[0] || "";
 								git = (git.toLowerCase().split("version")[1] || "").trim();
@@ -69531,15 +69754,7 @@ var require_osinfo = /* @__PURE__ */ __commonJSMin(((exports) => {
 							}
 							functionProcessed();
 						});
-						else functionProcessed();
-					} else exec$14("git --version", (error, stdout) => {
-						if (!error) {
-							let git = stdout.toString().split("\n")[0] || "";
-							git = (git.toLowerCase().split("version")[1] || "").trim();
-							appsObj.versions.git = (git.split(" ")[0] || "").trim();
-						}
-						functionProcessed();
-					});
+					}
 					if ({}.hasOwnProperty.call(appsObj.versions, "apache")) exec$14("apachectl -v 2>&1", (error, stdout) => {
 						if (!error) {
 							const apache = (stdout.toString().split("\n")[0] || "").split(":");
@@ -69605,55 +69820,57 @@ var require_osinfo = /* @__PURE__ */ __commonJSMin(((exports) => {
 						}
 						functionProcessed();
 					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "postgresql")) if (_linux) exec$14("locate bin/postgres", (error, stdout) => {
-						if (!error) {
-							const safePath = /^[a-zA-Z0-9/_.-]+$/;
-							const postgresqlBin = stdout.toString().split("\n").filter((p) => safePath.test(p.trim())).sort();
-							if (postgresqlBin.length) execFile(postgresqlBin[postgresqlBin.length - 1], ["-V"], (error, stdout) => {
+					if ({}.hasOwnProperty.call(appsObj.versions, "postgresql")) {
+						if (_linux) exec$14("locate bin/postgres", (error, stdout) => {
+							if (!error) {
+								const safePath = /^[a-zA-Z0-9/_.-]+$/;
+								const postgresqlBin = stdout.toString().split("\n").filter((p) => safePath.test(p.trim())).sort();
+								if (postgresqlBin.length) execFile(postgresqlBin[postgresqlBin.length - 1], ["-V"], (error, stdout) => {
+									if (!error) {
+										const postgresql = stdout.toString().split("\n")[0].split(" ") || [];
+										appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : "";
+									}
+									functionProcessed();
+								});
+								else functionProcessed();
+							} else exec$14("psql -V", (error, stdout) => {
 								if (!error) {
 									const postgresql = stdout.toString().split("\n")[0].split(" ") || [];
 									appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : "";
+									appsObj.versions.postgresql = appsObj.versions.postgresql.split("-")[0];
 								}
 								functionProcessed();
 							});
-							else functionProcessed();
-						} else exec$14("psql -V", (error, stdout) => {
-							if (!error) {
-								const postgresql = stdout.toString().split("\n")[0].split(" ") || [];
-								appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : "";
-								appsObj.versions.postgresql = appsObj.versions.postgresql.split("-")[0];
-							}
-							functionProcessed();
 						});
-					});
-					else if (_windows) util.powerShell("Get-CimInstance Win32_Service | select caption | fl").then((stdout) => {
-						stdout.split(/\n\s*\n/).forEach((item) => {
-							if (item.trim() !== "") {
-								let lines = item.trim().split("\r\n");
-								let srvCaption = util.getValue(lines, "caption", ":", true).toLowerCase();
-								if (srvCaption.indexOf("postgresql") > -1) {
-									const parts = srvCaption.split(" server ");
-									if (parts.length > 1) appsObj.versions.postgresql = parts[1];
+						else if (_windows) util.powerShell("Get-CimInstance Win32_Service | select caption | fl").then((stdout) => {
+							stdout.split(/\n\s*\n/).forEach((item) => {
+								if (item.trim() !== "") {
+									let lines = item.trim().split("\r\n");
+									let srvCaption = util.getValue(lines, "caption", ":", true).toLowerCase();
+									if (srvCaption.indexOf("postgresql") > -1) {
+										const parts = srvCaption.split(" server ");
+										if (parts.length > 1) appsObj.versions.postgresql = parts[1];
+									}
 								}
-							}
-						});
-						functionProcessed();
-					});
-					else exec$14("postgres -V", (error, stdout) => {
-						if (!error) {
-							const postgresql = stdout.toString().split("\n")[0].split(" ") || [];
-							appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : "";
-							if (appsObj.versions.postgresql.includes("(") && postgresql.length >= 2 && !postgresql[postgresql.length - 2].includes("(")) appsObj.versions.postgresql = postgresql[postgresql.length - 2];
+							});
 							functionProcessed();
-						} else exec$14("pg_config --version", (error, stdout) => {
+						});
+						else exec$14("postgres -V", (error, stdout) => {
 							if (!error) {
 								const postgresql = stdout.toString().split("\n")[0].split(" ") || [];
 								appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : "";
 								if (appsObj.versions.postgresql.includes("(") && postgresql.length >= 2 && !postgresql[postgresql.length - 2].includes("(")) appsObj.versions.postgresql = postgresql[postgresql.length - 2];
-							}
-							functionProcessed();
+								functionProcessed();
+							} else exec$14("pg_config --version", (error, stdout) => {
+								if (!error) {
+									const postgresql = stdout.toString().split("\n")[0].split(" ") || [];
+									appsObj.versions.postgresql = postgresql.length ? postgresql[postgresql.length - 1] : "";
+									if (appsObj.versions.postgresql.includes("(") && postgresql.length >= 2 && !postgresql[postgresql.length - 2].includes("(")) appsObj.versions.postgresql = postgresql[postgresql.length - 2];
+								}
+								functionProcessed();
+							});
 						});
-					});
+					}
 					if ({}.hasOwnProperty.call(appsObj.versions, "perl")) exec$14("perl -v", (error, stdout) => {
 						if (!error) {
 							const perl = stdout.toString().split("\n") || "";
@@ -69662,112 +69879,124 @@ var require_osinfo = /* @__PURE__ */ __commonJSMin(((exports) => {
 						}
 						functionProcessed();
 					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "python")) if (_darwin) try {
-						const lines = execSync$9("sw_vers").toString().split("\n");
-						const osVersion = util.getValue(lines, "ProductVersion", ":");
-						const gitHomebrewExists1 = fs$10.existsSync("/usr/local/Cellar/python");
-						const gitHomebrewExists2 = fs$10.existsSync("/opt/homebrew/bin/python");
-						if (util.darwinXcodeExists() && util.semverCompare("12.0.1", osVersion) < 0 || gitHomebrewExists1 || gitHomebrewExists2) exec$14(gitHomebrewExists1 ? "/usr/local/Cellar/python -V 2>&1" : gitHomebrewExists2 ? "/opt/homebrew/bin/python -V 2>&1" : "python -V 2>&1", (error, stdout) => {
+					if ({}.hasOwnProperty.call(appsObj.versions, "python")) {
+						if (_darwin) try {
+							const lines = execSync$9("sw_vers").toString().split("\n");
+							const osVersion = util.getValue(lines, "ProductVersion", ":");
+							const gitHomebrewExists1 = fs$10.existsSync("/usr/local/Cellar/python");
+							const gitHomebrewExists2 = fs$10.existsSync("/opt/homebrew/bin/python");
+							if (util.darwinXcodeExists() && util.semverCompare("12.0.1", osVersion) < 0 || gitHomebrewExists1 || gitHomebrewExists2) exec$14(gitHomebrewExists1 ? "/usr/local/Cellar/python -V 2>&1" : gitHomebrewExists2 ? "/opt/homebrew/bin/python -V 2>&1" : "python -V 2>&1", (error, stdout) => {
+								if (!error) {
+									const python = stdout.toString().split("\n")[0] || "";
+									appsObj.versions.python = python.toLowerCase().replace("python", "").trim();
+								}
+								functionProcessed();
+							});
+							else functionProcessed();
+						} catch {
+							functionProcessed();
+						}
+						else exec$14("python -V 2>&1", (error, stdout) => {
 							if (!error) {
 								const python = stdout.toString().split("\n")[0] || "";
 								appsObj.versions.python = python.toLowerCase().replace("python", "").trim();
 							}
 							functionProcessed();
 						});
-						else functionProcessed();
-					} catch {
-						functionProcessed();
 					}
-					else exec$14("python -V 2>&1", (error, stdout) => {
-						if (!error) {
-							const python = stdout.toString().split("\n")[0] || "";
-							appsObj.versions.python = python.toLowerCase().replace("python", "").trim();
-						}
-						functionProcessed();
-					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "python3")) if (_darwin) {
-						const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/python3") || fs$10.existsSync("/opt/homebrew/bin/python3");
-						if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("python3 -V 2>&1", (error, stdout) => {
+					if ({}.hasOwnProperty.call(appsObj.versions, "python3")) {
+						if (_darwin) {
+							const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/python3") || fs$10.existsSync("/opt/homebrew/bin/python3");
+							if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("python3 -V 2>&1", (error, stdout) => {
+								if (!error) {
+									const python = stdout.toString().split("\n")[0] || "";
+									appsObj.versions.python3 = python.toLowerCase().replace("python", "").trim();
+								}
+								functionProcessed();
+							});
+							else functionProcessed();
+						} else exec$14("python3 -V 2>&1", (error, stdout) => {
 							if (!error) {
 								const python = stdout.toString().split("\n")[0] || "";
 								appsObj.versions.python3 = python.toLowerCase().replace("python", "").trim();
 							}
 							functionProcessed();
 						});
-						else functionProcessed();
-					} else exec$14("python3 -V 2>&1", (error, stdout) => {
-						if (!error) {
-							const python = stdout.toString().split("\n")[0] || "";
-							appsObj.versions.python3 = python.toLowerCase().replace("python", "").trim();
-						}
-						functionProcessed();
-					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "pip")) if (_darwin) {
-						const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/pip") || fs$10.existsSync("/opt/homebrew/bin/pip");
-						if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("pip -V 2>&1", (error, stdout) => {
+					}
+					if ({}.hasOwnProperty.call(appsObj.versions, "pip")) {
+						if (_darwin) {
+							const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/pip") || fs$10.existsSync("/opt/homebrew/bin/pip");
+							if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("pip -V 2>&1", (error, stdout) => {
+								if (!error) {
+									const parts = (stdout.toString().split("\n")[0] || "").split(" ");
+									appsObj.versions.pip = parts.length >= 2 ? parts[1] : "";
+								}
+								functionProcessed();
+							});
+							else functionProcessed();
+						} else exec$14("pip -V 2>&1", (error, stdout) => {
 							if (!error) {
 								const parts = (stdout.toString().split("\n")[0] || "").split(" ");
 								appsObj.versions.pip = parts.length >= 2 ? parts[1] : "";
 							}
 							functionProcessed();
 						});
-						else functionProcessed();
-					} else exec$14("pip -V 2>&1", (error, stdout) => {
-						if (!error) {
-							const parts = (stdout.toString().split("\n")[0] || "").split(" ");
-							appsObj.versions.pip = parts.length >= 2 ? parts[1] : "";
-						}
-						functionProcessed();
-					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "pip3")) if (_darwin) {
-						const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/pip3") || fs$10.existsSync("/opt/homebrew/bin/pip3");
-						if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("pip3 -V 2>&1", (error, stdout) => {
+					}
+					if ({}.hasOwnProperty.call(appsObj.versions, "pip3")) {
+						if (_darwin) {
+							const gitHomebrewExists = fs$10.existsSync("/usr/local/Cellar/pip3") || fs$10.existsSync("/opt/homebrew/bin/pip3");
+							if (util.darwinXcodeExists() || gitHomebrewExists) exec$14("pip3 -V 2>&1", (error, stdout) => {
+								if (!error) {
+									const parts = (stdout.toString().split("\n")[0] || "").split(" ");
+									appsObj.versions.pip3 = parts.length >= 2 ? parts[1] : "";
+								}
+								functionProcessed();
+							});
+							else functionProcessed();
+						} else exec$14("pip3 -V 2>&1", (error, stdout) => {
 							if (!error) {
 								const parts = (stdout.toString().split("\n")[0] || "").split(" ");
 								appsObj.versions.pip3 = parts.length >= 2 ? parts[1] : "";
 							}
 							functionProcessed();
 						});
-						else functionProcessed();
-					} else exec$14("pip3 -V 2>&1", (error, stdout) => {
-						if (!error) {
-							const parts = (stdout.toString().split("\n")[0] || "").split(" ");
-							appsObj.versions.pip3 = parts.length >= 2 ? parts[1] : "";
-						}
-						functionProcessed();
-					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "java")) if (_darwin) exec$14("/usr/libexec/java_home -V 2>&1", (error, stdout) => {
-						if (!error && stdout.toString().toLowerCase().indexOf("no java runtime") === -1) exec$14("java -version 2>&1", (error, stdout) => {
+					}
+					if ({}.hasOwnProperty.call(appsObj.versions, "java")) {
+						if (_darwin) exec$14("/usr/libexec/java_home -V 2>&1", (error, stdout) => {
+							if (!error && stdout.toString().toLowerCase().indexOf("no java runtime") === -1) exec$14("java -version 2>&1", (error, stdout) => {
+								if (!error) {
+									const parts = (stdout.toString().split("\n")[0] || "").split("\"");
+									appsObj.versions.java = parts.length === 3 ? parts[1].trim() : "";
+								}
+								functionProcessed();
+							});
+							else functionProcessed();
+						});
+						else exec$14("java -version 2>&1", (error, stdout) => {
 							if (!error) {
 								const parts = (stdout.toString().split("\n")[0] || "").split("\"");
 								appsObj.versions.java = parts.length === 3 ? parts[1].trim() : "";
 							}
 							functionProcessed();
 						});
-						else functionProcessed();
-					});
-					else exec$14("java -version 2>&1", (error, stdout) => {
-						if (!error) {
-							const parts = (stdout.toString().split("\n")[0] || "").split("\"");
-							appsObj.versions.java = parts.length === 3 ? parts[1].trim() : "";
-						}
-						functionProcessed();
-					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "gcc")) if (_darwin && util.darwinXcodeExists() || !_darwin) exec$14("gcc -dumpversion", (error, stdout) => {
-						if (!error) appsObj.versions.gcc = stdout.toString().split("\n")[0].trim() || "";
-						if (appsObj.versions.gcc.indexOf(".") > -1) functionProcessed();
-						else exec$14("gcc --version", (error, stdout) => {
-							if (!error) {
-								const gcc = stdout.toString().split("\n")[0].trim();
-								if (gcc.indexOf("gcc") > -1 && gcc.indexOf(")") > -1) {
-									const parts = gcc.split(")");
-									appsObj.versions.gcc = parts[1].trim() || appsObj.versions.gcc;
+					}
+					if ({}.hasOwnProperty.call(appsObj.versions, "gcc")) {
+						if (_darwin && util.darwinXcodeExists() || !_darwin) exec$14("gcc -dumpversion", (error, stdout) => {
+							if (!error) appsObj.versions.gcc = stdout.toString().split("\n")[0].trim() || "";
+							if (appsObj.versions.gcc.indexOf(".") > -1) functionProcessed();
+							else exec$14("gcc --version", (error, stdout) => {
+								if (!error) {
+									const gcc = stdout.toString().split("\n")[0].trim();
+									if (gcc.indexOf("gcc") > -1 && gcc.indexOf(")") > -1) {
+										const parts = gcc.split(")");
+										appsObj.versions.gcc = parts[1].trim() || appsObj.versions.gcc;
+									}
 								}
-							}
-							functionProcessed();
+								functionProcessed();
+							});
 						});
-					});
-					else functionProcessed();
+						else functionProcessed();
+					}
 					if ({}.hasOwnProperty.call(appsObj.versions, "virtualbox")) exec$14(util.getVboxmanage() + " -v 2>&1", (error, stdout) => {
 						if (!error) {
 							const parts = (stdout.toString().split("\n")[0] || "").split("r");
@@ -69818,24 +70047,28 @@ var require_osinfo = /* @__PURE__ */ __commonJSMin(((exports) => {
 						}
 						functionProcessed();
 					});
-					if ({}.hasOwnProperty.call(appsObj.versions, "powershell")) if (_windows) util.powerShell("$PSVersionTable").then((stdout) => {
-						const lines = stdout.toString().toLowerCase().split("\n").map((line) => line.replace(/ +/g, " ").replace(/ +/g, ":"));
-						appsObj.versions.powershell = util.getValue(lines, "psversion");
-						functionProcessed();
-					});
-					else functionProcessed();
-					if ({}.hasOwnProperty.call(appsObj.versions, "dotnet")) if (_windows) util.powerShell("gci \"HKLM:\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\" -recurse | gp -name Version,Release -EA 0 | where { $_.PSChildName -match \"^(?!S)\\p{L}\"} | select PSChildName, Version, Release").then((stdout) => {
-						const lines = stdout.toString().split("\r\n");
-						let dotnet = "";
-						lines.forEach((line) => {
-							line = line.replace(/ +/g, " ");
-							const parts = line.split(" ");
-							dotnet = dotnet || (parts[0].toLowerCase().startsWith("client") && parts.length > 2 ? parts[1].trim() : parts[0].toLowerCase().startsWith("full") && parts.length > 2 ? parts[1].trim() : "");
+					if ({}.hasOwnProperty.call(appsObj.versions, "powershell")) {
+						if (_windows) util.powerShell("$PSVersionTable").then((stdout) => {
+							const lines = stdout.toString().toLowerCase().split("\n").map((line) => line.replace(/ +/g, " ").replace(/ +/g, ":"));
+							appsObj.versions.powershell = util.getValue(lines, "psversion");
+							functionProcessed();
 						});
-						appsObj.versions.dotnet = dotnet.trim();
-						functionProcessed();
-					});
-					else functionProcessed();
+						else functionProcessed();
+					}
+					if ({}.hasOwnProperty.call(appsObj.versions, "dotnet")) {
+						if (_windows) util.powerShell("gci \"HKLM:\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\" -recurse | gp -name Version,Release -EA 0 | where { $_.PSChildName -match \"^(?!S)\\p{L}\"} | select PSChildName, Version, Release").then((stdout) => {
+							const lines = stdout.toString().split("\r\n");
+							let dotnet = "";
+							lines.forEach((line) => {
+								line = line.replace(/ +/g, " ");
+								const parts = line.split(" ");
+								dotnet = dotnet || (parts[0].toLowerCase().startsWith("client") && parts.length > 2 ? parts[1].trim() : parts[0].toLowerCase().startsWith("full") && parts.length > 2 ? parts[1].trim() : "");
+							});
+							appsObj.versions.dotnet = dotnet.trim();
+							functionProcessed();
+						});
+						else functionProcessed();
+					}
 				} catch {
 					if (callback) callback(appsObj.versions);
 					resolve(appsObj.versions);
@@ -70908,10 +71141,12 @@ var require_cpu = /* @__PURE__ */ __commonJSMin(((exports) => {
 								let size = parseInt(sizeParts[0], 10);
 								const unit = sizeParts.length > 1 ? sizeParts[1] : "kb";
 								size = size * (unit === "kb" ? 1024 : unit === "mb" ? 1048576 : unit === "gb" ? 1073741824 : 1);
-								if (cacheType) if (cacheType === "l1") {
-									result.cache[cacheType + "d"] = size / 2;
-									result.cache[cacheType + "i"] = size / 2;
-								} else result.cache[cacheType] = size;
+								if (cacheType) {
+									if (cacheType === "l1") {
+										result.cache[cacheType + "d"] = size / 2;
+										result.cache[cacheType + "i"] = size / 2;
+									} else result.cache[cacheType] = size;
+								}
 							}
 							result.socket = util.getValue(lines, "Upgrade").replace("Socket", "").trim();
 							const threadCount = util.getValue(lines, "thread count").trim();
@@ -71410,10 +71645,12 @@ var require_cpu = /* @__PURE__ */ __commonJSMin(((exports) => {
 						let size = parseInt(sizeParts[0], 10);
 						const unit = sizeParts.length > 1 ? sizeParts[1] : "kb";
 						size = size * (unit === "kb" ? 1024 : unit === "mb" ? 1048576 : unit === "gb" ? 1073741824 : 1);
-						if (cacheType) if (cacheType === "l1") {
-							result[cacheType + "d"] = size / 2;
-							result[cacheType + "i"] = size / 2;
-						} else result[cacheType] = size;
+						if (cacheType) {
+							if (cacheType === "l1") {
+								result[cacheType + "d"] = size / 2;
+								result[cacheType + "i"] = size / 2;
+							} else result[cacheType] = size;
+						}
 					}
 					if (callback) callback(result);
 					resolve(result);
@@ -72695,12 +72932,14 @@ var require_graphics = /* @__PURE__ */ __commonJSMin(((exports) => {
 									currentController.bus = pciIDs.length > 0 && isExternal ? "PCIe" : "Onboard";
 									currentController.vram = null;
 									currentController.vramDynamic = false;
-								} else if (parts[1].toLowerCase().indexOf(" ltd.") >= 0) if ((parts[1].match(/]/g) || []).length > 1) {
-									currentController.vendor = parts[1].substr(0, parts[1].toLowerCase().indexOf("]") + 1).trim();
-									currentController.model = parts[1].substr(parts[1].toLowerCase().indexOf("]") + 1, 200).trim().split("(")[0].trim();
-								} else {
-									currentController.vendor = parts[1].substr(0, parts[1].toLowerCase().indexOf(" ltd.") + 5).trim();
-									currentController.model = parts[1].substr(parts[1].toLowerCase().indexOf(" ltd.") + 5, 200).trim().split("(")[0].trim();
+								} else if (parts[1].toLowerCase().indexOf(" ltd.") >= 0) {
+									if ((parts[1].match(/]/g) || []).length > 1) {
+										currentController.vendor = parts[1].substr(0, parts[1].toLowerCase().indexOf("]") + 1).trim();
+										currentController.model = parts[1].substr(parts[1].toLowerCase().indexOf("]") + 1, 200).trim().split("(")[0].trim();
+									} else {
+										currentController.vendor = parts[1].substr(0, parts[1].toLowerCase().indexOf(" ltd.") + 5).trim();
+										currentController.model = parts[1].substr(parts[1].toLowerCase().indexOf(" ltd.") + 5, 200).trim().split("(")[0].trim();
+									}
 								}
 								if (currentController.model && subsystem.indexOf(currentController.model) !== -1) {
 									const subVendor = subsystem.split(currentController.model)[0].trim();
@@ -72990,8 +73229,10 @@ var require_graphics = /* @__PURE__ */ __commonJSMin(((exports) => {
 						currentDisplay.positionY = util.toInt(geometry[2]);
 					}
 				}
-				if (is_edid) if (lines[i].search(/\S|$/) > start) edid_raw += lines[i].toLowerCase().trim();
-				else applyEdid();
+				if (is_edid) {
+					if (lines[i].search(/\S|$/) > start) edid_raw += lines[i].toLowerCase().trim();
+					else applyEdid();
+				}
 				if (lines[i].toLowerCase().indexOf("edid:") >= 0) {
 					is_edid = true;
 					edid_raw = "";
@@ -73627,45 +73868,47 @@ var require_filesystem = /* @__PURE__ */ __commonJSMin(((exports) => {
 		const devices = [];
 		let i = 0;
 		lines.forEach((line) => {
-			if (line.length > 0) if (line[0] === "*") i++;
-			else {
-				const parts = line.split(":");
-				if (parts.length > 1) {
-					if (!devices[i]) devices[i] = {
-						name: "",
-						identifier: "",
-						type: "disk",
-						fsType: "",
-						mount: "",
-						size: 0,
-						physical: "HDD",
-						uuid: "",
-						label: "",
-						model: "",
-						serial: "",
-						removable: false,
-						protocol: "",
-						group: "",
-						device: ""
-					};
-					parts[0] = parts[0].trim().toUpperCase().replace(/ +/g, "");
-					parts[1] = parts[1].trim();
-					if ("DEVICEIDENTIFIER" === parts[0]) devices[i].identifier = parts[1];
-					if ("DEVICENODE" === parts[0]) devices[i].name = parts[1];
-					if ("VOLUMENAME" === parts[0]) {
-						if (parts[1].indexOf("Not applicable") === -1) devices[i].label = parts[1];
+			if (line.length > 0) {
+				if (line[0] === "*") i++;
+				else {
+					const parts = line.split(":");
+					if (parts.length > 1) {
+						if (!devices[i]) devices[i] = {
+							name: "",
+							identifier: "",
+							type: "disk",
+							fsType: "",
+							mount: "",
+							size: 0,
+							physical: "HDD",
+							uuid: "",
+							label: "",
+							model: "",
+							serial: "",
+							removable: false,
+							protocol: "",
+							group: "",
+							device: ""
+						};
+						parts[0] = parts[0].trim().toUpperCase().replace(/ +/g, "");
+						parts[1] = parts[1].trim();
+						if ("DEVICEIDENTIFIER" === parts[0]) devices[i].identifier = parts[1];
+						if ("DEVICENODE" === parts[0]) devices[i].name = parts[1];
+						if ("VOLUMENAME" === parts[0]) {
+							if (parts[1].indexOf("Not applicable") === -1) devices[i].label = parts[1];
+						}
+						if ("PROTOCOL" === parts[0]) devices[i].protocol = parts[1];
+						if ("DISKSIZE" === parts[0]) devices[i].size = parseBytes(parts[1]);
+						if ("FILESYSTEMPERSONALITY" === parts[0]) devices[i].fsType = parts[1];
+						if ("MOUNTPOINT" === parts[0]) devices[i].mount = parts[1];
+						if ("VOLUMEUUID" === parts[0]) devices[i].uuid = parts[1];
+						if ("READ-ONLYMEDIA" === parts[0] && parts[1] === "Yes") devices[i].physical = "CD/DVD";
+						if ("SOLIDSTATE" === parts[0] && parts[1] === "Yes") devices[i].physical = "SSD";
+						if ("VIRTUAL" === parts[0]) devices[i].type = "virtual";
+						if ("REMOVABLEMEDIA" === parts[0]) devices[i].removable = parts[1] === "Removable";
+						if ("PARTITIONTYPE" === parts[0]) devices[i].type = "part";
+						if ("DEVICE/MEDIANAME" === parts[0]) devices[i].model = parts[1];
 					}
-					if ("PROTOCOL" === parts[0]) devices[i].protocol = parts[1];
-					if ("DISKSIZE" === parts[0]) devices[i].size = parseBytes(parts[1]);
-					if ("FILESYSTEMPERSONALITY" === parts[0]) devices[i].fsType = parts[1];
-					if ("MOUNTPOINT" === parts[0]) devices[i].mount = parts[1];
-					if ("VOLUMEUUID" === parts[0]) devices[i].uuid = parts[1];
-					if ("READ-ONLYMEDIA" === parts[0] && parts[1] === "Yes") devices[i].physical = "CD/DVD";
-					if ("SOLIDSTATE" === parts[0] && parts[1] === "Yes") devices[i].physical = "SSD";
-					if ("VIRTUAL" === parts[0]) devices[i].type = "virtual";
-					if ("REMOVABLEMEDIA" === parts[0]) devices[i].removable = parts[1] === "Removable";
-					if ("PARTITIONTYPE" === parts[0]) devices[i].type = "part";
-					if ("DEVICE/MEDIANAME" === parts[0]) devices[i].model = parts[1];
 				}
 			}
 		});
@@ -75007,17 +75250,19 @@ var require_network = /* @__PURE__ */ __commonJSMin(((exports) => {
 					dnsSuffixes.primaryDNS = primaryDNS.trim();
 					if (!dnsSuffixes.primaryDNS) dnsSuffixes.primaryDNS = "Not defined";
 				}
-				if (index > 1) if (index % 2 === 0) {
-					const name = element.substring(element.lastIndexOf(" ") + 1).replace(":", "");
-					iface.name = name;
-				} else {
-					const connectionSpecificDNS = element.split("\r\n").filter((element) => {
-						return element.toUpperCase().includes("DNS");
-					});
-					const dnsSuffix = connectionSpecificDNS[0].substring(connectionSpecificDNS[0].lastIndexOf(":") + 1);
-					iface.dnsSuffix = dnsSuffix.trim();
-					dnsSuffixes.ifaces.push(iface);
-					iface = {};
+				if (index > 1) {
+					if (index % 2 === 0) {
+						const name = element.substring(element.lastIndexOf(" ") + 1).replace(":", "");
+						iface.name = name;
+					} else {
+						const connectionSpecificDNS = element.split("\r\n").filter((element) => {
+							return element.toUpperCase().includes("DNS");
+						});
+						const dnsSuffix = connectionSpecificDNS[0].substring(connectionSpecificDNS[0].lastIndexOf(":") + 1);
+						iface.dnsSuffix = dnsSuffix.trim();
+						dnsSuffixes.ifaces.push(iface);
+						iface = {};
+					}
 				}
 			});
 			return dnsSuffixes;
@@ -75388,152 +75633,155 @@ var require_network = /* @__PURE__ */ __commonJSMin(((exports) => {
 				let nics = [];
 				let dnsSuffixes = [];
 				let nics8021xInfo = [];
-				if (_darwin || _freebsd || _openbsd || _netbsd) if (JSON.stringify(ifaces) === JSON.stringify(_ifaces) && !rescan) {
-					result = _networkInterfaces;
-					if (callback) callback(result);
-					resolve(result);
-				} else {
-					const defaultInterface = getDefaultNetworkInterface();
-					_ifaces = JSON.parse(JSON.stringify(ifaces));
-					nics = getDarwinNics();
-					nics.forEach((nic) => {
-						let ip4link = "";
-						let ip4linksubnet = "";
-						let ip6link = "";
-						let ip6linksubnet = "";
-						nic.ip4 = "";
-						nic.ip6 = "";
-						if ({}.hasOwnProperty.call(ifaces, nic.iface)) ifaces[nic.iface].forEach((details) => {
-							if (details.family === "IPv4" || details.family === 4) {
-								if (!nic.ip4 && !nic.ip4.match(/^169.254/i)) {
-									nic.ip4 = details.address;
-									nic.ip4subnet = details.netmask;
-								}
-								if (nic.ip4.match(/^169.254/i)) {
-									ip4link = details.address;
-									ip4linksubnet = details.netmask;
-								}
-							}
-							if (details.family === "IPv6" || details.family === 6) {
-								if (!nic.ip6 && !nic.ip6.match(/^fe80::/i)) {
-									nic.ip6 = details.address;
-									nic.ip6subnet = details.netmask;
-								}
-								if (nic.ip6.match(/^fe80::/i)) {
-									ip6link = details.address;
-									ip6linksubnet = details.netmask;
-								}
-							}
-						});
-						if (!nic.ip4 && ip4link) {
-							nic.ip4 = ip4link;
-							nic.ip4subnet = ip4linksubnet;
-						}
-						if (!nic.ip6 && ip6link) {
-							nic.ip6 = ip6link;
-							nic.ip6subnet = ip6linksubnet;
-						}
-						const ifaceSanitized = util.sanitizeString(nic.iface);
-						result.push({
-							iface: nic.iface,
-							ifaceName: nic.iface,
-							default: nic.iface === defaultInterface,
-							ip4: nic.ip4,
-							ip4subnet: nic.ip4subnet || "",
-							ip6: nic.ip6,
-							ip6subnet: nic.ip6subnet || "",
-							mac: nic.mac,
-							internal: nic.internal,
-							virtual: nic.internal ? false : testVirtualNic(nic.iface, nic.iface, nic.mac),
-							operstate: nic.operstate,
-							type: nic.type,
-							duplex: nic.duplex,
-							mtu: nic.mtu,
-							speed: nic.speed,
-							dhcp: getDarwinIfaceDHCPstatus(ifaceSanitized),
-							dnsSuffix: "",
-							ieee8021xAuth: "",
-							ieee8021xState: "",
-							carrierChanges: 0
-						});
-					});
-					_networkInterfaces = result;
-					if (defaultString.toLowerCase().indexOf("default") >= 0) {
-						result = result.filter((item) => item.default);
-						if (result.length > 0) result = result[0];
-						else result = [];
-					}
-					if (callback) callback(result);
-					resolve(result);
-				}
-				if (_linux) if (JSON.stringify(ifaces) === JSON.stringify(_ifaces) && !rescan) {
-					result = _networkInterfaces;
-					if (callback) callback(result);
-					resolve(result);
-				} else {
-					_ifaces = JSON.parse(JSON.stringify(ifaces));
-					_dhcpNics = getLinuxDHCPNics();
-					const defaultInterface = getDefaultNetworkInterface();
-					for (let dev in ifaces) {
-						let ip4 = "";
-						let ip4subnet = "";
-						let ip6 = "";
-						let ip6subnet = "";
-						let mac = "";
-						let duplex = "";
-						let mtu = "";
-						let speed = null;
-						let carrierChanges = 0;
-						let dhcp = false;
-						let dnsSuffix = "";
-						let ieee8021xAuth = "";
-						let ieee8021xState = "";
-						let type = "";
-						let ip4link = "";
-						let ip4linksubnet = "";
-						let ip6link = "";
-						let ip6linksubnet = "";
-						if ({}.hasOwnProperty.call(ifaces, dev)) {
-							const ifaceName = dev;
-							ifaces[dev].forEach((details) => {
+				if (_darwin || _freebsd || _openbsd || _netbsd) {
+					if (JSON.stringify(ifaces) === JSON.stringify(_ifaces) && !rescan) {
+						result = _networkInterfaces;
+						if (callback) callback(result);
+						resolve(result);
+					} else {
+						const defaultInterface = getDefaultNetworkInterface();
+						_ifaces = JSON.parse(JSON.stringify(ifaces));
+						nics = getDarwinNics();
+						nics.forEach((nic) => {
+							let ip4link = "";
+							let ip4linksubnet = "";
+							let ip6link = "";
+							let ip6linksubnet = "";
+							nic.ip4 = "";
+							nic.ip6 = "";
+							if ({}.hasOwnProperty.call(ifaces, nic.iface)) ifaces[nic.iface].forEach((details) => {
 								if (details.family === "IPv4" || details.family === 4) {
-									if (!ip4 && !ip4.match(/^169.254/i)) {
-										ip4 = details.address;
-										ip4subnet = details.netmask;
+									if (!nic.ip4 && !nic.ip4.match(/^169.254/i)) {
+										nic.ip4 = details.address;
+										nic.ip4subnet = details.netmask;
 									}
-									if (ip4.match(/^169.254/i)) {
+									if (nic.ip4.match(/^169.254/i)) {
 										ip4link = details.address;
 										ip4linksubnet = details.netmask;
 									}
 								}
 								if (details.family === "IPv6" || details.family === 6) {
-									if (!ip6 && !ip6.match(/^fe80::/i)) {
-										ip6 = details.address;
-										ip6subnet = details.netmask;
+									if (!nic.ip6 && !nic.ip6.match(/^fe80::/i)) {
+										nic.ip6 = details.address;
+										nic.ip6subnet = details.netmask;
 									}
-									if (ip6.match(/^fe80::/i)) {
+									if (nic.ip6.match(/^fe80::/i)) {
 										ip6link = details.address;
 										ip6linksubnet = details.netmask;
 									}
 								}
-								mac = details.mac;
-								const nodeMainVersion = parseInt(process.versions.node.split("."), 10);
-								if (mac.indexOf("00:00:0") > -1 && (_linux || _darwin) && !details.internal && nodeMainVersion >= 8 && nodeMainVersion <= 11) {
-									if (Object.keys(_mac).length === 0) _mac = getMacAddresses();
-									mac = _mac[dev] || "";
-								}
 							});
-							if (!ip4 && ip4link) {
-								ip4 = ip4link;
-								ip4subnet = ip4linksubnet;
+							if (!nic.ip4 && ip4link) {
+								nic.ip4 = ip4link;
+								nic.ip4subnet = ip4linksubnet;
 							}
-							if (!ip6 && ip6link) {
-								ip6 = ip6link;
-								ip6subnet = ip6linksubnet;
+							if (!nic.ip6 && ip6link) {
+								nic.ip6 = ip6link;
+								nic.ip6subnet = ip6linksubnet;
 							}
-							const iface = dev.split(":")[0].trim();
-							const ifaceSanitized = util.sanitizeString(iface);
-							const cmd = `echo -n "addr_assign_type: "; cat /sys/class/net/${ifaceSanitized}/addr_assign_type 2>/dev/null; echo;
+							const ifaceSanitized = util.sanitizeString(nic.iface);
+							result.push({
+								iface: nic.iface,
+								ifaceName: nic.iface,
+								default: nic.iface === defaultInterface,
+								ip4: nic.ip4,
+								ip4subnet: nic.ip4subnet || "",
+								ip6: nic.ip6,
+								ip6subnet: nic.ip6subnet || "",
+								mac: nic.mac,
+								internal: nic.internal,
+								virtual: nic.internal ? false : testVirtualNic(nic.iface, nic.iface, nic.mac),
+								operstate: nic.operstate,
+								type: nic.type,
+								duplex: nic.duplex,
+								mtu: nic.mtu,
+								speed: nic.speed,
+								dhcp: getDarwinIfaceDHCPstatus(ifaceSanitized),
+								dnsSuffix: "",
+								ieee8021xAuth: "",
+								ieee8021xState: "",
+								carrierChanges: 0
+							});
+						});
+						_networkInterfaces = result;
+						if (defaultString.toLowerCase().indexOf("default") >= 0) {
+							result = result.filter((item) => item.default);
+							if (result.length > 0) result = result[0];
+							else result = [];
+						}
+						if (callback) callback(result);
+						resolve(result);
+					}
+				}
+				if (_linux) {
+					if (JSON.stringify(ifaces) === JSON.stringify(_ifaces) && !rescan) {
+						result = _networkInterfaces;
+						if (callback) callback(result);
+						resolve(result);
+					} else {
+						_ifaces = JSON.parse(JSON.stringify(ifaces));
+						_dhcpNics = getLinuxDHCPNics();
+						const defaultInterface = getDefaultNetworkInterface();
+						for (let dev in ifaces) {
+							let ip4 = "";
+							let ip4subnet = "";
+							let ip6 = "";
+							let ip6subnet = "";
+							let mac = "";
+							let duplex = "";
+							let mtu = "";
+							let speed = null;
+							let carrierChanges = 0;
+							let dhcp = false;
+							let dnsSuffix = "";
+							let ieee8021xAuth = "";
+							let ieee8021xState = "";
+							let type = "";
+							let ip4link = "";
+							let ip4linksubnet = "";
+							let ip6link = "";
+							let ip6linksubnet = "";
+							if ({}.hasOwnProperty.call(ifaces, dev)) {
+								const ifaceName = dev;
+								ifaces[dev].forEach((details) => {
+									if (details.family === "IPv4" || details.family === 4) {
+										if (!ip4 && !ip4.match(/^169.254/i)) {
+											ip4 = details.address;
+											ip4subnet = details.netmask;
+										}
+										if (ip4.match(/^169.254/i)) {
+											ip4link = details.address;
+											ip4linksubnet = details.netmask;
+										}
+									}
+									if (details.family === "IPv6" || details.family === 6) {
+										if (!ip6 && !ip6.match(/^fe80::/i)) {
+											ip6 = details.address;
+											ip6subnet = details.netmask;
+										}
+										if (ip6.match(/^fe80::/i)) {
+											ip6link = details.address;
+											ip6linksubnet = details.netmask;
+										}
+									}
+									mac = details.mac;
+									const nodeMainVersion = parseInt(process.versions.node.split("."), 10);
+									if (mac.indexOf("00:00:0") > -1 && (_linux || _darwin) && !details.internal && nodeMainVersion >= 8 && nodeMainVersion <= 11) {
+										if (Object.keys(_mac).length === 0) _mac = getMacAddresses();
+										mac = _mac[dev] || "";
+									}
+								});
+								if (!ip4 && ip4link) {
+									ip4 = ip4link;
+									ip4subnet = ip4linksubnet;
+								}
+								if (!ip6 && ip6link) {
+									ip6 = ip6link;
+									ip6subnet = ip6linksubnet;
+								}
+								const iface = dev.split(":")[0].trim();
+								const ifaceSanitized = util.sanitizeString(iface);
+								const cmd = `echo -n "addr_assign_type: "; cat /sys/class/net/${ifaceSanitized}/addr_assign_type 2>/dev/null; echo;
             echo -n "address: "; cat /sys/class/net/${ifaceSanitized}/address 2>/dev/null; echo;
             echo -n "addr_len: "; cat /sys/class/net/${ifaceSanitized}/addr_len 2>/dev/null; echo;
             echo -n "broadcast: "; cat /sys/class/net/${ifaceSanitized}/broadcast 2>/dev/null; echo;
@@ -75558,146 +75806,36 @@ var require_network = /* @__PURE__ */ __commonJSMin(((exports) => {
             echo -n "type: "; cat /sys/class/net/${ifaceSanitized}/type 2>/dev/null; echo;
             echo -n "wireless: "; cat /proc/net/wireless 2>/dev/null | grep ${ifaceSanitized}; echo;
             echo -n "wirelessspeed: "; iw dev ${ifaceSanitized} link 2>&1 | grep bitrate; echo;`;
-							let lines = [];
-							try {
-								lines = execSync$4(cmd, util.execOptsLinux).toString().split("\n");
-								const connectionName = getLinuxIfaceConnectionName(ifaceSanitized);
-								dhcp = getLinuxIfaceDHCPstatus(ifaceSanitized, connectionName, _dhcpNics);
-								dnsSuffix = getLinuxIfaceDNSsuffix(connectionName);
-								ieee8021xAuth = getLinuxIfaceIEEE8021xAuth(connectionName);
-								ieee8021xState = getLinuxIfaceIEEE8021xState(ieee8021xAuth);
-							} catch {
-								util.noop();
-							}
-							duplex = util.getValue(lines, "duplex");
-							duplex = duplex.startsWith("cat") ? "" : duplex;
-							mtu = parseInt(util.getValue(lines, "mtu"), 10);
-							let myspeed = parseInt(util.getValue(lines, "speed"), 10);
-							speed = isNaN(myspeed) ? null : myspeed;
-							const wirelessspeed = util.getValue(lines, "tx bitrate");
-							if (speed === null && wirelessspeed) {
-								myspeed = parseFloat(wirelessspeed);
+								let lines = [];
+								try {
+									lines = execSync$4(cmd, util.execOptsLinux).toString().split("\n");
+									const connectionName = getLinuxIfaceConnectionName(ifaceSanitized);
+									dhcp = getLinuxIfaceDHCPstatus(ifaceSanitized, connectionName, _dhcpNics);
+									dnsSuffix = getLinuxIfaceDNSsuffix(connectionName);
+									ieee8021xAuth = getLinuxIfaceIEEE8021xAuth(connectionName);
+									ieee8021xState = getLinuxIfaceIEEE8021xState(ieee8021xAuth);
+								} catch {
+									util.noop();
+								}
+								duplex = util.getValue(lines, "duplex");
+								duplex = duplex.startsWith("cat") ? "" : duplex;
+								mtu = parseInt(util.getValue(lines, "mtu"), 10);
+								let myspeed = parseInt(util.getValue(lines, "speed"), 10);
 								speed = isNaN(myspeed) ? null : myspeed;
-							}
-							carrierChanges = parseInt(util.getValue(lines, "carrier_changes"), 10);
-							const operstate = util.getValue(lines, "operstate");
-							type = operstate === "up" ? util.getValue(lines, "wireless").trim() ? "wireless" : "wired" : "unknown";
-							if (ifaceSanitized === "lo" || ifaceSanitized.startsWith("bond")) type = "virtual";
-							let internal = ifaces[dev] && ifaces[dev][0] ? ifaces[dev][0].internal : false;
-							if (dev.toLowerCase().indexOf("loopback") > -1 || ifaceName.toLowerCase().indexOf("loopback") > -1) internal = true;
-							const virtual = internal ? false : testVirtualNic(dev, ifaceName, mac);
-							result.push({
-								iface: ifaceSanitized,
-								ifaceName,
-								default: iface === defaultInterface,
-								ip4,
-								ip4subnet,
-								ip6,
-								ip6subnet,
-								mac,
-								internal,
-								virtual,
-								operstate,
-								type,
-								duplex,
-								mtu,
-								speed,
-								dhcp,
-								dnsSuffix,
-								ieee8021xAuth,
-								ieee8021xState,
-								carrierChanges
-							});
-						}
-					}
-					_networkInterfaces = result;
-					if (defaultString.toLowerCase().indexOf("default") >= 0) {
-						result = result.filter((item) => item.default);
-						if (result.length > 0) result = result[0];
-						else result = [];
-					}
-					if (callback) callback(result);
-					resolve(result);
-				}
-				if (_windows) if (JSON.stringify(ifaces) === JSON.stringify(_ifaces) && !rescan) {
-					result = _networkInterfaces;
-					if (callback) callback(result);
-					resolve(result);
-				} else {
-					_ifaces = JSON.parse(JSON.stringify(ifaces));
-					const defaultInterface = getDefaultNetworkInterface();
-					getWindowsNics().then((nics) => {
-						nics.forEach((nic) => {
-							let found = false;
-							Object.keys(ifaces).forEach((key) => {
-								if (!found) ifaces[key].forEach((value) => {
-									if (Object.keys(value).indexOf("mac") >= 0) found = value["mac"] === nic.mac;
-								});
-							});
-							if (!found) ifaces[nic.name] = [{ mac: nic.mac }];
-						});
-						nics8021xInfo = getWindowsWiredProfilesInformation();
-						dnsSuffixes = getWindowsDNSsuffixes();
-						for (let dev in ifaces) {
-							const ifaceSanitized = util.sanitizeString(dev);
-							let iface = dev;
-							let ip4 = "";
-							let ip4subnet = "";
-							let ip6 = "";
-							let ip6subnet = "";
-							let mac = "";
-							let duplex = "";
-							let mtu = "";
-							let speed = null;
-							let carrierChanges = 0;
-							let operstate = "down";
-							let dhcp = false;
-							let dnsSuffix = "";
-							let ieee8021xAuth = "";
-							let ieee8021xState = "";
-							let type = "";
-							if ({}.hasOwnProperty.call(ifaces, dev)) {
-								let ifaceName = dev;
-								ifaces[dev].forEach((details) => {
-									if (details.family === "IPv4" || details.family === 4) {
-										ip4 = details.address;
-										ip4subnet = details.netmask;
-									}
-									if (details.family === "IPv6" || details.family === 6) {
-										if (!ip6 || ip6.match(/^fe80::/i)) {
-											ip6 = details.address;
-											ip6subnet = details.netmask;
-										}
-									}
-									mac = details.mac;
-									const nodeMainVersion = parseInt(process.versions.node.split("."), 10);
-									if (mac.indexOf("00:00:0") > -1 && (_linux || _darwin) && !details.internal && nodeMainVersion >= 8 && nodeMainVersion <= 11) {
-										if (Object.keys(_mac).length === 0) _mac = getMacAddresses();
-										mac = _mac[dev] || "";
-									}
-								});
-								dnsSuffix = getWindowsIfaceDNSsuffix(dnsSuffixes.ifaces, ifaceSanitized);
-								let foundFirst = false;
-								nics.forEach((detail) => {
-									if (detail.mac === mac && !foundFirst) {
-										iface = detail.iface || iface;
-										ifaceName = detail.name;
-										dhcp = detail.dhcp;
-										operstate = detail.operstate;
-										speed = operstate === "up" ? detail.speed : 0;
-										type = detail.type;
-										foundFirst = true;
-									}
-								});
-								if (dev.toLowerCase().indexOf("wlan") >= 0 || ifaceName.toLowerCase().indexOf("wlan") >= 0 || ifaceName.toLowerCase().indexOf("802.11n") >= 0 || ifaceName.toLowerCase().indexOf("wireless") >= 0 || ifaceName.toLowerCase().indexOf("wi-fi") >= 0 || ifaceName.toLowerCase().indexOf("wifi") >= 0) type = "wireless";
-								const IEEE8021x = getWindowsIEEE8021x(type, ifaceSanitized, nics8021xInfo);
-								ieee8021xAuth = IEEE8021x.protocol;
-								ieee8021xState = IEEE8021x.state;
+								const wirelessspeed = util.getValue(lines, "tx bitrate");
+								if (speed === null && wirelessspeed) {
+									myspeed = parseFloat(wirelessspeed);
+									speed = isNaN(myspeed) ? null : myspeed;
+								}
+								carrierChanges = parseInt(util.getValue(lines, "carrier_changes"), 10);
+								const operstate = util.getValue(lines, "operstate");
+								type = operstate === "up" ? util.getValue(lines, "wireless").trim() ? "wireless" : "wired" : "unknown";
+								if (ifaceSanitized === "lo" || ifaceSanitized.startsWith("bond")) type = "virtual";
 								let internal = ifaces[dev] && ifaces[dev][0] ? ifaces[dev][0].internal : false;
 								if (dev.toLowerCase().indexOf("loopback") > -1 || ifaceName.toLowerCase().indexOf("loopback") > -1) internal = true;
 								const virtual = internal ? false : testVirtualNic(dev, ifaceName, mac);
 								result.push({
-									iface,
+									iface: ifaceSanitized,
 									ifaceName,
 									default: iface === defaultInterface,
 									ip4,
@@ -75728,7 +75866,120 @@ var require_network = /* @__PURE__ */ __commonJSMin(((exports) => {
 						}
 						if (callback) callback(result);
 						resolve(result);
-					});
+					}
+				}
+				if (_windows) {
+					if (JSON.stringify(ifaces) === JSON.stringify(_ifaces) && !rescan) {
+						result = _networkInterfaces;
+						if (callback) callback(result);
+						resolve(result);
+					} else {
+						_ifaces = JSON.parse(JSON.stringify(ifaces));
+						const defaultInterface = getDefaultNetworkInterface();
+						getWindowsNics().then((nics) => {
+							nics.forEach((nic) => {
+								let found = false;
+								Object.keys(ifaces).forEach((key) => {
+									if (!found) ifaces[key].forEach((value) => {
+										if (Object.keys(value).indexOf("mac") >= 0) found = value["mac"] === nic.mac;
+									});
+								});
+								if (!found) ifaces[nic.name] = [{ mac: nic.mac }];
+							});
+							nics8021xInfo = getWindowsWiredProfilesInformation();
+							dnsSuffixes = getWindowsDNSsuffixes();
+							for (let dev in ifaces) {
+								const ifaceSanitized = util.sanitizeString(dev);
+								let iface = dev;
+								let ip4 = "";
+								let ip4subnet = "";
+								let ip6 = "";
+								let ip6subnet = "";
+								let mac = "";
+								let duplex = "";
+								let mtu = "";
+								let speed = null;
+								let carrierChanges = 0;
+								let operstate = "down";
+								let dhcp = false;
+								let dnsSuffix = "";
+								let ieee8021xAuth = "";
+								let ieee8021xState = "";
+								let type = "";
+								if ({}.hasOwnProperty.call(ifaces, dev)) {
+									let ifaceName = dev;
+									ifaces[dev].forEach((details) => {
+										if (details.family === "IPv4" || details.family === 4) {
+											ip4 = details.address;
+											ip4subnet = details.netmask;
+										}
+										if (details.family === "IPv6" || details.family === 6) {
+											if (!ip6 || ip6.match(/^fe80::/i)) {
+												ip6 = details.address;
+												ip6subnet = details.netmask;
+											}
+										}
+										mac = details.mac;
+										const nodeMainVersion = parseInt(process.versions.node.split("."), 10);
+										if (mac.indexOf("00:00:0") > -1 && (_linux || _darwin) && !details.internal && nodeMainVersion >= 8 && nodeMainVersion <= 11) {
+											if (Object.keys(_mac).length === 0) _mac = getMacAddresses();
+											mac = _mac[dev] || "";
+										}
+									});
+									dnsSuffix = getWindowsIfaceDNSsuffix(dnsSuffixes.ifaces, ifaceSanitized);
+									let foundFirst = false;
+									nics.forEach((detail) => {
+										if (detail.mac === mac && !foundFirst) {
+											iface = detail.iface || iface;
+											ifaceName = detail.name;
+											dhcp = detail.dhcp;
+											operstate = detail.operstate;
+											speed = operstate === "up" ? detail.speed : 0;
+											type = detail.type;
+											foundFirst = true;
+										}
+									});
+									if (dev.toLowerCase().indexOf("wlan") >= 0 || ifaceName.toLowerCase().indexOf("wlan") >= 0 || ifaceName.toLowerCase().indexOf("802.11n") >= 0 || ifaceName.toLowerCase().indexOf("wireless") >= 0 || ifaceName.toLowerCase().indexOf("wi-fi") >= 0 || ifaceName.toLowerCase().indexOf("wifi") >= 0) type = "wireless";
+									const IEEE8021x = getWindowsIEEE8021x(type, ifaceSanitized, nics8021xInfo);
+									ieee8021xAuth = IEEE8021x.protocol;
+									ieee8021xState = IEEE8021x.state;
+									let internal = ifaces[dev] && ifaces[dev][0] ? ifaces[dev][0].internal : false;
+									if (dev.toLowerCase().indexOf("loopback") > -1 || ifaceName.toLowerCase().indexOf("loopback") > -1) internal = true;
+									const virtual = internal ? false : testVirtualNic(dev, ifaceName, mac);
+									result.push({
+										iface,
+										ifaceName,
+										default: iface === defaultInterface,
+										ip4,
+										ip4subnet,
+										ip6,
+										ip6subnet,
+										mac,
+										internal,
+										virtual,
+										operstate,
+										type,
+										duplex,
+										mtu,
+										speed,
+										dhcp,
+										dnsSuffix,
+										ieee8021xAuth,
+										ieee8021xState,
+										carrierChanges
+									});
+								}
+							}
+							_networkInterfaces = result;
+							if (defaultString.toLowerCase().indexOf("default") >= 0) {
+								result = result.filter((item) => item.default);
+								if (result.length > 0) result = result[0];
+								else result = [];
+							}
+							if (callback) callback(result);
+							resolve(result);
+						});
+					}
 				}
 			});
 		});
@@ -75868,23 +76119,25 @@ var require_network = /* @__PURE__ */ __commonJSMin(((exports) => {
 				let tx_errors = 0;
 				let cmd, lines, stats;
 				if (!_network[ifaceSanitized] || _network[ifaceSanitized] && !_network[ifaceSanitized].ms || _network[ifaceSanitized] && _network[ifaceSanitized].ms && Date.now() - _network[ifaceSanitized].ms >= 500) {
-					if (_linux) if (fs$4.existsSync("/sys/class/net/" + ifaceSanitized)) {
-						cmd = "cat /sys/class/net/" + ifaceSanitized + "/operstate; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_bytes; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_bytes; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_dropped; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_errors; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_dropped; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_errors; ";
-						exec$8(cmd, (error, stdout) => {
-							if (!error) {
-								lines = stdout.toString().split("\n");
-								operstate = lines[0].trim();
-								rx_bytes = parseInt(lines[1], 10);
-								tx_bytes = parseInt(lines[2], 10);
-								rx_dropped = parseInt(lines[3], 10);
-								rx_errors = parseInt(lines[4], 10);
-								tx_dropped = parseInt(lines[5], 10);
-								tx_errors = parseInt(lines[6], 10);
-								result = calcNetworkSpeed(ifaceSanitized, rx_bytes, tx_bytes, operstate, rx_dropped, rx_errors, tx_dropped, tx_errors);
-							}
-							resolve(result);
-						});
-					} else resolve(result);
+					if (_linux) {
+						if (fs$4.existsSync("/sys/class/net/" + ifaceSanitized)) {
+							cmd = "cat /sys/class/net/" + ifaceSanitized + "/operstate; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_bytes; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_bytes; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_dropped; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_errors; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_dropped; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_errors; ";
+							exec$8(cmd, (error, stdout) => {
+								if (!error) {
+									lines = stdout.toString().split("\n");
+									operstate = lines[0].trim();
+									rx_bytes = parseInt(lines[1], 10);
+									tx_bytes = parseInt(lines[2], 10);
+									rx_dropped = parseInt(lines[3], 10);
+									rx_errors = parseInt(lines[4], 10);
+									tx_dropped = parseInt(lines[5], 10);
+									tx_errors = parseInt(lines[6], 10);
+									result = calcNetworkSpeed(ifaceSanitized, rx_bytes, tx_bytes, operstate, rx_dropped, rx_errors, tx_dropped, tx_errors);
+								}
+								resolve(result);
+							});
+						} else resolve(result);
+					}
 					if (_freebsd || _openbsd || _netbsd) {
 						cmd = "netstat -ibndI " + ifaceSanitized;
 						exec$8(cmd, (error, stdout) => {
@@ -77553,194 +77806,195 @@ var require_processes = /* @__PURE__ */ __commonJSMin(((exports) => {
 					list: []
 				};
 				let cmd = "";
-				if (_processes_cpu.ms && Date.now() - _processes_cpu.ms >= 500 || _processes_cpu.ms === 0) if (_linux || _freebsd || _openbsd || _netbsd || _darwin || _sunos) {
-					if (_linux) cmd = "export LC_ALL=C; ps -axo pid:11,ppid:11,pcpu:6,pmem:6,pri:5,vsz:11,rss:11,ni:5,etime:30,state:5,tty:15,user:20,command; unset LC_ALL";
-					if (_freebsd || _openbsd || _netbsd) cmd = "export LC_ALL=C; ps -axo pid,ppid,pcpu,pmem,pri,vsz,rss,ni,etime,state,tty,user,command; unset LC_ALL";
-					if (_darwin) cmd = "ps -axo pid,ppid,pcpu,pmem,pri,vsz=temp_title_1,rss=temp_title_2,nice,etime=temp_title_3,state,tty,user,command -r";
-					if (_sunos) cmd = "ps -Ao pid,ppid,pcpu,pmem,pri,vsz,rss,nice,stime,s,tty,user,comm";
-					try {
-						exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
-							if (!error && stdout.toString().trim()) {
-								result.list = parseProcesses(stdout.toString().split("\n")).slice();
-								result.all = result.list.length;
-								result.running = result.list.filter((e) => {
-									return e.state === "running";
-								}).length;
-								result.blocked = result.list.filter((e) => {
-									return e.state === "blocked";
-								}).length;
-								result.sleeping = result.list.filter((e) => {
-									return e.state === "sleeping";
-								}).length;
-								if (_linux) {
-									cmd = "cat /proc/stat | grep \"cpu \"";
-									result.list.forEach((element) => {
-										cmd += ";cat /proc/" + element.pid + "/stat";
-									});
-									exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
-										let curr_processes = stdout.toString().split("\n");
-										let all = parseProcStat(curr_processes.shift());
-										let list_new = {};
-										let resultProcess = {};
-										curr_processes.forEach((element) => {
-											resultProcess = calcProcStatLinux(element, all, _processes_cpu);
-											if (resultProcess.pid) {
-												let listPos = result.list.map((e) => {
-													return e.pid;
-												}).indexOf(resultProcess.pid);
-												if (listPos >= 0) {
-													result.list[listPos].cpu = resultProcess.cpuu + resultProcess.cpus;
-													result.list[listPos].cpuu = resultProcess.cpuu;
-													result.list[listPos].cpus = resultProcess.cpus;
-												}
-												list_new[resultProcess.pid] = {
-													cpuu: resultProcess.cpuu,
-													cpus: resultProcess.cpus,
-													utime: resultProcess.utime,
-													stime: resultProcess.stime,
-													cutime: resultProcess.cutime,
-													cstime: resultProcess.cstime
-												};
-											}
+				if (_processes_cpu.ms && Date.now() - _processes_cpu.ms >= 500 || _processes_cpu.ms === 0) {
+					if (_linux || _freebsd || _openbsd || _netbsd || _darwin || _sunos) {
+						if (_linux) cmd = "export LC_ALL=C; ps -axo pid:11,ppid:11,pcpu:6,pmem:6,pri:5,vsz:11,rss:11,ni:5,etime:30,state:5,tty:15,user:20,command; unset LC_ALL";
+						if (_freebsd || _openbsd || _netbsd) cmd = "export LC_ALL=C; ps -axo pid,ppid,pcpu,pmem,pri,vsz,rss,ni,etime,state,tty,user,command; unset LC_ALL";
+						if (_darwin) cmd = "ps -axo pid,ppid,pcpu,pmem,pri,vsz=temp_title_1,rss=temp_title_2,nice,etime=temp_title_3,state,tty,user,command -r";
+						if (_sunos) cmd = "ps -Ao pid,ppid,pcpu,pmem,pri,vsz,rss,nice,stime,s,tty,user,comm";
+						try {
+							exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
+								if (!error && stdout.toString().trim()) {
+									result.list = parseProcesses(stdout.toString().split("\n")).slice();
+									result.all = result.list.length;
+									result.running = result.list.filter((e) => {
+										return e.state === "running";
+									}).length;
+									result.blocked = result.list.filter((e) => {
+										return e.state === "blocked";
+									}).length;
+									result.sleeping = result.list.filter((e) => {
+										return e.state === "sleeping";
+									}).length;
+									if (_linux) {
+										cmd = "cat /proc/stat | grep \"cpu \"";
+										result.list.forEach((element) => {
+											cmd += ";cat /proc/" + element.pid + "/stat";
 										});
-										_processes_cpu.all = all;
-										_processes_cpu.list = Object.assign({}, list_new);
-										_processes_cpu.ms = Date.now();
-										_processes_cpu.result = Object.assign({}, result);
-										if (callback) callback(result);
-										resolve(result);
-									});
-								} else {
-									if (callback) callback(result);
-									resolve(result);
-								}
-							} else {
-								cmd = "ps -o pid,ppid,vsz,rss,nice,etime,stat,tty,user,comm";
-								if (_sunos) cmd = "ps -o pid,ppid,vsz,rss,nice,etime,s,tty,user,comm";
-								exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
-									if (!error) {
-										let lines = stdout.toString().split("\n");
-										lines.shift();
-										result.list = parseProcesses2(lines).slice();
-										result.all = result.list.length;
-										result.running = result.list.filter((e) => {
-											return e.state === "running";
-										}).length;
-										result.blocked = result.list.filter((e) => {
-											return e.state === "blocked";
-										}).length;
-										result.sleeping = result.list.filter((e) => {
-											return e.state === "sleeping";
-										}).length;
-										if (callback) callback(result);
-										resolve(result);
+										exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
+											let curr_processes = stdout.toString().split("\n");
+											let all = parseProcStat(curr_processes.shift());
+											let list_new = {};
+											let resultProcess = {};
+											curr_processes.forEach((element) => {
+												resultProcess = calcProcStatLinux(element, all, _processes_cpu);
+												if (resultProcess.pid) {
+													let listPos = result.list.map((e) => {
+														return e.pid;
+													}).indexOf(resultProcess.pid);
+													if (listPos >= 0) {
+														result.list[listPos].cpu = resultProcess.cpuu + resultProcess.cpus;
+														result.list[listPos].cpuu = resultProcess.cpuu;
+														result.list[listPos].cpus = resultProcess.cpus;
+													}
+													list_new[resultProcess.pid] = {
+														cpuu: resultProcess.cpuu,
+														cpus: resultProcess.cpus,
+														utime: resultProcess.utime,
+														stime: resultProcess.stime,
+														cutime: resultProcess.cutime,
+														cstime: resultProcess.cstime
+													};
+												}
+											});
+											_processes_cpu.all = all;
+											_processes_cpu.list = Object.assign({}, list_new);
+											_processes_cpu.ms = Date.now();
+											_processes_cpu.result = Object.assign({}, result);
+											if (callback) callback(result);
+											resolve(result);
+										});
 									} else {
 										if (callback) callback(result);
 										resolve(result);
 									}
+								} else {
+									cmd = "ps -o pid,ppid,vsz,rss,nice,etime,stat,tty,user,comm";
+									if (_sunos) cmd = "ps -o pid,ppid,vsz,rss,nice,etime,s,tty,user,comm";
+									exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
+										if (!error) {
+											let lines = stdout.toString().split("\n");
+											lines.shift();
+											result.list = parseProcesses2(lines).slice();
+											result.all = result.list.length;
+											result.running = result.list.filter((e) => {
+												return e.state === "running";
+											}).length;
+											result.blocked = result.list.filter((e) => {
+												return e.state === "blocked";
+											}).length;
+											result.sleeping = result.list.filter((e) => {
+												return e.state === "sleeping";
+											}).length;
+											if (callback) callback(result);
+											resolve(result);
+										} else {
+											if (callback) callback(result);
+											resolve(result);
+										}
+									});
+								}
+							});
+						} catch {
+							if (callback) callback(result);
+							resolve(result);
+						}
+					} else if (_windows) try {
+						util.powerShell(`Get-CimInstance Win32_Process | select-Object ProcessId,ParentProcessId,ExecutionState,Caption,CommandLine,ExecutablePath,UserModeTime,KernelModeTime,WorkingSetSize,Priority,PageFileUsage,
+                @{n="CreationDate";e={$_.CreationDate.ToString("yyyy-MM-dd HH:mm:ss")}} | ConvertTo-Json -compress`).then((stdout, error) => {
+							if (!error) {
+								const procs = [];
+								const procStats = [];
+								const list_new = {};
+								let allcpuu = 0;
+								let allcpus = 0;
+								let processArray = [];
+								try {
+									stdout = stdout.trim().replace(/^\uFEFF/, "");
+									processArray = JSON.parse(stdout);
+									if (!Array.isArray(processArray)) processArray = [processArray];
+								} catch {}
+								processArray.forEach((element) => {
+									const pid = element.ProcessId;
+									const parentPid = element.ParentProcessId;
+									const statusValue = element.ExecutionState || null;
+									const name = element.Caption;
+									const commandLine = element.CommandLine;
+									const commandPath = element.ExecutablePath;
+									const utime = element.UserModeTime;
+									const stime = element.KernelModeTime;
+									const memw = element.WorkingSetSize;
+									allcpuu = allcpuu + utime;
+									allcpus = allcpus + stime;
+									result.all++;
+									if (!statusValue) result.unknown++;
+									if (statusValue === "3") result.running++;
+									if (statusValue === "4" || statusValue === "5") result.blocked++;
+									procStats.push({
+										pid,
+										utime,
+										stime,
+										cpu: 0,
+										cpuu: 0,
+										cpus: 0
+									});
+									procs.push({
+										pid,
+										parentPid,
+										name,
+										cpu: 0,
+										cpuu: 0,
+										cpus: 0,
+										mem: memw / os$4.totalmem() * 100,
+										priority: element.Priority || null,
+										memVsz: element.PageFileUsage || null,
+										memRss: Math.floor((element.WorkingSetSize || 0) / 1024),
+										nice: 0,
+										started: element.CreationDate,
+										state: statusValue ? _winStatusValues[statusValue] : _winStatusValues[0],
+										tty: "",
+										user: "",
+										command: commandLine || name,
+										path: commandPath,
+										params: ""
+									});
 								});
+								result.sleeping = result.all - result.running - result.blocked - result.unknown;
+								result.list = procs;
+								procStats.forEach((element) => {
+									let resultProcess = calcProcStatWin(element, allcpuu + allcpus, _processes_cpu);
+									let listPos = result.list.map((e) => e.pid).indexOf(resultProcess.pid);
+									if (listPos >= 0) {
+										result.list[listPos].cpu = resultProcess.cpuu + resultProcess.cpus;
+										result.list[listPos].cpuu = resultProcess.cpuu;
+										result.list[listPos].cpus = resultProcess.cpus;
+									}
+									list_new[resultProcess.pid] = {
+										cpuu: resultProcess.cpuu,
+										cpus: resultProcess.cpus,
+										utime: resultProcess.utime,
+										stime: resultProcess.stime
+									};
+								});
+								_processes_cpu.all = allcpuu + allcpus;
+								_processes_cpu.all_utime = allcpuu;
+								_processes_cpu.all_stime = allcpus;
+								_processes_cpu.list = Object.assign({}, list_new);
+								_processes_cpu.ms = Date.now();
+								_processes_cpu.result = Object.assign({}, result);
 							}
+							if (callback) callback(result);
+							resolve(result);
 						});
 					} catch {
 						if (callback) callback(result);
 						resolve(result);
 					}
-				} else if (_windows) try {
-					util.powerShell(`Get-CimInstance Win32_Process | select-Object ProcessId,ParentProcessId,ExecutionState,Caption,CommandLine,ExecutablePath,UserModeTime,KernelModeTime,WorkingSetSize,Priority,PageFileUsage,
-                @{n="CreationDate";e={$_.CreationDate.ToString("yyyy-MM-dd HH:mm:ss")}} | ConvertTo-Json -compress`).then((stdout, error) => {
-						if (!error) {
-							const procs = [];
-							const procStats = [];
-							const list_new = {};
-							let allcpuu = 0;
-							let allcpus = 0;
-							let processArray = [];
-							try {
-								stdout = stdout.trim().replace(/^\uFEFF/, "");
-								processArray = JSON.parse(stdout);
-								if (!Array.isArray(processArray)) processArray = [processArray];
-							} catch {}
-							processArray.forEach((element) => {
-								const pid = element.ProcessId;
-								const parentPid = element.ParentProcessId;
-								const statusValue = element.ExecutionState || null;
-								const name = element.Caption;
-								const commandLine = element.CommandLine;
-								const commandPath = element.ExecutablePath;
-								const utime = element.UserModeTime;
-								const stime = element.KernelModeTime;
-								const memw = element.WorkingSetSize;
-								allcpuu = allcpuu + utime;
-								allcpus = allcpus + stime;
-								result.all++;
-								if (!statusValue) result.unknown++;
-								if (statusValue === "3") result.running++;
-								if (statusValue === "4" || statusValue === "5") result.blocked++;
-								procStats.push({
-									pid,
-									utime,
-									stime,
-									cpu: 0,
-									cpuu: 0,
-									cpus: 0
-								});
-								procs.push({
-									pid,
-									parentPid,
-									name,
-									cpu: 0,
-									cpuu: 0,
-									cpus: 0,
-									mem: memw / os$4.totalmem() * 100,
-									priority: element.Priority || null,
-									memVsz: element.PageFileUsage || null,
-									memRss: Math.floor((element.WorkingSetSize || 0) / 1024),
-									nice: 0,
-									started: element.CreationDate,
-									state: statusValue ? _winStatusValues[statusValue] : _winStatusValues[0],
-									tty: "",
-									user: "",
-									command: commandLine || name,
-									path: commandPath,
-									params: ""
-								});
-							});
-							result.sleeping = result.all - result.running - result.blocked - result.unknown;
-							result.list = procs;
-							procStats.forEach((element) => {
-								let resultProcess = calcProcStatWin(element, allcpuu + allcpus, _processes_cpu);
-								let listPos = result.list.map((e) => e.pid).indexOf(resultProcess.pid);
-								if (listPos >= 0) {
-									result.list[listPos].cpu = resultProcess.cpuu + resultProcess.cpus;
-									result.list[listPos].cpuu = resultProcess.cpuu;
-									result.list[listPos].cpus = resultProcess.cpus;
-								}
-								list_new[resultProcess.pid] = {
-									cpuu: resultProcess.cpuu,
-									cpus: resultProcess.cpus,
-									utime: resultProcess.utime,
-									stime: resultProcess.stime
-								};
-							});
-							_processes_cpu.all = allcpuu + allcpus;
-							_processes_cpu.all_utime = allcpuu;
-							_processes_cpu.all_stime = allcpus;
-							_processes_cpu.list = Object.assign({}, list_new);
-							_processes_cpu.ms = Date.now();
-							_processes_cpu.result = Object.assign({}, result);
-						}
+					else {
 						if (callback) callback(result);
 						resolve(result);
-					});
-				} catch {
-					if (callback) callback(result);
-					resolve(result);
-				}
-				else {
-					if (callback) callback(result);
-					resolve(result);
-				}
-				else {
+					}
+				} else {
 					if (callback) callback(_processes_cpu.result);
 					resolve(_processes_cpu.result);
 				}
@@ -77780,64 +78034,159 @@ var require_processes = /* @__PURE__ */ __commonJSMin(((exports) => {
 				if (util.isPrototypePolluted() && processesString !== "*") processesString = "------";
 				let processes = processesString.split("|");
 				let result = [];
-				if ((util.isPrototypePolluted() ? "" : util.sanitizeShellString(proc) || "*") && processes.length && processes[0] !== "------") if (_windows) try {
-					util.powerShell("Get-CimInstance Win32_Process | select ProcessId,Caption,UserModeTime,KernelModeTime,WorkingSetSize | ConvertTo-Json -compress").then((stdout, error) => {
-						if (!error) {
-							const procStats = [];
-							const list_new = {};
-							let allcpuu = 0;
-							let allcpus = 0;
-							let processArray = [];
-							try {
-								stdout = stdout.trim().replace(/^\uFEFF/, "");
-								processArray = JSON.parse(stdout);
-								if (!Array.isArray(processArray)) processArray = [processArray];
-							} catch {}
-							processArray.forEach((element) => {
-								const pid = element.ProcessId;
-								const name = element.Caption;
-								const utime = element.UserModeTime;
-								const stime = element.KernelModeTime;
-								const mem = element.WorkingSetSize;
-								allcpuu = allcpuu + utime;
-								allcpus = allcpus + stime;
-								procStats.push({
-									pid,
-									name,
-									utime,
-									stime,
-									cpu: 0,
-									cpuu: 0,
-									cpus: 0,
-									mem
-								});
-								let pname = "";
-								let inList = false;
-								processes.forEach((proc) => {
-									if (name.toLowerCase().indexOf(proc.toLowerCase()) >= 0 && !inList) {
-										inList = true;
-										pname = proc;
-									}
-								});
-								if (processesString === "*" || inList) {
-									let processFound = false;
-									result.forEach((item) => {
-										if (item.proc.toLowerCase() === pname.toLowerCase()) {
-											item.pids.push(pid);
-											item.mem += mem / os$4.totalmem() * 100;
-											processFound = true;
+				if ((util.isPrototypePolluted() ? "" : util.sanitizeShellString(proc) || "*") && processes.length && processes[0] !== "------") {
+					if (_windows) try {
+						util.powerShell("Get-CimInstance Win32_Process | select ProcessId,Caption,UserModeTime,KernelModeTime,WorkingSetSize | ConvertTo-Json -compress").then((stdout, error) => {
+							if (!error) {
+								const procStats = [];
+								const list_new = {};
+								let allcpuu = 0;
+								let allcpus = 0;
+								let processArray = [];
+								try {
+									stdout = stdout.trim().replace(/^\uFEFF/, "");
+									processArray = JSON.parse(stdout);
+									if (!Array.isArray(processArray)) processArray = [processArray];
+								} catch {}
+								processArray.forEach((element) => {
+									const pid = element.ProcessId;
+									const name = element.Caption;
+									const utime = element.UserModeTime;
+									const stime = element.KernelModeTime;
+									const mem = element.WorkingSetSize;
+									allcpuu = allcpuu + utime;
+									allcpus = allcpus + stime;
+									procStats.push({
+										pid,
+										name,
+										utime,
+										stime,
+										cpu: 0,
+										cpuu: 0,
+										cpus: 0,
+										mem
+									});
+									let pname = "";
+									let inList = false;
+									processes.forEach((proc) => {
+										if (name.toLowerCase().indexOf(proc.toLowerCase()) >= 0 && !inList) {
+											inList = true;
+											pname = proc;
 										}
 									});
-									if (!processFound) result.push({
-										proc: pname,
-										pid,
-										pids: [pid],
+									if (processesString === "*" || inList) {
+										let processFound = false;
+										result.forEach((item) => {
+											if (item.proc.toLowerCase() === pname.toLowerCase()) {
+												item.pids.push(pid);
+												item.mem += mem / os$4.totalmem() * 100;
+												processFound = true;
+											}
+										});
+										if (!processFound) result.push({
+											proc: pname,
+											pid,
+											pids: [pid],
+											cpu: 0,
+											mem: mem / os$4.totalmem() * 100
+										});
+									}
+								});
+								if (processesString !== "*") processes.filter((name) => procStats.filter((item) => item.name.toLowerCase().indexOf(name) >= 0).length === 0).forEach((procName) => {
+									result.push({
+										proc: procName,
+										pid: null,
+										pids: [],
 										cpu: 0,
-										mem: mem / os$4.totalmem() * 100
+										mem: 0
+									});
+								});
+								procStats.forEach((element) => {
+									let resultProcess = calcProcStatWin(element, allcpuu + allcpus, _process_cpu);
+									let listPos = -1;
+									for (let j = 0; j < result.length; j++) if (result[j].pid === resultProcess.pid || result[j].pids.indexOf(resultProcess.pid) >= 0) listPos = j;
+									if (listPos >= 0) result[listPos].cpu += resultProcess.cpuu + resultProcess.cpus;
+									list_new[resultProcess.pid] = {
+										cpuu: resultProcess.cpuu,
+										cpus: resultProcess.cpus,
+										utime: resultProcess.utime,
+										stime: resultProcess.stime
+									};
+								});
+								_process_cpu.all = allcpuu + allcpus;
+								_process_cpu.all_utime = allcpuu;
+								_process_cpu.all_stime = allcpus;
+								_process_cpu.list = Object.assign({}, list_new);
+								_process_cpu.ms = Date.now();
+								_process_cpu.result = JSON.parse(JSON.stringify(result));
+								if (callback) callback(result);
+								resolve(result);
+							}
+						});
+					} catch {
+						if (callback) callback(result);
+						resolve(result);
+					}
+					else if (_darwin || _linux || _freebsd || _openbsd || _netbsd) util.execSafe("ps", ["-axo", "pid,ppid,pcpu,pmem,comm"]).then((stdout) => {
+						if (stdout) {
+							const procStats = [];
+							const lines = stdout.toString().split("\n").filter((line) => {
+								if (processesString === "*") return true;
+								if (line.toLowerCase().indexOf("grep") !== -1) return false;
+								let found = false;
+								processes.forEach((item) => {
+									found = found || line.toLowerCase().indexOf(item.toLowerCase()) >= 0;
+								});
+								return found;
+							});
+							if (processesString === "*") lines.shift();
+							lines.forEach((line) => {
+								const data = line.trim().replace(/ +/g, " ").split(" ");
+								if (data.length > 4) {
+									const linuxName = data[4].indexOf("/") >= 0 ? data[4].substring(0, data[4].indexOf("/")) : data[4];
+									const name = _linux ? linuxName : data[4].substring(data[4].lastIndexOf("/") + 1);
+									procStats.push({
+										name,
+										pid: parseInt(data[0]) || 0,
+										ppid: parseInt(data[1]) || 0,
+										cpu: parseFloat(data[2].replace(",", ".")),
+										mem: parseFloat(data[3].replace(",", "."))
 									});
 								}
 							});
-							if (processesString !== "*") processes.filter((name) => procStats.filter((item) => item.name.toLowerCase().indexOf(name) >= 0).length === 0).forEach((procName) => {
+							procStats.forEach((item) => {
+								let listPos = -1;
+								let inList = false;
+								let name = item.name;
+								for (let j = 0; j < result.length; j++) if (item.name.toLowerCase().indexOf(result[j].proc.toLowerCase()) >= 0) listPos = j;
+								processes.forEach((proc) => {
+									if (item.name.toLowerCase().indexOf(proc.toLowerCase()) >= 0 && !inList) {
+										inList = true;
+										name = proc;
+									}
+								});
+								if (processesString === "*" || inList) {
+									if (listPos < 0) {
+										if (name) result.push({
+											proc: name,
+											pid: item.pid,
+											pids: [item.pid],
+											cpu: item.cpu,
+											mem: item.mem
+										});
+									} else {
+										if (item.ppid < 10) result[listPos].pid = item.pid;
+										result[listPos].pids.push(item.pid);
+										result[listPos].cpu += item.cpu;
+										result[listPos].mem += item.mem;
+									}
+								}
+							});
+							if (processesString !== "*") processes.filter((name) => {
+								return procStats.filter((item) => {
+									return item.name.toLowerCase().indexOf(name) >= 0;
+								}).length === 0;
+							}).forEach((procName) => {
 								result.push({
 									proc: procName,
 									pid: null,
@@ -77846,149 +78195,57 @@ var require_processes = /* @__PURE__ */ __commonJSMin(((exports) => {
 									mem: 0
 								});
 							});
-							procStats.forEach((element) => {
-								let resultProcess = calcProcStatWin(element, allcpuu + allcpus, _process_cpu);
-								let listPos = -1;
-								for (let j = 0; j < result.length; j++) if (result[j].pid === resultProcess.pid || result[j].pids.indexOf(resultProcess.pid) >= 0) listPos = j;
-								if (listPos >= 0) result[listPos].cpu += resultProcess.cpuu + resultProcess.cpus;
-								list_new[resultProcess.pid] = {
-									cpuu: resultProcess.cpuu,
-									cpus: resultProcess.cpus,
-									utime: resultProcess.utime,
-									stime: resultProcess.stime
-								};
-							});
-							_process_cpu.all = allcpuu + allcpus;
-							_process_cpu.all_utime = allcpuu;
-							_process_cpu.all_stime = allcpus;
-							_process_cpu.list = Object.assign({}, list_new);
-							_process_cpu.ms = Date.now();
-							_process_cpu.result = JSON.parse(JSON.stringify(result));
-							if (callback) callback(result);
-							resolve(result);
-						}
-					});
-				} catch {
-					if (callback) callback(result);
-					resolve(result);
-				}
-				else if (_darwin || _linux || _freebsd || _openbsd || _netbsd) util.execSafe("ps", ["-axo", "pid,ppid,pcpu,pmem,comm"]).then((stdout) => {
-					if (stdout) {
-						const procStats = [];
-						const lines = stdout.toString().split("\n").filter((line) => {
-							if (processesString === "*") return true;
-							if (line.toLowerCase().indexOf("grep") !== -1) return false;
-							let found = false;
-							processes.forEach((item) => {
-								found = found || line.toLowerCase().indexOf(item.toLowerCase()) >= 0;
-							});
-							return found;
-						});
-						if (processesString === "*") lines.shift();
-						lines.forEach((line) => {
-							const data = line.trim().replace(/ +/g, " ").split(" ");
-							if (data.length > 4) {
-								const linuxName = data[4].indexOf("/") >= 0 ? data[4].substring(0, data[4].indexOf("/")) : data[4];
-								const name = _linux ? linuxName : data[4].substring(data[4].lastIndexOf("/") + 1);
-								procStats.push({
-									name,
-									pid: parseInt(data[0]) || 0,
-									ppid: parseInt(data[1]) || 0,
-									cpu: parseFloat(data[2].replace(",", ".")),
-									mem: parseFloat(data[3].replace(",", "."))
+							if (_linux) {
+								result.forEach((item) => {
+									item.cpu = 0;
 								});
-							}
-						});
-						procStats.forEach((item) => {
-							let listPos = -1;
-							let inList = false;
-							let name = item.name;
-							for (let j = 0; j < result.length; j++) if (item.name.toLowerCase().indexOf(result[j].proc.toLowerCase()) >= 0) listPos = j;
-							processes.forEach((proc) => {
-								if (item.name.toLowerCase().indexOf(proc.toLowerCase()) >= 0 && !inList) {
-									inList = true;
-									name = proc;
-								}
-							});
-							if (processesString === "*" || inList) if (listPos < 0) {
-								if (name) result.push({
-									proc: name,
-									pid: item.pid,
-									pids: [item.pid],
-									cpu: item.cpu,
-									mem: item.mem
+								let cmd = "cat /proc/stat | grep \"cpu \"";
+								for (let i in result) for (let j in result[i].pids) cmd += ";cat /proc/" + result[i].pids[j] + "/stat";
+								exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
+									let curr_processes = stdout.toString().split("\n");
+									let all = parseProcStat(curr_processes.shift());
+									let list_new = {};
+									let resultProcess = {};
+									curr_processes.forEach((element) => {
+										resultProcess = calcProcStatLinux(element, all, _process_cpu);
+										if (resultProcess.pid) {
+											let resultItemId = -1;
+											for (let i in result) if (result[i].pids.indexOf(resultProcess.pid) >= 0) resultItemId = i;
+											if (resultItemId >= 0) result[resultItemId].cpu += resultProcess.cpuu + resultProcess.cpus;
+											list_new[resultProcess.pid] = {
+												cpuu: resultProcess.cpuu,
+												cpus: resultProcess.cpus,
+												utime: resultProcess.utime,
+												stime: resultProcess.stime,
+												cutime: resultProcess.cutime,
+												cstime: resultProcess.cstime
+											};
+										}
+									});
+									result.forEach((item) => {
+										item.cpu = Math.round(item.cpu * 100) / 100;
+									});
+									_process_cpu.all = all;
+									_process_cpu.list = Object.assign({}, list_new);
+									_process_cpu.ms = Date.now();
+									_process_cpu.result = Object.assign({}, result);
+									if (callback) callback(result);
+									resolve(result);
 								});
 							} else {
-								if (item.ppid < 10) result[listPos].pid = item.pid;
-								result[listPos].pids.push(item.pid);
-								result[listPos].cpu += item.cpu;
-								result[listPos].mem += item.mem;
-							}
-						});
-						if (processesString !== "*") processes.filter((name) => {
-							return procStats.filter((item) => {
-								return item.name.toLowerCase().indexOf(name) >= 0;
-							}).length === 0;
-						}).forEach((procName) => {
-							result.push({
-								proc: procName,
-								pid: null,
-								pids: [],
-								cpu: 0,
-								mem: 0
-							});
-						});
-						if (_linux) {
-							result.forEach((item) => {
-								item.cpu = 0;
-							});
-							let cmd = "cat /proc/stat | grep \"cpu \"";
-							for (let i in result) for (let j in result[i].pids) cmd += ";cat /proc/" + result[i].pids[j] + "/stat";
-							exec$6(cmd, { maxBuffer: 104857600 }, (error, stdout) => {
-								let curr_processes = stdout.toString().split("\n");
-								let all = parseProcStat(curr_processes.shift());
-								let list_new = {};
-								let resultProcess = {};
-								curr_processes.forEach((element) => {
-									resultProcess = calcProcStatLinux(element, all, _process_cpu);
-									if (resultProcess.pid) {
-										let resultItemId = -1;
-										for (let i in result) if (result[i].pids.indexOf(resultProcess.pid) >= 0) resultItemId = i;
-										if (resultItemId >= 0) result[resultItemId].cpu += resultProcess.cpuu + resultProcess.cpus;
-										list_new[resultProcess.pid] = {
-											cpuu: resultProcess.cpuu,
-											cpus: resultProcess.cpus,
-											utime: resultProcess.utime,
-											stime: resultProcess.stime,
-											cutime: resultProcess.cutime,
-											cstime: resultProcess.cstime
-										};
-									}
-								});
-								result.forEach((item) => {
-									item.cpu = Math.round(item.cpu * 100) / 100;
-								});
-								_process_cpu.all = all;
-								_process_cpu.list = Object.assign({}, list_new);
-								_process_cpu.ms = Date.now();
-								_process_cpu.result = Object.assign({}, result);
 								if (callback) callback(result);
 								resolve(result);
-							});
+							}
 						} else {
 							if (callback) callback(result);
 							resolve(result);
 						}
-					} else {
+					});
+					else {
 						if (callback) callback(result);
 						resolve(result);
 					}
-				});
-				else {
-					if (callback) callback(result);
-					resolve(result);
-				}
-				else {
+				} else {
 					if (callback) callback(result);
 					resolve(result);
 				}
@@ -79321,22 +79578,23 @@ var require_printer = /* @__PURE__ */ __commonJSMin(((exports) => {
 								}
 							}
 						}
-						if (result.length === 0) if (_linux) {
-							cmd = "export LC_ALL=C; lpstat -lp 2>/dev/null; unset LC_ALL";
-							exec$3(cmd, (error, stdout) => {
-								const parts = ("\n" + stdout.toString()).split("\nprinter ");
-								for (let i = 1; i < parts.length; i++) {
-									const printers = parseLinuxLpstatPrinter(parts[i].split("\n"), i);
-									result.push(printers);
-								}
+						if (result.length === 0) {
+							if (_linux) {
+								cmd = "export LC_ALL=C; lpstat -lp 2>/dev/null; unset LC_ALL";
+								exec$3(cmd, (error, stdout) => {
+									const parts = ("\n" + stdout.toString()).split("\nprinter ");
+									for (let i = 1; i < parts.length; i++) {
+										const printers = parseLinuxLpstatPrinter(parts[i].split("\n"), i);
+										result.push(printers);
+									}
+									if (callback) callback(result);
+									resolve(result);
+								});
+							} else {
 								if (callback) callback(result);
 								resolve(result);
-							});
+							}
 						} else {
-							if (callback) callback(result);
-							resolve(result);
-						}
-						else {
 							if (callback) callback(result);
 							resolve(result);
 						}
@@ -81307,34 +81565,35 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports) => {
 								keys = keys.split("|")[0].trim();
 							}
 							keys = keys.replace(/,/g, " ").replace(/ +/g, " ").split(" ");
-							if (data[i]) if (Array.isArray(data[i])) {
-								const partialArray = [];
-								data[i].forEach((element) => {
-									let partialRes = {};
-									if (keys.length === 1 && (keys[0] === "*" || keys[0] === "all")) partialRes = element;
-									else keys.forEach((k) => {
-										if ({}.hasOwnProperty.call(element, k)) partialRes[k] = element[k];
-									});
-									if (filter && filterParts.length === 2) {
-										if ({}.hasOwnProperty.call(partialRes, filterParts[0].trim())) {
-											const val = partialRes[filterParts[0].trim()];
-											if (typeof val === "number") {
-												if (val === parseFloat(filterParts[1].trim())) partialArray.push(partialRes);
-											} else if (typeof val === "string") {
-												if (val.toLowerCase() === filterParts[1].trim().toLowerCase()) partialArray.push(partialRes);
+							if (data[i]) {
+								if (Array.isArray(data[i])) {
+									const partialArray = [];
+									data[i].forEach((element) => {
+										let partialRes = {};
+										if (keys.length === 1 && (keys[0] === "*" || keys[0] === "all")) partialRes = element;
+										else keys.forEach((k) => {
+											if ({}.hasOwnProperty.call(element, k)) partialRes[k] = element[k];
+										});
+										if (filter && filterParts.length === 2) {
+											if ({}.hasOwnProperty.call(partialRes, filterParts[0].trim())) {
+												const val = partialRes[filterParts[0].trim()];
+												if (typeof val === "number") {
+													if (val === parseFloat(filterParts[1].trim())) partialArray.push(partialRes);
+												} else if (typeof val === "string") {
+													if (val.toLowerCase() === filterParts[1].trim().toLowerCase()) partialArray.push(partialRes);
+												}
 											}
-										}
-									} else partialArray.push(partialRes);
-								});
-								result[key] = partialArray;
-							} else {
-								const partialRes = {};
-								keys.forEach((k) => {
-									if ({}.hasOwnProperty.call(data[i], k)) partialRes[k] = data[i][k];
-								});
-								result[key] = partialRes;
-							}
-							else result[key] = {};
+										} else partialArray.push(partialRes);
+									});
+									result[key] = partialArray;
+								} else {
+									const partialRes = {};
+									keys.forEach((k) => {
+										if ({}.hasOwnProperty.call(data[i], k)) partialRes[k] = data[i][k];
+									});
+									result[key] = partialRes;
+								}
+							} else result[key] = {};
 						}
 						i++;
 					}
@@ -81647,9 +81906,10 @@ var require_visit = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function replaceNode(key, path, node) {
 		const parent = path[path.length - 1];
 		if (identity.isCollection(parent)) parent.items[key] = node;
-		else if (identity.isPair(parent)) if (key === "key") parent.key = node;
-		else parent.value = node;
-		else if (identity.isDocument(parent)) parent.contents = node;
+		else if (identity.isPair(parent)) {
+			if (key === "key") parent.key = node;
+			else parent.value = node;
+		} else if (identity.isDocument(parent)) parent.contents = node;
 		else {
 			const pt = identity.isAlias(parent) ? "alias" : "scalar";
 			throw new Error(`Cannot replace node with ${pt} parent`);
@@ -81903,30 +82163,32 @@ var require_applyReviver = /* @__PURE__ */ __commonJSMin(((exports) => {
 	* Includes extensions for handling Map and Set objects.
 	*/
 	function applyReviver(reviver, obj, key, val) {
-		if (val && typeof val === "object") if (Array.isArray(val)) for (let i = 0, len = val.length; i < len; ++i) {
-			const v0 = val[i];
-			const v1 = applyReviver(reviver, val, String(i), v0);
-			if (v1 === void 0) delete val[i];
-			else if (v1 !== v0) val[i] = v1;
-		}
-		else if (val instanceof Map) for (const k of Array.from(val.keys())) {
-			const v0 = val.get(k);
-			const v1 = applyReviver(reviver, val, k, v0);
-			if (v1 === void 0) val.delete(k);
-			else if (v1 !== v0) val.set(k, v1);
-		}
-		else if (val instanceof Set) for (const v0 of Array.from(val)) {
-			const v1 = applyReviver(reviver, val, v0, v0);
-			if (v1 === void 0) val.delete(v0);
-			else if (v1 !== v0) {
-				val.delete(v0);
-				val.add(v1);
+		if (val && typeof val === "object") {
+			if (Array.isArray(val)) for (let i = 0, len = val.length; i < len; ++i) {
+				const v0 = val[i];
+				const v1 = applyReviver(reviver, val, String(i), v0);
+				if (v1 === void 0) delete val[i];
+				else if (v1 !== v0) val[i] = v1;
 			}
-		}
-		else for (const [k, v0] of Object.entries(val)) {
-			const v1 = applyReviver(reviver, val, k, v0);
-			if (v1 === void 0) delete val[k];
-			else if (v1 !== v0) val[k] = v1;
+			else if (val instanceof Map) for (const k of Array.from(val.keys())) {
+				const v0 = val.get(k);
+				const v1 = applyReviver(reviver, val, k, v0);
+				if (v1 === void 0) val.delete(k);
+				else if (v1 !== v0) val.set(k, v1);
+			}
+			else if (val instanceof Set) for (const v0 of Array.from(val)) {
+				const v1 = applyReviver(reviver, val, v0, v0);
+				if (v1 === void 0) val.delete(v0);
+				else if (v1 !== v0) {
+					val.delete(v0);
+					val.add(v1);
+				}
+			}
+			else for (const [k, v0] of Object.entries(val)) {
+				const v1 = applyReviver(reviver, val, k, v0);
+				if (v1 === void 0) delete val[k];
+				else if (v1 !== v0) val[k] = v1;
+			}
 		}
 		return reviver.call(obj, key, val);
 	}
@@ -82355,8 +82617,10 @@ var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 		const folds = [];
 		const escapedFolds = {};
 		let end = lineWidth - indent.length;
-		if (typeof indentAtStart === "number") if (indentAtStart > lineWidth - Math.max(2, minContentWidth)) folds.push(0);
-		else end = lineWidth - indentAtStart;
+		if (typeof indentAtStart === "number") {
+			if (indentAtStart > lineWidth - Math.max(2, minContentWidth)) folds.push(0);
+			else end = lineWidth - indentAtStart;
+		}
 		let split = void 0;
 		let prev = void 0;
 		let overflow = false;
@@ -82393,23 +82657,25 @@ var require_foldFlowLines = /* @__PURE__ */ __commonJSMin(((exports) => {
 					const next = text[i + 1];
 					if (next && next !== " " && next !== "\n" && next !== "	") split = i;
 				}
-				if (i >= end) if (split) {
-					folds.push(split);
-					end = split + endStep;
-					split = void 0;
-				} else if (mode === FOLD_QUOTED) {
-					while (prev === " " || prev === "	") {
-						prev = ch;
-						ch = text[i += 1];
-						overflow = true;
-					}
-					const j = i > escEnd + 1 ? i - 2 : escStart - 1;
-					if (escapedFolds[j]) return text;
-					folds.push(j);
-					escapedFolds[j] = true;
-					end = j + endStep;
-					split = void 0;
-				} else overflow = true;
+				if (i >= end) {
+					if (split) {
+						folds.push(split);
+						end = split + endStep;
+						split = void 0;
+					} else if (mode === FOLD_QUOTED) {
+						while (prev === " " || prev === "	") {
+							prev = ch;
+							ch = text[i += 1];
+							overflow = true;
+						}
+						const j = i > escEnd + 1 ? i - 2 : escStart - 1;
+						if (escapedFolds[j]) return text;
+						folds.push(j);
+						escapedFolds[j] = true;
+						end = j + endStep;
+						split = void 0;
+					} else overflow = true;
+				}
 			}
 			prev = ch;
 		}
@@ -82893,8 +83159,10 @@ var require_log = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (logLevel === "debug") console.log(...messages);
 	}
 	function warn(logLevel, warning) {
-		if (logLevel === "debug" || logLevel === "warn") if (typeof node_process$2.emitWarning === "function") node_process$2.emitWarning(warning);
-		else console.warn(warning);
+		if (logLevel === "debug" || logLevel === "warn") {
+			if (typeof node_process$2.emitWarning === "function") node_process$2.emitWarning(warning);
+			else console.warn(warning);
+		}
 	}
 	exports.debug = debug;
 	exports.warn = warn;
@@ -83748,11 +84016,12 @@ var require_pairs = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (iterable && Symbol.iterator in Object(iterable)) for (let it of iterable) {
 			if (typeof replacer === "function") it = replacer.call(iterable, String(i++), it);
 			let key, value;
-			if (Array.isArray(it)) if (it.length === 2) {
-				key = it[0];
-				value = it[1];
-			} else throw new TypeError(`Expected [key, value] tuple: ${it}`);
-			else if (it && it instanceof Object) {
+			if (Array.isArray(it)) {
+				if (it.length === 2) {
+					key = it[0];
+					value = it[1];
+				} else throw new TypeError(`Expected [key, value] tuple: ${it}`);
+			} else if (it && it instanceof Object) {
 				const keys = Object.keys(it);
 				if (keys.length === 1) {
 					key = keys[0];
@@ -83829,8 +84098,10 @@ var require_omap = /* @__PURE__ */ __commonJSMin(((exports) => {
 		resolve(seq, onError) {
 			const pairs$1 = pairs.resolvePairs(seq, onError);
 			const seenKeys = [];
-			for (const { key } of pairs$1.items) if (identity.isScalar(key)) if (seenKeys.includes(key.value)) onError(`Ordered maps must not include duplicate keys: ${key.value}`);
-			else seenKeys.push(key.value);
+			for (const { key } of pairs$1.items) if (identity.isScalar(key)) {
+				if (seenKeys.includes(key.value)) onError(`Ordered maps must not include duplicate keys: ${key.value}`);
+				else seenKeys.push(key.value);
+			}
 			return Object.assign(new YAMLOMap(), pairs$1);
 		},
 		createNode: (schema, iterable, ctx) => YAMLOMap.from(schema, iterable, ctx)
@@ -84046,9 +84317,10 @@ var require_set = /* @__PURE__ */ __commonJSMin(((exports) => {
 		tag: "tag:yaml.org,2002:set",
 		createNode: (schema, iterable, ctx) => YAMLSet.from(schema, iterable, ctx),
 		resolve(map, onError) {
-			if (identity.isMap(map)) if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map);
-			else onError("Set items must all have null values");
-			else onError("Expected a mapping for this tag");
+			if (identity.isMap(map)) {
+				if (map.hasAllNullValues(true)) return Object.assign(new YAMLSet(), map);
+				else onError("Set items must all have null values");
+			} else onError("Expected a mapping for this tag");
 			return map;
 		}
 	};
@@ -84244,10 +84516,12 @@ var require_tags = /* @__PURE__ */ __commonJSMin(((exports) => {
 		const schemaTags = schemas.get(schemaName);
 		if (schemaTags && !customTags) return addMergeTag && !schemaTags.includes(merge.merge) ? schemaTags.concat(merge.merge) : schemaTags.slice();
 		let tags = schemaTags;
-		if (!tags) if (Array.isArray(customTags)) tags = [];
-		else {
-			const keys = Array.from(schemas.keys()).filter((key) => key !== "yaml11").map((key) => JSON.stringify(key)).join(", ");
-			throw new Error(`Unknown schema "${schemaName}"; use one of ${keys} or define customTags array`);
+		if (!tags) {
+			if (Array.isArray(customTags)) tags = [];
+			else {
+				const keys = Array.from(schemas.keys()).filter((key) => key !== "yaml11").map((key) => JSON.stringify(key)).join(", ");
+				throw new Error(`Unknown schema "${schemaName}"; use one of ${keys} or define customTags array`);
+			}
 		}
 		if (Array.isArray(customTags)) for (const tag of customTags) tags = tags.concat(tag);
 		else if (typeof customTags === "function") tags = customTags(tags.slice());
@@ -84339,14 +84613,15 @@ var require_stringifyDocument = /* @__PURE__ */ __commonJSMin(((exports) => {
 			if ((body[0] === "|" || body[0] === ">") && lines[lines.length - 1] === "---") lines[lines.length - 1] = `--- ${body}`;
 			else lines.push(body);
 		} else lines.push(stringify.stringify(doc.contents, ctx));
-		if (doc.directives?.docEnd) if (doc.comment) {
-			const cs = commentString(doc.comment);
-			if (cs.includes("\n")) {
-				lines.push("...");
-				lines.push(stringifyComment.indentComment(cs, ""));
-			} else lines.push(`... ${cs}`);
-		} else lines.push("...");
-		else {
+		if (doc.directives?.docEnd) {
+			if (doc.comment) {
+				const cs = commentString(doc.comment);
+				if (cs.includes("\n")) {
+					lines.push("...");
+					lines.push(stringifyComment.indentComment(cs, ""));
+				} else lines.push(`... ${cs}`);
+			} else lines.push("...");
+		} else {
 			let dc = doc.comment;
 			if (dc && chompKeep) dc = dc.replace(/^\n+/, "");
 			if (dc) {
@@ -84892,8 +85167,10 @@ var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 				}
 				if (!keyProps.anchor && !keyProps.tag && !sep) {
 					commentEnd = keyProps.end;
-					if (keyProps.comment) if (map.comment) map.comment += "\n" + keyProps.comment;
-					else map.comment = keyProps.comment;
+					if (keyProps.comment) {
+						if (map.comment) map.comment += "\n" + keyProps.comment;
+						else map.comment = keyProps.comment;
+					}
 					continue;
 				}
 				if (keyProps.newlineAfterProp || utilContainsNewline.containsNewline(key)) onError(key ?? start[start.length - 1], "MULTILINE_IMPLICIT_KEY", "Implicit keys need to be on a single line");
@@ -84926,8 +85203,10 @@ var require_resolve_block_map = /* @__PURE__ */ __commonJSMin(((exports) => {
 				map.items.push(pair);
 			} else {
 				if (implicitKey) onError(keyNode.range, "MISSING_CHAR", "Implicit map keys need to be followed by map values");
-				if (valueProps.comment) if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
-				else keyNode.comment = valueProps.comment;
+				if (valueProps.comment) {
+					if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
+					else keyNode.comment = valueProps.comment;
+				}
 				const pair = new Pair.Pair(keyNode);
 				if (ctx.options.keepSourceTokens) pair.srcToken = collItem;
 				map.items.push(pair);
@@ -84965,12 +85244,15 @@ var require_resolve_block_seq = /* @__PURE__ */ __commonJSMin(((exports) => {
 				parentIndent: bs.indent,
 				startOnNewline: true
 			});
-			if (!props.found) if (props.anchor || props.tag || value) if (value?.type === "block-seq") onError(props.end, "BAD_INDENT", "All sequence items must start at the same column");
-			else onError(offset, "MISSING_CHAR", "Sequence item without - indicator");
-			else {
-				commentEnd = props.end;
-				if (props.comment) seq.comment = props.comment;
-				continue;
+			if (!props.found) {
+				if (props.anchor || props.tag || value) {
+					if (value?.type === "block-seq") onError(props.end, "BAD_INDENT", "All sequence items must start at the same column");
+					else onError(offset, "MISSING_CHAR", "Sequence item without - indicator");
+				} else {
+					commentEnd = props.end;
+					if (props.comment) seq.comment = props.comment;
+					continue;
+				}
 			}
 			const node = value ? composeNode(ctx, value, props, onError) : composeEmptyNode(ctx, props.end, start, null, props, onError);
 			if (ctx.schema.compat) utilFlowIndentCheck.flowIndentCheck(bs.indent, value, onError);
@@ -85064,8 +85346,10 @@ var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) =
 				if (!props.anchor && !props.tag && !sep && !value) {
 					if (i === 0 && props.comma) onError(props.comma, "UNEXPECTED_TOKEN", `Unexpected , in ${fcName}`);
 					else if (i < fc.items.length - 1) onError(props.start, "UNEXPECTED_TOKEN", `Unexpected empty item in ${fcName}`);
-					if (props.comment) if (coll.comment) coll.comment += "\n" + props.comment;
-					else coll.comment = props.comment;
+					if (props.comment) {
+						if (coll.comment) coll.comment += "\n" + props.comment;
+						else coll.comment = props.comment;
+					}
 					offset = props.end;
 					continue;
 				}
@@ -85125,13 +85409,17 @@ var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) =
 						}
 						if (props.start < valueProps.found.offset - 1024) onError(valueProps.found, "KEY_OVER_1024_CHARS", "The : indicator must be at most 1024 chars after the start of an implicit flow sequence key");
 					}
-				} else if (value) if ("source" in value && value.source?.[0] === ":") onError(value, "MISSING_CHAR", `Missing space after : in ${fcName}`);
-				else onError(valueProps.start, "MISSING_CHAR", `Missing , or : between ${fcName} items`);
+				} else if (value) {
+					if ("source" in value && value.source?.[0] === ":") onError(value, "MISSING_CHAR", `Missing space after : in ${fcName}`);
+					else onError(valueProps.start, "MISSING_CHAR", `Missing , or : between ${fcName} items`);
+				}
 				const valueNode = value ? composeNode(ctx, value, valueProps, onError) : valueProps.found ? composeEmptyNode(ctx, valueProps.end, sep, null, valueProps, onError) : null;
 				if (valueNode) {
 					if (isBlock(value)) onError(valueNode.range, "BLOCK_IN_FLOW", blockMsg);
-				} else if (valueProps.comment) if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
-				else keyNode.comment = valueProps.comment;
+				} else if (valueProps.comment) {
+					if (keyNode.comment) keyNode.comment += "\n" + valueProps.comment;
+					else keyNode.comment = valueProps.comment;
+				}
 				const pair = new Pair.Pair(keyNode, valueNode);
 				if (ctx.options.keepSourceTokens) pair.srcToken = collItem;
 				if (isMap) {
@@ -85165,8 +85453,10 @@ var require_resolve_flow_collection = /* @__PURE__ */ __commonJSMin(((exports) =
 		}
 		if (ee.length > 0) {
 			const end = resolveEnd.resolveEnd(ee, cePos, ctx.options.strict, onError);
-			if (end.comment) if (coll.comment) coll.comment += "\n" + end.comment;
-			else coll.comment = end.comment;
+			if (end.comment) {
+				if (coll.comment) coll.comment += "\n" + end.comment;
+				else coll.comment = end.comment;
+			}
 			coll.range = [
 				fc.offset,
 				cePos,
@@ -85316,9 +85606,10 @@ var require_resolve_block_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 				value += sep + indent.slice(trimIndent) + content;
 				sep = "\n";
 				prevMoreIndented = true;
-			} else if (content === "") if (sep === "\n") value += "\n";
-			else sep = "\n";
-			else {
+			} else if (content === "") {
+				if (sep === "\n") value += "\n";
+				else sep = "\n";
+			} else {
 				value += sep + content;
 				sep = " ";
 				prevMoreIndented = false;
@@ -85512,9 +85803,10 @@ var require_resolve_flow_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 		let pos = first.lastIndex;
 		line.lastIndex = pos;
 		while (match = line.exec(source)) {
-			if (match[1] === "") if (sep === "\n") res += sep;
-			else sep = "\n";
-			else {
+			if (match[1] === "") {
+				if (sep === "\n") res += sep;
+				else sep = "\n";
+			} else {
 				res += sep + match[1];
 				sep = " ";
 			}
@@ -85651,8 +85943,10 @@ var require_compose_scalar = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function findScalarTagByName(schema, value, tagName, tagToken, onError) {
 		if (tagName === "!") return schema[identity.SCALAR];
 		const matchWithTest = [];
-		for (const tag of schema.tags) if (!tag.collection && tag.tag === tagName) if (tag.default && tag.test) matchWithTest.push(tag);
-		else return tag;
+		for (const tag of schema.tags) if (!tag.collection && tag.tag === tagName) {
+			if (tag.default && tag.test) matchWithTest.push(tag);
+			else return tag;
+		}
 		for (const tag of matchWithTest) if (tag.test?.test(value)) return tag;
 		const kt = schema.knownTags[tagName];
 		if (kt && !kt.collection) {
@@ -85752,8 +86046,10 @@ var require_compose_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 		if (anchor && node.anchor === "") onError(anchor, "BAD_ALIAS", "Anchor cannot be an empty string");
 		if (atKey && ctx.options.stringKeys && (!identity.isScalar(node) || typeof node.value !== "string" || node.tag && node.tag !== "tag:yaml.org,2002:str")) onError(tag ?? token, "NON_STRING_KEY", "With stringKeys, all keys must be strings");
 		if (spaceBefore) node.spaceBefore = true;
-		if (comment) if (token.type === "scalar" && token.source === "") node.comment = comment;
-		else node.commentBefore = comment;
+		if (comment) {
+			if (token.type === "scalar" && token.source === "") node.comment = comment;
+			else node.commentBefore = comment;
+		}
 		if (ctx.options.keepSourceTokens && isSrcToken) node.srcToken = token;
 		return node;
 	}
@@ -86949,11 +87245,13 @@ var require_lexer = /* @__PURE__ */ __commonJSMin(((exports) => {
 				end = i;
 			} else if (isEmpty(ch)) {
 				let next = this.buffer[i + 1];
-				if (ch === "\r") if (next === "\n") {
-					i += 1;
-					ch = "\n";
-					next = this.buffer[i + 1];
-				} else end = i;
+				if (ch === "\r") {
+					if (next === "\n") {
+						i += 1;
+						ch = "\n";
+						next = this.buffer[i + 1];
+					} else end = i;
+				}
 				if (next === "#" || inFlow && flowIndicatorChars.has(next)) break;
 				if (ch === "\n") {
 					const cs = this.continueScalar(i + 1);
@@ -87172,9 +87470,10 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 			for (const it of fc.items) if (it.sep && !it.value && !includesToken(it.start, "explicit-key-ind") && !includesToken(it.sep, "map-value-ind")) {
 				if (it.key) it.value = it.key;
 				delete it.key;
-				if (isFlowToken(it.value)) if (it.value.end) arrayPushArray(it.value.end, it.sep);
-				else it.value.end = it.sep;
-				else arrayPushArray(it.start, it.sep);
+				if (isFlowToken(it.value)) {
+					if (it.value.end) arrayPushArray(it.value.end, it.sep);
+					else it.value.end = it.sep;
+				} else arrayPushArray(it.start, it.sep);
 				delete it.sep;
 			}
 		}
@@ -87609,13 +87908,31 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 						this.onKeyLine = true;
 						return;
 					case "map-value-ind":
-						if (it.explicitKey) if (!it.sep) if (includesToken(it.start, "newline")) Object.assign(it, {
-							key: null,
-							sep: [this.sourceToken]
-						});
-						else {
-							const start = getFirstKeyStartProps(it.start);
-							this.stack.push({
+						if (it.explicitKey) {
+							if (!it.sep) {
+								if (includesToken(it.start, "newline")) Object.assign(it, {
+									key: null,
+									sep: [this.sourceToken]
+								});
+								else {
+									const start = getFirstKeyStartProps(it.start);
+									this.stack.push({
+										type: "block-map",
+										offset: this.offset,
+										indent: this.indent,
+										items: [{
+											start,
+											key: null,
+											sep: [this.sourceToken]
+										}]
+									});
+								}
+							} else if (it.value) map.items.push({
+								start: [],
+								key: null,
+								sep: [this.sourceToken]
+							});
+							else if (includesToken(it.sep, "map-value-ind")) this.stack.push({
 								type: "block-map",
 								offset: this.offset,
 								indent: this.indent,
@@ -87625,42 +87942,26 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 									sep: [this.sourceToken]
 								}]
 							});
-						}
-						else if (it.value) map.items.push({
-							start: [],
-							key: null,
-							sep: [this.sourceToken]
-						});
-						else if (includesToken(it.sep, "map-value-ind")) this.stack.push({
-							type: "block-map",
-							offset: this.offset,
-							indent: this.indent,
-							items: [{
-								start,
-								key: null,
-								sep: [this.sourceToken]
-							}]
-						});
-						else if (isFlowToken(it.key) && !includesToken(it.sep, "newline")) {
-							const start = getFirstKeyStartProps(it.start);
-							const key = it.key;
-							const sep = it.sep;
-							sep.push(this.sourceToken);
-							delete it.key;
-							delete it.sep;
-							this.stack.push({
-								type: "block-map",
-								offset: this.offset,
-								indent: this.indent,
-								items: [{
-									start,
-									key,
-									sep
-								}]
-							});
-						} else if (start.length > 0) it.sep = it.sep.concat(start, this.sourceToken);
-						else it.sep.push(this.sourceToken);
-						else if (!it.sep) Object.assign(it, {
+							else if (isFlowToken(it.key) && !includesToken(it.sep, "newline")) {
+								const start = getFirstKeyStartProps(it.start);
+								const key = it.key;
+								const sep = it.sep;
+								sep.push(this.sourceToken);
+								delete it.key;
+								delete it.sep;
+								this.stack.push({
+									type: "block-map",
+									offset: this.offset,
+									indent: this.indent,
+									items: [{
+										start,
+										key,
+										sep
+									}]
+								});
+							} else if (start.length > 0) it.sep = it.sep.concat(start, this.sourceToken);
+							else it.sep.push(this.sourceToken);
+						} else if (!it.sep) Object.assign(it, {
 							key: null,
 							sep: [this.sourceToken]
 						});
@@ -88034,8 +88335,10 @@ var require_public_api = /* @__PURE__ */ __commonJSMin(((exports) => {
 		const doc = parseDocument(src, options);
 		if (!doc) return null;
 		doc.warnings.forEach((warning) => log.warn(doc.options.logLevel, warning));
-		if (doc.errors.length > 0) if (doc.options.logLevel !== "silent") throw doc.errors[0];
-		else doc.errors = [];
+		if (doc.errors.length > 0) {
+			if (doc.options.logLevel !== "silent") throw doc.errors[0];
+			else doc.errors = [];
+		}
 		return doc.toJS(Object.assign({ reviver: _reviver }, options));
 	}
 	function stringify(value, replacer, options) {

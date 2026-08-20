@@ -84,12 +84,13 @@ function ensureAbsoluteRoot(root, itemPath) {
 		if (itemPath.match(/^[A-Z]:[^\\/]|^[A-Z]:$/i)) {
 			let cwd = process.cwd();
 			assert(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
-			if (itemPath[0].toUpperCase() === cwd[0].toUpperCase()) if (itemPath.length === 2) return `${itemPath[0]}:\\${cwd.substr(3)}`;
-			else {
-				if (!cwd.endsWith("\\")) cwd += "\\";
-				return `${itemPath[0]}:\\${cwd.substr(3)}${itemPath.substr(2)}`;
-			}
-			else return `${itemPath[0]}:\\${itemPath.substr(2)}`;
+			if (itemPath[0].toUpperCase() === cwd[0].toUpperCase()) {
+				if (itemPath.length === 2) return `${itemPath[0]}:\\${cwd.substr(3)}`;
+				else {
+					if (!cwd.endsWith("\\")) cwd += "\\";
+					return `${itemPath[0]}:\\${cwd.substr(3)}${itemPath.substr(2)}`;
+				}
+			} else return `${itemPath[0]}:\\${itemPath.substr(2)}`;
 		} else if (normalizeSeparators(itemPath).match(/^\\$|^\\[^\\]/)) {
 			const cwd = process.cwd();
 			assert(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
@@ -1691,9 +1692,10 @@ var Minimatch = class {
 				const next = pp[i + 1];
 				const prev = pp[i - 1];
 				if (p !== GLOBSTAR || prev === GLOBSTAR) return;
-				if (prev === void 0) if (next !== void 0 && next !== GLOBSTAR) pp[i + 1] = "(?:\\/|" + twoStar + "\\/)?" + next;
-				else pp[i] = twoStar;
-				else if (next === void 0) pp[i - 1] = prev + "(?:\\/|\\/" + twoStar + ")?";
+				if (prev === void 0) {
+					if (next !== void 0 && next !== GLOBSTAR) pp[i + 1] = "(?:\\/|" + twoStar + "\\/)?" + next;
+					else pp[i] = twoStar;
+				} else if (next === void 0) pp[i - 1] = prev + "(?:\\/|\\/" + twoStar + ")?";
 				else if (next !== GLOBSTAR) {
 					pp[i - 1] = prev + "(?:\\/|\\/" + twoStar + "\\/)" + next;
 					pp[i + 1] = GLOBSTAR;
