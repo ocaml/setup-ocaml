@@ -13,7 +13,7 @@ export default defineConfig({
     target: "node24",
     outDir: "../../dist",
     hash: false,
-    minify: true,
+    minify: false,
   },
   run: {
     tasks: {
