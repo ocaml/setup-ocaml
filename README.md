@@ -156,13 +156,13 @@ steps:
 
 The `ocaml-compiler` input supports the Semantic Versioning Specification, for more detailed examples please refer to the [documentation](https://github.com/npm/node-semver#ranges).
 
-When a version range is used (e.g., `5`, `5.4.x`), the highest matching version from the opam-repository is always selected.
+When a version range is used (e.g., `5`, `5.5.x`), the highest matching version from the opam-repository is always selected.
 
 > [!WARNING]
 > Version numbers containing a dot **must be quoted** in YAML to avoid being parsed as floats. For example, an unquoted `5.10` is parsed as the float `5.1`, which would silently resolve to the latest `5.1.x` compiler instead of `5.10.x`. To be safe, always quote version values:
 >
 > ```yml
-> ocaml-compiler: "5.4"
+> ocaml-compiler: "5.5"
 > ```
 
 > [!NOTE]
@@ -170,11 +170,11 @@ When a version range is used (e.g., `5`, `5.4.x`), the highest matching version 
 
 Examples:
 
-- Exact package name: `ocaml-base-compiler.5.4.0`
-- Combine multiple packages: `ocaml-variants.5.4.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
+- Exact package name: `ocaml-base-compiler.5.5.0`
+- Combine multiple packages: `ocaml-variants.5.5.0+options,ocaml-option-flambda,ocaml-option-musl,ocaml-option-static`
 - Major versions: `"4"`, `"5"`
-- Minor versions: `"4.08"`, `"4.14"`, `"5.4"`, `"5.4.x"`
-- More specific versions: `"~4.02.2"`, `"5.4.0"`
+- Minor versions: `"4.08"`, `"4.14"`, `"5.5"`, `"5.5.x"`
+- More specific versions: `"~4.02.2"`, `"5.5.0"`
 
 ## Caching
 

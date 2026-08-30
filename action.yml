@@ -8,9 +8,9 @@ inputs:
   ocaml-compiler:
     description: >-
       The OCaml compiler packages to initialise. Accepts a semver version
-      range (e.g. "5.3", "4.14.x") which is resolved to the latest
+      range (e.g. "5.5", "4.14.x") which is resolved to the latest
       matching version from opam-repository, or a full opam package name
-      (e.g. "ocaml-variants.5.3.0+options,ocaml-option-flambda").
+      (e.g. "ocaml-variants.5.5.0+options,ocaml-option-flambda").
     required: true
   opam-repositories:
     description: >-

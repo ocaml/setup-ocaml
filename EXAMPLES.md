@@ -89,7 +89,7 @@ steps:
   - name: Set-up OCaml with MSVC
     uses: ocaml/setup-ocaml@v3
     with:
-      ocaml-compiler: "5.4"
+      ocaml-compiler: "5.5"
       windows-compiler: msvc
 ```
 
@@ -105,7 +105,7 @@ steps:
   - name: Set-up OCaml with MSYS2
     uses: ocaml/setup-ocaml@v3
     with:
-      ocaml-compiler: "5.4"
+      ocaml-compiler: "5.5"
       windows-environment: msys2
 ```
 
@@ -121,7 +121,7 @@ steps:
   - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v3
     with:
-      ocaml-compiler: ocaml-base-compiler.5.4.0~dev
+      ocaml-compiler: ocaml-base-compiler.5.5.0~dev
       opam-repositories: |
         custom: git+https://github.com/<username>/<custom-opam-repository>.git
         default: git+https://github.com/ocaml/opam-repository.git
@@ -139,7 +139,7 @@ steps:
   - name: Set-up OCaml
     uses: ocaml/setup-ocaml@v3
     with:
-      ocaml-compiler: "5.4"
+      ocaml-compiler: "5.5"
     env:
       OPAMLOCKED: locked
 
