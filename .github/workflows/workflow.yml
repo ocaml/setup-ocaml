@@ -43,10 +43,10 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set-up OCaml 5.4
+      - name: Set-up OCaml 5.5
         uses: ./
         with:
-          ocaml-compiler: "5.4"
+          ocaml-compiler: "5.5"
           allow-prerelease-opam: ${{ matrix.allow-prerelease-opam }}
       - run: opam install ssl
 
@@ -57,10 +57,10 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set-up OCaml 5.4
+      - name: Set-up OCaml 5.5
         uses: ./
         with:
-          ocaml-compiler: "5.4"
+          ocaml-compiler: "5.5"
       - run: opam install ssl
 
   windows:
@@ -79,10 +79,10 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set-up OCaml 5.4
+      - name: Set-up OCaml 5.5
         uses: ./
         with:
-          ocaml-compiler: "5.4"
+          ocaml-compiler: "5.5"
           windows-compiler: ${{ matrix.windows-compiler }}
           windows-environment: ${{ matrix.windows-environment }}
       - run: opam install ssl
@@ -102,7 +102,7 @@ jobs:
       - name: Set-up OCaml without cache
         uses: ./
         with:
-          ocaml-compiler: "5.4"
+          ocaml-compiler: "5.5"
           cache: false
           # Verify that the deprecated input cannot override cache: false.
           dune-cache: true
@@ -111,6 +111,6 @@ jobs:
       - name: Reuse the local switch without cache
         uses: ./
         with:
-          ocaml-compiler: "5.4"
+          ocaml-compiler: "5.5"
           cache: false
       - run: opam install ssl
