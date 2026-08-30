@@ -23667,7 +23667,7 @@ var require_helpers = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/agent-base/dist/index.js
-var require_dist$4 = /* @__PURE__ */ __commonJSMin(((exports) => {
+var require_dist$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		if (k2 === void 0) k2 = k;
 		var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -23879,7 +23879,7 @@ var require_parse_proxy_response = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/https-proxy-agent/dist/index.js
-var require_dist$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
+var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		if (k2 === void 0) k2 = k;
 		var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -23920,7 +23920,7 @@ var require_dist$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const tls$1 = __importStar(__require("tls"));
 	const assert_1 = __importDefault(__require("assert"));
 	const debug_1 = __importDefault(require_src());
-	const agent_base_1 = require_dist$4();
+	const agent_base_1 = require_dist$3();
 	const url_1$1 = __require("url");
 	const parse_proxy_response_1 = require_parse_proxy_response();
 	const debug = (0, debug_1.default)("https-proxy-agent");
@@ -24027,7 +24027,7 @@ var require_dist$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/http-proxy-agent/dist/index.js
-var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
+var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		if (k2 === void 0) k2 = k;
 		var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -24068,7 +24068,7 @@ var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const tls = __importStar(__require("tls"));
 	const debug_1 = __importDefault(require_src());
 	const events_1 = __require("events");
-	const agent_base_1 = require_dist$4();
+	const agent_base_1 = require_dist$3();
 	const url_1 = __require("url");
 	const debug = (0, debug_1.default)("http-proxy-agent");
 	/**
@@ -24149,8 +24149,8 @@ var require_dist$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/@typespec/ts-http-runtime/dist/esm/policies/proxyPolicy.js
-var import_dist$2 = require_dist$3();
-var import_dist$3 = require_dist$2();
+var import_dist$1 = require_dist$2();
+var import_dist$2 = require_dist$1();
 const HTTPS_PROXY = "HTTPS_PROXY";
 const HTTP_PROXY = "HTTP_PROXY";
 const ALL_PROXY = "ALL_PROXY";
@@ -24246,10 +24246,10 @@ function setProxyAgentOnRequest(request, cachedAgents, proxyUrl) {
 	const isInsecure = new URL(request.url).protocol !== "https:";
 	if (request.tlsSettings) logger$4.warning("TLS settings are not supported in combination with custom Proxy, certificates provided to the client will be ignored.");
 	if (isInsecure) {
-		if (!cachedAgents.httpProxyAgent) cachedAgents.httpProxyAgent = new import_dist$3.HttpProxyAgent(proxyUrl);
+		if (!cachedAgents.httpProxyAgent) cachedAgents.httpProxyAgent = new import_dist$2.HttpProxyAgent(proxyUrl);
 		request.agent = cachedAgents.httpProxyAgent;
 	} else {
-		if (!cachedAgents.httpsProxyAgent) cachedAgents.httpsProxyAgent = new import_dist$2.HttpsProxyAgent(proxyUrl);
+		if (!cachedAgents.httpsProxyAgent) cachedAgents.httpsProxyAgent = new import_dist$1.HttpsProxyAgent(proxyUrl);
 		request.agent = cachedAgents.httpsProxyAgent;
 	}
 }
@@ -27481,6 +27481,9 @@ function convertHttpClient(requestPolicyClient) {
 
 //#endregion
 //#region node_modules/fast-xml-parser/src/util.js
+const nameStartChar = ":A-Za-z_\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD";
+const nameChar = nameStartChar + "\\-.\\d\\u00B7\\u0300-\\u036F\\u203F-\\u2040";
+const nameRegexp = "[" + nameStartChar + "][" + nameChar + "]*";
 const regexName = /* @__PURE__ */ new RegExp("^[:A-Za-z_\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD][:A-Za-z_\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.\\d\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*$");
 function getAllMatches(string, regex) {
 	const matches = [];
@@ -27693,11 +27696,86 @@ function readAttributeStr(xmlData, i) {
 	};
 }
 /**
-* Select all the attributes whether valid or invalid.
+* Walk `attrStr` once, left to right, splitting it into attribute tokens.
+*
+* This replaces a regex that used to do the same job
+* (`(\s*)([^\s=]+)(\s*=)?(\s*(['"])(([\s\S])*?)\5)?`). That regex led with an
+* optional whitespace group followed by a required "non-whitespace" group.
+* On a long run of whitespace that never resolves into an attribute name
+* (e.g. a tag with thousands of trailing spaces before `>`), the engine
+* backtracks the whitespace group one character at a time before giving up
+* and moving to the next starting position — one full backtrack per
+* position, which is quadratic in the length of the run.
+*
+* A single forward-only scan can never backtrack, so it can't be made slow
+* this way no matter how much whitespace the input contains — it's always
+* proportional to the length of the string, once.
+*
+* Each returned token mirrors the shape the old regex match array had, so
+* the validation logic below (which reads token[1]..token[6]) didn't need
+* to change:
+*   token.startIndex - where this token begins in attrStr
+*   token[1]          - leading whitespace before the name
+*   token[2]          - the attribute name
+*   token[3]          - whitespace + '=' if present, else undefined
+*   token[4]          - marker (any defined value) if a quoted value was found
+*   token[5]          - the quote character used ('"' or "'")
+*   token[6]          - the value's text, without the surrounding quotes
+*
+* A malformed leading character (e.g. a stray '=' with no name before it)
+* is simply skipped over, one character at a time — the same outcome the
+* old regex produced by failing to match at that position and retrying at
+* the next one.
 */
-const validAttrStrRegxp = /* @__PURE__ */ new RegExp("(\\s*)([^\\s=]+)(\\s*=)?(\\s*(['\"])(([\\s\\S])*?)\\5)?", "g");
+function scanAttributeTokens(attrStr) {
+	const tokens = [];
+	const len = attrStr.length;
+	let i = 0;
+	while (i < len) {
+		const tokenStart = i;
+		while (i < len && isWhiteSpace(attrStr[i])) i++;
+		if (i >= len) break;
+		if (attrStr[i] === "=") {
+			i = tokenStart + 1;
+			continue;
+		}
+		const leadingWs = attrStr.slice(tokenStart, i);
+		const nameStart = i;
+		while (i < len && !isWhiteSpace(attrStr[i]) && attrStr[i] !== "=") i++;
+		const name = attrStr.slice(nameStart, i);
+		let equalsGroup;
+		let j = i;
+		while (j < len && isWhiteSpace(attrStr[j])) j++;
+		if (j < len && attrStr[j] === "=") {
+			equalsGroup = attrStr.slice(i, j + 1);
+			i = j + 1;
+		}
+		let quoteChar;
+		let value;
+		let k = i;
+		while (k < len && isWhiteSpace(attrStr[k])) k++;
+		if (k < len && (attrStr[k] === "\"" || attrStr[k] === "'")) {
+			const valueStart = k + 1;
+			const closeIdx = attrStr.indexOf(attrStr[k], valueStart);
+			if (closeIdx !== -1) {
+				quoteChar = attrStr[k];
+				value = attrStr.slice(valueStart, closeIdx);
+				i = closeIdx + 1;
+			}
+		}
+		const token = { startIndex: tokenStart };
+		token[1] = leadingWs;
+		token[2] = name;
+		token[3] = equalsGroup;
+		token[4] = quoteChar !== void 0 ? true : void 0;
+		token[5] = quoteChar;
+		token[6] = value;
+		tokens.push(token);
+	}
+	return tokens;
+}
 function validateAttributeString(attrStr, options) {
-	const matches = getAllMatches(attrStr, validAttrStrRegxp);
+	const matches = scanAttributeTokens(attrStr);
 	const attrNames = {};
 	for (let i = 0; i < matches.length; i++) {
 		if (matches[i][1].length === 0) return getErrorObject("InvalidAttr", "Attribute '" + matches[i][2] + "' has no space in starting.", getPositionFromMatch(matches[i]));
@@ -28458,9 +28536,9 @@ var XmlNode = class {
 * XML NS spec:  https://www.w3.org/TR/xml-names/#NT-NCName
 */
 const nameStartChar10 = ":A-Za-z_À-ÖØ-öø-˿Ͱ-ͽͿ-҆҈-῿‌-‍⁰-↏Ⰰ-⿯、-퟿豈-﷏ﷰ-�";
-const nameChar10 = ":A-Za-z_À-ÖØ-öø-˿Ͱ-ͽͿ-҆҈-῿‌-‍⁰-↏Ⰰ-⿯、-퟿豈-﷏ﷰ-�\\-\\.\\d·̀-ͯ‿-⁀";
+const nameChar10 = nameStartChar10 + "\\-\\.\\d" + "·" + "̀-ͯ" + "‿-⁀";
 const nameStartChar11 = ":A-Za-z_À-˿Ͱ-ͽͿ-҆҈-῿‌-‍⁰-↏Ⰰ-⿯、-퟿豈-﷏ﷰ-�𐀀-󯿿";
-const nameChar11 = ":A-Za-z_À-˿Ͱ-ͽͿ-҆҈-῿‌-‍⁰-↏Ⰰ-⿯、-퟿豈-﷏ﷰ-�𐀀-󯿿\\-\\.\\d·̀-ͯ҇‿-⁀";
+const nameChar11 = nameStartChar11 + "\\-\\.\\d" + "·" + "̀-ͯ" + "҇" + "‿-⁀";
 const buildRegexes = (startChar, char, flags = "") => {
 	const ncNamePat = `[${startChar.replace(":", "")}][${char.replace(":", "")}]*`;
 	return {
@@ -63085,141 +63163,136 @@ var endpoint = withDefaults$2(null, DEFAULTS);
 
 //#endregion
 //#region node_modules/content-type/dist/index.js
-var require_dist$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/*!
-	* content-type
-	* Copyright(c) 2015 Douglas Christopher Wilson
-	* MIT Licensed
-	*/
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.parse = parse;
-	/**
-	* Null object perf optimization. Faster than `Object.create(null)` and `{ __proto__: null }`.
-	*/
-	const NullObject = /* @__PURE__ */ (() => {
-		const C = function() {};
-		C.prototype = Object.create(null);
-		return C;
-	})();
-	/**
-	* Parse a `Content-Type` header.
-	*/
-	function parse(header, options) {
-		const stopChar = options?.comma === true ? COMMA : 65536;
-		const len = header.length;
-		let index = skipOWS(header, options?.start ?? 0, len);
-		const valueStart = index;
-		index = skipValue(header, index, len, stopChar);
-		const valueEnd = trailingOWS(header, valueStart, index);
-		const type = header.slice(valueStart, valueEnd).toLowerCase();
-		if (options?.parameters === false) return {
-			type,
-			index,
-			parameters: new NullObject()
-		};
-		return parseParameters(header, type, index, len, stopChar);
-	}
-	const SP = 32;
-	const HTAB = 9;
-	const SEMI = 59;
-	const EQ = 61;
-	const DQUOTE = 34;
-	const BSLASH = 92;
-	const COMMA = 44;
-	/**
-	* Parses the parameters of a `Content-Type` header starting at the given index.
-	*/
-	function parseParameters(header, type, index, len, stopChar) {
-		const parameters = new NullObject();
-		parameter: while (index < len) {
-			if (header.charCodeAt(index) === stopChar) break;
-			index = skipOWS(header, index + 1, len);
-			const keyStart = index;
-			while (index < len) {
-				const code = header.charCodeAt(index);
-				if (code === stopChar) break parameter;
-				if (code === SEMI) continue parameter;
-				if (code === EQ) {
-					const keyEnd = trailingOWS(header, keyStart, index);
-					const key = header.slice(keyStart, keyEnd).toLowerCase();
-					index = skipOWS(header, index + 1, len);
-					if (index < len && header.charCodeAt(index) === DQUOTE) {
-						index++;
-						let value = "";
-						while (index < len) {
-							const code = header.charCodeAt(index++);
-							if (code === DQUOTE) {
-								index = skipValue(header, index, len, stopChar);
-								if (parameters[key] === void 0) parameters[key] = value;
-								break;
-							}
-							if (code === BSLASH && index < len) {
-								value += header[index++];
-								continue;
-							}
-							value += String.fromCharCode(code);
+/*!
+* content-type
+* Copyright(c) 2015 Douglas Christopher Wilson
+* MIT Licensed
+*/
+/**
+* Null object perf optimization. Faster than `Object.create(null)` and `{ __proto__: null }`.
+*/
+const NullObject = /* @__PURE__ */ (() => {
+	const C = function() {};
+	C.prototype = Object.create(null);
+	return C;
+})();
+/**
+* Parse a `Content-Type` header.
+*/
+function parse(header, options) {
+	const stopChar = options?.comma === true ? COMMA : 65536;
+	const len = header.length;
+	let index = skipOWS(header, options?.start ?? 0, len);
+	const valueStart = index;
+	index = skipValue(header, index, len, stopChar);
+	const valueEnd = trailingOWS(header, valueStart, index);
+	const type = header.slice(valueStart, valueEnd).toLowerCase();
+	if (options?.parameters === false) return {
+		type,
+		index,
+		parameters: new NullObject()
+	};
+	return parseParameters(header, type, index, len, stopChar);
+}
+const SP = 32;
+const HTAB = 9;
+const SEMI = 59;
+const EQ = 61;
+const DQUOTE = 34;
+const BSLASH = 92;
+const COMMA = 44;
+/**
+* Parses the parameters of a `Content-Type` header starting at the given index.
+*/
+function parseParameters(header, type, index, len, stopChar) {
+	const parameters = new NullObject();
+	parameter: while (index < len) {
+		if (header.charCodeAt(index) === stopChar) break;
+		index = skipOWS(header, index + 1, len);
+		const keyStart = index;
+		while (index < len) {
+			const code = header.charCodeAt(index);
+			if (code === stopChar) break parameter;
+			if (code === SEMI) continue parameter;
+			if (code === EQ) {
+				const keyEnd = trailingOWS(header, keyStart, index);
+				const key = header.slice(keyStart, keyEnd).toLowerCase();
+				index = skipOWS(header, index + 1, len);
+				if (index < len && header.charCodeAt(index) === DQUOTE) {
+					index++;
+					let value = "";
+					while (index < len) {
+						const code = header.charCodeAt(index++);
+						if (code === DQUOTE) {
+							index = skipValue(header, index, len, stopChar);
+							if (parameters[key] === void 0) parameters[key] = value;
+							break;
 						}
-						continue parameter;
-					}
-					const valueStart = index;
-					index = skipValue(header, index, len, stopChar);
-					if (parameters[key] === void 0) {
-						const valueEnd = trailingOWS(header, valueStart, index);
-						parameters[key] = header.slice(valueStart, valueEnd);
+						if (code === BSLASH && index < len) {
+							value += header[index++];
+							continue;
+						}
+						value += String.fromCharCode(code);
 					}
 					continue parameter;
 				}
-				index++;
+				const valueStart = index;
+				index = skipValue(header, index, len, stopChar);
+				if (parameters[key] === void 0) {
+					const valueEnd = trailingOWS(header, valueStart, index);
+					parameters[key] = header.slice(valueStart, valueEnd);
+				}
+				continue parameter;
 			}
-		}
-		return {
-			type,
-			index,
-			parameters
-		};
-	}
-	/**
-	* Skip over characters until a semicolon or other exit character.
-	*/
-	function skipValue(str, index, len, stopChar) {
-		while (index < len) {
-			const code = str.charCodeAt(index);
-			if (code === SEMI || code === stopChar) break;
 			index++;
 		}
-		return index;
 	}
-	/**
-	* Skip optional whitespace (OWS) in an HTTP header value.
-	*
-	* OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
-	*/
-	function skipOWS(header, index, len) {
-		while (index < len) {
-			const char = header.charCodeAt(index);
-			if (char !== SP && char !== HTAB) break;
-			index++;
-		}
-		return index;
+	return {
+		type,
+		index,
+		parameters
+	};
+}
+/**
+* Skip over characters until a semicolon or other exit character.
+*/
+function skipValue(str, index, len, stopChar) {
+	while (index < len) {
+		const code = str.charCodeAt(index);
+		if (code === SEMI || code === stopChar) break;
+		index++;
 	}
-	/**
-	* Trim optional whitespace (OWS) from the end of a substring.
-	*
-	* OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
-	*/
-	function trailingOWS(header, start, end) {
-		while (end > start) {
-			const char = header.charCodeAt(end - 1);
-			if (char !== SP && char !== HTAB) break;
-			end--;
-		}
-		return end;
+	return index;
+}
+/**
+* Skip optional whitespace (OWS) in an HTTP header value.
+*
+* OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
+*/
+function skipOWS(header, index, len) {
+	while (index < len) {
+		const char = header.charCodeAt(index);
+		if (char !== SP && char !== HTAB) break;
+		index++;
 	}
-}));
+	return index;
+}
+/**
+* Trim optional whitespace (OWS) from the end of a substring.
+*
+* OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
+*/
+function trailingOWS(header, start, end) {
+	while (end > start) {
+		const char = header.charCodeAt(end - 1);
+		if (char !== SP && char !== HTAB) break;
+		end--;
+	}
+	return end;
+}
 
 //#endregion
 //#region node_modules/json-with-bigint/json-with-bigint.js
-var import_dist$1 = require_dist$1();
 const intRegex = /^-?\d+$/;
 const noiseValue = /^-?\d+n+$/;
 const originalStringify = JSON.stringify;
@@ -63615,7 +63688,7 @@ var RequestError = class extends Error {
 
 //#endregion
 //#region node_modules/@octokit/request/dist-bundle/index.js
-var defaults_default = { headers: { "user-agent": `octokit-request.js/10.0.14 ${getUserAgent()}` } };
+var defaults_default = { headers: { "user-agent": `octokit-request.js/10.0.15 ${getUserAgent()}` } };
 function isPlainObject(value) {
 	if (typeof value !== "object" || value === null) return false;
 	if (Object.prototype.toString.call(value) !== "[object Object]") return false;
@@ -63702,7 +63775,7 @@ async function fetchWrapper(requestOptions) {
 async function getResponseData(response) {
 	const contentType = response.headers.get("content-type");
 	if (!contentType) return response.text().catch(noop$1);
-	const mimetype = (0, import_dist$1.parse)(contentType);
+	const mimetype = parse(contentType);
 	if (isJSONResponse(mimetype)) {
 		let text = "";
 		try {
@@ -66043,7 +66116,7 @@ var require_backoff = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_package = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = {
 		"name": "systeminformation",
-		"version": "5.33.1",
+		"version": "5.33.5",
 		"description": "Advanced, lightweight system and OS information library",
 		"license": "MIT",
 		"author": "Sebastian Hildebrandt <hildebrandt@plus-innovations.com> (https://plus-innovations.com)",
@@ -66449,9 +66522,12 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
 				_psPersistent = true;
 				_psChild.stdout.on("data", (data) => {
 					_psResult = _psResult + data.toString("utf8");
-					if (data.indexOf(_psCmdSeperator) >= 0) {
-						powerShellProceedResults(_psResult);
-						_psResult = "";
+					let sepIndex = _psResult.indexOf(_psCmdSeperator);
+					while (sepIndex >= 0) {
+						const end = sepIndex + 16;
+						powerShellProceedResults(_psResult.slice(0, end));
+						_psResult = _psResult.slice(end);
+						sepIndex = _psResult.indexOf(_psCmdSeperator);
 					}
 				});
 				_psChild.stderr.on("data", () => {
@@ -66493,7 +66569,7 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
 						start: /* @__PURE__ */ new Date()
 					});
 					try {
-						if (_psChild && _psChild.pid) _psChild.stdin.write("$OutputEncoding = [System.Console]::OutputEncoding = [System.Console]::InputEncoding = [System.Text.Encoding]::UTF8 ; echo --###START###--" + id + "--##ID##--; " + os$11.EOL + cmd + os$11.EOL + "echo --###ENDCMD###--" + os$11.EOL);
+						if (_psChild && _psChild.pid) _psChild.stdin.write(_psToUTF8 + "echo " + _psCmdStart + id + "--##ID##--; " + os$11.EOL + cmd + os$11.EOL + "echo --###ENDCMD###--" + os$11.EOL);
 					} catch {
 						resolve("");
 					}
@@ -69473,6 +69549,7 @@ var require_osinfo = /* @__PURE__ */ __commonJSMin(((exports) => {
 					result.codename = result.release.startsWith("14.") ? "Sonoma" : result.codename;
 					result.codename = result.release.startsWith("15.") ? "Sequoia" : result.codename;
 					result.codename = result.release.startsWith("26.") ? "Tahoe" : result.codename;
+					result.codename = result.release.startsWith("27.") ? "Golden Gate" : result.codename;
 					result.uefi = true;
 					result.codepage = util.getCodepage();
 					if (callback) callback(result);
@@ -74961,12 +75038,23 @@ var require_filesystem = /* @__PURE__ */ __commonJSMin(((exports) => {
 					} catch {
 						util.noop();
 					}
+					function hasControlCharacters(str) {
+						return /\p{Cc}/u.test(str);
+					}
 					util.promiseAll(workload).then((data) => {
 						let devices = data.results[0].toString().split(/\n\s*\n/);
 						devices.forEach((device) => {
 							const lines = device.split("\r\n");
 							const size = util.getValue(lines, "Size", ":").trim();
 							const status = util.getValue(lines, "Status", ":").trim().toLowerCase();
+							let serialNum = util.getValue(lines, "SerialNumber", ":").trim();
+							if (hasControlCharacters(serialNum)) {
+								const instanceId = util.getValue(lines, "PNPDeviceId", ":").trim().split("\\")[2];
+								if (instanceId) {
+									const parts = instanceId.split("&");
+									if (parts.length == 2 && parts[1] === "0") serialNum = parts[0];
+								}
+							}
 							if (size) result.push({
 								device: util.getValue(lines, "DeviceId", ":"),
 								type: device.indexOf("SSD") > -1 ? "SSD" : "HD",
@@ -74981,7 +75069,7 @@ var require_filesystem = /* @__PURE__ */ __commonJSMin(((exports) => {
 								tracksPerCylinder: parseInt(util.getValue(lines, "TracksPerCylinder", ":"), 10),
 								sectorsPerTrack: parseInt(util.getValue(lines, "SectorsPerTrack", ":"), 10),
 								firmwareRevision: util.getValue(lines, "FirmwareRevision", ":").trim(),
-								serialNum: util.getValue(lines, "SerialNumber", ":").trim(),
+								serialNum,
 								interfaceType: util.getValue(lines, "InterfaceType", ":").trim(),
 								smartStatus: status === "ok" ? "Ok" : status === "degraded" ? "Degraded" : status === "pred fail" ? "Predicted Failure" : "Unknown",
 								temperature: null
@@ -90443,7 +90531,7 @@ async function composeOpamCacheKeys() {
 	const { version: opamVersion } = await latestOpamRelease;
 	const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
 	const ocamlCompiler = await resolvedCompiler;
-	const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
+	const repositoryUrls = OPAM_REPOSITORIES.map(([, value]) => value).join();
 	const osInfo = await import_lib.osInfo();
 	const components = [
 		PLATFORM,

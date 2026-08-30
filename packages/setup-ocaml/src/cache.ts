@@ -50,7 +50,7 @@ async function composeOpamCacheKeys() {
   const { version: opamVersion } = await latestOpamRelease;
   const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
   const ocamlCompiler = await resolvedCompiler;
-  const repositoryUrls = OPAM_REPOSITORIES.map(([_, value]) => value).join();
+  const repositoryUrls = OPAM_REPOSITORIES.map(([, value]) => value).join();
   const osInfo = await system.osInfo();
   const components = [
     PLATFORM,

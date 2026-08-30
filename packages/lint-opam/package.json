@@ -10,6 +10,6 @@
     "@tsconfig/strictest": "2.0.8",
     "@types/node": "24.13.3",
     "typescript": "7.0.2",
-    "vite-plus": "0.2.9"
+    "vite-plus": "0.3.0"
   }
 }

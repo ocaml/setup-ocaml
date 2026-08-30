@@ -15,6 +15,6 @@
     "packageurl-js": "2.0.1",
     "strip-ansi": "7.2.0",
     "typescript": "7.0.2",
-    "vite-plus": "0.2.9"
+    "vite-plus": "0.3.0"
   }
 }
