@@ -43,13 +43,24 @@ inputs:
       sandboxing is always disabled regardless of this setting.
     required: false
     default: "false"
+  cache:
+    description: >-
+      Cache the opam root and local switch using GitHub Actions cache.
+      Set to "false" to disable all GitHub Actions cache operations, including
+      the deprecated Dune cache. This does not affect the hosted tool cache.
+    required: false
+    default: "true"
   dune-cache:
     description: >-
-      Enable Dune build caching via GitHub Actions cache. When enabled,
-      the Dune cache directory is saved and restored between workflow runs
-      to speed up incremental builds.
+      Deprecated. Enable Dune build caching via GitHub Actions cache. This has
+      no effect when "cache" is "false" and will be removed in the next major
+      release.
     required: false
     default: "false"
+    deprecationMessage: >-
+      This input will be removed in v4. The "cache" input takes precedence:
+      "cache: false" disables Dune caching. Manage Dune caching separately
+      after removal.
   cache-prefix:
     description: >-
       The prefix used for all cache keys. Change this value

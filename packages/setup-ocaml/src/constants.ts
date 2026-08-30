@@ -125,7 +125,9 @@ export const OPAM_DISABLE_SANDBOXING =
   // [TODO] unlock this once sandboxing is supported on Windows
   PLATFORM !== "windows" && core.getBooleanInput("opam-disable-sandboxing");
 
-export const DUNE_CACHE = core.getBooleanInput("dune-cache");
+export const OPAM_CACHE = core.getBooleanInput("cache");
+
+export const DUNE_CACHE = OPAM_CACHE && core.getBooleanInput("dune-cache");
 
 export const CACHE_PREFIX = core.getInput("cache-prefix");
 

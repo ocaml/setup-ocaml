@@ -1,4 +1,4 @@
-import { A as exec, C as WINDOWS_ENVIRONMENT, D as exportVariable, E as error, O as group, S as PLATFORM, T as debug, _ as DUNE_CACHE_ROOT, b as OPAM_REPOSITORIES, c as installOcaml, d as repositoryRemoveAll, f as setupOpam, g as DUNE_CACHE, h as CYGWIN_ROOT_BIN, i as restoreOpamCache, k as isDebug, l as pin, m as CYGWIN_BASH_ENV, o as saveOpamCache, p as update, r as restoreDuneCache, s as resolvedCompiler, t as installDune, u as repositoryAddAll, v as OPAM_LOCAL_PACKAGES, w as addPath, x as OPAM_ROOT, y as OPAM_PIN } from "./dune.mjs";
+import { A as group, C as OPAM_ROOT, D as debug, E as addPath, M as exec, O as error, S as OPAM_REPOSITORIES, T as WINDOWS_ENVIRONMENT, _ as DUNE_CACHE_ROOT, b as OPAM_LOCAL_PACKAGES, c as installOcaml, d as repositoryRemoveAll, f as setupOpam, g as DUNE_CACHE, h as CYGWIN_ROOT_BIN, i as restoreOpamCache, j as isDebug, k as exportVariable, l as pin, m as CYGWIN_BASH_ENV, o as saveOpamCache, p as update, r as restoreDuneCache, s as resolvedCompiler, t as installDune, u as repositoryAddAll, v as GITHUB_WORKSPACE, w as PLATFORM, x as OPAM_PIN, y as OPAM_CACHE } from "./dune.mjs";
 import * as process$2 from "node:process";
 import * as os$3 from "os";
 import * as fs$1 from "fs";
@@ -2284,6 +2284,9 @@ function create(patterns, options) {
 //#endregion
 //#region src/installer.ts
 const OPAM_SOLVER_TIMEOUT = 600;
+async function pathExists(filePath) {
+	return await promises$1.access(filePath).then(() => true, () => false);
+}
 async function installer() {
 	if (isDebug()) exportVariable("OPAMVERBOSE", 1);
 	exportVariable("OPAMCOLOR", "always");
@@ -2320,8 +2323,8 @@ async function installer() {
 			]);
 		});
 	}
-	const opamCacheHit = await restoreOpamCache();
-	const opamRootInitialized = await promises$1.access(path.join(OPAM_ROOT, "config")).then(() => true, () => false);
+	const opamCacheHit = OPAM_CACHE ? await restoreOpamCache() : void 0;
+	const [opamRootInitialized, localSwitchInitialized] = await Promise.all([pathExists(path.join(OPAM_ROOT, "config")), pathExists(path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config"))]);
 	const useInitialRepository = !opamCacheHit && !opamRootInitialized;
 	await setupOpam(useInitialRepository ? OPAM_REPOSITORIES[0] : void 0);
 	if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin") {
@@ -2330,14 +2333,16 @@ async function installer() {
 		addPath(CYGWIN_ROOT_BIN);
 	}
 	if (!opamCacheHit) {
-		if (useInitialRepository) await repositoryAddAll(OPAM_REPOSITORIES.slice(1));
+		if (useInitialRepository && !localSwitchInitialized) await repositoryAddAll(OPAM_REPOSITORIES.slice(1));
 		else {
 			await repositoryRemoveAll();
 			await repositoryAddAll(OPAM_REPOSITORIES);
 		}
-		const ocamlCompiler = await resolvedCompiler;
-		await installOcaml(ocamlCompiler);
-		await saveOpamCache();
+		if (!localSwitchInitialized) {
+			const ocamlCompiler = await resolvedCompiler;
+			await installOcaml(ocamlCompiler);
+			if (OPAM_CACHE) await saveOpamCache();
+		}
 	} else await update();
 	if (DUNE_CACHE) {
 		await restoreDuneCache();

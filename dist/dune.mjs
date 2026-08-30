@@ -88556,7 +88556,8 @@ const OPAM_REPOSITORIES = (() => {
 const OPAM_PIN = getBooleanInput("opam-pin");
 const OPAM_LOCAL_PACKAGES = getInput("opam-local-packages");
 const OPAM_DISABLE_SANDBOXING = PLATFORM !== "windows" && getBooleanInput("opam-disable-sandboxing");
-const DUNE_CACHE = getBooleanInput("dune-cache");
+const OPAM_CACHE = getBooleanInput("cache");
+const DUNE_CACHE = OPAM_CACHE && getBooleanInput("dune-cache");
 const CACHE_PREFIX = getInput("cache-prefix");
 const WINDOWS_ENVIRONMENT = (() => {
 	const value = getInput("windows-environment").toLowerCase();
@@ -90677,4 +90678,4 @@ async function trimDuneCache() {
 }
 
 //#endregion
-export { exec$17 as A, WINDOWS_ENVIRONMENT as C, exportVariable as D, error as E, group as O, PLATFORM as S, debug as T, DUNE_CACHE_ROOT as _, saveDuneCache as a, OPAM_REPOSITORIES as b, installOcaml as c, repositoryRemoveAll as d, setupOpam as f, DUNE_CACHE as g, CYGWIN_ROOT_BIN as h, restoreOpamCache as i, isDebug as k, pin as l, CYGWIN_BASH_ENV as m, trimDuneCache as n, saveOpamCache as o, update as p, restoreDuneCache as r, resolvedCompiler as s, installDune as t, repositoryAddAll as u, OPAM_LOCAL_PACKAGES as v, addPath as w, OPAM_ROOT as x, OPAM_PIN as y };
+export { group as A, OPAM_ROOT as C, debug as D, addPath as E, exec$17 as M, error as O, OPAM_REPOSITORIES as S, WINDOWS_ENVIRONMENT as T, DUNE_CACHE_ROOT as _, saveDuneCache as a, OPAM_LOCAL_PACKAGES as b, installOcaml as c, repositoryRemoveAll as d, setupOpam as f, DUNE_CACHE as g, CYGWIN_ROOT_BIN as h, restoreOpamCache as i, isDebug as j, exportVariable as k, pin as l, CYGWIN_BASH_ENV as m, trimDuneCache as n, saveOpamCache as o, update as p, restoreDuneCache as r, resolvedCompiler as s, installDune as t, repositoryAddAll as u, GITHUB_WORKSPACE as v, PLATFORM as w, OPAM_PIN as x, OPAM_CACHE as y };

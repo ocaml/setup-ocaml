@@ -11,6 +11,8 @@ import {
   CYGWIN_ROOT_BIN,
   DUNE_CACHE,
   DUNE_CACHE_ROOT,
+  GITHUB_WORKSPACE,
+  OPAM_CACHE,
   OPAM_LOCAL_PACKAGES,
   OPAM_PIN,
   OPAM_REPOSITORIES,
@@ -31,6 +33,13 @@ import { resolvedCompiler } from "./version.js";
 
 // 10 minutes — the 0install solver can be slow on large dependency trees.
 const OPAM_SOLVER_TIMEOUT = 600;
+
+async function pathExists(filePath: string) {
+  return await fs.access(filePath).then(
+    () => true,
+    () => false,
+  );
+}
 
 export async function installer() {
   if (core.isDebug()) {
@@ -66,11 +75,11 @@ export async function installer() {
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     });
   }
-  const opamCacheHit = await restoreOpamCache();
-  const opamRootInitialized = await fs.access(path.join(OPAM_ROOT, "config")).then(
-    () => true,
-    () => false,
-  );
+  const opamCacheHit = OPAM_CACHE ? await restoreOpamCache() : undefined;
+  const [opamRootInitialized, localSwitchInitialized] = await Promise.all([
+    pathExists(path.join(OPAM_ROOT, "config")),
+    pathExists(path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config")),
+  ]);
   const useInitialRepository = !opamCacheHit && !opamRootInitialized;
   await setupOpam(useInitialRepository ? OPAM_REPOSITORIES[0] : undefined);
   if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "cygwin") {
@@ -79,15 +88,19 @@ export async function installer() {
     core.addPath(CYGWIN_ROOT_BIN);
   }
   if (!opamCacheHit) {
-    if (useInitialRepository) {
+    if (useInitialRepository && !localSwitchInitialized) {
       await repositoryAddAll(OPAM_REPOSITORIES.slice(1));
     } else {
       await repositoryRemoveAll();
       await repositoryAddAll(OPAM_REPOSITORIES);
     }
-    const ocamlCompiler = await resolvedCompiler;
-    await installOcaml(ocamlCompiler);
-    await saveOpamCache();
+    if (!localSwitchInitialized) {
+      const ocamlCompiler = await resolvedCompiler;
+      await installOcaml(ocamlCompiler);
+      if (OPAM_CACHE) {
+        await saveOpamCache();
+      }
+    }
   } else {
     await update();
   }

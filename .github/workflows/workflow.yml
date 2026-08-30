@@ -99,8 +99,18 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install dependencies
         run: pacman -Sy --noconfirm bash bubblewrap ca-certificates coreutils curl diffutils gcc git gnupg make nano ncurses patch rsync sudo tar unzip xz
-      - name: Set-up OCaml
+      - name: Set-up OCaml without cache
         uses: ./
         with:
           ocaml-compiler: "5.4"
+          cache: false
+          # Verify that the deprecated input cannot override cache: false.
+          dune-cache: true
+      - name: Ensure caches are disabled
+        run: test -z "${DUNE_CACHE_ROOT:-}"
+      - name: Reuse the local switch without cache
+        uses: ./
+        with:
+          ocaml-compiler: "5.4"
+          cache: false
       - run: opam install ssl
