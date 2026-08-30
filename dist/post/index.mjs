@@ -1,4 +1,4 @@
-import { E as error, a as saveDuneCache, g as DUNE_CACHE, n as trimDuneCache } from "../dune.mjs";
+import { O as error, a as saveDuneCache, g as DUNE_CACHE, n as trimDuneCache } from "../dune.mjs";
 import * as process$1 from "node:process";
 
 //#region src/post.ts
