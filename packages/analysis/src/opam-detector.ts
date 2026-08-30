@@ -1,32 +1,23 @@
 import type { Package } from "@github/dependency-submission-toolkit";
 import { BuildTarget, PackageCache } from "@github/dependency-submission-toolkit";
 import { PackageURL } from "packageurl-js";
+import { z } from "zod";
 
-export interface Output {
-  "opam-version": string;
-  "command-line": string[];
-  switch: string;
-  tree: Forest;
-}
+const OpamDependency = z.object({
+  name: z.string(),
+  version: z.string(),
+  get dependencies() {
+    return z.array(OpamDependency);
+  },
+});
+type OpamDependency = z.infer<typeof OpamDependency>;
 
-interface OpamPackage {
-  name: string;
-  version: string;
-}
+export const OpamOutput = z.object({
+  tree: z.array(OpamDependency),
+});
+type OpamOutput = z.infer<typeof OpamOutput>;
 
-interface OpamDepsTree extends OpamPackage {
-  dependencies: Dependencies;
-}
-
-interface OpamDepsNode extends OpamDepsTree {
-  satisfies: string | null;
-  is_duplicate: boolean;
-}
-
-type Forest = OpamDepsTree[];
-type Dependencies = OpamDepsNode[];
-
-function parseDependencies(cache: PackageCache, dependencies: Dependencies): Package[] {
+function parseDependencies(cache: PackageCache, dependencies: OpamDependency[]): Package[] {
   const packages = dependencies.map((dependency) => {
     const purl = new PackageURL(
       "opam",
@@ -45,7 +36,7 @@ function parseDependencies(cache: PackageCache, dependencies: Dependencies): Pac
   return packages;
 }
 
-export function createBuildTarget(output: Output, filePath: string) {
+export function createBuildTarget(output: OpamOutput, filePath: string) {
   const opamPackage = output.tree.at(0);
   if (!opamPackage) {
     throw new Error(

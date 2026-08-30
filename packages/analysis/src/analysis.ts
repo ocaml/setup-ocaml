@@ -5,8 +5,7 @@ import * as process from "node:process";
 import { exec } from "@actions/exec";
 import * as glob from "@actions/glob";
 import { Snapshot, submitSnapshot } from "@github/dependency-submission-toolkit";
-import type { Output } from "./opam-detector.js";
-import { createBuildTarget } from "./opam-detector.js";
+import { createBuildTarget, OpamOutput } from "./opam-detector.js";
 
 async function retrieveOpamLocalPackages() {
   const globber = await glob.create("*.opam");
@@ -36,7 +35,7 @@ export async function analysis() {
         silent: true,
       },
     );
-    const output = JSON.parse(await fs.readFile(tempJson, "utf8")) as unknown as Output;
+    const output = OpamOutput.parse(JSON.parse(await fs.readFile(tempJson, "utf8")));
     const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
     const opamPackagePath = path.normalize(path.relative(githubWorkspace, fpath));
     const buildTarget = createBuildTarget(output, opamPackagePath);

@@ -8,7 +8,8 @@
     "@actions/exec": "3.0.0",
     "@actions/glob": "0.7.0",
     "@github/dependency-submission-toolkit": "2.0.5",
-    "packageurl-js": "2.0.1"
+    "packageurl-js": "2.0.1",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@tsconfig/node24": "24.0.5",
