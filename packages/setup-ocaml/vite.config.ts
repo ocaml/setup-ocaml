@@ -7,7 +7,9 @@ export default defineConfig({
       "post/index": "src/post.ts",
     },
     deps: {
+      alwaysBundle: [/.*/],
       onlyBundle: false,
+      onlyImport: [],
     },
     platform: "node",
     target: "node24",

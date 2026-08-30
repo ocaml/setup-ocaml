@@ -3,9 +3,11 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "devDependencies": {
+  "dependencies": {
     "@actions/core": "3.0.1",
-    "@actions/exec": "3.0.0",
+    "@actions/exec": "3.0.0"
+  },
+  "devDependencies": {
     "@tsconfig/node24": "24.0.5",
     "@tsconfig/strictest": "2.0.8",
     "@types/node": "24.13.3",

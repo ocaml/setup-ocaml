@@ -78,7 +78,7 @@ export const OPAM_ROOT = (() => {
   return path.join(os.homedir(), ".opam");
 })();
 
-export const CYGWIN_ROOT = path.join(OPAM_ROOT, ".cygwin", "root");
+const CYGWIN_ROOT = path.join(OPAM_ROOT, ".cygwin", "root");
 
 export const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
 

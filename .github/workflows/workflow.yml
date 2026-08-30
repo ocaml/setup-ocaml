@@ -23,6 +23,8 @@ jobs:
       - if: always()
         run: yarn lint
       - if: always()
+        run: yarn knip
+      - if: always()
         run: yarn typecheck
       - if: always()
         name: Ensure dist directory is up-to-date

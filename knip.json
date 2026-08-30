@@ -1,0 +1,63 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "include": [
+    "files",
+    "dependencies",
+    "devDependencies",
+    "optionalPeerDependencies",
+    "unlisted",
+    "binaries",
+    "unresolved",
+    "exports",
+    "nsExports",
+    "types",
+    "nsTypes",
+    "enumMembers",
+    "namespaceMembers",
+    "duplicates",
+    "catalog",
+    "catalogReferences",
+    "cycles"
+  ],
+  "includeEntryExports": true,
+  "treatConfigHintsAsErrors": true,
+  "treatTagHintsAsErrors": true,
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "optionalPeerDependencies": "error",
+    "unlisted": "error",
+    "binaries": "error",
+    "unresolved": "error",
+    "exports": "error",
+    "nsExports": "error",
+    "types": "error",
+    "nsTypes": "error",
+    "enumMembers": "error",
+    "namespaceMembers": "error",
+    "duplicates": "error",
+    "catalog": "error",
+    "catalogReferences": "error",
+    "cycles": "error"
+  },
+  "cycles": {
+    "dynamicImports": true
+  },
+  "workspaces": {
+    ".": {
+      "project": [],
+      "vite": false,
+      "vite-plus": false
+    },
+    "packages/*": {
+      "vite": false,
+      "vite-plus": false
+    },
+    "packages/setup-ocaml": {
+      "entry": ["src/index.ts!", "src/post.ts!"],
+      "vite": false,
+      "vite-plus": false
+    }
+  }
+}

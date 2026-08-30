@@ -4,7 +4,9 @@ export default defineConfig({
   pack: {
     entry: "src/index.ts",
     deps: {
+      alwaysBundle: [/.*/],
       onlyBundle: false,
+      onlyImport: [],
     },
     platform: "node",
     target: "node24",
