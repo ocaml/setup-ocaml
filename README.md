@@ -244,7 +244,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      ocaml:
+        patterns:
+          - "ocaml/*"
 ```
+
+The `ocaml` group combines updates to GitHub Actions maintained by the OCaml organization into a single pull request.
 
 > [!NOTE]
 > [Renovate](https://github.com/marketplace/renovate) is also available for free as a third-party tool, which is much more flexible than Dependabot - depending on the project and your preferences. If you just want to automate GitHub Actions updates, Dependabot is good enough.
