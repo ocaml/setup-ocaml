@@ -93486,7 +93486,7 @@ async function updateUnixPackageIndexFiles() {
 
 //#endregion
 //#region src/opam.ts
-const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
+const OPAM_STABLE_VERSION_RANGE = "<2.7.0";
 const EXECUTABLE_PERMISSION = 493;
 const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
