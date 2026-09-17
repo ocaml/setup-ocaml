@@ -20,7 +20,7 @@ inputs:
       repositories (e.g. "custom: https://my-repo.example.com").
     required: false
     default: |
-      default: git+https://github.com/ocaml/opam-repository.git
+      default: https://opam.ocaml.org
   opam-pin:
     description: >-
       Automatically pin local opam packages (matched by

@@ -21,9 +21,7 @@ import {
   updateUnixPackageIndexFiles,
 } from "./system-packages.js";
 
-// Stable opam version range — excludes 2.6.x pre-releases which may
-// contain breaking changes to the CLI or repository format.
-const OPAM_STABLE_VERSION_RANGE = "<2.6.0";
+const OPAM_STABLE_VERSION_RANGE = "<2.7.0";
 
 const EXECUTABLE_PERMISSION = 0o755;
 
