@@ -10,8 +10,8 @@
   "devDependencies": {
     "@tsconfig/node24": "24.0.5",
     "@tsconfig/strictest": "2.0.8",
-    "@types/node": "24.13.3",
+    "@types/node": "24.13.5",
     "typescript": "7.0.2",
-    "vite-plus": "0.3.0"
+    "vite-plus": "0.3.2"
   }
 }

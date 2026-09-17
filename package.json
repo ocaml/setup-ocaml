@@ -14,8 +14,8 @@
     "typecheck": "vp run --recursive typecheck"
   },
   "devDependencies": {
-    "knip": "6.33.0",
-    "vite-plus": "0.3.0"
+    "knip": "6.36.0",
+    "vite-plus": "0.3.2"
   },
   "packageManager": "yarn@4.18.0"
 }
