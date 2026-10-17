@@ -22,7 +22,7 @@ function parseDependencies(cache: PackageCache, dependencies: OpamDependency[]):
     const purl = new PackageURL(
       "opam",
       undefined,
-      encodeURIComponent(dependency.name),
+      dependency.name,
       dependency.version,
       undefined,
       undefined,

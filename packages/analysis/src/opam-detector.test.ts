@@ -28,7 +28,7 @@ it("lists the dependencies of an opam package by package URL", () => {
       .map(({ packageURL }) => `indirect  ${packageURL.toString()}`),
   ];
   expect(lines.join("\n")).toMatchInlineSnapshot(`
-    direct    pkg:opam/conf-g%252B%252B@1.0
+    direct    pkg:opam/conf-g%2B%2B@1.0
     direct    pkg:opam/ocaml@5.5.0
     indirect  pkg:opam/ocaml-base-compiler@5.5.0
   `);
