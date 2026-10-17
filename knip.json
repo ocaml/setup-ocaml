@@ -46,15 +46,10 @@
   },
   "workspaces": {
     ".": {
-      "project": [],
-      "vite": false
-    },
-    "packages/*": {
-      "vite": false
+      "project": []
     },
     "packages/setup-ocaml": {
-      "entry": ["src/index.ts!", "src/post.ts!"],
-      "vite": false
+      "entry": ["src/index.ts!", "src/post.ts!"]
     }
   }
 }
