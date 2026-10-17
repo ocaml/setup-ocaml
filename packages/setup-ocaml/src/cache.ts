@@ -14,6 +14,7 @@ import {
   PLATFORM,
 } from "./constants.js";
 import type { Inputs, WindowsEnvironment } from "./inputs.js";
+import { toCygwinPath, toMsysPath } from "./paths.js";
 
 export const DUNE_CACHE_KEY_STATE = "dune-cache-key";
 
@@ -79,16 +80,11 @@ function composeOpamCachePaths(windowsEnvironment: WindowsEnvironment) {
   const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
   const paths = [OPAM_ROOT, opamLocalCachePath];
   if (PLATFORM === "windows") {
-    const {
-      repo: { repo },
-    } = github.context;
     if (windowsEnvironment === "msys2") {
-      const opamMsys2LocalCachePath = path.posix.join("/d", "a", repo, repo, "_opam");
-      paths.push(opamMsys2LocalCachePath);
+      paths.push(toMsysPath(opamLocalCachePath));
     }
     if (windowsEnvironment === "cygwin") {
-      const opamCygwinLocalCachePath = path.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
-      paths.push(opamCygwinLocalCachePath);
+      paths.push(toCygwinPath(opamLocalCachePath));
     }
   }
   return paths;

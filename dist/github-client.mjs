@@ -84182,8 +84182,18 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region src/cache.ts
+//#region src/paths.ts
 var import_lib = /* @__PURE__ */ __toESM(require_lib(), 1);
+function toMsysPath(windowsPath) {
+	const { root } = path$1.win32.parse(windowsPath);
+	return `/${root.charAt(0).toLowerCase()}/${windowsPath.slice(root.length).replaceAll("\\", "/")}`;
+}
+function toCygwinPath(windowsPath) {
+	return path$1.posix.join("/cygdrive", toMsysPath(windowsPath));
+}
+
+//#endregion
+//#region src/cache.ts
 const DUNE_CACHE_KEY_STATE = "dune-cache-key";
 function composeDuneCacheKeys(cachePrefix, ocamlCompiler) {
 	const { workflow, job, runId } = context;
@@ -84251,15 +84261,8 @@ function composeOpamCachePaths(windowsEnvironment) {
 	const opamLocalCachePath = path$1.join(GITHUB_WORKSPACE, "_opam");
 	const paths = [OPAM_ROOT, opamLocalCachePath];
 	if (PLATFORM === "windows") {
-		const { repo: { repo } } = context;
-		if (windowsEnvironment === "msys2") {
-			const opamMsys2LocalCachePath = path$1.posix.join("/d", "a", repo, repo, "_opam");
-			paths.push(opamMsys2LocalCachePath);
-		}
-		if (windowsEnvironment === "cygwin") {
-			const opamCygwinLocalCachePath = path$1.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
-			paths.push(opamCygwinLocalCachePath);
-		}
+		if (windowsEnvironment === "msys2") paths.push(toMsysPath(opamLocalCachePath));
+		if (windowsEnvironment === "cygwin") paths.push(toCygwinPath(opamLocalCachePath));
 	}
 	return paths;
 }
@@ -85601,4 +85604,4 @@ function createOctokit(token) {
 }
 
 //#endregion
-export { info as A, __require as B, debug as C, getInput as D, getBooleanInput as E, cp as F, mkdirP as I, rmRF as L, notice as M, exec as N, getState as O, getExecOutput as P, HttpClient as R, addPath as S, exportVariable as T, __toESM as V, OPAM_ROOT as _, restoreDuneCache as a, record as b, saveOpamCache as c, ARCHITECTURE as d, CYGWIN_BASH_ENV as f, MSYS2_ROOT as g, GITHUB_WORKSPACE as h, DUNE_CACHE_KEY_STATE as i, isDebug as j, group as k, require_semver as l, DUNE_CACHE_ROOT as m, installDune as n, restoreOpamCache as o, CYGWIN_ROOT_BIN as p, trimDuneCache as r, saveDuneCache as s, createOctokit as t, create as u, PLATFORM as v, error$1 as w, string as x, RUNNER_ENVIRONMENT as y, __commonJSMin as z };
+export { group as A, __commonJSMin as B, addPath as C, getBooleanInput as D, exportVariable as E, getExecOutput as F, __toESM as H, cp as I, mkdirP as L, isDebug as M, notice as N, getInput as O, exec as P, rmRF as R, string as S, error$1 as T, __require as V, MSYS2_ROOT as _, restoreDuneCache as a, RUNNER_ENVIRONMENT as b, saveOpamCache as c, create as d, ARCHITECTURE as f, GITHUB_WORKSPACE as g, DUNE_CACHE_ROOT as h, DUNE_CACHE_KEY_STATE as i, info as j, getState as k, toMsysPath as l, CYGWIN_ROOT_BIN as m, installDune as n, restoreOpamCache as o, CYGWIN_BASH_ENV as p, trimDuneCache as r, saveDuneCache as s, createOctokit as t, require_semver as u, OPAM_ROOT as v, debug as w, record as x, PLATFORM as y, HttpClient as z };

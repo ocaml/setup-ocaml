@@ -8,6 +8,7 @@ import * as semver from "semver";
 import { ARCHITECTURE, MSYS2_ROOT, PLATFORM } from "./constants.js";
 import type { Octokit } from "./github-client.js";
 import type { Inputs, OpamRepository, WindowsCompiler } from "./inputs.js";
+import { toMsysPath } from "./paths.js";
 import {
   installMsys2Packages,
   installUnixSystemPackages,
@@ -22,11 +23,7 @@ const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
 
 function toGpgPath(filePath: string) {
-  if (PLATFORM !== "windows") {
-    return filePath;
-  }
-  const { root } = path.parse(filePath);
-  return `/${root.charAt(0).toLowerCase()}/${filePath.slice(root.length).replaceAll("\\", "/")}`;
+  return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
 }
 
 async function verifyOpamSignature(

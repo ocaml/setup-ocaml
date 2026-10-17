@@ -1,4 +1,4 @@
-import { A as info, B as __require, C as debug, D as getInput, E as getBooleanInput, F as cp, I as mkdirP, L as rmRF, M as notice, N as exec, P as getExecOutput, R as HttpClient, S as addPath, T as exportVariable, V as __toESM, _ as OPAM_ROOT, a as restoreDuneCache, b as record, c as saveOpamCache, d as ARCHITECTURE, f as CYGWIN_BASH_ENV, g as MSYS2_ROOT, h as GITHUB_WORKSPACE, j as isDebug, k as group, l as require_semver, m as DUNE_CACHE_ROOT, n as installDune, o as restoreOpamCache, p as CYGWIN_ROOT_BIN, t as createOctokit, u as create, v as PLATFORM, w as error, x as string, y as RUNNER_ENVIRONMENT, z as __commonJSMin } from "./github-client.mjs";
+import { A as group, B as __commonJSMin, C as addPath, D as getBooleanInput, E as exportVariable, F as getExecOutput, H as __toESM, I as cp, L as mkdirP, M as isDebug, N as notice, O as getInput, P as exec, R as rmRF, S as string, T as error, V as __require, _ as MSYS2_ROOT, a as restoreDuneCache, b as RUNNER_ENVIRONMENT, c as saveOpamCache, d as create, f as ARCHITECTURE, g as GITHUB_WORKSPACE, h as DUNE_CACHE_ROOT, j as info, l as toMsysPath, m as CYGWIN_ROOT_BIN, n as installDune, o as restoreOpamCache, p as CYGWIN_BASH_ENV, t as createOctokit, u as require_semver, v as OPAM_ROOT, w as debug, x as record, y as PLATFORM, z as HttpClient } from "./github-client.mjs";
 import * as process$2 from "node:process";
 import * as os$3 from "os";
 import * as crypto from "crypto";
@@ -7240,9 +7240,7 @@ const EXECUTABLE_PERMISSION = 493;
 const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
 function toGpgPath(filePath) {
-	if (PLATFORM !== "windows") return filePath;
-	const { root } = path.parse(filePath);
-	return `/${root.charAt(0).toLowerCase()}/${filePath.slice(root.length).replaceAll("\\", "/")}`;
+	return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
 }
 async function verifyOpamSignature(binaryPath, signaturePath, publicKeyPath) {
 	const gpgHome = await promises$1.mkdtemp(path.join(os$2.tmpdir(), "setup-ocaml-gpg-"));
