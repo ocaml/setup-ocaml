@@ -162,15 +162,15 @@ async function initializeOpam(inputs: Inputs, initialRepository?: OpamRepository
     }
     if (PLATFORM !== "windows") {
       try {
-        await installUnixSystemPackages();
+        await installUnixSystemPackages(PLATFORM);
       } catch (error) {
         if (error instanceof Error) {
           core.notice(
             `System package installation failed. Re-synchronizing package index files and retrying installation. Error details: ${error.message.toLocaleLowerCase()}`,
           );
         }
-        await updateUnixPackageIndexFiles();
-        await installUnixSystemPackages();
+        await updateUnixPackageIndexFiles(PLATFORM);
+        await installUnixSystemPackages(PLATFORM);
       }
     }
     const extraOptions = [];

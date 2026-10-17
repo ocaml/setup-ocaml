@@ -7142,20 +7142,14 @@ function _getGlobal(key, defaultValue) {
 
 //#endregion
 //#region src/system-packages.ts
-async function retrieveInstallableOptionalDependencies(optionalDependencies) {
-	switch (PLATFORM) {
-		case "linux": {
-			if (optionalDependencies.length === 0) return [];
-			const output = await getExecOutput("apt-cache", [
-				"show",
-				"--no-all-versions",
-				...optionalDependencies
-			]);
-			const installablePackages = new Set(output.stdout.split("\n").filter((line) => line.startsWith("Package: ")).map((line) => line.slice(9)));
-			return optionalDependencies.filter((packageName) => installablePackages.has(packageName));
-		}
-		default: return [];
-	}
+async function retrieveInstallableAptPackages(packages) {
+	const output = await getExecOutput("apt-cache", [
+		"show",
+		"--no-all-versions",
+		...packages
+	]);
+	const installablePackages = new Set(output.stdout.split("\n").filter((line) => line.startsWith("Package: ")).map((line) => line.slice(9)));
+	return packages.filter((packageName) => installablePackages.has(packageName));
 }
 async function skipPackageManagement() {
 	let isContainerRunner = false;
@@ -7179,12 +7173,12 @@ async function disableManDbAutoUpdate() {
 		if (error instanceof Error) info(error.message);
 	}
 }
-async function installUnixSystemPackages() {
+async function installUnixSystemPackages(platform) {
 	if (await skipPackageManagement()) return;
-	switch (PLATFORM) {
+	switch (platform) {
 		case "linux": {
 			await disableManDbAutoUpdate();
-			const optionalDependencies = await retrieveInstallableOptionalDependencies([
+			const optionalDependencies = await retrieveInstallableAptPackages([
 				"darcs",
 				"g++-multilib",
 				"gcc-multilib",
@@ -7201,11 +7195,14 @@ async function installUnixSystemPackages() {
 			]);
 			break;
 		}
-		case "macos": await exec("brew", [
-			"install",
-			"darcs",
-			"mercurial"
-		]);
+		case "macos":
+			await exec("brew", [
+				"install",
+				"darcs",
+				"mercurial"
+			]);
+			break;
+		default: throw new Error(`Unhandled platform: ${String(platform)}`);
 	}
 }
 async function installMsys2Packages(windowsCompiler) {
@@ -7223,13 +7220,16 @@ async function installMsys2Packages(windowsCompiler) {
 		...packages
 	]);
 }
-async function updateUnixPackageIndexFiles() {
+async function updateUnixPackageIndexFiles(platform) {
 	if (await skipPackageManagement()) return;
-	switch (PLATFORM) {
+	switch (platform) {
 		case "linux":
 			await exec("sudo", ["apt-get", "update"]);
 			break;
-		case "macos": await exec("brew", ["update"]);
+		case "macos":
+			await exec("brew", ["update"]);
+			break;
+		default: throw new Error(`Unhandled platform: ${String(platform)}`);
 	}
 }
 
@@ -7324,11 +7324,11 @@ async function initializeOpam(inputs, initialRepository) {
 	await group("Initialising opam state", async () => {
 		if (PLATFORM === "windows" && inputs.windowsEnvironment === "msys2") await installMsys2Packages(inputs.windowsCompiler);
 		if (PLATFORM !== "windows") try {
-			await installUnixSystemPackages();
+			await installUnixSystemPackages(PLATFORM);
 		} catch (error) {
 			if (error instanceof Error) notice(`System package installation failed. Re-synchronizing package index files and retrying installation. Error details: ${error.message.toLocaleLowerCase()}`);
-			await updateUnixPackageIndexFiles();
-			await installUnixSystemPackages();
+			await updateUnixPackageIndexFiles(PLATFORM);
+			await installUnixSystemPackages(PLATFORM);
 		}
 		const extraOptions = [];
 		if (PLATFORM === "windows") {

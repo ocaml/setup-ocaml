@@ -5,29 +5,17 @@ import { exec, getExecOutput } from "@actions/exec";
 import { MSYS2_ROOT, PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
 import type { WindowsCompiler } from "./inputs.js";
 
-async function retrieveInstallableOptionalDependencies(optionalDependencies: string[]) {
-  switch (PLATFORM) {
-    case "linux": {
-      if (optionalDependencies.length === 0) {
-        return [];
-      }
-      const output = await getExecOutput("apt-cache", [
-        "show",
-        "--no-all-versions",
-        ...optionalDependencies,
-      ]);
-      const installablePackages = new Set(
-        output.stdout
-          .split("\n")
-          .filter((line) => line.startsWith("Package: "))
-          .map((line) => line.slice("Package: ".length)),
-      );
-      return optionalDependencies.filter((packageName) => installablePackages.has(packageName));
-    }
-    default: {
-      return [];
-    }
-  }
+type UnixPlatform = Exclude<typeof PLATFORM, "windows">;
+
+async function retrieveInstallableAptPackages(packages: string[]) {
+  const output = await getExecOutput("apt-cache", ["show", "--no-all-versions", ...packages]);
+  const installablePackages = new Set(
+    output.stdout
+      .split("\n")
+      .filter((line) => line.startsWith("Package: "))
+      .map((line) => line.slice("Package: ".length)),
+  );
+  return packages.filter((packageName) => installablePackages.has(packageName));
 }
 
 async function skipPackageManagement() {
@@ -62,14 +50,14 @@ async function disableManDbAutoUpdate() {
   }
 }
 
-export async function installUnixSystemPackages() {
+export async function installUnixSystemPackages(platform: UnixPlatform) {
   if (await skipPackageManagement()) {
     return;
   }
-  switch (PLATFORM) {
+  switch (platform) {
     case "linux": {
       await disableManDbAutoUpdate();
-      const optionalDependencies = await retrieveInstallableOptionalDependencies([
+      const optionalDependencies = await retrieveInstallableAptPackages([
         "darcs",
         "g++-multilib",
         "gcc-multilib",
@@ -89,6 +77,10 @@ export async function installUnixSystemPackages() {
     case "macos": {
       await exec("brew", ["install", "darcs", "mercurial"]);
       break;
+    }
+    default: {
+      const unreachable: never = platform;
+      throw new Error(`Unhandled platform: ${String(unreachable)}`);
     }
   }
 }
@@ -110,11 +102,11 @@ export async function installMsys2Packages(windowsCompiler: WindowsCompiler) {
   ]);
 }
 
-export async function updateUnixPackageIndexFiles() {
+export async function updateUnixPackageIndexFiles(platform: UnixPlatform) {
   if (await skipPackageManagement()) {
     return;
   }
-  switch (PLATFORM) {
+  switch (platform) {
     case "linux": {
       await exec("sudo", ["apt-get", "update"]);
       break;
@@ -122,6 +114,10 @@ export async function updateUnixPackageIndexFiles() {
     case "macos": {
       await exec("brew", ["update"]);
       break;
+    }
+    default: {
+      const unreachable: never = platform;
+      throw new Error(`Unhandled platform: ${String(unreachable)}`);
     }
   }
 }
