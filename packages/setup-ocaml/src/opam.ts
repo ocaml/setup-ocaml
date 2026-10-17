@@ -5,16 +5,9 @@ import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
 import * as semver from "semver";
-import {
-  ALLOW_PRERELEASE_OPAM,
-  ARCHITECTURE,
-  MSYS2_ROOT,
-  OPAM_DISABLE_SANDBOXING,
-  PLATFORM,
-  WINDOWS_COMPILER,
-  WINDOWS_ENVIRONMENT,
-} from "./constants.js";
-import { octokit } from "./github-client.js";
+import { ARCHITECTURE, MSYS2_ROOT, PLATFORM } from "./constants.js";
+import type { Octokit } from "./github-client.js";
+import type { Inputs, OpamRepository, WindowsCompiler } from "./inputs.js";
 import {
   installMsys2Packages,
   installUnixSystemPackages,
@@ -80,8 +73,17 @@ async function verifyOpamSignature(
   }
 }
 
-export const latestOpamRelease = (async () => {
-  const semverRange = ALLOW_PRERELEASE_OPAM ? "*" : OPAM_STABLE_VERSION_RANGE;
+interface OpamRelease {
+  readonly version: string;
+  readonly browserDownloadUrl: string;
+  readonly signatureBrowserDownloadUrl: string;
+}
+
+export async function findLatestOpamRelease(
+  octokit: Octokit,
+  allowPrerelease: boolean,
+): Promise<OpamRelease> {
+  const semverRange = allowPrerelease ? "*" : OPAM_STABLE_VERSION_RANGE;
   const { data } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
     repo: "opam",
@@ -89,7 +91,7 @@ export const latestOpamRelease = (async () => {
   const releases = data
     .filter((release) =>
       semver.satisfies(release.tag_name, semverRange, {
-        includePrerelease: ALLOW_PRERELEASE_OPAM,
+        includePrerelease: allowPrerelease,
         loose: true,
       }),
     )
@@ -120,11 +122,14 @@ export const latestOpamRelease = (async () => {
   throw new Error(
     `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`,
   );
-})();
+}
 
-async function acquireOpam() {
+async function acquireOpam({
+  version,
+  browserDownloadUrl,
+  signatureBrowserDownloadUrl,
+}: OpamRelease) {
   await core.group("Installing opam", async () => {
-    const { version, browserDownloadUrl, signatureBrowserDownloadUrl } = await latestOpamRelease;
     const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
     const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
     if (cachedPath === "") {
@@ -153,10 +158,10 @@ async function acquireOpam() {
   });
 }
 
-async function initializeOpam(initialRepository?: [string, string]) {
+async function initializeOpam(inputs: Inputs, initialRepository?: OpamRepository) {
   await core.group("Initialising opam state", async () => {
-    if (PLATFORM === "windows" && WINDOWS_ENVIRONMENT === "msys2") {
-      await installMsys2Packages();
+    if (PLATFORM === "windows" && inputs.windowsEnvironment === "msys2") {
+      await installMsys2Packages(inputs.windowsCompiler);
     }
     if (PLATFORM !== "windows") {
       try {
@@ -173,14 +178,14 @@ async function initializeOpam(initialRepository?: [string, string]) {
     }
     const extraOptions = [];
     if (PLATFORM === "windows") {
-      if (WINDOWS_ENVIRONMENT === "msys2") {
+      if (inputs.windowsEnvironment === "msys2") {
         extraOptions.push(`--cygwin-location=${MSYS2_ROOT}`);
       }
-      if (WINDOWS_ENVIRONMENT === "cygwin") {
+      if (inputs.windowsEnvironment === "cygwin") {
         extraOptions.push("--cygwin-internal-install");
       }
     }
-    if (OPAM_DISABLE_SANDBOXING) {
+    if (inputs.opamDisableSandboxing) {
       extraOptions.push("--disable-sandboxing");
     }
     await exec("opam", [
@@ -194,15 +199,19 @@ async function initializeOpam(initialRepository?: [string, string]) {
   });
 }
 
-export async function setupOpam(initialRepository?: [string, string]) {
-  await acquireOpam();
-  await initializeOpam(initialRepository);
+export async function setupOpam(
+  inputs: Inputs,
+  release: OpamRelease,
+  initialRepository?: OpamRepository,
+) {
+  await acquireOpam(release);
+  await initializeOpam(inputs, initialRepository);
 }
 
-export async function installOcaml(ocamlCompiler: string) {
+export async function installOcaml(ocamlCompiler: string, windowsCompiler: WindowsCompiler) {
   await core.group("Installing OCaml compiler", async () => {
     const packages = [ocamlCompiler];
-    if (PLATFORM === "windows" && WINDOWS_COMPILER === "msvc") {
+    if (PLATFORM === "windows" && windowsCompiler === "msvc") {
       packages.push("system-msvc");
     }
     await exec("opam", [
@@ -236,7 +245,7 @@ async function repositoryAdd(name: string, address: string) {
   await exec("opam", ["repository", "--all-switches", "--set-default", "add", name, address]);
 }
 
-export async function repositoryAddAll(repositories: [string, string][]) {
+export async function repositoryAddAll(repositories: readonly OpamRepository[]) {
   if (repositories.length === 0) {
     return;
   }

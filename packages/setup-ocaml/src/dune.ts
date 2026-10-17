@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
-import { octokit } from "./github-client.js";
+import type { Octokit } from "./github-client.js";
 
 const DUNE_CACHE_TOTAL_SIZE_MB = 5000;
 
@@ -11,7 +11,7 @@ export async function installDune() {
   });
 }
 
-export async function trimDuneCache() {
+export async function trimDuneCache(octokit: Octokit) {
   await core.group("Clearing old dune cache files to save space", async () => {
     const {
       repo: { owner, repo },

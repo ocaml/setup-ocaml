@@ -1,7 +1,6 @@
 import * as path from "node:path";
 import * as semver from "semver";
-import { OCAML_COMPILER } from "./constants.js";
-import { octokit } from "./github-client.js";
+import type { Octokit } from "./github-client.js";
 
 function isSemverValidRange(semverVersion: string) {
   return semver.validRange(semverVersion, { loose: true }) !== null;
@@ -24,7 +23,7 @@ function parseCompilerVersion(packagePath: string): readonly [string, string] | 
   return [semverVersion, opamVersion] as const;
 }
 
-async function retrieveCompilerVersions(repo: string) {
+async function retrieveCompilerVersions(octokit: Octokit, repo: string) {
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
     repo,
@@ -65,14 +64,14 @@ function matchVersion(versions: Map<string, string>, semverVersion: string) {
   return undefined;
 }
 
-async function resolveVersion(semverVersion: string) {
-  const versions = await retrieveCompilerVersions("opam-repository");
+async function resolveVersion(octokit: Octokit, semverVersion: string) {
+  const versions = await retrieveCompilerVersions(octokit, "opam-repository");
   const match = matchVersion(versions, semverVersion);
   if (match !== undefined) {
     return match;
   }
   // Old compiler releases are no longer in opam-repository itself.
-  const archivedVersions = await retrieveCompilerVersions("opam-repository-archive");
+  const archivedVersions = await retrieveCompilerVersions(octokit, "opam-repository-archive");
   for (const [key, opamVersion] of archivedVersions) {
     if (!versions.has(key)) {
       versions.set(key, opamVersion);
@@ -87,11 +86,11 @@ async function resolveVersion(semverVersion: string) {
   );
 }
 
-export const resolvedCompiler = (async () => {
-  const semverInput = OCAML_COMPILER.replace("~", "-");
+export async function resolveCompiler(octokit: Octokit, ocamlCompiler: string) {
+  const semverInput = ocamlCompiler.replace("~", "-");
   if (isSemverValidRange(semverInput)) {
-    const opamVersion = await resolveVersion(semverInput);
+    const opamVersion = await resolveVersion(octokit, semverInput);
     return `ocaml-base-compiler.${opamVersion}`;
   }
-  return OCAML_COMPILER;
-})();
+  return ocamlCompiler;
+}

@@ -8,29 +8,24 @@ import * as github from "@actions/github";
 import * as system from "systeminformation";
 import {
   ARCHITECTURE,
-  CACHE_PREFIX,
   DUNE_CACHE_ROOT,
   GITHUB_WORKSPACE,
-  OPAM_DISABLE_SANDBOXING,
-  OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
-  WINDOWS_COMPILER,
-  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
-import { latestOpamRelease } from "./opam.js";
-import { resolvedCompiler } from "./version.js";
+import type { Inputs, WindowsEnvironment } from "./inputs.js";
 
-async function composeDuneCacheKeys() {
+export const DUNE_CACHE_KEY_STATE = "dune-cache-key";
+
+function composeDuneCacheKeys(cachePrefix: string, ocamlCompiler: string) {
   const { workflow, job, runId } = github.context;
-  const ocamlCompiler = await resolvedCompiler;
   const plainKey = [ocamlCompiler, workflow, job].join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
+  const key = `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
   const restoreKeys = [
     key,
-    `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-`,
-    `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-`,
+    `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-`,
+    `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-`,
   ];
   core.debug(`dune cache key: ${plainKey}`);
   return { key, restoreKeys };
@@ -45,11 +40,11 @@ async function getMsvcVersion() {
   return stdout.trim();
 }
 
-async function composeOpamCacheKeys() {
-  const { version: opamVersion } = await latestOpamRelease;
-  const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-  const ocamlCompiler = await resolvedCompiler;
-  const repositoryUrls = OPAM_REPOSITORIES.map(([, value]) => value).join();
+async function composeOpamCacheKeys(inputs: Inputs, opamVersion: string, ocamlCompiler: string) {
+  const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
+  const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst
+    .map(([, value]) => value)
+    .join();
   const osInfo = await system.osInfo();
   const components = [
     PLATFORM,
@@ -61,16 +56,16 @@ async function composeOpamCacheKeys() {
     sandbox,
   ];
   if (PLATFORM === "windows") {
-    components.push(WINDOWS_ENVIRONMENT);
-    components.push(WINDOWS_COMPILER);
-    if (WINDOWS_COMPILER === "msvc") {
+    components.push(inputs.windowsEnvironment);
+    components.push(inputs.windowsCompiler);
+    if (inputs.windowsCompiler === "msvc") {
       const msvcVersion = await getMsvcVersion();
       components.push(msvcVersion);
     }
   }
   const plainKey = components.join();
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
+  const key = `${inputs.cachePrefix}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
   core.debug(`opam cache key: ${plainKey}`);
   return { key, restoreKeys };
@@ -80,18 +75,18 @@ function composeDuneCachePaths() {
   return [DUNE_CACHE_ROOT];
 }
 
-function composeOpamCachePaths() {
+function composeOpamCachePaths(windowsEnvironment: WindowsEnvironment) {
   const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
   const paths = [OPAM_ROOT, opamLocalCachePath];
   if (PLATFORM === "windows") {
     const {
       repo: { repo },
     } = github.context;
-    if (WINDOWS_ENVIRONMENT === "msys2") {
+    if (windowsEnvironment === "msys2") {
       const opamMsys2LocalCachePath = path.posix.join("/d", "a", repo, repo, "_opam");
       paths.push(opamMsys2LocalCachePath);
     }
-    if (WINDOWS_ENVIRONMENT === "cygwin") {
+    if (windowsEnvironment === "cygwin") {
       const opamCygwinLocalCachePath = path.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
       paths.push(opamCygwinLocalCachePath);
     }
@@ -142,35 +137,34 @@ async function saveCache(key: string, paths: string[]) {
   }
 }
 
-export async function restoreDuneCache() {
-  return await core.group("Restoring dune cache", async () => {
-    const { key, restoreKeys } = await composeDuneCacheKeys();
+export async function restoreDuneCache(cachePrefix: string, ocamlCompiler: string) {
+  await core.group("Restoring dune cache", async () => {
+    const { key, restoreKeys } = composeDuneCacheKeys(cachePrefix, ocamlCompiler);
+    core.saveState(DUNE_CACHE_KEY_STATE, key);
     const paths = composeDuneCachePaths();
-    const cacheKey = await restoreCache(key, restoreKeys, paths);
-    return cacheKey;
+    await restoreCache(key, restoreKeys, paths);
   });
 }
 
-export async function restoreOpamCache() {
+export async function restoreOpamCache(inputs: Inputs, opamVersion: string, ocamlCompiler: string) {
   return await core.group("Restoring opam cache", async () => {
-    const { key, restoreKeys } = await composeOpamCacheKeys();
-    const paths = composeOpamCachePaths();
+    const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
+    const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     return await restoreCache(key, restoreKeys, paths);
   });
 }
 
-export async function saveDuneCache() {
+export async function saveDuneCache(key: string) {
   await core.group("Saving dune cache", async () => {
-    const { key } = await composeDuneCacheKeys();
     const paths = composeDuneCachePaths();
     await saveCache(key, paths);
   });
 }
 
-export async function saveOpamCache() {
+export async function saveOpamCache(inputs: Inputs, opamVersion: string, ocamlCompiler: string) {
   await core.group("Saving opam cache", async () => {
-    const { key, restoreKeys } = await composeOpamCacheKeys();
-    const paths = composeOpamCachePaths();
+    const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
+    const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     const cacheHit = await restoreCache(key, restoreKeys, paths, {
       lookupOnly: true,
     });

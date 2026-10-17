@@ -17,10 +17,17 @@ export default defineConfig({
     hash: false,
     minify: false,
   },
+  test: {
+    setupFiles: ["./test/runner.ts"],
+    snapshotSerializers: ["../../vitest.snapshot-serializer.ts"],
+  },
   run: {
     tasks: {
       build: {
         command: "vp pack",
+      },
+      test: {
+        command: "vp test",
       },
       typecheck: {
         command: "tsc",

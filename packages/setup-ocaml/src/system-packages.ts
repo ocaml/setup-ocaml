@@ -2,7 +2,8 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
-import { MSYS2_ROOT, PLATFORM, RUNNER_ENVIRONMENT, WINDOWS_COMPILER } from "./constants.js";
+import { MSYS2_ROOT, PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
+import type { WindowsCompiler } from "./inputs.js";
 
 async function retrieveInstallableOptionalDependencies(optionalDependencies: string[]) {
   switch (PLATFORM) {
@@ -92,13 +93,13 @@ export async function installUnixSystemPackages() {
   }
 }
 
-export async function installMsys2Packages() {
+export async function installMsys2Packages(windowsCompiler: WindowsCompiler) {
   // Install the same base packages that opam's --cygwin-internal-install
   // provides for Cygwin (see opamInitDefaults.ml required_packages_for_cygwin).
   // MSYS2 packages are installed to C:\msys64 which is outside the opam cache,
   // so they must be pre-installed. MSVC builds use cl.exe instead of GCC.
   const packages = ["make", "tar", "unzip", "rsync"];
-  if (WINDOWS_COMPILER === "mingw") {
+  if (windowsCompiler === "mingw") {
     packages.push("mingw-w64-x86_64-gcc");
   }
   await exec(path.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [

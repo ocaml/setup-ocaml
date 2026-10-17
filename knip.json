@@ -49,7 +49,8 @@
       "project": []
     },
     "packages/setup-ocaml": {
-      "entry": ["src/index.ts!", "src/post.ts!"]
+      "entry": ["src/index.ts!", "src/post.ts!"],
+      "project": ["src/**/*.ts!", "test/**/*.ts"]
     }
   }
 }

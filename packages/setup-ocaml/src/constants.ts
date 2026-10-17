@@ -1,8 +1,6 @@
 import * as os from "node:os";
 import * as path from "node:path";
 import * as process from "node:process";
-import * as core from "@actions/core";
-import * as yaml from "yaml";
 import { z } from "zod";
 
 // ── Platform & Architecture ──
@@ -95,70 +93,3 @@ export const DUNE_CACHE_ROOT = (() => {
   }
   return path.join(os.homedir(), ".cache", "dune");
 })();
-
-// ── Action Inputs ──
-
-const OpamRepositories = z.record(z.string(), z.string());
-type OpamRepositories = z.infer<typeof OpamRepositories>;
-
-function parseOpamRepositories(input: string): OpamRepositories {
-  const parsed = OpamRepositories.safeParse(yaml.parse(input, { schema: "failsafe" }));
-  if (!parsed.success) {
-    throw new Error("opam-repositories input must be a YAML mapping of name: URL pairs", {
-      cause: parsed.error,
-    });
-  }
-  return parsed.data;
-}
-
-export const OCAML_COMPILER = core.getInput("ocaml-compiler", {
-  required: true,
-});
-
-export const OPAM_REPOSITORIES = (() => {
-  const entries = Object.entries(parseOpamRepositories(core.getInput("opam-repositories")));
-  if (entries.length === 0) {
-    throw new Error("opam-repositories input must not be empty");
-  }
-  return entries.reverse();
-})();
-
-export const OPAM_PIN = core.getBooleanInput("opam-pin");
-
-export const OPAM_LOCAL_PACKAGES = core.getInput("opam-local-packages");
-
-export const OPAM_DISABLE_SANDBOXING =
-  // [TODO] unlock this once sandboxing is supported on Windows
-  PLATFORM !== "windows" && core.getBooleanInput("opam-disable-sandboxing");
-
-export const OPAM_CACHE = core.getBooleanInput("cache");
-
-export const DUNE_CACHE = OPAM_CACHE && core.getBooleanInput("dune-cache");
-
-export const CACHE_PREFIX = core.getInput("cache-prefix");
-
-type WindowsEnvironment = "cygwin" | "msys2";
-
-export const WINDOWS_ENVIRONMENT: WindowsEnvironment = (() => {
-  const value = core.getInput("windows-environment").toLowerCase();
-  if (value !== "cygwin" && value !== "msys2") {
-    throw new Error(
-      `Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`,
-    );
-  }
-  return value;
-})();
-
-type WindowsCompiler = "mingw" | "msvc";
-
-export const WINDOWS_COMPILER: WindowsCompiler = (() => {
-  const value = core.getInput("windows-compiler").toLowerCase();
-  if (value !== "mingw" && value !== "msvc") {
-    throw new Error(`Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`);
-  }
-  return value;
-})();
-
-export const ALLOW_PRERELEASE_OPAM = core.getBooleanInput("allow-prerelease-opam");
-
-export const GITHUB_TOKEN = core.getInput("github-token");

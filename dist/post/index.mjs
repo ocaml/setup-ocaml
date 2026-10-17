@@ -1,12 +1,14 @@
-import { O as error, a as saveDuneCache, g as DUNE_CACHE, n as trimDuneCache } from "../dune.mjs";
+import { D as getInput, O as getState, i as DUNE_CACHE_KEY_STATE, r as trimDuneCache, s as saveDuneCache, t as createOctokit, w as error } from "../github-client.mjs";
 import * as process$1 from "node:process";
 
 //#region src/post.ts
 async function run() {
 	try {
-		if (DUNE_CACHE) {
-			await trimDuneCache();
-			await saveDuneCache();
+		const duneCacheKey = getState(DUNE_CACHE_KEY_STATE);
+		if (duneCacheKey) {
+			const octokit = createOctokit(getInput("github-token"));
+			await trimDuneCache(octokit);
+			await saveDuneCache(duneCacheKey);
 		}
 		process$1.exit(0);
 	} catch (error$1) {
