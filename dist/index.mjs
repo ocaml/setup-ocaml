@@ -7487,6 +7487,33 @@ const OPAM_SOLVER_TIMEOUT = 600;
 async function pathExists(filePath) {
 	return await promises$1.access(filePath).then(() => true, () => false);
 }
+function planOpamSetup({ cacheRestored, rootInitialized, switchInitialized }) {
+	if (cacheRestored) return {
+		initialiseWithFirstRepository: false,
+		repositories: "update",
+		createSwitch: false
+	};
+	return {
+		initialiseWithFirstRepository: !rootInitialized,
+		repositories: rootInitialized || switchInitialized ? "replace-all" : "add-remaining",
+		createSwitch: !switchInitialized
+	};
+}
+async function syncRepositories(sync, repositories) {
+	switch (sync) {
+		case "add-remaining":
+			await repositoryAddAll(repositories.slice(1));
+			break;
+		case "replace-all":
+			await repositoryRemoveAll();
+			await repositoryAddAll(repositories);
+			break;
+		case "update":
+			await update();
+			break;
+		default: throw new Error(`Unhandled repository sync: ${String(sync)}`);
+	}
+}
 async function installer(inputs) {
 	const octokit = createOctokit(inputs.githubToken);
 	const [opamRelease, ocamlCompiler] = await Promise.all([findLatestOpamRelease(octokit, inputs.allowPrereleaseOpam), resolveCompiler(octokit, inputs.ocamlCompiler)]);
@@ -7525,26 +7552,24 @@ async function installer(inputs) {
 			]);
 		});
 	}
-	const opamCacheHit = inputs.cache ? await restoreOpamCache(inputs, opamRelease.version, ocamlCompiler) : void 0;
-	const [opamRootInitialized, localSwitchInitialized] = await Promise.all([pathExists(path.join(OPAM_ROOT, "config")), pathExists(path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config"))]);
-	const useInitialRepository = !opamCacheHit && !opamRootInitialized;
-	await setupOpam(inputs, opamRelease, useInitialRepository ? inputs.opamRepositoriesLowestPriorityFirst[0] : void 0);
+	const cacheKey = inputs.cache ? await restoreOpamCache(inputs, opamRelease.version, ocamlCompiler) : void 0;
+	const [rootInitialized, switchInitialized] = await Promise.all([pathExists(path.join(OPAM_ROOT, "config")), pathExists(path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config"))]);
+	const plan = planOpamSetup({
+		cacheRestored: Boolean(cacheKey),
+		rootInitialized,
+		switchInitialized
+	});
+	await setupOpam(inputs, opamRelease, plan.initialiseWithFirstRepository ? inputs.opamRepositoriesLowestPriorityFirst[0] : void 0);
 	if (PLATFORM === "windows" && inputs.windowsEnvironment === "cygwin") {
 		await promises$1.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
 		exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
 		addPath(CYGWIN_ROOT_BIN);
 	}
-	if (!opamCacheHit) {
-		if (useInitialRepository && !localSwitchInitialized) await repositoryAddAll(inputs.opamRepositoriesLowestPriorityFirst.slice(1));
-		else {
-			await repositoryRemoveAll();
-			await repositoryAddAll(inputs.opamRepositoriesLowestPriorityFirst);
-		}
-		if (!localSwitchInitialized) {
-			await installOcaml(ocamlCompiler, inputs.windowsCompiler);
-			if (inputs.cache) await saveOpamCache(inputs, opamRelease.version, ocamlCompiler);
-		}
-	} else await update();
+	await syncRepositories(plan.repositories, inputs.opamRepositoriesLowestPriorityFirst);
+	if (plan.createSwitch) {
+		await installOcaml(ocamlCompiler, inputs.windowsCompiler);
+		if (inputs.cache) await saveOpamCache(inputs, opamRelease.version, ocamlCompiler);
+	}
 	if (inputs.duneCache) {
 		await restoreDuneCache(inputs.cachePrefix, ocamlCompiler);
 		await installDune();
