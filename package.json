@@ -11,6 +11,8 @@
     "fix": "vp check --fix",
     "knip": "knip && knip --strict",
     "lint": "vp check",
+    "test": "vp run --recursive test",
+    "test:update": "vp run --recursive test -- -u",
     "typecheck": "vp run --recursive typecheck"
   },
   "devDependencies": {

@@ -13,10 +13,16 @@ export default defineConfig({
     outDir: "../../analysis/dist",
     minify: true,
   },
+  test: {
+    snapshotSerializers: ["../../vitest.snapshot-serializer.ts"],
+  },
   run: {
     tasks: {
       build: {
         command: "vp pack",
+      },
+      test: {
+        command: "vp test",
       },
       typecheck: {
         command: "tsc",
