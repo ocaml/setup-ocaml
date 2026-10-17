@@ -5,7 +5,6 @@ import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
-import { backOff } from "exponential-backoff";
 import * as system from "systeminformation";
 import {
   ARCHITECTURE,
@@ -111,14 +110,10 @@ async function restoreCache(
     return;
   }
   try {
-    const cacheKey = await backOff(
-      async () =>
-        await cache.restoreCache(paths, key, restoreKeys, {
-          useAzureSdk: true,
-          ...options,
-        }),
-      { numOfAttempts: 5 },
-    );
+    const cacheKey = await cache.restoreCache(paths, key, restoreKeys, {
+      useAzureSdk: true,
+      ...options,
+    });
     if (cacheKey) {
       core.info(`Cache restored from key: ${cacheKey}`);
     } else {
@@ -126,11 +121,8 @@ async function restoreCache(
     }
     return cacheKey;
   } catch (error) {
-    if (error instanceof Error) {
-      core.info(error.message);
-    }
-    core.notice(
-      "An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.",
+    core.warning(
+      `Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`,
     );
     return;
   }
@@ -142,20 +134,11 @@ async function saveCache(key: string, paths: string[]) {
     return;
   }
   try {
-    await backOff(
-      async () =>
-        await cache.saveCache(paths, key, {
-          useAzureSdk: true,
-        }),
-      { numOfAttempts: 5 },
-    );
+    await cache.saveCache(paths, key, {
+      useAzureSdk: true,
+    });
   } catch (error) {
-    if (error instanceof Error) {
-      core.info(error.message);
-    }
-    core.notice(
-      "An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.",
-    );
+    core.warning(`Failed to save cache: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

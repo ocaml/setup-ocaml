@@ -542,7 +542,6 @@ __metadata:
     "@tsconfig/strictest": "npm:2.0.8"
     "@types/node": "npm:24.19.2"
     "@types/semver": "npm:7.8.0"
-    exponential-backoff: "npm:3.1.3"
     semver: "npm:7.8.5"
     systeminformation: "npm:5.33.15"
     typescript: "npm:7.0.2"
@@ -2175,7 +2174,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exponential-backoff@npm:3.1.3, exponential-backoff@npm:^3.1.1":
+"exponential-backoff@npm:^3.1.1":
   version: 3.1.3
   resolution: "exponential-backoff@npm:3.1.3"
   checksum: 10c0/77e3ae682b7b1f4972f563c6dbcd2b0d54ac679e62d5d32f3e5085feba20483cf28bd505543f520e287a56d4d55a28d7874299941faf637e779a1aa5994d1267
