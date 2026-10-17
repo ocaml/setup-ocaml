@@ -1,1 +1,0 @@
-../../lint-opam/README.md
