@@ -27,13 +27,7 @@ export async function analysis() {
     await exec(
       "opam",
       ["tree", "--with-dev-setup", "--with-doc", "--with-test", `--json=${tempJson}`, name],
-      {
-        env: {
-          ...process.env,
-          PATH: process.env.PATH ?? "",
-        },
-        silent: true,
-      },
+      { silent: true },
     );
     const output = OpamOutput.parse(JSON.parse(await fs.readFile(tempJson, "utf8")));
     const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();

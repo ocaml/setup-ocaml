@@ -2,7 +2,6 @@ import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import * as process from "node:process";
 import * as core from "@actions/core";
-import { convertToUnix } from "./compat.js";
 
 function parseKeyValue(line: string): [string, string] {
   const [key = "", value = ""] = line.split("=").map((s) => s.trim());
@@ -16,10 +15,13 @@ async function parse() {
   } catch {
     return;
   }
-  const buf = await fs.readFile(fpath);
-  const str = buf.toString();
-  const normalisedStr = convertToUnix(str);
-  return new Map(normalisedStr.split("\n").values().map(parseKeyValue));
+  const str = await fs.readFile(fpath, "utf8");
+  return new Map(
+    str
+      .split(/\r?\n|\r/)
+      .values()
+      .map(parseKeyValue),
+  );
 }
 
 export async function retrieveOcamlformatVersion() {
