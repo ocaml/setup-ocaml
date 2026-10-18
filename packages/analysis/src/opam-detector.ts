@@ -7,11 +7,11 @@ import { PackageURL } from "packageurl-js";
 import { z } from "zod";
 
 const OpamDependency = z.object({
-  name: z.string(),
-  version: z.string(),
   get dependencies() {
     return z.array(OpamDependency);
   },
+  name: z.string(),
+  version: z.string(),
 });
 type OpamDependency = z.infer<typeof OpamDependency>;
 

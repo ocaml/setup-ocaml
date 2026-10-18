@@ -33,8 +33,8 @@ function parseCompilerVersion(
 async function retrieveCompilerVersions(octokit: Octokit, repo: string) {
   const { data: packages } = await octokit.rest.repos.getContent({
     owner: "ocaml",
-    repo,
     path: "packages/ocaml-base-compiler",
+    repo,
   });
   if (!Array.isArray(packages)) {
     return new Map<string, string>();
@@ -59,8 +59,8 @@ function matchVersion(versions: Map<string, string>, semverVersion: string) {
     }
   }
   const prereleaseMatch = semver.maxSatisfying(semverVersions, semverVersion, {
-    loose: true,
     includePrerelease: true,
+    loose: true,
   });
   if (prereleaseMatch !== null) {
     const opamVersion = versions.get(prereleaseMatch);
@@ -68,7 +68,7 @@ function matchVersion(versions: Map<string, string>, semverVersion: string) {
       return opamVersion;
     }
   }
-  return undefined;
+  return;
 }
 
 async function resolveVersion(octokit: Octokit, semverVersion: string) {

@@ -16,7 +16,7 @@ async function parse() {
   } catch {
     return;
   }
-  const str = await fs.readFile(fpath, "utf8");
+  const str = await fs.readFile(fpath, "utf-8");
   return new Map(
     str
       .split(/\r?\n|\r/)

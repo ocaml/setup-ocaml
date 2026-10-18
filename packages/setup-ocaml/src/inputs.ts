@@ -89,17 +89,17 @@ export function readInputs(): Inputs {
   const allowPrereleaseOpam = core.getBooleanInput("allow-prerelease-opam");
   const githubToken = core.getInput("github-token");
   return {
-    ocamlCompiler,
-    opamRepositoriesLowestPriorityFirst,
-    opamPin,
-    opamLocalPackages,
-    opamDisableSandboxing,
-    cache,
-    duneCache,
-    cachePrefix,
-    windowsEnvironment,
-    windowsCompiler,
     allowPrereleaseOpam,
+    cache,
+    cachePrefix,
+    duneCache,
     githubToken,
+    ocamlCompiler,
+    opamDisableSandboxing,
+    opamLocalPackages,
+    opamPin,
+    opamRepositoriesLowestPriorityFirst,
+    windowsCompiler,
+    windowsEnvironment,
   };
 }

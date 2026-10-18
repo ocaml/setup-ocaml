@@ -61,16 +61,16 @@ function planOpamSetup({
 }: OpamState): OpamSetupPlan {
   if (cacheRestored) {
     return {
+      createSwitch: false,
       initialiseWithFirstRepository: false,
       repositories: "update",
-      createSwitch: false,
     };
   }
   return {
+    createSwitch: !switchInitialized,
     initialiseWithFirstRepository: !rootInitialized,
     repositories:
       rootInitialized || switchInitialized ? "replace-all" : "add-remaining",
-    createSwitch: !switchInitialized,
   };
 }
 

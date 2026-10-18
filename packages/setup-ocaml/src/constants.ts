@@ -54,7 +54,7 @@ export const PLATFORM = (() => {
 })();
 
 export const RUNNER_ENVIRONMENT = ((): RunnerEnvironment => {
-  const ImageOS = process.env.ImageOS;
+  const { ImageOS } = process.env;
   const runnerEnvironment = RunnerEnvironment.optional().parse(
     process.env.RUNNER_ENVIRONMENT
   );

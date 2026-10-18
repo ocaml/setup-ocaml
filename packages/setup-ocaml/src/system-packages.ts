@@ -4,7 +4,8 @@ import * as path from "node:path";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 
-import { MSYS2_ROOT, PLATFORM, RUNNER_ENVIRONMENT } from "./constants.js";
+import type { PLATFORM } from "./constants.js";
+import { MSYS2_ROOT, RUNNER_ENVIRONMENT } from "./constants.js";
 import type { WindowsCompiler } from "./inputs.js";
 
 type UnixPlatform = Exclude<typeof PLATFORM, "windows">;

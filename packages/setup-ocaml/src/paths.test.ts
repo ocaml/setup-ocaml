@@ -1,8 +1,8 @@
-import { expect, it } from "vite-plus/test";
+import { expect, test } from "vite-plus/test";
 
 import { toCygwinPath, toMsysPath } from "./paths.js";
 
-it("converts Windows paths for MSYS2 and Cygwin", () => {
+test("converts Windows paths for MSYS2 and Cygwin", () => {
   const windowsPaths = [
     String.raw`D:\a\setup-ocaml\setup-ocaml\_opam`,
     String.raw`C:\Users\runneradmin\AppData\Local\Temp\gpg`,

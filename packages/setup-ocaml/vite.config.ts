@@ -2,24 +2,20 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   pack: {
-    entry: {
-      index: "src/index.ts",
-      "post/index": "src/post.ts",
-    },
     deps: {
       alwaysBundle: [/.*/],
       onlyBundle: false,
       onlyImport: [],
     },
-    platform: "node",
-    target: "node24",
-    outDir: "../../dist",
+    entry: {
+      index: "src/index.ts",
+      "post/index": "src/post.ts",
+    },
     hash: false,
     minify: false,
-  },
-  test: {
-    setupFiles: ["./test/runner.ts"],
-    snapshotSerializers: ["../../vitest.snapshot-serializer.ts"],
+    outDir: "../../dist",
+    platform: "node",
+    target: "node24",
   },
   run: {
     tasks: {
@@ -33,5 +29,9 @@ export default defineConfig({
         command: "tsc",
       },
     },
+  },
+  test: {
+    setupFiles: ["./test/runner.ts"],
+    snapshotSerializers: ["../../vitest.snapshot-serializer.ts"],
   },
 });

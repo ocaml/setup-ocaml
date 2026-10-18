@@ -1,12 +1,14 @@
-import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
 import { setInputs } from "../test/runner.js";
 import { readInputs } from "./inputs.js";
 
-beforeEach(() => setInputs());
+beforeEach(() => {
+  setInputs();
+});
 afterEach(() => vi.unstubAllEnvs());
 
-it("parses the default inputs", () => {
+test("parses the default inputs", () => {
   expect(readInputs()).toMatchInlineSnapshot(`
     {
       "allowPrereleaseOpam": false,
@@ -30,7 +32,7 @@ it("parses the default inputs", () => {
   `);
 });
 
-it("orders repositories from lowest to highest priority", () => {
+test("orders repositories from lowest to highest priority", () => {
   setInputs({
     "opam-repositories":
       "overlay: https://example.com/overlay\ndefault: https://opam.ocaml.org",
@@ -50,7 +52,7 @@ it("orders repositories from lowest to highest priority", () => {
   `);
 });
 
-it("ignores dune-cache when cache is disabled", () => {
+test("ignores dune-cache when cache is disabled", () => {
   setInputs({ cache: "false", "dune-cache": "true" });
   const { cache, duneCache } = readInputs();
   expect({ cache, duneCache }).toMatchInlineSnapshot(`
@@ -61,7 +63,7 @@ it("ignores dune-cache when cache is disabled", () => {
   `);
 });
 
-it("reports invalid inputs", () => {
+test("reports invalid inputs", () => {
   const output = [
     { "windows-environment": "wsl" },
     { "windows-compiler": "clang" },

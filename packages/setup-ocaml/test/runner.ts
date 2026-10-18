@@ -20,7 +20,7 @@ const ActionManifest = z.object({
 const actionInputDefaults = Object.entries(
   ActionManifest.parse(
     yaml.parse(
-      fs.readFileSync(new URL("../../../action.yml", import.meta.url), "utf8")
+      fs.readFileSync(new URL("../../../action.yml", import.meta.url), "utf-8")
     )
   ).inputs
 ).map(([name, input]) => [name, input.default ?? ""] as const);
@@ -28,8 +28,8 @@ const actionInputDefaults = Object.entries(
 export function setInputs(overrides: Record<string, string> = {}) {
   const inputs = {
     ...Object.fromEntries(actionInputDefaults),
-    "ocaml-compiler": "5.5",
     "github-token": "token",
+    "ocaml-compiler": "5.5",
     ...overrides,
   };
   for (const [name, value] of Object.entries(inputs)) {
@@ -38,11 +38,10 @@ export function setInputs(overrides: Record<string, string> = {}) {
 }
 
 const asset = (name: string) => ({
-  name,
   browser_download_url: `http://127.0.0.1:1/${name}`,
+  name,
 });
 const opamRelease = (version: string) => ({
-  tag_name: version,
   assets: [
     "x86_64-linux",
     "arm64-linux",
@@ -52,11 +51,12 @@ const opamRelease = (version: string) => ({
     asset(`opam-${version}-${suffix}`),
     asset(`opam-${version}-${suffix}.sig`),
   ]),
+  tag_name: version,
 });
 const compilerPackages = (versions: string[]) =>
   versions.map((version) => ({
-    type: "dir",
     path: `packages/ocaml-base-compiler/ocaml-base-compiler.${version}`,
+    type: "dir",
   }));
 const githubApi = new Map<string, unknown>([
   [
@@ -78,7 +78,7 @@ const githubApi = new Map<string, unknown>([
     "/repos/ocaml/opam-repository-archive/contents/packages/ocaml-base-compiler",
     compilerPackages(["3.12.1", "4.02.3"]),
   ],
-  ["/repos/ocaml/example/actions/runs/123/jobs", { total_count: 2, jobs: [] }],
+  ["/repos/ocaml/example/actions/runs/123/jobs", { jobs: [], total_count: 2 }],
 ]);
 
 export const githubRequests: string[] = [];
@@ -110,16 +110,16 @@ for (const name of [
 
 Object.assign(process.env, {
   GITHUB_API_URL: `http://127.0.0.1:${(githubServer.address() as AddressInfo).port}`,
-  HOME: path.join(runnerRoot, "home"),
-  GITHUB_WORKSPACE: path.join(runnerRoot, "workspace"),
   GITHUB_ENV: path.join(runnerRoot, "github-env"),
-  GITHUB_PATH: path.join(runnerRoot, "github-path"),
-  GITHUB_STATE: path.join(runnerRoot, "github-state"),
-  GITHUB_OUTPUT: path.join(runnerRoot, "github-output"),
-  GITHUB_REPOSITORY: "ocaml/example",
-  GITHUB_WORKFLOW: "workflow",
   GITHUB_JOB: "job",
+  GITHUB_OUTPUT: path.join(runnerRoot, "github-output"),
+  GITHUB_PATH: path.join(runnerRoot, "github-path"),
+  GITHUB_REPOSITORY: "ocaml/example",
   GITHUB_RUN_ID: "123",
+  GITHUB_STATE: path.join(runnerRoot, "github-state"),
+  GITHUB_WORKFLOW: "workflow",
+  GITHUB_WORKSPACE: path.join(runnerRoot, "workspace"),
+  HOME: path.join(runnerRoot, "home"),
   RUNNER_ENVIRONMENT: "self-hosted",
   RUNNER_TEMP: path.join(runnerRoot, "temp"),
   RUNNER_TOOL_CACHE: path.join(runnerRoot, "tool-cache"),

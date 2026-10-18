@@ -44,7 +44,7 @@ export async function analysis() {
       { silent: true }
     );
     const output = OpamOutput.parse(
-      JSON.parse(await fs.readFile(tempJson, "utf8"))
+      JSON.parse(await fs.readFile(tempJson, "utf-8"))
     );
     const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
     const opamPackagePath = path.normalize(

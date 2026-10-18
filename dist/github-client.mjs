@@ -22878,7 +22878,7 @@ const PLATFORM = (() => {
 	}
 })();
 const RUNNER_ENVIRONMENT = (() => {
-	const ImageOS = process$2.env.ImageOS;
+	const { ImageOS } = process$2.env;
 	const runnerEnvironment = RunnerEnvironment.optional().parse(process$2.env.RUNNER_ENVIRONMENT);
 	if (ImageOS) return "github-hosted";
 	if (!runnerEnvironment) return "self-hosted";
@@ -84201,7 +84201,7 @@ function composeDuneCacheKeys(cachePrefix, ocamlCompiler) {
 		ocamlCompiler,
 		workflow,
 		job
-	].join();
+	].join(",");
 	const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
 	const key = `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
 	const restoreKeys = [
@@ -84225,7 +84225,7 @@ async function getMsvcVersion() {
 }
 async function composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler) {
 	const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
-	const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst.map(([, value]) => value).join();
+	const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst.map(([, value]) => value).join(",");
 	const osInfo = await import_lib.osInfo();
 	const components = [
 		PLATFORM,
@@ -84237,14 +84237,13 @@ async function composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler) {
 		sandbox
 	];
 	if (PLATFORM === "windows") {
-		components.push(inputs.windowsEnvironment);
-		components.push(inputs.windowsCompiler);
+		components.push(inputs.windowsEnvironment, inputs.windowsCompiler);
 		if (inputs.windowsCompiler === "msvc") {
 			const msvcVersion = await getMsvcVersion();
 			components.push(msvcVersion);
 		}
 	}
-	const plainKey = components.join();
+	const plainKey = components.join(",");
 	const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
 	const key = `${inputs.cachePrefix}-setup-ocaml-opam-${hash}`;
 	const restoreKeys = [key];

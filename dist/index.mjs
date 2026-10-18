@@ -6779,19 +6779,23 @@ function readInputs() {
 	const opamLocalPackages = getInput("opam-local-packages");
 	const opamDisableSandboxing = SANDBOXING_SUPPORTED && getBooleanInput("opam-disable-sandboxing");
 	const cache = getBooleanInput("cache");
+	const duneCache = cache && getBooleanInput("dune-cache");
+	const cachePrefix = getInput("cache-prefix");
+	const windowsEnvironment = parseWindowsEnvironment(getInput("windows-environment"));
+	const windowsCompiler = parseWindowsCompiler(getInput("windows-compiler"));
 	return {
-		ocamlCompiler,
-		opamRepositoriesLowestPriorityFirst,
-		opamPin,
-		opamLocalPackages,
-		opamDisableSandboxing,
-		cache,
-		duneCache: cache && getBooleanInput("dune-cache"),
-		cachePrefix: getInput("cache-prefix"),
-		windowsEnvironment: parseWindowsEnvironment(getInput("windows-environment")),
-		windowsCompiler: parseWindowsCompiler(getInput("windows-compiler")),
 		allowPrereleaseOpam: getBooleanInput("allow-prerelease-opam"),
-		githubToken: getInput("github-token")
+		cache,
+		cachePrefix,
+		duneCache,
+		githubToken: getInput("github-token"),
+		ocamlCompiler,
+		opamDisableSandboxing,
+		opamLocalPackages,
+		opamPin,
+		opamRepositoriesLowestPriorityFirst,
+		windowsCompiler,
+		windowsEnvironment
 	};
 }
 
@@ -7266,8 +7270,8 @@ async function verifyOpamSignature(binaryPath, signaturePath, publicKeyPath) {
 		info(`Verified opam signature with key ${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}`);
 	} finally {
 		await promises$1.rm(gpgHome, {
-			recursive: true,
-			force: true
+			force: true,
+			recursive: true
 		});
 	}
 }
@@ -7289,9 +7293,9 @@ async function findLatestOpamRelease(octokit, allowPrerelease) {
 			const signature = release.assets.find((candidate) => candidate.name === `${asset.name}.sig`);
 			if (!signature) throw new Error(`Failed to find the signature '${asset.name}.sig' in the opam ${release.tag_name} release. Refusing to install an unsigned opam binary.`);
 			return {
-				version: release.tag_name,
 				browserDownloadUrl: asset.browser_download_url,
-				signatureBrowserDownloadUrl: signature.browser_download_url
+				signatureBrowserDownloadUrl: signature.browser_download_url,
+				version: release.tag_name
 			};
 		}
 	}
@@ -7300,7 +7304,7 @@ async function findLatestOpamRelease(octokit, allowPrerelease) {
 async function acquireOpam({ version, browserDownloadUrl, signatureBrowserDownloadUrl }) {
 	await group("Installing opam", async () => {
 		const cachedPath = find("opam", version, ARCHITECTURE);
-		const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
+		const opam = PLATFORM === "windows" ? "opam.exe" : "opam";
 		if (cachedPath === "") {
 			const [downloadedPath, signaturePath, publicKeyPath] = await Promise.all([
 				downloadTool(browserDownloadUrl),
@@ -7441,8 +7445,8 @@ function parseCompilerVersion(packagePath) {
 async function retrieveCompilerVersions(octokit, repo) {
 	const { data: packages } = await octokit.rest.repos.getContent({
 		owner: "ocaml",
-		repo,
-		path: "packages/ocaml-base-compiler"
+		path: "packages/ocaml-base-compiler",
+		repo
 	});
 	if (!Array.isArray(packages)) return /* @__PURE__ */ new Map();
 	return new Map(packages.values().map(({ path }) => parseCompilerVersion(path)).filter((entry) => entry !== void 0));
@@ -7455,8 +7459,8 @@ function matchVersion(versions, semverVersion) {
 		if (opamVersion !== void 0) return opamVersion;
 	}
 	const prereleaseMatch = import_semver.maxSatisfying(semverVersions, semverVersion, {
-		loose: true,
-		includePrerelease: true
+		includePrerelease: true,
+		loose: true
 	});
 	if (prereleaseMatch !== null) {
 		const opamVersion = versions.get(prereleaseMatch);
@@ -7487,14 +7491,14 @@ async function pathExists(filePath) {
 }
 function planOpamSetup({ cacheRestored, rootInitialized, switchInitialized }) {
 	if (cacheRestored) return {
+		createSwitch: false,
 		initialiseWithFirstRepository: false,
-		repositories: "update",
-		createSwitch: false
+		repositories: "update"
 	};
 	return {
+		createSwitch: !switchInitialized,
 		initialiseWithFirstRepository: !rootInitialized,
-		repositories: rootInitialized || switchInitialized ? "replace-all" : "add-remaining",
-		createSwitch: !switchInitialized
+		repositories: rootInitialized || switchInitialized ? "replace-all" : "add-remaining"
 	};
 }
 async function syncRepositories(sync, repositories) {

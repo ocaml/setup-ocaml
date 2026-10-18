@@ -74,7 +74,7 @@ async function verifyOpamSignature(
       `Verified opam signature with key ${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}`
     );
   } finally {
-    await fs.rm(gpgHome, { recursive: true, force: true });
+    await fs.rm(gpgHome, { force: true, recursive: true });
   }
 }
 
@@ -124,9 +124,9 @@ export async function findLatestOpamRelease(
         );
       }
       return {
-        version: release.tag_name,
         browserDownloadUrl: asset.browser_download_url,
         signatureBrowserDownloadUrl: signature.browser_download_url,
+        version: release.tag_name,
       };
     }
   }
@@ -142,7 +142,7 @@ async function acquireOpam({
 }: OpamRelease) {
   await core.group("Installing opam", async () => {
     const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
-    const opam = PLATFORM !== "windows" ? "opam" : "opam.exe";
+    const opam = PLATFORM === "windows" ? "opam.exe" : "opam";
     if (cachedPath === "") {
       const [downloadedPath, signaturePath, publicKeyPath] = await Promise.all([
         toolCache.downloadTool(browserDownloadUrl),

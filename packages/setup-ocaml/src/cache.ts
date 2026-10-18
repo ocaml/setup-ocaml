@@ -22,7 +22,7 @@ export const DUNE_CACHE_KEY_STATE = "dune-cache-key";
 
 function composeDuneCacheKeys(cachePrefix: string, ocamlCompiler: string) {
   const { workflow, job, runId } = github.context;
-  const plainKey = [ocamlCompiler, workflow, job].join();
+  const plainKey = [ocamlCompiler, workflow, job].join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
   const restoreKeys = [
@@ -51,7 +51,7 @@ async function composeOpamCacheKeys(
   const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
   const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst
     .map(([, value]) => value)
-    .join();
+    .join(",");
   const osInfo = await system.osInfo();
   const components = [
     PLATFORM,
@@ -63,14 +63,13 @@ async function composeOpamCacheKeys(
     sandbox,
   ];
   if (PLATFORM === "windows") {
-    components.push(inputs.windowsEnvironment);
-    components.push(inputs.windowsCompiler);
+    components.push(inputs.windowsEnvironment, inputs.windowsCompiler);
     if (inputs.windowsCompiler === "msvc") {
       const msvcVersion = await getMsvcVersion();
       components.push(msvcVersion);
     }
   }
-  const plainKey = components.join();
+  const plainKey = components.join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
   const key = `${inputs.cachePrefix}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];

@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as process from "node:process";
 
-import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, vi, test } from "vite-plus/test";
 
 import { ARCHITECTURE, PLATFORM } from "../src/constants.js";
 import { readInputs } from "../src/inputs.js";
@@ -14,34 +14,27 @@ const recorded = vi.hoisted(() => ({
   transcript: [] as string[],
 }));
 
-vi.mock("@actions/cache", () => ({
+vi.mock(import("@actions/cache"), () => ({
   isFeatureAvailable: () => true,
-  restoreCache: async (
-    paths: string[],
-    key: string,
-    restoreKeys: string[],
-    options?: { lookupOnly?: boolean }
-  ) => {
+  restoreCache: (paths, key, restoreKeys = [], options = {}) => {
     const hit = [key, ...restoreKeys].find((candidate) =>
       [...recorded.cacheEntries].some((entry) => entry.startsWith(candidate))
     );
-    const mode = options?.lookupOnly ? "look up" : "restore";
+    const mode = options.lookupOnly === true ? "look up" : "restore";
     recorded.transcript.push(
-      `cache ${mode} ${key}: ${hit === undefined ? "miss" : "hit"}`
+      `cache ${mode} ${key}: ${hit === undefined ? "miss" : "hit"}`,
+      ...paths.map((cachePath) => `  ${cachePath}`)
     );
-    recorded.transcript.push(...paths.map((cachePath) => `  ${cachePath}`));
-    return hit;
+    return Promise.resolve(hit);
   },
-  saveCache: async (paths: string[], key: string) => {
+  saveCache: (paths, key) => {
     recorded.cacheEntries.add(key);
-    recorded.transcript.push(`cache save ${key}`);
-    recorded.transcript.push(...paths.map((cachePath) => `  ${cachePath}`));
-    return 1;
+    recorded.transcript.push(
+      `cache save ${key}`,
+      ...paths.map((cachePath) => `  ${cachePath}`)
+    );
+    return Promise.resolve(1);
   },
-}));
-
-vi.mock("systeminformation", () => ({
-  osInfo: async () => ({ release: "24.04" }),
 }));
 
 const workspace = path.join(runnerRoot, "workspace");
@@ -55,12 +48,13 @@ function normalise(text: string) {
     .replaceAll(runnerRoot, "<runner>")
     .replaceAll(new RegExp(`\\b${PLATFORM}\\b`, "g"), "<platform>")
     .replaceAll(new RegExp(`\\b${ARCHITECTURE}\\b`, "g"), "<arch>")
-    .replaceAll(/\b[0-9a-f]{64}\b/g, "<sha256>");
+    .replaceAll(/\b[0-9a-f]{64}\b/g, "<sha256>")
+    .replaceAll(/(?<=opam cache key: <platform>,)[^,]+/g, "<os-release>");
 }
 
 function resetRunner() {
   for (const entry of fs.readdirSync(runnerRoot)) {
-    fs.rmSync(path.join(runnerRoot, entry), { recursive: true, force: true });
+    fs.rmSync(path.join(runnerRoot, entry), { force: true, recursive: true });
   }
   for (const directory of [home, workspace]) {
     fs.mkdirSync(directory, { recursive: true });
@@ -107,7 +101,7 @@ async function runAction(inputs: Record<string, string> = {}) {
 }
 
 function readCommandFile(name: string) {
-  const text = fs.readFileSync(path.join(runnerRoot, name), "utf8");
+  const text = fs.readFileSync(path.join(runnerRoot, name), "utf-8");
   return normalise(
     text
       .replaceAll(/^(.+)<<(ghadelimiter_[\w-]+)\n([\s\S]*?)\n\2$/gm, "$1=$3")
@@ -163,17 +157,17 @@ afterEach(() => {
   Object.assign(process.env, savedEnvironment);
 });
 
-it("sets up opam and the compiler on a fresh runner", async () => {
-  expect(await runAction()).toMatchInlineSnapshot(`
+test("sets up opam and the compiler on a fresh runner", async () => {
+  await expect(runAction()).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache restore v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
     opam switch --no-install --packages=ocaml-base-compiler.5.5.0 create .
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache look up v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
@@ -201,13 +195,13 @@ it("sets up opam and the compiler on a fresh runner", async () => {
   );
 });
 
-it("restores the opam cache that an earlier run saved", async () => {
+test("restores the opam cache that an earlier run saved", async () => {
   await runAction();
   resetRunner();
-  expect(await runAction()).toMatchInlineSnapshot(`
+  await expect(runAction()).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache restore v3-setup-ocaml-opam-<sha256>: hit
       <runner>/home/.opam
       <runner>/workspace/_opam
@@ -217,12 +211,12 @@ it("restores the opam cache that an earlier run saved", async () => {
   `);
 });
 
-it("adds repositories from the lowest to the highest priority", async () => {
+test("adds repositories from the lowest to the highest priority", async () => {
   const opamRepositories =
     "overlay: https://example.com/overlay\ndefault: https://opam.ocaml.org";
-  expect(
-    await runAction({ "opam-repositories": opamRepositories, cache: "false" })
-  ).toMatchInlineSnapshot(`
+  await expect(
+    runAction({ cache: "false", "opam-repositories": opamRepositories })
+  ).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
@@ -232,9 +226,9 @@ it("adds repositories from the lowest to the highest priority", async () => {
   `);
 });
 
-it("replaces the repositories of an existing opam root", async () => {
+test("replaces the repositories of an existing opam root", async () => {
   givenOpamRoot();
-  expect(await runAction({ cache: "false" })).toMatchInlineSnapshot(`
+  await expect(runAction({ cache: "false" })).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook
@@ -245,9 +239,9 @@ it("replaces the repositories of an existing opam root", async () => {
   `);
 });
 
-it("keeps an existing local switch", async () => {
+test("keeps an existing local switch", async () => {
   givenLocalSwitch();
-  expect(await runAction({ cache: "false" })).toMatchInlineSnapshot(`
+  await expect(runAction({ cache: "false" })).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
@@ -256,10 +250,10 @@ it("keeps an existing local switch", async () => {
   `);
 });
 
-it("keeps an existing opam root and local switch", async () => {
+test("keeps an existing opam root and local switch", async () => {
   givenOpamRoot();
   givenLocalSwitch();
-  expect(await runAction({ cache: "false" })).toMatchInlineSnapshot(`
+  await expect(runAction({ cache: "false" })).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook
@@ -269,18 +263,18 @@ it("keeps an existing opam root and local switch", async () => {
   `);
 });
 
-it("disables sandboxing on request", async () => {
-  expect(await runAction({ "opam-disable-sandboxing": "true" }))
+test("disables sandboxing on request", async () => {
+  await expect(runAction({ "opam-disable-sandboxing": "true" })).resolves
     .toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,nosandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,nosandbox
     cache restore v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
     opam init --auto-setup --bare --disable-sandboxing --enable-shell-hook default https://opam.ocaml.org
     opam switch --no-install --packages=ocaml-base-compiler.5.5.0 create .
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,nosandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,nosandbox
     cache look up v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
@@ -292,18 +286,18 @@ it("disables sandboxing on request", async () => {
   `);
 });
 
-it("installs a pre-release opam on request", async () => {
-  expect(await runAction({ "allow-prerelease-opam": "true" }))
+test("installs a pre-release opam on request", async () => {
+  await expect(runAction({ "allow-prerelease-opam": "true" })).resolves
     .toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.7.0-alpha1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.7.0-alpha1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache restore v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
     opam switch --no-install --packages=ocaml-base-compiler.5.5.0 create .
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.7.0-alpha1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.7.0-alpha1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache look up v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
@@ -315,7 +309,7 @@ it("installs a pre-release opam on request", async () => {
   `);
 });
 
-it("resolves the ocaml-compiler input to a compiler package", async () => {
+test("resolves the ocaml-compiler input to a compiler package", async () => {
   const lines = [];
   for (const ocamlCompiler of [
     "4.08",
@@ -328,8 +322,8 @@ it("resolves the ocaml-compiler input to a compiler package", async () => {
     "6",
   ]) {
     const output = await runAction({
-      "ocaml-compiler": ocamlCompiler,
       cache: "false",
+      "ocaml-compiler": ocamlCompiler,
     });
     const result =
       /--packages=(\S+)/.exec(output)?.[1] ??
@@ -363,17 +357,18 @@ it("resolves the ocaml-compiler input to a compiler package", async () => {
   `);
 });
 
-it("restores the Dune cache and records its key for the post step", async () => {
-  expect(await runAction({ "dune-cache": "true" })).toMatchInlineSnapshot(`
+test("restores the Dune cache and records its key for the post step", async () => {
+  await expect(runAction({ "dune-cache": "true" })).resolves
+    .toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache restore v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
     opam switch --no-install --packages=ocaml-base-compiler.5.5.0 create .
-    ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
+    ::debug::opam cache key: <platform>,<os-release>,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
     cache look up v3-setup-ocaml-opam-<sha256>: miss
       <runner>/home/.opam
       <runner>/workspace/_opam
@@ -392,16 +387,16 @@ it("restores the Dune cache and records its key for the post step", async () => 
   );
 });
 
-it("pins the local opam packages", async () => {
+test("pins the local opam packages", async () => {
   for (const name of ["foo.opam", "bar.opam"]) {
     fs.writeFileSync(path.join(workspace, name), "");
   }
-  expect(
-    await runAction({
-      "opam-local-packages": path.join(workspace, "*.opam"),
+  await expect(
+    runAction({
       cache: "false",
+      "opam-local-packages": path.join(workspace, "*.opam"),
     })
-  ).toMatchInlineSnapshot(`
+  ).resolves.toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
