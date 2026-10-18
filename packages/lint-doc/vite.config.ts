@@ -3,7 +3,7 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   pack: {
     deps: {
-      alwaysBundle: [/.*/],
+      alwaysBundle: [/.*/u],
       onlyBundle: false,
       onlyImport: [],
     },

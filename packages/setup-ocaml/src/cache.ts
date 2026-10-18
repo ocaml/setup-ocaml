@@ -1,5 +1,5 @@
 import * as crypto from "node:crypto";
-import * as path from "node:path";
+import path from "node:path";
 
 import type { DownloadOptions } from "@actions/cache";
 import * as cache from "@actions/cache";
@@ -77,9 +77,7 @@ const composeOpamCacheKeys = async (
   return { key, restoreKeys };
 };
 
-const composeDuneCachePaths = () => {
-  return [DUNE_CACHE_ROOT];
-};
+const composeDuneCachePaths = () => [DUNE_CACHE_ROOT];
 
 const composeOpamCachePaths = (windowsEnvironment: WindowsEnvironment) => {
   const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
@@ -103,26 +101,26 @@ const restoreCache = async (
 ) => {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
-    return;
+    return null;
   }
   try {
     const cacheKey = await cache.restoreCache(paths, key, restoreKeys, {
       useAzureSdk: true,
       ...options,
     });
-    if (cacheKey) {
-      core.info(`Cache restored from key: ${cacheKey}`);
-    } else {
+    if (cacheKey === undefined || cacheKey === "") {
       core.info(
         `Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`
       );
+      return null;
     }
+    core.info(`Cache restored from key: ${cacheKey}`);
     return cacheKey;
   } catch (error) {
     core.warning(
       `Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`
     );
-    return;
+    return null;
   }
 };
 
@@ -161,8 +159,8 @@ export const restoreOpamCache = async (
   inputs: Inputs,
   opamVersion: string,
   ocamlCompiler: string
-) => {
-  return await core.group("Restoring opam cache", async () => {
+) =>
+  await core.group("Restoring opam cache", async () => {
     const { key, restoreKeys } = await composeOpamCacheKeys(
       inputs,
       opamVersion,
@@ -171,7 +169,6 @@ export const restoreOpamCache = async (
     const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     return await restoreCache(key, restoreKeys, paths);
   });
-};
 
 export const saveDuneCache = async (key: string) => {
   await core.group("Saving dune cache", async () => {
@@ -195,11 +192,7 @@ export const saveOpamCache = async (
     const cacheHit = await restoreCache(key, restoreKeys, paths, {
       lookupOnly: true,
     });
-    if (cacheHit) {
-      core.info(
-        "Cache entry with the same key, version, and scope already exists"
-      );
-    } else {
+    if (cacheHit === null) {
       await exec("opam", [
         "clean",
         "--all-switches",
@@ -210,6 +203,10 @@ export const saveOpamCache = async (
         "--unused-repositories",
       ]);
       await saveCache(key, paths);
+    } else {
+      core.info(
+        "Cache entry with the same key, version, and scope already exists"
+      );
     }
   });
 };

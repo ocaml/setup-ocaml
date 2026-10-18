@@ -45,7 +45,7 @@ const parseOpamRepositories = (input: string): OpamRepository[] => {
   if (entries.length === 0) {
     throw new Error("opam-repositories input must not be empty");
   }
-  return entries.reverse();
+  return entries.toReversed();
 };
 
 const parseWindowsEnvironment = (input: string): WindowsEnvironment => {

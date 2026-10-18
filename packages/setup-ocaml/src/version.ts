@@ -1,12 +1,11 @@
-import * as path from "node:path";
+import path from "node:path";
 
 import * as semver from "semver";
 
 import type { Octokit } from "./github-client.js";
 
-const isSemverValidRange = (semverVersion: string) => {
-  return semver.validRange(semverVersion, { loose: true }) !== null;
-};
+const isSemverValidRange = (semverVersion: string) =>
+  semver.validRange(semverVersion, { loose: true }) !== null;
 
 const parseCompilerVersion = (
   packagePath: string
@@ -18,12 +17,10 @@ const parseCompilerVersion = (
   if (parsed === null) {
     return undefined;
   }
+  // opam pads OCaml 4 minor versions below 10 (4.00.0, 4.01.0) but not later
+  // ones (4.14.2, 5.5.0).
   const minor =
-    parsed.major < 5 && parsed.minor < 10
-      ? // ocaml-base-compiler.4.00.0, ocaml-base-compiler.4.01.0
-        `0${parsed.minor}`
-      : // ocaml-base-compiler.5.5.0, ocaml-base-compiler.4.14.2
-        parsed.minor;
+    parsed.major < 5 && parsed.minor < 10 ? `0${parsed.minor}` : parsed.minor;
   const prerelease =
     parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
   const semverVersion = `${parsed.major}.${minor}.${parsed.patch}${prerelease}`;
@@ -42,7 +39,7 @@ const retrieveCompilerVersions = async (octokit: Octokit, repo: string) => {
   return new Map(
     packages
       .values()
-      .map(({ path }) => parseCompilerVersion(path))
+      .map(({ path: packagePath }) => parseCompilerVersion(packagePath))
       .filter((entry) => entry !== undefined)
   );
 };
@@ -68,13 +65,13 @@ const matchVersion = (versions: Map<string, string>, semverVersion: string) => {
       return opamVersion;
     }
   }
-  return;
+  return null;
 };
 
 const resolveVersion = async (octokit: Octokit, semverVersion: string) => {
   const versions = await retrieveCompilerVersions(octokit, "opam-repository");
   const match = matchVersion(versions, semverVersion);
-  if (match !== undefined) {
+  if (match !== null) {
     return match;
   }
   // Old compiler releases are no longer in opam-repository itself.
@@ -88,7 +85,7 @@ const resolveVersion = async (octokit: Octokit, semverVersion: string) => {
     }
   }
   const archivedMatch = matchVersion(versions, semverVersion);
-  if (archivedMatch !== undefined) {
+  if (archivedMatch !== null) {
     return archivedMatch;
   }
   throw new Error(

@@ -1,8 +1,8 @@
+import { once } from "node:events";
 import * as fs from "node:fs";
 import * as http from "node:http";
-import type { AddressInfo } from "node:net";
 import * as os from "node:os";
-import * as path from "node:path";
+import path from "node:path";
 import * as process from "node:process";
 
 import { vi } from "vite-plus/test";
@@ -94,10 +94,13 @@ const githubServer = http.createServer((request, response) => {
   });
   response.end(JSON.stringify(body ?? { message: "Not Found" }));
 });
-await new Promise<void>((resolve) =>
-  githubServer.listen(0, "127.0.0.1", resolve)
-);
+githubServer.listen(0, "127.0.0.1");
+await once(githubServer, "listening");
 githubServer.unref();
+const githubAddress = githubServer.address();
+if (githubAddress === null || typeof githubAddress === "string") {
+  throw new Error("The fake GitHub API is not listening on a TCP port");
+}
 
 for (const name of [
   "ImageOS",
@@ -105,11 +108,11 @@ for (const name of [
   "XDG_CACHE_HOME",
   "GITHUB_EVENT_PATH",
 ]) {
-  delete process.env[name];
+  Reflect.deleteProperty(process.env, name);
 }
 
 Object.assign(process.env, {
-  GITHUB_API_URL: `http://127.0.0.1:${(githubServer.address() as AddressInfo).port}`,
+  GITHUB_API_URL: `http://127.0.0.1:${githubAddress.port}`,
   GITHUB_ENV: path.join(runnerRoot, "github-env"),
   GITHUB_JOB: "job",
   GITHUB_OUTPUT: path.join(runnerRoot, "github-output"),

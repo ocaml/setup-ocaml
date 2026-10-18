@@ -1,64 +1,54 @@
 import * as os from "node:os";
-import * as path from "node:path";
+import path from "node:path";
 import * as process from "node:process";
 
 import { z } from "zod";
 
 // ── Platform & Architecture ──
 
-const RunnerEnvironment = z.enum(["github-hosted", "self-hosted"]);
-type RunnerEnvironment = z.infer<typeof RunnerEnvironment>;
+const RunnerEnvironmentSchema = z.enum(["github-hosted", "self-hosted"]);
+type RunnerEnvironment = z.infer<typeof RunnerEnvironmentSchema>;
+
+const ARCHITECTURES = new Map<NodeJS.Architecture, string>([
+  ["arm", "armhf"],
+  ["arm64", "arm64"],
+  ["riscv64", "riscv64"],
+  ["s390x", "s390x"],
+  ["x64", "x86_64"],
+]);
 
 export const ARCHITECTURE = (() => {
-  switch (process.arch) {
-    case "arm": {
-      return "armhf";
-    }
-    case "arm64": {
-      return "arm64";
-    }
-    case "riscv64": {
-      return "riscv64";
-    }
-    case "s390x": {
-      return "s390x";
-    }
-    case "x64": {
-      return "x86_64";
-    }
-    default: {
-      throw new Error(
-        `'${process.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`
-      );
-    }
+  const architecture = ARCHITECTURES.get(process.arch);
+  if (architecture === undefined) {
+    throw new Error(
+      `'${process.arch}' is not supported. Supported architectures: ${[...ARCHITECTURES.keys()].join(", ")}`
+    );
   }
+  return architecture;
 })();
 
+const PLATFORMS = new Map<NodeJS.Platform, "linux" | "macos" | "windows">([
+  ["darwin", "macos"],
+  ["linux", "linux"],
+  ["win32", "windows"],
+]);
+
 export const PLATFORM = (() => {
-  switch (process.platform) {
-    case "darwin": {
-      return "macos";
-    }
-    case "linux": {
-      return "linux";
-    }
-    case "win32": {
-      return "windows";
-    }
-    default: {
-      throw new Error(
-        `'${process.platform}' is not supported. Supported platforms: darwin, linux, win32`
-      );
-    }
+  const platform = PLATFORMS.get(process.platform);
+  if (platform === undefined) {
+    throw new Error(
+      `'${process.platform}' is not supported. Supported platforms: ${[...PLATFORMS.keys()].join(", ")}`
+    );
   }
+  return platform;
 })();
 
 export const RUNNER_ENVIRONMENT = ((): RunnerEnvironment => {
   const { ImageOS } = process.env;
-  const runnerEnvironment = RunnerEnvironment.optional().parse(
+  const runnerEnvironment = RunnerEnvironmentSchema.optional().parse(
     process.env.RUNNER_ENVIRONMENT
   );
-  if (ImageOS) {
+  if (ImageOS !== undefined && ImageOS !== "") {
     return "github-hosted";
   }
   if (!runnerEnvironment) {
@@ -88,7 +78,7 @@ export const CYGWIN_BASH_ENV = path.join(CYGWIN_ROOT, "bash_env");
 
 export const DUNE_CACHE_ROOT = (() => {
   const xdgCacheHome = process.env.XDG_CACHE_HOME;
-  if (xdgCacheHome) {
+  if (xdgCacheHome !== undefined && xdgCacheHome !== "") {
     return path.join(xdgCacheHome, "dune");
   }
   if (PLATFORM === "windows") {

@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
-import * as path from "node:path";
+import path from "node:path";
 import * as process from "node:process";
 
 import * as core from "@actions/core";
@@ -33,12 +33,11 @@ import { resolveCompiler } from "./version.js";
 // 10 minutes — the 0install solver can be slow on large dependency trees.
 const OPAM_SOLVER_TIMEOUT = 600;
 
-const pathExists = async (filePath: string) => {
-  return await fs.access(filePath).then(
+const pathExists = async (filePath: string) =>
+  await fs.access(filePath).then(
     () => true,
     () => false
   );
-};
 
 interface OpamState {
   readonly cacheRestored: boolean;
@@ -132,15 +131,15 @@ export const installer = async (inputs: Inputs) => {
         "behavior",
         "set",
         "symlinkEvaluation",
-        "R2L:1", // Remote-to-Local
-        "R2R:1", // Remote-to-Remote
+        "R2L:1",
+        "R2R:1",
       ]);
       await exec("fsutil", ["behavior", "query", "SymlinkEvaluation"]);
     });
   }
   const cacheKey = inputs.cache
     ? await restoreOpamCache(inputs, opamRelease.version, ocamlCompiler)
-    : undefined;
+    : null;
   const [rootInitialized, switchInitialized] = await Promise.all([
     pathExists(path.join(OPAM_ROOT, "config")),
     pathExists(
@@ -148,7 +147,7 @@ export const installer = async (inputs: Inputs) => {
     ),
   ]);
   const plan = planOpamSetup({
-    cacheRestored: Boolean(cacheKey),
+    cacheRestored: cacheKey !== null,
     rootInitialized,
     switchInitialized,
   });

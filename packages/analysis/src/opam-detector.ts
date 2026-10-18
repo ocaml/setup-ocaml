@@ -6,19 +6,19 @@ import {
 import { PackageURL } from "packageurl-js";
 import { z } from "zod";
 
-const OpamDependency = z.object({
+const OpamDependencySchema = z.object({
   get dependencies() {
-    return z.array(OpamDependency);
+    return z.array(OpamDependencySchema);
   },
   name: z.string(),
   version: z.string(),
 });
-type OpamDependency = z.infer<typeof OpamDependency>;
+type OpamDependency = z.infer<typeof OpamDependencySchema>;
 
-export const OpamOutput = z.object({
-  tree: z.array(OpamDependency),
+export const OpamOutputSchema = z.object({
+  tree: z.array(OpamDependencySchema),
 });
-type OpamOutput = z.infer<typeof OpamOutput>;
+type OpamOutput = z.infer<typeof OpamOutputSchema>;
 
 const parseDependencies = (
   cache: PackageCache,

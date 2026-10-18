@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
-import * as path from "node:path";
+import path from "node:path";
 
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
@@ -25,9 +25,8 @@ const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT =
   "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
 
-const toGpgPath = (filePath: string) => {
-  return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
-};
+const toGpgPath = (filePath: string) =>
+  PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
 
 const verifyOpamSignature = async (
   binaryPath: string,
@@ -100,7 +99,7 @@ export const findLatestOpamRelease = async (
         loose: true,
       })
     )
-    .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
+    .toSorted(({ tag_name: v1 }, { tag_name: v2 }) =>
       semver.rcompare(v1, v2, { loose: true })
     );
   if (releases.length === 0) {
@@ -151,16 +150,16 @@ const acquireOpam = async ({
       ]);
       core.info(`Downloaded opam ${version} from ${browserDownloadUrl}`);
       await verifyOpamSignature(downloadedPath, signaturePath, publicKeyPath);
-      const cachedPath = await toolCache.cacheFile(
+      const newlyCachedPath = await toolCache.cacheFile(
         downloadedPath,
         opam,
         "opam",
         version,
         ARCHITECTURE
       );
-      core.info(`Successfully cached opam to ${cachedPath}`);
-      await fs.chmod(path.join(cachedPath, opam), EXECUTABLE_PERMISSION);
-      core.addPath(cachedPath);
+      core.info(`Successfully cached opam to ${newlyCachedPath}`);
+      await fs.chmod(path.join(newlyCachedPath, opam), EXECUTABLE_PERMISSION);
+      core.addPath(newlyCachedPath);
       core.info("Added opam to the path");
     } else {
       core.addPath(cachedPath);
@@ -251,6 +250,7 @@ export const pin = async (fpaths: string[]) => {
       const dname = path.dirname(fpath);
       // Keep the target as a local path so opam can detect the VCS backend.
       // Normalised pins parse file:// URLs directly and therefore use rsync.
+      // oxlint-disable-next-line no-await-in-loop -- opam pins one package at a time
       await exec("opam", ["pin", "--no-action", "add", `${fname}.dev`, "."], {
         cwd: dname,
       });
@@ -277,19 +277,20 @@ export const repositoryAddAll = async (
   }
   await core.group("Initialising opam repositories", async () => {
     for (const [name, address] of repositories) {
+      // oxlint-disable-next-line no-await-in-loop -- the order of addition sets the priority
       await repositoryAdd(name, address);
     }
   });
 };
 
 const repositoryList = async () => {
-  const repositoryList = await getExecOutput(
+  const { exitCode, stdout } = await getExecOutput(
     "opam",
     ["repository", "--all-switches", "--short", "list"],
     { ignoreReturnCode: true, silent: true }
   );
-  if (repositoryList.exitCode === 0) {
-    return repositoryList.stdout
+  if (exitCode === 0) {
+    return stdout
       .split("\n")
       .map((repository) => repository.trim())
       .filter((repository) => repository.length > 0);

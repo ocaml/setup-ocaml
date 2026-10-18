@@ -7,7 +7,7 @@ import * as path$1 from "path";
 import { ok } from "assert";
 import * as util from "util";
 import * as os$2 from "node:os";
-import * as path from "node:path";
+import path from "node:path";
 import { promises as promises$1 } from "node:fs";
 import * as stream from "stream";
 import * as fs$1 from "node:fs/promises";
@@ -6760,7 +6760,7 @@ const parseOpamRepositories = (input) => {
 	if (!parsed.success) throw new Error("opam-repositories input must be a YAML mapping of name: URL pairs", { cause: parsed.error });
 	const entries = Object.entries(parsed.data);
 	if (entries.length === 0) throw new Error("opam-repositories input must not be empty");
-	return entries.reverse();
+	return entries.toReversed();
 };
 const parseWindowsEnvironment = (input) => {
 	const value = input.toLowerCase();
@@ -7243,9 +7243,7 @@ const OPAM_STABLE_VERSION_RANGE = "<2.7.0";
 const EXECUTABLE_PERMISSION = 493;
 const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
-const toGpgPath = (filePath) => {
-	return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
-};
+const toGpgPath = (filePath) => PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
 const verifyOpamSignature = async (binaryPath, signaturePath, publicKeyPath) => {
 	const gpgHome = await promises$1.mkdtemp(path.join(os$2.tmpdir(), "setup-ocaml-gpg-"));
 	const gpg = PLATFORM === "windows" ? path.join(MSYS2_ROOT, "usr", "bin", "gpg.exe") : "gpg";
@@ -7284,7 +7282,7 @@ const findLatestOpamRelease = async (octokit, allowPrerelease) => {
 	const releases = data.filter((release) => import_semver.satisfies(release.tag_name, semverRange, {
 		includePrerelease: allowPrerelease,
 		loose: true
-	})).sort(({ tag_name: v1 }, { tag_name: v2 }) => import_semver.rcompare(v1, v2, { loose: true }));
+	})).toSorted(({ tag_name: v1 }, { tag_name: v2 }) => import_semver.rcompare(v1, v2, { loose: true }));
 	if (releases.length === 0) throw new Error("Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases.");
 	const binarySuffix = PLATFORM === "windows" ? `${ARCHITECTURE}-${PLATFORM}.exe` : `${ARCHITECTURE}-${PLATFORM}`;
 	for (const release of releases) {
@@ -7313,10 +7311,10 @@ const acquireOpam = async ({ version, browserDownloadUrl, signatureBrowserDownlo
 			]);
 			info(`Downloaded opam ${version} from ${browserDownloadUrl}`);
 			await verifyOpamSignature(downloadedPath, signaturePath, publicKeyPath);
-			const cachedPath = await cacheFile(downloadedPath, opam, "opam", version, ARCHITECTURE);
-			info(`Successfully cached opam to ${cachedPath}`);
-			await promises$1.chmod(path.join(cachedPath, opam), EXECUTABLE_PERMISSION);
-			addPath(cachedPath);
+			const newlyCachedPath = await cacheFile(downloadedPath, opam, "opam", version, ARCHITECTURE);
+			info(`Successfully cached opam to ${newlyCachedPath}`);
+			await promises$1.chmod(path.join(newlyCachedPath, opam), EXECUTABLE_PERMISSION);
+			addPath(newlyCachedPath);
 			info("Added opam to the path");
 		} else {
 			addPath(cachedPath);
@@ -7400,7 +7398,7 @@ const repositoryAddAll = async (repositories) => {
 	});
 };
 const repositoryList = async () => {
-	const repositoryList = await getExecOutput("opam", [
+	const { exitCode, stdout } = await getExecOutput("opam", [
 		"repository",
 		"--all-switches",
 		"--short",
@@ -7409,7 +7407,7 @@ const repositoryList = async () => {
 		ignoreReturnCode: true,
 		silent: true
 	});
-	if (repositoryList.exitCode === 0) return repositoryList.stdout.split("\n").map((repository) => repository.trim()).filter((repository) => repository.length > 0);
+	if (exitCode === 0) return stdout.split("\n").map((repository) => repository.trim()).filter((repository) => repository.length > 0);
 	return [];
 };
 const repositoryRemoveAll = async () => {
@@ -7431,9 +7429,7 @@ const update = async () => {
 
 //#endregion
 //#region src/version.ts
-const isSemverValidRange = (semverVersion) => {
-	return import_semver.validRange(semverVersion, { loose: true }) !== null;
-};
+const isSemverValidRange = (semverVersion) => import_semver.validRange(semverVersion, { loose: true }) !== null;
 const parseCompilerVersion = (packagePath) => {
 	const opamVersion = path.basename(packagePath).replace("ocaml-base-compiler.", "");
 	const parsed = import_semver.parse(opamVersion.replace("~", "-"), { loose: true });
@@ -7449,7 +7445,7 @@ const retrieveCompilerVersions = async (octokit, repo) => {
 		repo
 	});
 	if (!Array.isArray(packages)) return /* @__PURE__ */ new Map();
-	return new Map(packages.values().map(({ path }) => parseCompilerVersion(path)).filter((entry) => entry !== void 0));
+	return new Map(packages.values().map(({ path: packagePath }) => parseCompilerVersion(packagePath)).filter((entry) => entry !== void 0));
 };
 const matchVersion = (versions, semverVersion) => {
 	const semverVersions = versions.keys().toArray();
@@ -7466,15 +7462,16 @@ const matchVersion = (versions, semverVersion) => {
 		const opamVersion = versions.get(prereleaseMatch);
 		if (opamVersion !== void 0) return opamVersion;
 	}
+	return null;
 };
 const resolveVersion = async (octokit, semverVersion) => {
 	const versions = await retrieveCompilerVersions(octokit, "opam-repository");
 	const match = matchVersion(versions, semverVersion);
-	if (match !== void 0) return match;
+	if (match !== null) return match;
 	const archivedVersions = await retrieveCompilerVersions(octokit, "opam-repository-archive");
 	for (const [key, opamVersion] of archivedVersions) if (!versions.has(key)) versions.set(key, opamVersion);
 	const archivedMatch = matchVersion(versions, semverVersion);
-	if (archivedMatch !== void 0) return archivedMatch;
+	if (archivedMatch !== null) return archivedMatch;
 	throw new Error(`Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository or opam-repository-archive. Please check if you specified a valid version number or version range.`);
 };
 const resolveCompiler = async (octokit, ocamlCompiler) => {
@@ -7486,9 +7483,7 @@ const resolveCompiler = async (octokit, ocamlCompiler) => {
 //#endregion
 //#region src/installer.ts
 const OPAM_SOLVER_TIMEOUT = 600;
-const pathExists = async (filePath) => {
-	return await promises$1.access(filePath).then(() => true, () => false);
-};
+const pathExists = async (filePath) => await promises$1.access(filePath).then(() => true, () => false);
 const planOpamSetup = ({ cacheRestored, rootInitialized, switchInitialized }) => {
 	if (cacheRestored) return {
 		createSwitch: false,
@@ -7554,10 +7549,10 @@ const installer = async (inputs) => {
 			]);
 		});
 	}
-	const cacheKey = inputs.cache ? await restoreOpamCache(inputs, opamRelease.version, ocamlCompiler) : void 0;
+	const cacheKey = inputs.cache ? await restoreOpamCache(inputs, opamRelease.version, ocamlCompiler) : null;
 	const [rootInitialized, switchInitialized] = await Promise.all([pathExists(path.join(OPAM_ROOT, "config")), pathExists(path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config"))]);
 	const plan = planOpamSetup({
-		cacheRestored: Boolean(cacheKey),
+		cacheRestored: cacheKey !== null,
 		rootInitialized,
 		switchInitialized
 	});

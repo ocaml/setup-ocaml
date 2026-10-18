@@ -27,7 +27,7 @@ import * as buffer$1 from "buffer";
 import { Buffer as Buffer$1 } from "buffer";
 import * as os$2 from "node:os";
 import os$1, { EOL as EOL$1 } from "node:os";
-import * as path$1 from "node:path";
+import path from "node:path";
 import fs from "node:fs";
 import * as stream from "stream";
 import { Readable as Readable$1 } from "stream";
@@ -22858,46 +22858,50 @@ function superRefine(fn, params) {
 
 //#endregion
 //#region src/constants.ts
-const RunnerEnvironment = _enum(["github-hosted", "self-hosted"]);
+const RunnerEnvironmentSchema = _enum(["github-hosted", "self-hosted"]);
+const ARCHITECTURES = /* @__PURE__ */ new Map([
+	["arm", "armhf"],
+	["arm64", "arm64"],
+	["riscv64", "riscv64"],
+	["s390x", "s390x"],
+	["x64", "x86_64"]
+]);
 const ARCHITECTURE = (() => {
-	switch (process$2.arch) {
-		case "arm": return "armhf";
-		case "arm64": return "arm64";
-		case "riscv64": return "riscv64";
-		case "s390x": return "s390x";
-		case "x64": return "x86_64";
-		default: throw new Error(`'${process$2.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`);
-	}
+	const architecture = ARCHITECTURES.get(process$2.arch);
+	if (architecture === void 0) throw new Error(`'${process$2.arch}' is not supported. Supported architectures: ${[...ARCHITECTURES.keys()].join(", ")}`);
+	return architecture;
 })();
+const PLATFORMS = /* @__PURE__ */ new Map([
+	["darwin", "macos"],
+	["linux", "linux"],
+	["win32", "windows"]
+]);
 const PLATFORM = (() => {
-	switch (process$2.platform) {
-		case "darwin": return "macos";
-		case "linux": return "linux";
-		case "win32": return "windows";
-		default: throw new Error(`'${process$2.platform}' is not supported. Supported platforms: darwin, linux, win32`);
-	}
+	const platform = PLATFORMS.get(process$2.platform);
+	if (platform === void 0) throw new Error(`'${process$2.platform}' is not supported. Supported platforms: ${[...PLATFORMS.keys()].join(", ")}`);
+	return platform;
 })();
 const RUNNER_ENVIRONMENT = (() => {
 	const { ImageOS } = process$2.env;
-	const runnerEnvironment = RunnerEnvironment.optional().parse(process$2.env.RUNNER_ENVIRONMENT);
-	if (ImageOS) return "github-hosted";
+	const runnerEnvironment = RunnerEnvironmentSchema.optional().parse(process$2.env.RUNNER_ENVIRONMENT);
+	if (ImageOS !== void 0 && ImageOS !== "") return "github-hosted";
 	if (!runnerEnvironment) return "self-hosted";
 	return runnerEnvironment;
 })();
 const GITHUB_WORKSPACE = process$2.env.GITHUB_WORKSPACE ?? process$2.cwd();
-const MSYS2_ROOT = path$1.join("C:", "msys64");
+const MSYS2_ROOT = path.join("C:", "msys64");
 const OPAM_ROOT = (() => {
-	if (PLATFORM === "windows") return path$1.join("C:", ".opam");
-	return path$1.join(os$2.homedir(), ".opam");
+	if (PLATFORM === "windows") return path.join("C:", ".opam");
+	return path.join(os$2.homedir(), ".opam");
 })();
-const CYGWIN_ROOT = path$1.join(OPAM_ROOT, ".cygwin", "root");
-const CYGWIN_ROOT_BIN = path$1.join(CYGWIN_ROOT, "bin");
-const CYGWIN_BASH_ENV = path$1.join(CYGWIN_ROOT, "bash_env");
+const CYGWIN_ROOT = path.join(OPAM_ROOT, ".cygwin", "root");
+const CYGWIN_ROOT_BIN = path.join(CYGWIN_ROOT, "bin");
+const CYGWIN_BASH_ENV = path.join(CYGWIN_ROOT, "bash_env");
 const DUNE_CACHE_ROOT = (() => {
 	const xdgCacheHome = process$2.env.XDG_CACHE_HOME;
-	if (xdgCacheHome) return path$1.join(xdgCacheHome, "dune");
-	if (PLATFORM === "windows") return path$1.join("C:", "dune");
-	return path$1.join(os$2.homedir(), ".cache", "dune");
+	if (xdgCacheHome !== void 0 && xdgCacheHome !== "") return path.join(xdgCacheHome, "dune");
+	if (PLATFORM === "windows") return path.join("C:", "dune");
+	return path.join(os$2.homedir(), ".cache", "dune");
 })();
 
 //#endregion
@@ -24103,12 +24107,12 @@ const qmarksTestNoExtDot = ([$0]) => {
 };
 /* c8 ignore start */
 const defaultPlatform = typeof process === "object" && process ? typeof process.env === "object" && process.env && process.env.__MINIMATCH_TESTING_PLATFORM__ || process.platform : "posix";
-const path = {
+const path$1 = {
 	win32: { sep: "\\" },
 	posix: { sep: "/" }
 };
 /* c8 ignore stop */
-const sep$2 = defaultPlatform === "win32" ? path.win32.sep : path.posix.sep;
+const sep$2 = defaultPlatform === "win32" ? path$1.win32.sep : path$1.posix.sep;
 minimatch.sep = sep$2;
 const GLOBSTAR = Symbol("globstar **");
 minimatch.GLOBSTAR = GLOBSTAR;
@@ -84185,12 +84189,10 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports) => {
 //#region src/paths.ts
 var import_lib = /* @__PURE__ */ __toESM(require_lib(), 1);
 const toMsysPath = (windowsPath) => {
-	const { root } = path$1.win32.parse(windowsPath);
+	const { root } = path.win32.parse(windowsPath);
 	return `/${root.charAt(0).toLowerCase()}/${windowsPath.slice(root.length).replaceAll("\\", "/")}`;
 };
-const toCygwinPath = (windowsPath) => {
-	return path$1.posix.join("/cygdrive", toMsysPath(windowsPath));
-};
+const toCygwinPath = (windowsPath) => path.posix.join("/cygdrive", toMsysPath(windowsPath));
 
 //#endregion
 //#region src/cache.ts
@@ -84253,11 +84255,9 @@ const composeOpamCacheKeys = async (inputs, opamVersion, ocamlCompiler) => {
 		restoreKeys
 	};
 };
-const composeDuneCachePaths = () => {
-	return [DUNE_CACHE_ROOT];
-};
+const composeDuneCachePaths = () => [DUNE_CACHE_ROOT];
 const composeOpamCachePaths = (windowsEnvironment) => {
-	const opamLocalCachePath = path$1.join(GITHUB_WORKSPACE, "_opam");
+	const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
 	const paths = [OPAM_ROOT, opamLocalCachePath];
 	if (PLATFORM === "windows") {
 		if (windowsEnvironment === "msys2") paths.push(toMsysPath(opamLocalCachePath));
@@ -84268,19 +84268,22 @@ const composeOpamCachePaths = (windowsEnvironment) => {
 const restoreCache = async (key, restoreKeys, paths, options) => {
 	if (!isFeatureAvailable()) {
 		info("Actions cache service feature is unavailable");
-		return;
+		return null;
 	}
 	try {
 		const cacheKey = await restoreCache$1(paths, key, restoreKeys, {
 			useAzureSdk: true,
 			...options
 		});
-		if (cacheKey) info(`Cache restored from key: ${cacheKey}`);
-		else info(`Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+		if (cacheKey === void 0 || cacheKey === "") {
+			info(`Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+			return null;
+		}
+		info(`Cache restored from key: ${cacheKey}`);
 		return cacheKey;
 	} catch (error) {
 		warning(`Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`);
-		return;
+		return null;
 	}
 };
 const saveCache = async (key, paths) => {
@@ -84302,13 +84305,11 @@ const restoreDuneCache = async (cachePrefix, ocamlCompiler) => {
 		await restoreCache(key, restoreKeys, paths);
 	});
 };
-const restoreOpamCache = async (inputs, opamVersion, ocamlCompiler) => {
-	return await group("Restoring opam cache", async () => {
-		const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
-		const paths = composeOpamCachePaths(inputs.windowsEnvironment);
-		return await restoreCache(key, restoreKeys, paths);
-	});
-};
+const restoreOpamCache = async (inputs, opamVersion, ocamlCompiler) => await group("Restoring opam cache", async () => {
+	const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
+	const paths = composeOpamCachePaths(inputs.windowsEnvironment);
+	return await restoreCache(key, restoreKeys, paths);
+});
 const saveDuneCache = async (key) => {
 	await group("Saving dune cache", async () => {
 		const paths = composeDuneCachePaths();
@@ -84319,8 +84320,7 @@ const saveOpamCache = async (inputs, opamVersion, ocamlCompiler) => {
 	await group("Saving opam cache", async () => {
 		const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
 		const paths = composeOpamCachePaths(inputs.windowsEnvironment);
-		if (await restoreCache(key, restoreKeys, paths, { lookupOnly: true })) info("Cache entry with the same key, version, and scope already exists");
-		else {
+		if (await restoreCache(key, restoreKeys, paths, { lookupOnly: true }) === null) {
 			await exec("opam", [
 				"clean",
 				"--all-switches",
@@ -84331,7 +84331,7 @@ const saveOpamCache = async (inputs, opamVersion, ocamlCompiler) => {
 				"--unused-repositories"
 			]);
 			await saveCache(key, paths);
-		}
+		} else info("Cache entry with the same key, version, and scope already exists");
 	});
 };
 
@@ -85601,9 +85601,7 @@ retry.VERSION = VERSION;
 
 //#endregion
 //#region src/github-client.ts
-const createOctokit = (token) => {
-	return getOctokit(token, void 0, retry);
-};
+const createOctokit = (token) => getOctokit(token, void 0, retry);
 
 //#endregion
 export { group as A, __commonJSMin as B, addPath as C, getBooleanInput as D, exportVariable as E, getExecOutput as F, __toESM as H, cp as I, mkdirP as L, isDebug as M, notice as N, getInput as O, exec as P, rmRF as R, string as S, error$1 as T, __require as V, MSYS2_ROOT as _, restoreDuneCache as a, RUNNER_ENVIRONMENT as b, saveOpamCache as c, create as d, ARCHITECTURE as f, GITHUB_WORKSPACE as g, DUNE_CACHE_ROOT as h, DUNE_CACHE_KEY_STATE as i, info as j, getState as k, toMsysPath as l, CYGWIN_ROOT_BIN as m, installDune as n, restoreOpamCache as o, CYGWIN_BASH_ENV as p, trimDuneCache as r, saveDuneCache as s, createOctokit as t, require_semver as u, OPAM_ROOT as v, debug as w, record as x, PLATFORM as y, HttpClient as z };
