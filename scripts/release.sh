@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 function Release() {
-  local MAJOR_VERSION="$1"
-  local FULL_VERSION="$2"
+  local MAJOR_VERSION="${1:-}"
+  local FULL_VERSION="${2:-}"
 
   if [ -z "$MAJOR_VERSION" ] || [ -z "$FULL_VERSION" ]; then
     echo "Usage: release.sh [MAJOR_VERSION] [FULL_VERSION]"
@@ -10,21 +12,19 @@ function Release() {
     exit 1
   fi
 
-  echo "Delete a major version tag: $MAJOR_VERSION"
-  git tag -d "$MAJOR_VERSION"
-  git push origin ":$MAJOR_VERSION"
-
-  echo "Create a major version tag: $MAJOR_VERSION"
-  git tag "$MAJOR_VERSION"
-
   echo "Create a full version tag: $FULL_VERSION"
-  git tag "$FULL_VERSION"
+  if [ "$(git rev-parse --quiet --verify "refs/tags/$FULL_VERSION^{commit}" || true)" != "$(git rev-parse HEAD)" ]; then
+    git tag "$FULL_VERSION"
+  fi
+
+  echo "Move the major version tag: $MAJOR_VERSION"
+  git tag --force "$MAJOR_VERSION"
 
   echo "Push tags"
-  git push --tags
+  git push --atomic origin "refs/tags/$FULL_VERSION" "+refs/tags/$MAJOR_VERSION"
 
   echo "Create a GitHub release: $FULL_VERSION"
   gh release create "$FULL_VERSION" --generate-notes
 }
 
-Release "$1" "$2"
+Release "$@"

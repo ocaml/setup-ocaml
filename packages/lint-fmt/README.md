@@ -1,1 +1,0 @@
-../../lint-fmt/README.md

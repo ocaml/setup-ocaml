@@ -27,6 +27,8 @@ jobs:
       - if: always()
         run: yarn typecheck
       - if: always()
+        run: yarn test
+      - if: always()
         name: Ensure dist directory is up-to-date
         run: yarn build && git diff --exit-code --ignore-cr-at-eol
 

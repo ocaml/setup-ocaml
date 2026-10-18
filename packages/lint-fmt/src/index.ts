@@ -1,11 +1,13 @@
-import * as path from "node:path";
+import path from "node:path";
 import * as process from "node:process";
+
 import * as core from "@actions/core";
+
 import { checkFmt } from "./lint.js";
 import { retrieveOcamlformatVersion } from "./ocamlformat.js";
 import { installFormattingDependencies } from "./opam.js";
 
-async function run() {
+const run = async () => {
   try {
     const workingDirectory = core.getInput("working-directory");
     const githubWorkspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
@@ -20,6 +22,6 @@ async function run() {
     }
     process.exit(1);
   }
-}
+};
 
 void run();

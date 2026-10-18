@@ -1,35 +1,31 @@
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import path from "node:path";
+
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
-import { MSYS2_ROOT, PLATFORM, RUNNER_ENVIRONMENT, WINDOWS_COMPILER } from "./constants.js";
 
-async function retrieveInstallableOptionalDependencies(optionalDependencies: string[]) {
-  switch (PLATFORM) {
-    case "linux": {
-      if (optionalDependencies.length === 0) {
-        return [];
-      }
-      const output = await getExecOutput("apt-cache", [
-        "show",
-        "--no-all-versions",
-        ...optionalDependencies,
-      ]);
-      const installablePackages = new Set(
-        output.stdout
-          .split("\n")
-          .filter((line) => line.startsWith("Package: "))
-          .map((line) => line.slice("Package: ".length)),
-      );
-      return optionalDependencies.filter((packageName) => installablePackages.has(packageName));
-    }
-    default: {
-      return [];
-    }
-  }
-}
+import type { PLATFORM } from "./constants.js";
+import { MSYS2_ROOT, RUNNER_ENVIRONMENT } from "./constants.js";
+import type { WindowsCompiler } from "./inputs.js";
 
-async function skipPackageManagement() {
+type UnixPlatform = Exclude<typeof PLATFORM, "windows">;
+
+const retrieveInstallableAptPackages = async (packages: string[]) => {
+  const output = await getExecOutput("apt-cache", [
+    "show",
+    "--no-all-versions",
+    ...packages,
+  ]);
+  const installablePackages = new Set(
+    output.stdout
+      .split("\n")
+      .filter((line) => line.startsWith("Package: "))
+      .map((line) => line.slice("Package: ".length))
+  );
+  return packages.filter((packageName) => installablePackages.has(packageName));
+};
+
+const skipPackageManagement = async () => {
   // Skip package management if running in a self-hosted environment or in a
   // github-hosted Docker container.
   let isContainerRunner = false;
@@ -40,9 +36,9 @@ async function skipPackageManagement() {
     isContainerRunner = false;
   }
   return RUNNER_ENVIRONMENT === "self-hosted" || isContainerRunner;
-}
+};
 
-async function disableManDbAutoUpdate() {
+const disableManDbAutoUpdate = async () => {
   try {
     await exec("sudo", ["debconf-communicate"], {
       input: Buffer.from("set man-db/auto-update false"),
@@ -59,16 +55,16 @@ async function disableManDbAutoUpdate() {
       core.info(error.message);
     }
   }
-}
+};
 
-export async function installUnixSystemPackages() {
+export const installUnixSystemPackages = async (platform: UnixPlatform) => {
   if (await skipPackageManagement()) {
     return;
   }
-  switch (PLATFORM) {
+  switch (platform) {
     case "linux": {
       await disableManDbAutoUpdate();
-      const optionalDependencies = await retrieveInstallableOptionalDependencies([
+      const optionalDependencies = await retrieveInstallableAptPackages([
         "darcs",
         "g++-multilib",
         "gcc-multilib",
@@ -89,16 +85,22 @@ export async function installUnixSystemPackages() {
       await exec("brew", ["install", "darcs", "mercurial"]);
       break;
     }
+    default: {
+      const unreachable: never = platform;
+      throw new Error(`Unhandled platform: ${String(unreachable)}`);
+    }
   }
-}
+};
 
-export async function installMsys2Packages() {
+export const installMsys2Packages = async (
+  windowsCompiler: WindowsCompiler
+) => {
   // Install the same base packages that opam's --cygwin-internal-install
   // provides for Cygwin (see opamInitDefaults.ml required_packages_for_cygwin).
   // MSYS2 packages are installed to C:\msys64 which is outside the opam cache,
   // so they must be pre-installed. MSVC builds use cl.exe instead of GCC.
   const packages = ["make", "tar", "unzip", "rsync"];
-  if (WINDOWS_COMPILER === "mingw") {
+  if (windowsCompiler === "mingw") {
     packages.push("mingw-w64-x86_64-gcc");
   }
   await exec(path.join(MSYS2_ROOT, "usr", "bin", "pacman.exe"), [
@@ -107,13 +109,13 @@ export async function installMsys2Packages() {
     "--needed",
     ...packages,
   ]);
-}
+};
 
-export async function updateUnixPackageIndexFiles() {
+export const updateUnixPackageIndexFiles = async (platform: UnixPlatform) => {
   if (await skipPackageManagement()) {
     return;
   }
-  switch (PLATFORM) {
+  switch (platform) {
     case "linux": {
       await exec("sudo", ["apt-get", "update"]);
       break;
@@ -122,5 +124,9 @@ export async function updateUnixPackageIndexFiles() {
       await exec("brew", ["update"]);
       break;
     }
+    default: {
+      const unreachable: never = platform;
+      throw new Error(`Unhandled platform: ${String(unreachable)}`);
+    }
   }
-}
+};

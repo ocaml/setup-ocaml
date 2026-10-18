@@ -1,56 +1,57 @@
 import * as crypto from "node:crypto";
-import * as path from "node:path";
+import path from "node:path";
+
 import type { DownloadOptions } from "@actions/cache";
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
-import { backOff } from "exponential-backoff";
 import * as system from "systeminformation";
+
 import {
   ARCHITECTURE,
-  CACHE_PREFIX,
   DUNE_CACHE_ROOT,
   GITHUB_WORKSPACE,
-  OPAM_DISABLE_SANDBOXING,
-  OPAM_REPOSITORIES,
   OPAM_ROOT,
   PLATFORM,
-  WINDOWS_COMPILER,
-  WINDOWS_ENVIRONMENT,
 } from "./constants.js";
-import { latestOpamRelease } from "./opam.js";
-import { resolvedCompiler } from "./version.js";
+import type { Inputs, WindowsEnvironment } from "./inputs.js";
+import { toCygwinPath, toMsysPath } from "./paths.js";
 
-async function composeDuneCacheKeys() {
+export const DUNE_CACHE_KEY_STATE = "dune-cache-key";
+
+const composeDuneCacheKeys = (cachePrefix: string, ocamlCompiler: string) => {
   const { workflow, job, runId } = github.context;
-  const ocamlCompiler = await resolvedCompiler;
-  const plainKey = [ocamlCompiler, workflow, job].join();
+  const plainKey = [ocamlCompiler, workflow, job].join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const key = `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
+  const key = `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-${runId}`;
   const restoreKeys = [
     key,
-    `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-`,
-    `${CACHE_PREFIX}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-`,
+    `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-${hash}-`,
+    `${cachePrefix}-setup-ocaml-dune-${PLATFORM}-${ARCHITECTURE}-`,
   ];
   core.debug(`dune cache key: ${plainKey}`);
   return { key, restoreKeys };
-}
+};
 
-async function getMsvcVersion() {
+const getMsvcVersion = async () => {
   const { stdout } = await getExecOutput(
     "vswhere",
     ["-latest", "-property", "installationVersion"],
-    { silent: true },
+    { silent: true }
   );
   return stdout.trim();
-}
+};
 
-async function composeOpamCacheKeys() {
-  const { version: opamVersion } = await latestOpamRelease;
-  const sandbox = OPAM_DISABLE_SANDBOXING ? "nosandbox" : "sandbox";
-  const ocamlCompiler = await resolvedCompiler;
-  const repositoryUrls = OPAM_REPOSITORIES.map(([, value]) => value).join();
+const composeOpamCacheKeys = async (
+  inputs: Inputs,
+  opamVersion: string,
+  ocamlCompiler: string
+) => {
+  const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
+  const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst
+    .map(([, value]) => value)
+    .join(",");
   const osInfo = await system.osInfo();
   const components = [
     PLATFORM,
@@ -62,138 +63,136 @@ async function composeOpamCacheKeys() {
     sandbox,
   ];
   if (PLATFORM === "windows") {
-    components.push(WINDOWS_ENVIRONMENT);
-    components.push(WINDOWS_COMPILER);
-    if (WINDOWS_COMPILER === "msvc") {
+    components.push(inputs.windowsEnvironment, inputs.windowsCompiler);
+    if (inputs.windowsCompiler === "msvc") {
       const msvcVersion = await getMsvcVersion();
       components.push(msvcVersion);
     }
   }
-  const plainKey = components.join();
+  const plainKey = components.join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
-  const key = `${CACHE_PREFIX}-setup-ocaml-opam-${hash}`;
+  const key = `${inputs.cachePrefix}-setup-ocaml-opam-${hash}`;
   const restoreKeys = [key];
   core.debug(`opam cache key: ${plainKey}`);
   return { key, restoreKeys };
-}
+};
 
-function composeDuneCachePaths() {
-  return [DUNE_CACHE_ROOT];
-}
+const composeDuneCachePaths = () => [DUNE_CACHE_ROOT];
 
-function composeOpamCachePaths() {
+const composeOpamCachePaths = (windowsEnvironment: WindowsEnvironment) => {
   const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
   const paths = [OPAM_ROOT, opamLocalCachePath];
   if (PLATFORM === "windows") {
-    const {
-      repo: { repo },
-    } = github.context;
-    if (WINDOWS_ENVIRONMENT === "msys2") {
-      const opamMsys2LocalCachePath = path.posix.join("/d", "a", repo, repo, "_opam");
-      paths.push(opamMsys2LocalCachePath);
+    if (windowsEnvironment === "msys2") {
+      paths.push(toMsysPath(opamLocalCachePath));
     }
-    if (WINDOWS_ENVIRONMENT === "cygwin") {
-      const opamCygwinLocalCachePath = path.posix.join("/cygdrive", "d", "a", repo, repo, "_opam");
-      paths.push(opamCygwinLocalCachePath);
+    if (windowsEnvironment === "cygwin") {
+      paths.push(toCygwinPath(opamLocalCachePath));
     }
   }
   return paths;
-}
+};
 
-async function restoreCache(
+const restoreCache = async (
   key: string,
   restoreKeys: string[],
   paths: string[],
-  options?: DownloadOptions,
-) {
+  options?: DownloadOptions
+) => {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
-    return;
+    return null;
   }
   try {
-    const cacheKey = await backOff(
-      async () =>
-        await cache.restoreCache(paths, key, restoreKeys, {
-          useAzureSdk: true,
-          ...options,
-        }),
-      { numOfAttempts: 5 },
-    );
-    if (cacheKey) {
-      core.info(`Cache restored from key: ${cacheKey}`);
-    } else {
-      core.info(`Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+    const cacheKey = await cache.restoreCache(paths, key, restoreKeys, {
+      useAzureSdk: true,
+      ...options,
+    });
+    if (cacheKey === undefined || cacheKey === "") {
+      core.info(
+        `Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`
+      );
+      return null;
     }
+    core.info(`Cache restored from key: ${cacheKey}`);
     return cacheKey;
   } catch (error) {
-    if (error instanceof Error) {
-      core.info(error.message);
-    }
-    core.notice(
-      "An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.",
+    core.warning(
+      `Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`
     );
-    return;
+    return null;
   }
-}
+};
 
-async function saveCache(key: string, paths: string[]) {
+const saveCache = async (key: string, paths: string[]) => {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
     return;
   }
   try {
-    await backOff(
-      async () =>
-        await cache.saveCache(paths, key, {
-          useAzureSdk: true,
-        }),
-      { numOfAttempts: 5 },
-    );
+    await cache.saveCache(paths, key, {
+      useAzureSdk: true,
+    });
   } catch (error) {
-    if (error instanceof Error) {
-      core.info(error.message);
-    }
-    core.notice(
-      "An internal error has occurred in cache backend. Please check https://www.githubstatus.com for any ongoing issue in actions.",
+    core.warning(
+      `Failed to save cache: ${error instanceof Error ? error.message : String(error)}`
     );
   }
-}
+};
 
-export async function restoreDuneCache() {
-  return await core.group("Restoring dune cache", async () => {
-    const { key, restoreKeys } = await composeDuneCacheKeys();
+export const restoreDuneCache = async (
+  cachePrefix: string,
+  ocamlCompiler: string
+) => {
+  await core.group("Restoring dune cache", async () => {
+    const { key, restoreKeys } = composeDuneCacheKeys(
+      cachePrefix,
+      ocamlCompiler
+    );
+    core.saveState(DUNE_CACHE_KEY_STATE, key);
     const paths = composeDuneCachePaths();
-    const cacheKey = await restoreCache(key, restoreKeys, paths);
-    return cacheKey;
+    await restoreCache(key, restoreKeys, paths);
   });
-}
+};
 
-export async function restoreOpamCache() {
-  return await core.group("Restoring opam cache", async () => {
-    const { key, restoreKeys } = await composeOpamCacheKeys();
-    const paths = composeOpamCachePaths();
+export const restoreOpamCache = async (
+  inputs: Inputs,
+  opamVersion: string,
+  ocamlCompiler: string
+) =>
+  await core.group("Restoring opam cache", async () => {
+    const { key, restoreKeys } = await composeOpamCacheKeys(
+      inputs,
+      opamVersion,
+      ocamlCompiler
+    );
+    const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     return await restoreCache(key, restoreKeys, paths);
   });
-}
 
-export async function saveDuneCache() {
+export const saveDuneCache = async (key: string) => {
   await core.group("Saving dune cache", async () => {
-    const { key } = await composeDuneCacheKeys();
     const paths = composeDuneCachePaths();
     await saveCache(key, paths);
   });
-}
+};
 
-export async function saveOpamCache() {
+export const saveOpamCache = async (
+  inputs: Inputs,
+  opamVersion: string,
+  ocamlCompiler: string
+) => {
   await core.group("Saving opam cache", async () => {
-    const { key, restoreKeys } = await composeOpamCacheKeys();
-    const paths = composeOpamCachePaths();
+    const { key, restoreKeys } = await composeOpamCacheKeys(
+      inputs,
+      opamVersion,
+      ocamlCompiler
+    );
+    const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     const cacheHit = await restoreCache(key, restoreKeys, paths, {
       lookupOnly: true,
     });
-    if (cacheHit) {
-      core.info("Cache entry with the same key, version, and scope already exists");
-    } else {
+    if (cacheHit === null) {
       await exec("opam", [
         "clean",
         "--all-switches",
@@ -204,6 +203,10 @@ export async function saveOpamCache() {
         "--unused-repositories",
       ]);
       await saveCache(key, paths);
+    } else {
+      core.info(
+        "Cache entry with the same key, version, and scope already exists"
+      );
     }
   });
-}
+};

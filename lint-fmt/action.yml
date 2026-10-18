@@ -1,9 +1,6 @@
 name: Lint fmt
 description: >-
-  Check OCaml code formatting with OCamlFormat. Reads the required
-  OCamlFormat version from the .ocamlformat file, installs it, and
-  runs "dune build @fmt" to verify that all source files are
-  correctly formatted.
+  Check OCaml code formatting with OCamlFormat. Reads the required OCamlFormat version from the .ocamlformat file, installs it, and runs "dune build @fmt" to verify that all source files are correctly formatted.
 author: Sora Morimoto
 branding:
   icon: package
@@ -11,8 +8,7 @@ branding:
 inputs:
   working-directory:
     description: >-
-      The working directory for the workflow. Defaults to the root of
-      the repository.
+      The working directory for the workflow. Defaults to the root of the repository.
     required: false
     default: "."
 runs:

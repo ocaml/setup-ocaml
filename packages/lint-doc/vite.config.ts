@@ -2,16 +2,16 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   pack: {
-    entry: "src/index.ts",
     deps: {
-      alwaysBundle: [/.*/],
+      alwaysBundle: [/.*/u],
       onlyBundle: false,
       onlyImport: [],
     },
+    entry: "src/index.ts",
+    minify: true,
+    outDir: "../../lint-doc/dist",
     platform: "node",
     target: "node24",
-    outDir: "../../lint-doc/dist",
-    minify: true,
   },
   run: {
     tasks: {

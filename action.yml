@@ -7,94 +7,64 @@ branding:
 inputs:
   ocaml-compiler:
     description: >-
-      The OCaml compiler packages to initialise. Accepts a semver version
-      range (e.g. "5.5", "4.14.x") which is resolved to the latest
-      matching version from opam-repository, or a full opam package name
-      (e.g. "ocaml-variants.5.5.0+options,ocaml-option-flambda").
+      The OCaml compiler packages to initialise. Accepts a semver version range (e.g. "5.5", "4.14.x") which is resolved to the latest matching version from opam-repository, or a full opam package name (e.g. "ocaml-variants.5.5.0+options,ocaml-option-flambda").
     required: true
   opam-repositories:
     description: >-
-      A YAML mapping of opam repository name/URL pairs to use. Repositories
-      listed first take priority over later ones. The default is the
-      official opam-repository. Set this to add custom or overlay
-      repositories (e.g. "custom: https://my-repo.example.com").
+      A YAML mapping of opam repository name/URL pairs to use. Repositories listed first take priority over later ones. The default is the official opam-repository. Set this to add custom or overlay repositories (e.g. "custom: https://my-repo.example.com").
     required: false
     default: |
       default: https://opam.ocaml.org
   opam-pin:
     description: >-
-      Automatically pin local opam packages (matched by
-      "opam-local-packages") in the opam switch. Set to "false" to skip
-      pinning.
+      Automatically pin local opam packages (matched by "opam-local-packages") in the opam switch. Set to "false" to skip pinning.
     required: false
     default: "true"
   opam-local-packages:
     description: >-
-      A glob pattern matching the local .opam files to be pinned when
-      "opam-pin" is enabled. The default "*.opam" matches all .opam files
-      in the repository root.
+      A glob pattern matching the local .opam files to be pinned when "opam-pin" is enabled. The default "*.opam" matches all .opam files in the repository root.
     required: false
     default: "*.opam"
   opam-disable-sandboxing:
     description: >-
-      Disable the opam sandboxing feature. opam uses Bubblewrap on Linux
-      and sandbox-exec on macOS. This is useful for self-hosted
-      runners where the sandbox tool is not available. On Windows,
-      sandboxing is always disabled regardless of this setting.
+      Disable the opam sandboxing feature. opam uses Bubblewrap on Linux and sandbox-exec on macOS. This is useful for self-hosted runners where the sandbox tool is not available. On Windows, sandboxing is always disabled regardless of this setting.
     required: false
     default: "false"
   cache:
     description: >-
-      Cache the opam root and local switch using GitHub Actions cache.
-      Set to "false" to disable all GitHub Actions cache operations, including
-      the deprecated Dune cache. This does not affect the hosted tool cache.
+      Cache the opam root and local switch using GitHub Actions cache. Set to "false" to disable all GitHub Actions cache operations, including the deprecated Dune cache. This does not affect the hosted tool cache.
     required: false
     default: "true"
   dune-cache:
     description: >-
-      Deprecated. Enable Dune build caching via GitHub Actions cache. This has
-      no effect when "cache" is "false" and will be removed in the next major
-      release.
+      Deprecated. Enable Dune build caching via GitHub Actions cache. This has no effect when "cache" is "false" and will be removed in the next major release.
     required: false
     default: "false"
     deprecationMessage: >-
-      This input will be removed in v4. The "cache" input takes precedence:
-      "cache: false" disables Dune caching. Manage Dune caching separately
-      after removal.
+      This input will be removed in v4. The "cache" input takes precedence: "cache: false" disables Dune caching. Manage Dune caching separately after removal.
   cache-prefix:
     description: >-
-      The prefix used for all cache keys. Change this value
-      to force a cache invalidation when the cache becomes corrupted or
-      stale.
+      The prefix used for all cache keys. Change this value to force a cache invalidation when the cache becomes corrupted or stale.
     required: false
     default: v3
   windows-compiler:
     description: >-
-      The C compiler toolchain used for building on Windows.
-      Use "mingw" (default) for mingw-w64 (GCC), or "msvc" for the
-      Microsoft Visual C compiler. MSVC requires Visual Studio on the
-      runner (pre-installed on GitHub-hosted runners).
+      The C compiler toolchain used for building on Windows. Use "mingw" (default) for mingw-w64 (GCC), or "msvc" for the Microsoft Visual C compiler. MSVC requires Visual Studio on the runner (pre-installed on GitHub-hosted runners).
     required: false
     default: mingw
   windows-environment:
     description: >-
-      The Unix environment used for building on Windows.
-      Use "cygwin" (default) for opam's internal Cygwin, or "msys2" to use
-      the pre-installed MSYS2 on GitHub-hosted runners.
+      The Unix environment used for building on Windows. Use "cygwin" (default) for opam's internal Cygwin, or "msys2" to use the pre-installed MSYS2 on GitHub-hosted runners.
     required: false
     default: cygwin
   allow-prerelease-opam:
     description: >-
-      Allow the use of a pre-release version of opam. Set to "true" to opt
-      in to pre-release builds when available. Has no effect when no
-      pre-release version is available.
+      Allow the use of a pre-release version of opam. Set to "true" to opt in to pre-release builds when available. Has no effect when no pre-release version is available.
     required: false
     default: "false"
   github-token:
     description: >-
-      GitHub token used internally to query opam-repository for available
-      compiler versions. The default token is sufficient for most use
-      cases. DO NOT SET THIS unless you need to use a custom token.
+      GitHub token used internally to query opam-repository for available compiler versions. The default token is sufficient for most use cases. DO NOT SET THIS unless you need to use a custom token.
     required: false
     default: ${{ github.token }}
 runs:

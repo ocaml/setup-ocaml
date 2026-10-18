@@ -1,5 +1,7 @@
 import * as github from "@actions/github";
 import { retry } from "@octokit/plugin-retry";
-import { GITHUB_TOKEN } from "./constants.js";
 
-export const octokit = github.getOctokit(GITHUB_TOKEN, undefined, retry);
+export const createOctokit = (token: string) =>
+  github.getOctokit(token, undefined, retry);
+
+export type Octokit = ReturnType<typeof createOctokit>;

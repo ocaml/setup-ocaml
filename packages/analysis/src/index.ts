@@ -1,9 +1,11 @@
 import * as process from "node:process";
+
 import * as core from "@actions/core";
+
 import { analysis } from "./analysis.js";
 import { installDune, installOpamPackages } from "./opam.js";
 
-async function run() {
+const run = async () => {
   try {
     await installOpamPackages();
     await installDune();
@@ -15,6 +17,6 @@ async function run() {
     }
     process.exit(1);
   }
-}
+};
 
 void run();

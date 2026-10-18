@@ -1,8 +1,6 @@
 name: Lint doc
 description: >-
-  Check OCaml documentation comments by building with Odoc. Runs
-  "dune build @doc" with ODOC_WARN_ERROR=true so that any Odoc
-  warning is treated as an error.
+  Check OCaml documentation comments by building with Odoc. Runs "dune build @doc" with ODOC_WARN_ERROR=true so that any Odoc warning is treated as an error.
 author: Sora Morimoto
 branding:
   icon: package
@@ -10,8 +8,7 @@ branding:
 inputs:
   working-directory:
     description: >-
-      The working directory for the workflow. Defaults to the root of
-      the repository.
+      The working directory for the workflow. Defaults to the root of the repository.
     required: false
     default: "."
 runs:
