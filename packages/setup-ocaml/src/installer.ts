@@ -2,9 +2,11 @@ import { promises as fs } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import * as process from "node:process";
+
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as glob from "@actions/glob";
+
 import { restoreDuneCache, restoreOpamCache, saveOpamCache } from "./cache.js";
 import {
   CYGWIN_BASH_ENV,
@@ -34,7 +36,7 @@ const OPAM_SOLVER_TIMEOUT = 600;
 async function pathExists(filePath: string) {
   return await fs.access(filePath).then(
     () => true,
-    () => false,
+    () => false
   );
 }
 
@@ -58,18 +60,23 @@ function planOpamSetup({
   switchInitialized,
 }: OpamState): OpamSetupPlan {
   if (cacheRestored) {
-    return { initialiseWithFirstRepository: false, repositories: "update", createSwitch: false };
+    return {
+      initialiseWithFirstRepository: false,
+      repositories: "update",
+      createSwitch: false,
+    };
   }
   return {
     initialiseWithFirstRepository: !rootInitialized,
-    repositories: rootInitialized || switchInitialized ? "replace-all" : "add-remaining",
+    repositories:
+      rootInitialized || switchInitialized ? "replace-all" : "add-remaining",
     createSwitch: !switchInitialized,
   };
 }
 
 async function syncRepositories(
   sync: RepositorySync,
-  repositories: Inputs["opamRepositoriesLowestPriorityFirst"],
+  repositories: Inputs["opamRepositoriesLowestPriorityFirst"]
 ) {
   switch (sync) {
     case "add-remaining": {
@@ -136,7 +143,9 @@ export async function installer(inputs: Inputs) {
     : undefined;
   const [rootInitialized, switchInitialized] = await Promise.all([
     pathExists(path.join(OPAM_ROOT, "config")),
-    pathExists(path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config")),
+    pathExists(
+      path.join(GITHUB_WORKSPACE, "_opam", ".opam-switch", "switch-config")
+    ),
   ]);
   const plan = planOpamSetup({
     cacheRestored: Boolean(cacheKey),
@@ -146,14 +155,19 @@ export async function installer(inputs: Inputs) {
   await setupOpam(
     inputs,
     opamRelease,
-    plan.initialiseWithFirstRepository ? inputs.opamRepositoriesLowestPriorityFirst[0] : undefined,
+    plan.initialiseWithFirstRepository
+      ? inputs.opamRepositoriesLowestPriorityFirst[0]
+      : undefined
   );
   if (PLATFORM === "windows" && inputs.windowsEnvironment === "cygwin") {
     await fs.writeFile(CYGWIN_BASH_ENV, "set -o igncr");
     core.exportVariable("BASH_ENV", CYGWIN_BASH_ENV);
     core.addPath(CYGWIN_ROOT_BIN);
   }
-  await syncRepositories(plan.repositories, inputs.opamRepositoriesLowestPriorityFirst);
+  await syncRepositories(
+    plan.repositories,
+    inputs.opamRepositoriesLowestPriorityFirst
+  );
   if (plan.createSwitch) {
     await installOcaml(ocamlCompiler, inputs.windowsCompiler);
     if (inputs.cache) {

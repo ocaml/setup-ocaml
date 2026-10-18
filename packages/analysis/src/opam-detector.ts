@@ -1,5 +1,8 @@
 import type { Package } from "@github/dependency-submission-toolkit";
-import { BuildTarget, PackageCache } from "@github/dependency-submission-toolkit";
+import {
+  BuildTarget,
+  PackageCache,
+} from "@github/dependency-submission-toolkit";
 import { PackageURL } from "packageurl-js";
 import { z } from "zod";
 
@@ -17,7 +20,10 @@ export const OpamOutput = z.object({
 });
 type OpamOutput = z.infer<typeof OpamOutput>;
 
-function parseDependencies(cache: PackageCache, dependencies: OpamDependency[]): Package[] {
+function parseDependencies(
+  cache: PackageCache,
+  dependencies: OpamDependency[]
+): Package[] {
   const packages = dependencies.map((dependency) => {
     const purl = new PackageURL(
       "opam",
@@ -25,7 +31,7 @@ function parseDependencies(cache: PackageCache, dependencies: OpamDependency[]):
       dependency.name,
       dependency.version,
       undefined,
-      undefined,
+      undefined
     );
     if (cache.hasPackage(purl)) {
       return cache.package(purl);
@@ -40,11 +46,14 @@ export function createBuildTarget(output: OpamOutput, filePath: string) {
   const opamPackage = output.tree.at(0);
   if (!opamPackage) {
     throw new Error(
-      "No opam dependencies were found. Please ensure the opam file is valid and contains dependencies.",
+      "No opam dependencies were found. Please ensure the opam file is valid and contains dependencies."
     );
   }
   const cache = new PackageCache();
-  const topLevelDependencies = parseDependencies(cache, opamPackage.dependencies);
+  const topLevelDependencies = parseDependencies(
+    cache,
+    opamPackage.dependencies
+  );
   const buildTarget = new BuildTarget(opamPackage.name, filePath);
   for (const topLevelDependency of topLevelDependencies) {
     buildTarget.addBuildDependency(topLevelDependency);

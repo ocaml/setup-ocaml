@@ -1,6 +1,8 @@
 import * as path from "node:path";
 import * as process from "node:process";
+
 import * as core from "@actions/core";
+
 import { checkFmt } from "./lint.js";
 import { retrieveOcamlformatVersion } from "./ocamlformat.js";
 import { installFormattingDependencies } from "./opam.js";

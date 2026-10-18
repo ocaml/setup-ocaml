@@ -1,5 +1,7 @@
 import * as process from "node:process";
+
 import * as core from "@actions/core";
+
 import { analysis } from "./analysis.js";
 import { installDune, installOpamPackages } from "./opam.js";
 

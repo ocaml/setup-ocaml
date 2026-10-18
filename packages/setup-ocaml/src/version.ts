@@ -1,13 +1,19 @@
 import * as path from "node:path";
+
 import * as semver from "semver";
+
 import type { Octokit } from "./github-client.js";
 
 function isSemverValidRange(semverVersion: string) {
   return semver.validRange(semverVersion, { loose: true }) !== null;
 }
 
-function parseCompilerVersion(packagePath: string): readonly [string, string] | undefined {
-  const opamVersion = path.basename(packagePath).replace("ocaml-base-compiler.", "");
+function parseCompilerVersion(
+  packagePath: string
+): readonly [string, string] | undefined {
+  const opamVersion = path
+    .basename(packagePath)
+    .replace("ocaml-base-compiler.", "");
   const parsed = semver.parse(opamVersion.replace("~", "-"), { loose: true });
   if (parsed === null) {
     return undefined;
@@ -18,7 +24,8 @@ function parseCompilerVersion(packagePath: string): readonly [string, string] | 
         `0${parsed.minor}`
       : // ocaml-base-compiler.5.5.0, ocaml-base-compiler.4.14.2
         parsed.minor;
-  const prerelease = parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
+  const prerelease =
+    parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
   const semverVersion = `${parsed.major}.${minor}.${parsed.patch}${prerelease}`;
   return [semverVersion, opamVersion] as const;
 }
@@ -36,7 +43,7 @@ async function retrieveCompilerVersions(octokit: Octokit, repo: string) {
     packages
       .values()
       .map(({ path }) => parseCompilerVersion(path))
-      .filter((entry) => entry !== undefined),
+      .filter((entry) => entry !== undefined)
   );
 }
 
@@ -71,7 +78,10 @@ async function resolveVersion(octokit: Octokit, semverVersion: string) {
     return match;
   }
   // Old compiler releases are no longer in opam-repository itself.
-  const archivedVersions = await retrieveCompilerVersions(octokit, "opam-repository-archive");
+  const archivedVersions = await retrieveCompilerVersions(
+    octokit,
+    "opam-repository-archive"
+  );
   for (const [key, opamVersion] of archivedVersions) {
     if (!versions.has(key)) {
       versions.set(key, opamVersion);
@@ -82,7 +92,7 @@ async function resolveVersion(octokit: Octokit, semverVersion: string) {
     return archivedMatch;
   }
   throw new Error(
-    `Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository or opam-repository-archive. Please check if you specified a valid version number or version range.`,
+    `Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository or opam-repository-archive. Please check if you specified a valid version number or version range.`
   );
 }
 

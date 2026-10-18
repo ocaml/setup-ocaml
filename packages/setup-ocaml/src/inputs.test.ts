@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
+
 import { setInputs } from "../test/runner.js";
 import { readInputs } from "./inputs.js";
 
@@ -31,9 +32,11 @@ it("parses the default inputs", () => {
 
 it("orders repositories from lowest to highest priority", () => {
   setInputs({
-    "opam-repositories": "overlay: https://example.com/overlay\ndefault: https://opam.ocaml.org",
+    "opam-repositories":
+      "overlay: https://example.com/overlay\ndefault: https://opam.ocaml.org",
   });
-  expect(readInputs().opamRepositoriesLowestPriorityFirst).toMatchInlineSnapshot(`
+  expect(readInputs().opamRepositoriesLowestPriorityFirst)
+    .toMatchInlineSnapshot(`
     [
       [
         "default",

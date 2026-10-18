@@ -1,10 +1,12 @@
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
 import * as semver from "semver";
+
 import { ARCHITECTURE, MSYS2_ROOT, PLATFORM } from "./constants.js";
 import type { Octokit } from "./github-client.js";
 import type { Inputs, OpamRepository, WindowsCompiler } from "./inputs.js";
@@ -20,7 +22,8 @@ const OPAM_STABLE_VERSION_RANGE = "<2.7.0";
 const EXECUTABLE_PERMISSION = 0o755;
 
 const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
-const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
+const OPAM_DEV_PUBLIC_KEY_FINGERPRINT =
+  "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
 
 function toGpgPath(filePath: string) {
   return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
@@ -29,10 +32,13 @@ function toGpgPath(filePath: string) {
 async function verifyOpamSignature(
   binaryPath: string,
   signaturePath: string,
-  publicKeyPath: string,
+  publicKeyPath: string
 ) {
   const gpgHome = await fs.mkdtemp(path.join(os.tmpdir(), "setup-ocaml-gpg-"));
-  const gpg = PLATFORM === "windows" ? path.join(MSYS2_ROOT, "usr", "bin", "gpg.exe") : "gpg";
+  const gpg =
+    PLATFORM === "windows"
+      ? path.join(MSYS2_ROOT, "usr", "bin", "gpg.exe")
+      : "gpg";
   try {
     await exec(gpg, [
       "--batch",
@@ -53,7 +59,7 @@ async function verifyOpamSignature(
         toGpgPath(signaturePath),
         toGpgPath(binaryPath),
       ],
-      { silent: true },
+      { silent: true }
     );
     const validSignature = verification.stdout
       .split("\n")
@@ -61,10 +67,12 @@ async function verifyOpamSignature(
     const primaryKeyFingerprint = validSignature?.split(" ").at(-1);
     if (primaryKeyFingerprint !== OPAM_DEV_PUBLIC_KEY_FINGERPRINT) {
       throw new Error(
-        `The opam binary was not signed by the expected key '${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}'.`,
+        `The opam binary was not signed by the expected key '${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}'.`
       );
     }
-    core.info(`Verified opam signature with key ${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}`);
+    core.info(
+      `Verified opam signature with key ${OPAM_DEV_PUBLIC_KEY_FINGERPRINT}`
+    );
   } finally {
     await fs.rm(gpgHome, { recursive: true, force: true });
   }
@@ -78,7 +86,7 @@ interface OpamRelease {
 
 export async function findLatestOpamRelease(
   octokit: Octokit,
-  allowPrerelease: boolean,
+  allowPrerelease: boolean
 ): Promise<OpamRelease> {
   const semverRange = allowPrerelease ? "*" : OPAM_STABLE_VERSION_RANGE;
   const { data } = await octokit.rest.repos.listReleases({
@@ -90,23 +98,29 @@ export async function findLatestOpamRelease(
       semver.satisfies(release.tag_name, semverRange, {
         includePrerelease: allowPrerelease,
         loose: true,
-      }),
+      })
     )
-    .sort(({ tag_name: v1 }, { tag_name: v2 }) => semver.rcompare(v1, v2, { loose: true }));
+    .sort(({ tag_name: v1 }, { tag_name: v2 }) =>
+      semver.rcompare(v1, v2, { loose: true })
+    );
   if (releases.length === 0) {
     throw new Error(
-      "Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases.",
+      "Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases."
     );
   }
   const binarySuffix =
-    PLATFORM === "windows" ? `${ARCHITECTURE}-${PLATFORM}.exe` : `${ARCHITECTURE}-${PLATFORM}`;
+    PLATFORM === "windows"
+      ? `${ARCHITECTURE}-${PLATFORM}.exe`
+      : `${ARCHITECTURE}-${PLATFORM}`;
   for (const release of releases) {
     const asset = release.assets.find((a) => a.name.endsWith(binarySuffix));
     if (asset) {
-      const signature = release.assets.find((candidate) => candidate.name === `${asset.name}.sig`);
+      const signature = release.assets.find(
+        (candidate) => candidate.name === `${asset.name}.sig`
+      );
       if (!signature) {
         throw new Error(
-          `Failed to find the signature '${asset.name}.sig' in the opam ${release.tag_name} release. Refusing to install an unsigned opam binary.`,
+          `Failed to find the signature '${asset.name}.sig' in the opam ${release.tag_name} release. Refusing to install an unsigned opam binary.`
         );
       }
       return {
@@ -117,7 +131,7 @@ export async function findLatestOpamRelease(
     }
   }
   throw new Error(
-    `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`,
+    `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`
   );
 }
 
@@ -142,7 +156,7 @@ async function acquireOpam({
         opam,
         "opam",
         version,
-        ARCHITECTURE,
+        ARCHITECTURE
       );
       core.info(`Successfully cached opam to ${cachedPath}`);
       await fs.chmod(path.join(cachedPath, opam), EXECUTABLE_PERMISSION);
@@ -155,7 +169,10 @@ async function acquireOpam({
   });
 }
 
-async function initializeOpam(inputs: Inputs, initialRepository?: OpamRepository) {
+async function initializeOpam(
+  inputs: Inputs,
+  initialRepository?: OpamRepository
+) {
   await core.group("Initialising opam state", async () => {
     if (PLATFORM === "windows" && inputs.windowsEnvironment === "msys2") {
       await installMsys2Packages(inputs.windowsCompiler);
@@ -166,7 +183,7 @@ async function initializeOpam(inputs: Inputs, initialRepository?: OpamRepository
       } catch (error) {
         if (error instanceof Error) {
           core.notice(
-            `System package installation failed. Re-synchronizing package index files and retrying installation. Error details: ${error.message.toLocaleLowerCase()}`,
+            `System package installation failed. Re-synchronizing package index files and retrying installation. Error details: ${error.message.toLocaleLowerCase()}`
           );
         }
         await updateUnixPackageIndexFiles(PLATFORM);
@@ -199,13 +216,16 @@ async function initializeOpam(inputs: Inputs, initialRepository?: OpamRepository
 export async function setupOpam(
   inputs: Inputs,
   release: OpamRelease,
-  initialRepository?: OpamRepository,
+  initialRepository?: OpamRepository
 ) {
   await acquireOpam(release);
   await initializeOpam(inputs, initialRepository);
 }
 
-export async function installOcaml(ocamlCompiler: string, windowsCompiler: WindowsCompiler) {
+export async function installOcaml(
+  ocamlCompiler: string,
+  windowsCompiler: WindowsCompiler
+) {
   await core.group("Installing OCaml compiler", async () => {
     const packages = [ocamlCompiler];
     if (PLATFORM === "windows" && windowsCompiler === "msvc") {
@@ -239,10 +259,19 @@ export async function pin(fpaths: string[]) {
 }
 
 async function repositoryAdd(name: string, address: string) {
-  await exec("opam", ["repository", "--all-switches", "--set-default", "add", name, address]);
+  await exec("opam", [
+    "repository",
+    "--all-switches",
+    "--set-default",
+    "add",
+    name,
+    address,
+  ]);
 }
 
-export async function repositoryAddAll(repositories: readonly OpamRepository[]) {
+export async function repositoryAddAll(
+  repositories: readonly OpamRepository[]
+) {
   if (repositories.length === 0) {
     return;
   }
@@ -257,7 +286,7 @@ async function repositoryList() {
   const repositoryList = await getExecOutput(
     "opam",
     ["repository", "--all-switches", "--short", "list"],
-    { ignoreReturnCode: true, silent: true },
+    { ignoreReturnCode: true, silent: true }
   );
   if (repositoryList.exitCode === 0) {
     return repositoryList.stdout
@@ -272,7 +301,12 @@ export async function repositoryRemoveAll() {
   await core.group("Removing opam repositories", async () => {
     const repositories = await repositoryList();
     if (repositories.length > 0) {
-      await exec("opam", ["repository", "--all-switches", "remove", ...repositories]);
+      await exec("opam", [
+        "repository",
+        "--all-switches",
+        "remove",
+        ...repositories,
+      ]);
     }
   });
 }

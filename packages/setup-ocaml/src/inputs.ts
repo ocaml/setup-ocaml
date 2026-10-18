@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as yaml from "yaml";
 import { z } from "zod";
+
 import { PLATFORM } from "./constants.js";
 
 const OpamRepositories = z.record(z.string(), z.string());
@@ -29,11 +30,16 @@ export interface Inputs {
 }
 
 function parseOpamRepositories(input: string): OpamRepository[] {
-  const parsed = OpamRepositories.safeParse(yaml.parse(input, { schema: "failsafe" }));
+  const parsed = OpamRepositories.safeParse(
+    yaml.parse(input, { schema: "failsafe" })
+  );
   if (!parsed.success) {
-    throw new Error("opam-repositories input must be a YAML mapping of name: URL pairs", {
-      cause: parsed.error,
-    });
+    throw new Error(
+      "opam-repositories input must be a YAML mapping of name: URL pairs",
+      {
+        cause: parsed.error,
+      }
+    );
   }
   const entries = Object.entries(parsed.data);
   if (entries.length === 0) {
@@ -46,7 +52,7 @@ function parseWindowsEnvironment(input: string): WindowsEnvironment {
   const value = input.toLowerCase();
   if (value !== "cygwin" && value !== "msys2") {
     throw new Error(
-      `Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`,
+      `Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`
     );
   }
   return value;
@@ -55,7 +61,9 @@ function parseWindowsEnvironment(input: string): WindowsEnvironment {
 function parseWindowsCompiler(input: string): WindowsCompiler {
   const value = input.toLowerCase();
   if (value !== "mingw" && value !== "msvc") {
-    throw new Error(`Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`);
+    throw new Error(
+      `Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`
+    );
   }
   return value;
 }
@@ -63,7 +71,7 @@ function parseWindowsCompiler(input: string): WindowsCompiler {
 export function readInputs(): Inputs {
   const ocamlCompiler = core.getInput("ocaml-compiler", { required: true });
   const opamRepositoriesLowestPriorityFirst = parseOpamRepositories(
-    core.getInput("opam-repositories"),
+    core.getInput("opam-repositories")
   );
   const opamPin = core.getBooleanInput("opam-pin");
   const opamLocalPackages = core.getInput("opam-local-packages");
@@ -72,8 +80,12 @@ export function readInputs(): Inputs {
   const cache = core.getBooleanInput("cache");
   const duneCache = cache && core.getBooleanInput("dune-cache");
   const cachePrefix = core.getInput("cache-prefix");
-  const windowsEnvironment = parseWindowsEnvironment(core.getInput("windows-environment"));
-  const windowsCompiler = parseWindowsCompiler(core.getInput("windows-compiler"));
+  const windowsEnvironment = parseWindowsEnvironment(
+    core.getInput("windows-environment")
+  );
+  const windowsCompiler = parseWindowsCompiler(
+    core.getInput("windows-compiler")
+  );
   const allowPrereleaseOpam = core.getBooleanInput("allow-prerelease-opam");
   const githubToken = core.getInput("github-token");
   return {

@@ -1,5 +1,7 @@
 import * as process from "node:process";
+
 import * as core from "@actions/core";
+
 import { DUNE_CACHE_KEY_STATE, saveDuneCache } from "./cache.js";
 import { trimDuneCache } from "./dune.js";
 import { createOctokit } from "./github-client.js";

@@ -1,6 +1,7 @@
 import * as os from "node:os";
 import * as path from "node:path";
 import * as process from "node:process";
+
 import { z } from "zod";
 
 // ── Platform & Architecture ──
@@ -27,7 +28,7 @@ export const ARCHITECTURE = (() => {
     }
     default: {
       throw new Error(
-        `'${process.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`,
+        `'${process.arch}' is not supported. Supported architectures: arm, arm64, riscv64, s390x, x64`
       );
     }
   }
@@ -46,7 +47,7 @@ export const PLATFORM = (() => {
     }
     default: {
       throw new Error(
-        `'${process.platform}' is not supported. Supported platforms: darwin, linux, win32`,
+        `'${process.platform}' is not supported. Supported platforms: darwin, linux, win32`
       );
     }
   }
@@ -54,7 +55,9 @@ export const PLATFORM = (() => {
 
 export const RUNNER_ENVIRONMENT = ((): RunnerEnvironment => {
   const ImageOS = process.env.ImageOS;
-  const runnerEnvironment = RunnerEnvironment.optional().parse(process.env.RUNNER_ENVIRONMENT);
+  const runnerEnvironment = RunnerEnvironment.optional().parse(
+    process.env.RUNNER_ENVIRONMENT
+  );
   if (ImageOS) {
     return "github-hosted";
   }

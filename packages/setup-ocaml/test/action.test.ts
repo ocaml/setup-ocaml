@@ -1,7 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as process from "node:process";
+
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
+
 import { ARCHITECTURE, PLATFORM } from "../src/constants.js";
 import { readInputs } from "../src/inputs.js";
 import { installer } from "../src/installer.js";
@@ -18,13 +20,15 @@ vi.mock("@actions/cache", () => ({
     paths: string[],
     key: string,
     restoreKeys: string[],
-    options?: { lookupOnly?: boolean },
+    options?: { lookupOnly?: boolean }
   ) => {
     const hit = [key, ...restoreKeys].find((candidate) =>
-      [...recorded.cacheEntries].some((entry) => entry.startsWith(candidate)),
+      [...recorded.cacheEntries].some((entry) => entry.startsWith(candidate))
     );
     const mode = options?.lookupOnly ? "look up" : "restore";
-    recorded.transcript.push(`cache ${mode} ${key}: ${hit === undefined ? "miss" : "hit"}`);
+    recorded.transcript.push(
+      `cache ${mode} ${key}: ${hit === undefined ? "miss" : "hit"}`
+    );
     recorded.transcript.push(...paths.map((cachePath) => `  ${cachePath}`));
     return hit;
   },
@@ -36,7 +40,9 @@ vi.mock("@actions/cache", () => ({
   },
 }));
 
-vi.mock("systeminformation", () => ({ osInfo: async () => ({ release: "24.04" }) }));
+vi.mock("systeminformation", () => ({
+  osInfo: async () => ({ release: "24.04" }),
+}));
 
 const workspace = path.join(runnerRoot, "workspace");
 const home = path.join(runnerRoot, "home");
@@ -59,7 +65,12 @@ function resetRunner() {
   for (const directory of [home, workspace]) {
     fs.mkdirSync(directory, { recursive: true });
   }
-  for (const file of ["github-env", "github-path", "github-state", "github-output"]) {
+  for (const file of [
+    "github-env",
+    "github-path",
+    "github-state",
+    "github-output",
+  ]) {
     fs.writeFileSync(path.join(runnerRoot, file), "");
   }
   for (const version of ["2.6.1", "2.7.0-alpha1"]) {
@@ -74,7 +85,7 @@ function resetRunner() {
         "  echo default",
         "fi",
       ].join("\n"),
-      { mode: 0o755 },
+      { mode: 0o755 }
     );
   }
 }
@@ -86,9 +97,13 @@ async function runAction(inputs: Record<string, string> = {}) {
   try {
     await installer(readInputs());
   } catch (error) {
-    recorded.transcript.push(`error: ${error instanceof Error ? error.message : String(error)}`);
+    recorded.transcript.push(
+      `error: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
-  return normalise([...githubRequests.toSorted(), ...recorded.transcript].join("\n"));
+  return normalise(
+    [...githubRequests.toSorted(), ...recorded.transcript].join("\n")
+  );
 }
 
 function readCommandFile(name: string) {
@@ -96,8 +111,11 @@ function readCommandFile(name: string) {
   return normalise(
     text
       .replaceAll(/^(.+)<<(ghadelimiter_[\w-]+)\n([\s\S]*?)\n\2$/gm, "$1=$3")
-      .replace(/^OPAMDOWNLOADJOBS=\d+$/m, "OPAMDOWNLOADJOBS=<available parallelism>")
-      .trimEnd(),
+      .replace(
+        /^OPAMDOWNLOADJOBS=\d+$/m,
+        "OPAMDOWNLOADJOBS=<available parallelism>"
+      )
+      .trimEnd()
   );
 }
 
@@ -107,8 +125,13 @@ function givenOpamRoot() {
 }
 
 function givenLocalSwitch() {
-  fs.mkdirSync(path.join(workspace, "_opam", ".opam-switch"), { recursive: true });
-  fs.writeFileSync(path.join(workspace, "_opam", ".opam-switch", "switch-config"), "");
+  fs.mkdirSync(path.join(workspace, "_opam", ".opam-switch"), {
+    recursive: true,
+  });
+  fs.writeFileSync(
+    path.join(workspace, "_opam", ".opam-switch", "switch-config"),
+    ""
+  );
 }
 
 beforeEach(() => {
@@ -120,7 +143,9 @@ beforeEach(() => {
       const command = /^\[command\]\S*\/(\S+)(.*)$/.exec(line);
       if (command) {
         recorded.transcript.push(`${command[1]}${command[2]}`);
-      } else if (/^::(error|warning|notice)::|^::debug::(opam|dune) cache key/.test(line)) {
+      } else if (
+        /^::(error|warning|notice)::|^::debug::(opam|dune) cache key/.test(line)
+      ) {
         recorded.transcript.push(line);
       }
     }
@@ -172,7 +197,7 @@ it("sets up opam and the compiler on a fresh runner", async () => {
     CLICOLOR_FORCE=1
   `);
   expect(readCommandFile("github-path")).toMatchInlineSnapshot(
-    `<runner>/tool-cache/opam/2.6.1/<arch>`,
+    `<runner>/tool-cache/opam/2.6.1/<arch>`
   );
 });
 
@@ -193,9 +218,11 @@ it("restores the opam cache that an earlier run saved", async () => {
 });
 
 it("adds repositories from the lowest to the highest priority", async () => {
-  const opamRepositories = "overlay: https://example.com/overlay\ndefault: https://opam.ocaml.org";
-  expect(await runAction({ "opam-repositories": opamRepositories, cache: "false" }))
-    .toMatchInlineSnapshot(`
+  const opamRepositories =
+    "overlay: https://example.com/overlay\ndefault: https://opam.ocaml.org";
+  expect(
+    await runAction({ "opam-repositories": opamRepositories, cache: "false" })
+  ).toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org
@@ -243,7 +270,8 @@ it("keeps an existing opam root and local switch", async () => {
 });
 
 it("disables sandboxing on request", async () => {
-  expect(await runAction({ "opam-disable-sandboxing": "true" })).toMatchInlineSnapshot(`
+  expect(await runAction({ "opam-disable-sandboxing": "true" }))
+    .toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     ::debug::opam cache key: <platform>,24.04,<arch>,2.6.1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,nosandbox
@@ -265,7 +293,8 @@ it("disables sandboxing on request", async () => {
 });
 
 it("installs a pre-release opam on request", async () => {
-  expect(await runAction({ "allow-prerelease-opam": "true" })).toMatchInlineSnapshot(`
+  expect(await runAction({ "allow-prerelease-opam": "true" }))
+    .toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     ::debug::opam cache key: <platform>,24.04,<arch>,2.7.0-alpha1,ocaml-base-compiler.5.5.0,https://opam.ocaml.org,sandbox
@@ -298,9 +327,14 @@ it("resolves the ocaml-compiler input to a compiler package", async () => {
     "ocaml-variants.5.5.0+options,ocaml-option-flambda",
     "6",
   ]) {
-    const output = await runAction({ "ocaml-compiler": ocamlCompiler, cache: "false" });
+    const output = await runAction({
+      "ocaml-compiler": ocamlCompiler,
+      cache: "false",
+    });
     const result =
-      /--packages=(\S+)/.exec(output)?.[1] ?? /^error: (.*)$/m.exec(output)?.[1] ?? output;
+      /--packages=(\S+)/.exec(output)?.[1] ??
+      /^error: (.*)$/m.exec(output)?.[1] ??
+      output;
     lines.push(ocamlCompiler, `  ${result}`);
     if (output.includes("opam-repository-archive")) {
       lines.push("  (looked up in opam-repository-archive)");
@@ -354,7 +388,7 @@ it("restores the Dune cache and records its key for the post step", async () => 
     opam config report
   `);
   expect(readCommandFile("github-state")).toMatchInlineSnapshot(
-    `dune-cache-key=v3-setup-ocaml-dune-<platform>-<arch>-<sha256>-123`,
+    `dune-cache-key=v3-setup-ocaml-dune-<platform>-<arch>-<sha256>-123`
   );
 });
 
@@ -362,8 +396,12 @@ it("pins the local opam packages", async () => {
   for (const name of ["foo.opam", "bar.opam"]) {
     fs.writeFileSync(path.join(workspace, name), "");
   }
-  expect(await runAction({ "opam-local-packages": path.join(workspace, "*.opam"), cache: "false" }))
-    .toMatchInlineSnapshot(`
+  expect(
+    await runAction({
+      "opam-local-packages": path.join(workspace, "*.opam"),
+      cache: "false",
+    })
+  ).toMatchInlineSnapshot(`
     GET /repos/ocaml/opam-repository/contents/packages/ocaml-base-compiler
     GET /repos/ocaml/opam/releases
     opam init --auto-setup --bare --enable-shell-hook default https://opam.ocaml.org

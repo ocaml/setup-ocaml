@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
+
 import type { Octokit } from "./github-client.js";
 
 const DUNE_CACHE_TOTAL_SIZE_MB = 5000;
@@ -25,6 +26,13 @@ export async function trimDuneCache(octokit: Octokit) {
       run_id,
     });
     const cacheSize = Math.floor(DUNE_CACHE_TOTAL_SIZE_MB / totalCount);
-    await exec("opam", ["exec", "--", "dune", "cache", "trim", `--size=${cacheSize}MB`]);
+    await exec("opam", [
+      "exec",
+      "--",
+      "dune",
+      "cache",
+      "trim",
+      `--size=${cacheSize}MB`,
+    ]);
   });
 }

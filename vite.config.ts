@@ -1,3 +1,4 @@
+import ultracite from "ultracite/oxfmt";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
@@ -8,7 +9,5 @@ export default defineConfig({
       typeCheck: true,
     },
   },
-  fmt: {
-    ignorePatterns: ["**/dist/**"],
-  },
+  fmt: ultracite,
 });

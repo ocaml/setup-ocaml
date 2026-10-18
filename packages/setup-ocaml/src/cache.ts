@@ -1,11 +1,13 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
+
 import type { DownloadOptions } from "@actions/cache";
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
 import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import * as system from "systeminformation";
+
 import {
   ARCHITECTURE,
   DUNE_CACHE_ROOT,
@@ -36,12 +38,16 @@ async function getMsvcVersion() {
   const { stdout } = await getExecOutput(
     "vswhere",
     ["-latest", "-property", "installationVersion"],
-    { silent: true },
+    { silent: true }
   );
   return stdout.trim();
 }
 
-async function composeOpamCacheKeys(inputs: Inputs, opamVersion: string, ocamlCompiler: string) {
+async function composeOpamCacheKeys(
+  inputs: Inputs,
+  opamVersion: string,
+  ocamlCompiler: string
+) {
   const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
   const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst
     .map(([, value]) => value)
@@ -94,7 +100,7 @@ async function restoreCache(
   key: string,
   restoreKeys: string[],
   paths: string[],
-  options?: DownloadOptions,
+  options?: DownloadOptions
 ) {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
@@ -108,12 +114,14 @@ async function restoreCache(
     if (cacheKey) {
       core.info(`Cache restored from key: ${cacheKey}`);
     } else {
-      core.info(`Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`);
+      core.info(
+        `Cache is not found for input keys: ${[key, ...restoreKeys].join(", ")}`
+      );
     }
     return cacheKey;
   } catch (error) {
     core.warning(
-      `Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`
     );
     return;
   }
@@ -129,22 +137,38 @@ async function saveCache(key: string, paths: string[]) {
       useAzureSdk: true,
     });
   } catch (error) {
-    core.warning(`Failed to save cache: ${error instanceof Error ? error.message : String(error)}`);
+    core.warning(
+      `Failed to save cache: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
-export async function restoreDuneCache(cachePrefix: string, ocamlCompiler: string) {
+export async function restoreDuneCache(
+  cachePrefix: string,
+  ocamlCompiler: string
+) {
   await core.group("Restoring dune cache", async () => {
-    const { key, restoreKeys } = composeDuneCacheKeys(cachePrefix, ocamlCompiler);
+    const { key, restoreKeys } = composeDuneCacheKeys(
+      cachePrefix,
+      ocamlCompiler
+    );
     core.saveState(DUNE_CACHE_KEY_STATE, key);
     const paths = composeDuneCachePaths();
     await restoreCache(key, restoreKeys, paths);
   });
 }
 
-export async function restoreOpamCache(inputs: Inputs, opamVersion: string, ocamlCompiler: string) {
+export async function restoreOpamCache(
+  inputs: Inputs,
+  opamVersion: string,
+  ocamlCompiler: string
+) {
   return await core.group("Restoring opam cache", async () => {
-    const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
+    const { key, restoreKeys } = await composeOpamCacheKeys(
+      inputs,
+      opamVersion,
+      ocamlCompiler
+    );
     const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     return await restoreCache(key, restoreKeys, paths);
   });
@@ -157,15 +181,25 @@ export async function saveDuneCache(key: string) {
   });
 }
 
-export async function saveOpamCache(inputs: Inputs, opamVersion: string, ocamlCompiler: string) {
+export async function saveOpamCache(
+  inputs: Inputs,
+  opamVersion: string,
+  ocamlCompiler: string
+) {
   await core.group("Saving opam cache", async () => {
-    const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
+    const { key, restoreKeys } = await composeOpamCacheKeys(
+      inputs,
+      opamVersion,
+      ocamlCompiler
+    );
     const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     const cacheHit = await restoreCache(key, restoreKeys, paths, {
       lookupOnly: true,
     });
     if (cacheHit) {
-      core.info("Cache entry with the same key, version, and scope already exists");
+      core.info(
+        "Cache entry with the same key, version, and scope already exists"
+      );
     } else {
       await exec("opam", [
         "clean",

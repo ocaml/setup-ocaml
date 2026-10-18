@@ -1,4 +1,5 @@
 import { expect, it } from "vite-plus/test";
+
 import { createBuildTarget, OpamOutput } from "./opam-detector.js";
 
 it("lists the dependencies of an opam package by package URL", () => {
@@ -12,7 +13,13 @@ it("lists the dependencies of an opam package by package URL", () => {
           {
             name: "ocaml",
             version: "5.5.0",
-            dependencies: [{ name: "ocaml-base-compiler", version: "5.5.0", dependencies: [] }],
+            dependencies: [
+              {
+                name: "ocaml-base-compiler",
+                version: "5.5.0",
+                dependencies: [],
+              },
+            ],
           },
         ],
       },

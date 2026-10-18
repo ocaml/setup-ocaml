@@ -1,4 +1,5 @@
 import { expect, it } from "vite-plus/test";
+
 import { toCygwinPath, toMsysPath } from "./paths.js";
 
 it("converts Windows paths for MSYS2 and Cygwin", () => {
@@ -12,7 +13,7 @@ it("converts Windows paths for MSYS2 and Cygwin", () => {
         windowsPath,
         `  msys2:  ${toMsysPath(windowsPath)}`,
         `  cygwin: ${toCygwinPath(windowsPath)}`,
-      ].join("\n"),
+      ].join("\n")
     )
     .join("\n");
   expect(output).toMatchInlineSnapshot(`

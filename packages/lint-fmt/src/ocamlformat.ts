@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import * as process from "node:process";
+
 import * as core from "@actions/core";
 
 function parseKeyValue(line: string): [string, string] {
@@ -20,7 +21,7 @@ async function parse() {
     str
       .split(/\r?\n|\r/)
       .values()
-      .map(parseKeyValue),
+      .map(parseKeyValue)
   );
 }
 
@@ -35,7 +36,7 @@ export async function retrieveOcamlformatVersion() {
     return version;
   }
   core.warning(
-    "No ocamlformat version found in .ocamlformat file. It's recommended to specify the version in your .ocamlformat file for better consistency.",
+    "No ocamlformat version found in .ocamlformat file. It's recommended to specify the version in your .ocamlformat file for better consistency."
   );
   return;
 }
