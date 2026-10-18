@@ -25,7 +25,7 @@ const actionInputDefaults = Object.entries(
   ).inputs
 ).map(([name, input]) => [name, input.default ?? ""] as const);
 
-export function setInputs(overrides: Record<string, string> = {}) {
+export const setInputs = (overrides: Record<string, string> = {}) => {
   const inputs = {
     ...Object.fromEntries(actionInputDefaults),
     "github-token": "token",
@@ -35,7 +35,7 @@ export function setInputs(overrides: Record<string, string> = {}) {
   for (const [name, value] of Object.entries(inputs)) {
     vi.stubEnv(`INPUT_${name.toUpperCase()}`, value);
   }
-}
+};
 
 const asset = (name: string) => ({
   browser_download_url: `http://127.0.0.1:1/${name}`,

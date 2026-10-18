@@ -25,15 +25,15 @@ const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT =
   "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
 
-function toGpgPath(filePath: string) {
+const toGpgPath = (filePath: string) => {
   return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
-}
+};
 
-async function verifyOpamSignature(
+const verifyOpamSignature = async (
   binaryPath: string,
   signaturePath: string,
   publicKeyPath: string
-) {
+) => {
   const gpgHome = await fs.mkdtemp(path.join(os.tmpdir(), "setup-ocaml-gpg-"));
   const gpg =
     PLATFORM === "windows"
@@ -76,7 +76,7 @@ async function verifyOpamSignature(
   } finally {
     await fs.rm(gpgHome, { force: true, recursive: true });
   }
-}
+};
 
 interface OpamRelease {
   readonly version: string;
@@ -84,10 +84,10 @@ interface OpamRelease {
   readonly signatureBrowserDownloadUrl: string;
 }
 
-export async function findLatestOpamRelease(
+export const findLatestOpamRelease = async (
   octokit: Octokit,
   allowPrerelease: boolean
-): Promise<OpamRelease> {
+): Promise<OpamRelease> => {
   const semverRange = allowPrerelease ? "*" : OPAM_STABLE_VERSION_RANGE;
   const { data } = await octokit.rest.repos.listReleases({
     owner: "ocaml",
@@ -133,13 +133,13 @@ export async function findLatestOpamRelease(
   throw new Error(
     `Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`
   );
-}
+};
 
-async function acquireOpam({
+const acquireOpam = async ({
   version,
   browserDownloadUrl,
   signatureBrowserDownloadUrl,
-}: OpamRelease) {
+}: OpamRelease) => {
   await core.group("Installing opam", async () => {
     const cachedPath = toolCache.find("opam", version, ARCHITECTURE);
     const opam = PLATFORM === "windows" ? "opam.exe" : "opam";
@@ -167,12 +167,12 @@ async function acquireOpam({
       core.info("Added cached opam to the path");
     }
   });
-}
+};
 
-async function initializeOpam(
+const initializeOpam = async (
   inputs: Inputs,
   initialRepository?: OpamRepository
-) {
+) => {
   await core.group("Initialising opam state", async () => {
     if (PLATFORM === "windows" && inputs.windowsEnvironment === "msys2") {
       await installMsys2Packages(inputs.windowsCompiler);
@@ -211,21 +211,21 @@ async function initializeOpam(
       ...(initialRepository ?? []),
     ]);
   });
-}
+};
 
-export async function setupOpam(
+export const setupOpam = async (
   inputs: Inputs,
   release: OpamRelease,
   initialRepository?: OpamRepository
-) {
+) => {
   await acquireOpam(release);
   await initializeOpam(inputs, initialRepository);
-}
+};
 
-export async function installOcaml(
+export const installOcaml = async (
   ocamlCompiler: string,
   windowsCompiler: WindowsCompiler
-) {
+) => {
   await core.group("Installing OCaml compiler", async () => {
     const packages = [ocamlCompiler];
     if (PLATFORM === "windows" && windowsCompiler === "msvc") {
@@ -239,9 +239,9 @@ export async function installOcaml(
       ".",
     ]);
   });
-}
+};
 
-export async function pin(fpaths: string[]) {
+export const pin = async (fpaths: string[]) => {
   if (fpaths.length === 0) {
     return;
   }
@@ -256,9 +256,9 @@ export async function pin(fpaths: string[]) {
       });
     }
   });
-}
+};
 
-async function repositoryAdd(name: string, address: string) {
+const repositoryAdd = async (name: string, address: string) => {
   await exec("opam", [
     "repository",
     "--all-switches",
@@ -267,11 +267,11 @@ async function repositoryAdd(name: string, address: string) {
     name,
     address,
   ]);
-}
+};
 
-export async function repositoryAddAll(
+export const repositoryAddAll = async (
   repositories: readonly OpamRepository[]
-) {
+) => {
   if (repositories.length === 0) {
     return;
   }
@@ -280,9 +280,9 @@ export async function repositoryAddAll(
       await repositoryAdd(name, address);
     }
   });
-}
+};
 
-async function repositoryList() {
+const repositoryList = async () => {
   const repositoryList = await getExecOutput(
     "opam",
     ["repository", "--all-switches", "--short", "list"],
@@ -295,9 +295,9 @@ async function repositoryList() {
       .filter((repository) => repository.length > 0);
   }
   return [];
-}
+};
 
-export async function repositoryRemoveAll() {
+export const repositoryRemoveAll = async () => {
   await core.group("Removing opam repositories", async () => {
     const repositories = await repositoryList();
     if (repositories.length > 0) {
@@ -309,10 +309,10 @@ export async function repositoryRemoveAll() {
       ]);
     }
   });
-}
+};
 
-export async function update() {
+export const update = async () => {
   await core.group("Updating opam repositories", async () => {
     await exec("opam", ["update"]);
   });
-}
+};

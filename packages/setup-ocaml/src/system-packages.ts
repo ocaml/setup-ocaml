@@ -10,7 +10,7 @@ import type { WindowsCompiler } from "./inputs.js";
 
 type UnixPlatform = Exclude<typeof PLATFORM, "windows">;
 
-async function retrieveInstallableAptPackages(packages: string[]) {
+const retrieveInstallableAptPackages = async (packages: string[]) => {
   const output = await getExecOutput("apt-cache", [
     "show",
     "--no-all-versions",
@@ -23,9 +23,9 @@ async function retrieveInstallableAptPackages(packages: string[]) {
       .map((line) => line.slice("Package: ".length))
   );
   return packages.filter((packageName) => installablePackages.has(packageName));
-}
+};
 
-async function skipPackageManagement() {
+const skipPackageManagement = async () => {
   // Skip package management if running in a self-hosted environment or in a
   // github-hosted Docker container.
   let isContainerRunner = false;
@@ -36,9 +36,9 @@ async function skipPackageManagement() {
     isContainerRunner = false;
   }
   return RUNNER_ENVIRONMENT === "self-hosted" || isContainerRunner;
-}
+};
 
-async function disableManDbAutoUpdate() {
+const disableManDbAutoUpdate = async () => {
   try {
     await exec("sudo", ["debconf-communicate"], {
       input: Buffer.from("set man-db/auto-update false"),
@@ -55,9 +55,9 @@ async function disableManDbAutoUpdate() {
       core.info(error.message);
     }
   }
-}
+};
 
-export async function installUnixSystemPackages(platform: UnixPlatform) {
+export const installUnixSystemPackages = async (platform: UnixPlatform) => {
   if (await skipPackageManagement()) {
     return;
   }
@@ -90,9 +90,11 @@ export async function installUnixSystemPackages(platform: UnixPlatform) {
       throw new Error(`Unhandled platform: ${String(unreachable)}`);
     }
   }
-}
+};
 
-export async function installMsys2Packages(windowsCompiler: WindowsCompiler) {
+export const installMsys2Packages = async (
+  windowsCompiler: WindowsCompiler
+) => {
   // Install the same base packages that opam's --cygwin-internal-install
   // provides for Cygwin (see opamInitDefaults.ml required_packages_for_cygwin).
   // MSYS2 packages are installed to C:\msys64 which is outside the opam cache,
@@ -107,9 +109,9 @@ export async function installMsys2Packages(windowsCompiler: WindowsCompiler) {
     "--needed",
     ...packages,
   ]);
-}
+};
 
-export async function updateUnixPackageIndexFiles(platform: UnixPlatform) {
+export const updateUnixPackageIndexFiles = async (platform: UnixPlatform) => {
   if (await skipPackageManagement()) {
     return;
   }
@@ -127,4 +129,4 @@ export async function updateUnixPackageIndexFiles(platform: UnixPlatform) {
       throw new Error(`Unhandled platform: ${String(unreachable)}`);
     }
   }
-}
+};

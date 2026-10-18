@@ -20,7 +20,7 @@ import { toCygwinPath, toMsysPath } from "./paths.js";
 
 export const DUNE_CACHE_KEY_STATE = "dune-cache-key";
 
-function composeDuneCacheKeys(cachePrefix: string, ocamlCompiler: string) {
+const composeDuneCacheKeys = (cachePrefix: string, ocamlCompiler: string) => {
   const { workflow, job, runId } = github.context;
   const plainKey = [ocamlCompiler, workflow, job].join(",");
   const hash = crypto.createHash("sha256").update(plainKey).digest("hex");
@@ -32,22 +32,22 @@ function composeDuneCacheKeys(cachePrefix: string, ocamlCompiler: string) {
   ];
   core.debug(`dune cache key: ${plainKey}`);
   return { key, restoreKeys };
-}
+};
 
-async function getMsvcVersion() {
+const getMsvcVersion = async () => {
   const { stdout } = await getExecOutput(
     "vswhere",
     ["-latest", "-property", "installationVersion"],
     { silent: true }
   );
   return stdout.trim();
-}
+};
 
-async function composeOpamCacheKeys(
+const composeOpamCacheKeys = async (
   inputs: Inputs,
   opamVersion: string,
   ocamlCompiler: string
-) {
+) => {
   const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
   const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst
     .map(([, value]) => value)
@@ -75,13 +75,13 @@ async function composeOpamCacheKeys(
   const restoreKeys = [key];
   core.debug(`opam cache key: ${plainKey}`);
   return { key, restoreKeys };
-}
+};
 
-function composeDuneCachePaths() {
+const composeDuneCachePaths = () => {
   return [DUNE_CACHE_ROOT];
-}
+};
 
-function composeOpamCachePaths(windowsEnvironment: WindowsEnvironment) {
+const composeOpamCachePaths = (windowsEnvironment: WindowsEnvironment) => {
   const opamLocalCachePath = path.join(GITHUB_WORKSPACE, "_opam");
   const paths = [OPAM_ROOT, opamLocalCachePath];
   if (PLATFORM === "windows") {
@@ -93,14 +93,14 @@ function composeOpamCachePaths(windowsEnvironment: WindowsEnvironment) {
     }
   }
   return paths;
-}
+};
 
-async function restoreCache(
+const restoreCache = async (
   key: string,
   restoreKeys: string[],
   paths: string[],
   options?: DownloadOptions
-) {
+) => {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
     return;
@@ -124,9 +124,9 @@ async function restoreCache(
     );
     return;
   }
-}
+};
 
-async function saveCache(key: string, paths: string[]) {
+const saveCache = async (key: string, paths: string[]) => {
   if (!cache.isFeatureAvailable()) {
     core.info("Actions cache service feature is unavailable");
     return;
@@ -140,12 +140,12 @@ async function saveCache(key: string, paths: string[]) {
       `Failed to save cache: ${error instanceof Error ? error.message : String(error)}`
     );
   }
-}
+};
 
-export async function restoreDuneCache(
+export const restoreDuneCache = async (
   cachePrefix: string,
   ocamlCompiler: string
-) {
+) => {
   await core.group("Restoring dune cache", async () => {
     const { key, restoreKeys } = composeDuneCacheKeys(
       cachePrefix,
@@ -155,13 +155,13 @@ export async function restoreDuneCache(
     const paths = composeDuneCachePaths();
     await restoreCache(key, restoreKeys, paths);
   });
-}
+};
 
-export async function restoreOpamCache(
+export const restoreOpamCache = async (
   inputs: Inputs,
   opamVersion: string,
   ocamlCompiler: string
-) {
+) => {
   return await core.group("Restoring opam cache", async () => {
     const { key, restoreKeys } = await composeOpamCacheKeys(
       inputs,
@@ -171,20 +171,20 @@ export async function restoreOpamCache(
     const paths = composeOpamCachePaths(inputs.windowsEnvironment);
     return await restoreCache(key, restoreKeys, paths);
   });
-}
+};
 
-export async function saveDuneCache(key: string) {
+export const saveDuneCache = async (key: string) => {
   await core.group("Saving dune cache", async () => {
     const paths = composeDuneCachePaths();
     await saveCache(key, paths);
   });
-}
+};
 
-export async function saveOpamCache(
+export const saveOpamCache = async (
   inputs: Inputs,
   opamVersion: string,
   ocamlCompiler: string
-) {
+) => {
   await core.group("Saving opam cache", async () => {
     const { key, restoreKeys } = await composeOpamCacheKeys(
       inputs,
@@ -212,4 +212,4 @@ export async function saveOpamCache(
       await saveCache(key, paths);
     }
   });
-}
+};

@@ -43,16 +43,16 @@ const toolCache = path.join(runnerRoot, "tool-cache");
 
 let savedEnvironment: NodeJS.ProcessEnv = {};
 
-function normalise(text: string) {
+const normalise = (text: string) => {
   return text
     .replaceAll(runnerRoot, "<runner>")
     .replaceAll(new RegExp(`\\b${PLATFORM}\\b`, "g"), "<platform>")
     .replaceAll(new RegExp(`\\b${ARCHITECTURE}\\b`, "g"), "<arch>")
     .replaceAll(/\b[0-9a-f]{64}\b/g, "<sha256>")
     .replaceAll(/(?<=opam cache key: <platform>,)[^,]+/g, "<os-release>");
-}
+};
 
-function resetRunner() {
+const resetRunner = () => {
   for (const entry of fs.readdirSync(runnerRoot)) {
     fs.rmSync(path.join(runnerRoot, entry), { force: true, recursive: true });
   }
@@ -82,9 +82,9 @@ function resetRunner() {
       { mode: 0o755 }
     );
   }
-}
+};
 
-async function runAction(inputs: Record<string, string> = {}) {
+const runAction = async (inputs: Record<string, string> = {}) => {
   setInputs(inputs);
   githubRequests.length = 0;
   recorded.transcript.length = 0;
@@ -98,9 +98,9 @@ async function runAction(inputs: Record<string, string> = {}) {
   return normalise(
     [...githubRequests.toSorted(), ...recorded.transcript].join("\n")
   );
-}
+};
 
-function readCommandFile(name: string) {
+const readCommandFile = (name: string) => {
   const text = fs.readFileSync(path.join(runnerRoot, name), "utf-8");
   return normalise(
     text
@@ -111,14 +111,14 @@ function readCommandFile(name: string) {
       )
       .trimEnd()
   );
-}
+};
 
-function givenOpamRoot() {
+const givenOpamRoot = () => {
   fs.mkdirSync(path.join(home, ".opam"), { recursive: true });
   fs.writeFileSync(path.join(home, ".opam", "config"), "");
-}
+};
 
-function givenLocalSwitch() {
+const givenLocalSwitch = () => {
   fs.mkdirSync(path.join(workspace, "_opam", ".opam-switch"), {
     recursive: true,
   });
@@ -126,7 +126,7 @@ function givenLocalSwitch() {
     path.join(workspace, "_opam", ".opam-switch", "switch-config"),
     ""
   );
-}
+};
 
 beforeEach(() => {
   savedEnvironment = { ...process.env };

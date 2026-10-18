@@ -29,7 +29,7 @@ export interface Inputs {
   readonly githubToken: string;
 }
 
-function parseOpamRepositories(input: string): OpamRepository[] {
+const parseOpamRepositories = (input: string): OpamRepository[] => {
   const parsed = OpamRepositories.safeParse(
     yaml.parse(input, { schema: "failsafe" })
   );
@@ -46,9 +46,9 @@ function parseOpamRepositories(input: string): OpamRepository[] {
     throw new Error("opam-repositories input must not be empty");
   }
   return entries.reverse();
-}
+};
 
-function parseWindowsEnvironment(input: string): WindowsEnvironment {
+const parseWindowsEnvironment = (input: string): WindowsEnvironment => {
   const value = input.toLowerCase();
   if (value !== "cygwin" && value !== "msys2") {
     throw new Error(
@@ -56,9 +56,9 @@ function parseWindowsEnvironment(input: string): WindowsEnvironment {
     );
   }
   return value;
-}
+};
 
-function parseWindowsCompiler(input: string): WindowsCompiler {
+const parseWindowsCompiler = (input: string): WindowsCompiler => {
   const value = input.toLowerCase();
   if (value !== "mingw" && value !== "msvc") {
     throw new Error(
@@ -66,9 +66,9 @@ function parseWindowsCompiler(input: string): WindowsCompiler {
     );
   }
   return value;
-}
+};
 
-export function readInputs(): Inputs {
+export const readInputs = (): Inputs => {
   const ocamlCompiler = core.getInput("ocaml-compiler", { required: true });
   const opamRepositoriesLowestPriorityFirst = parseOpamRepositories(
     core.getInput("opam-repositories")
@@ -102,4 +102,4 @@ export function readInputs(): Inputs {
     windowsCompiler,
     windowsEnvironment,
   };
-}
+};

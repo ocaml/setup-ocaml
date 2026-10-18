@@ -1,9 +1,9 @@
 import { exec } from "@actions/exec";
 
-export async function opamLint() {
+export const opamLint = async () => {
   await exec("opam", ["lint"]);
-}
+};
 
-export async function opamDuneLint() {
+export const opamDuneLint = async () => {
   await exec("opam", ["exec", "--", "opam-dune-lint"]);
-}
+};

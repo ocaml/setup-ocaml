@@ -5,7 +5,7 @@ import * as core from "@actions/core";
 import { opamDuneLint, opamLint } from "./lint.js";
 import { installOpamDuneLint, installOpamPackages } from "./opam.js";
 
-async function run() {
+const run = async () => {
   try {
     await installOpamPackages();
     await installOpamDuneLint();
@@ -18,6 +18,6 @@ async function run() {
     }
     process.exit(1);
   }
-}
+};
 
 void run();

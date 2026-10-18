@@ -5,7 +5,7 @@ import * as core from "@actions/core";
 import { readInputs } from "./inputs.js";
 import { installer } from "./installer.js";
 
-async function run() {
+const run = async () => {
   try {
     const inputs = readInputs();
     await installer(inputs);
@@ -16,6 +16,6 @@ async function run() {
     }
     process.exit(1);
   }
-}
+};
 
 void run();

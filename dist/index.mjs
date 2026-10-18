@@ -6755,24 +6755,24 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 var import_dist = /* @__PURE__ */ __toESM(require_dist(), 1);
 const OpamRepositories = record(string(), string());
 const SANDBOXING_SUPPORTED = PLATFORM !== "windows";
-function parseOpamRepositories(input) {
+const parseOpamRepositories = (input) => {
 	const parsed = OpamRepositories.safeParse(import_dist.parse(input, { schema: "failsafe" }));
 	if (!parsed.success) throw new Error("opam-repositories input must be a YAML mapping of name: URL pairs", { cause: parsed.error });
 	const entries = Object.entries(parsed.data);
 	if (entries.length === 0) throw new Error("opam-repositories input must not be empty");
 	return entries.reverse();
-}
-function parseWindowsEnvironment(input) {
+};
+const parseWindowsEnvironment = (input) => {
 	const value = input.toLowerCase();
 	if (value !== "cygwin" && value !== "msys2") throw new Error(`Invalid windows-environment value '${value}'. Supported values: cygwin, msys2`);
 	return value;
-}
-function parseWindowsCompiler(input) {
+};
+const parseWindowsCompiler = (input) => {
 	const value = input.toLowerCase();
 	if (value !== "mingw" && value !== "msvc") throw new Error(`Invalid windows-compiler value '${value}'. Supported values: mingw, msvc`);
 	return value;
-}
-function readInputs() {
+};
+const readInputs = () => {
 	const ocamlCompiler = getInput("ocaml-compiler", { required: true });
 	const opamRepositoriesLowestPriorityFirst = parseOpamRepositories(getInput("opam-repositories"));
 	const opamPin = getBooleanInput("opam-pin");
@@ -6797,7 +6797,7 @@ function readInputs() {
 		windowsCompiler,
 		windowsEnvironment
 	};
-}
+};
 
 //#endregion
 //#region node_modules/@actions/tool-cache/lib/manifest.js
@@ -7146,7 +7146,7 @@ function _getGlobal(key, defaultValue) {
 
 //#endregion
 //#region src/system-packages.ts
-async function retrieveInstallableAptPackages(packages) {
+const retrieveInstallableAptPackages = async (packages) => {
 	const output = await getExecOutput("apt-cache", [
 		"show",
 		"--no-all-versions",
@@ -7154,8 +7154,8 @@ async function retrieveInstallableAptPackages(packages) {
 	]);
 	const installablePackages = new Set(output.stdout.split("\n").filter((line) => line.startsWith("Package: ")).map((line) => line.slice(9)));
 	return packages.filter((packageName) => installablePackages.has(packageName));
-}
-async function skipPackageManagement() {
+};
+const skipPackageManagement = async () => {
 	let isContainerRunner = false;
 	try {
 		await fs$1.access("/.dockerenv", fs$1.constants.R_OK);
@@ -7164,8 +7164,8 @@ async function skipPackageManagement() {
 		isContainerRunner = false;
 	}
 	return RUNNER_ENVIRONMENT === "self-hosted" || isContainerRunner;
-}
-async function disableManDbAutoUpdate() {
+};
+const disableManDbAutoUpdate = async () => {
 	try {
 		await exec("sudo", ["debconf-communicate"], { input: Buffer.from("set man-db/auto-update false") });
 	} catch (error) {
@@ -7176,8 +7176,8 @@ async function disableManDbAutoUpdate() {
 	} catch (error) {
 		if (error instanceof Error) info(error.message);
 	}
-}
-async function installUnixSystemPackages(platform) {
+};
+const installUnixSystemPackages = async (platform) => {
 	if (await skipPackageManagement()) return;
 	switch (platform) {
 		case "linux": {
@@ -7208,8 +7208,8 @@ async function installUnixSystemPackages(platform) {
 			break;
 		default: throw new Error(`Unhandled platform: ${String(platform)}`);
 	}
-}
-async function installMsys2Packages(windowsCompiler) {
+};
+const installMsys2Packages = async (windowsCompiler) => {
 	const packages = [
 		"make",
 		"tar",
@@ -7223,8 +7223,8 @@ async function installMsys2Packages(windowsCompiler) {
 		"--needed",
 		...packages
 	]);
-}
-async function updateUnixPackageIndexFiles(platform) {
+};
+const updateUnixPackageIndexFiles = async (platform) => {
 	if (await skipPackageManagement()) return;
 	switch (platform) {
 		case "linux":
@@ -7235,7 +7235,7 @@ async function updateUnixPackageIndexFiles(platform) {
 			break;
 		default: throw new Error(`Unhandled platform: ${String(platform)}`);
 	}
-}
+};
 
 //#endregion
 //#region src/opam.ts
@@ -7243,10 +7243,10 @@ const OPAM_STABLE_VERSION_RANGE = "<2.7.0";
 const EXECUTABLE_PERMISSION = 493;
 const OPAM_DEV_PUBLIC_KEY_URL = "https://opam.ocaml.org/opam-dev-pubkey.pgp";
 const OPAM_DEV_PUBLIC_KEY_FINGERPRINT = "92C526AE50DF39470EB2911BED4CF1CA67CBAA92";
-function toGpgPath(filePath) {
+const toGpgPath = (filePath) => {
 	return PLATFORM === "windows" ? toMsysPath(filePath) : filePath;
-}
-async function verifyOpamSignature(binaryPath, signaturePath, publicKeyPath) {
+};
+const verifyOpamSignature = async (binaryPath, signaturePath, publicKeyPath) => {
 	const gpgHome = await promises$1.mkdtemp(path.join(os$2.tmpdir(), "setup-ocaml-gpg-"));
 	const gpg = PLATFORM === "windows" ? path.join(MSYS2_ROOT, "usr", "bin", "gpg.exe") : "gpg";
 	try {
@@ -7274,8 +7274,8 @@ async function verifyOpamSignature(binaryPath, signaturePath, publicKeyPath) {
 			recursive: true
 		});
 	}
-}
-async function findLatestOpamRelease(octokit, allowPrerelease) {
+};
+const findLatestOpamRelease = async (octokit, allowPrerelease) => {
 	const semverRange = allowPrerelease ? "*" : OPAM_STABLE_VERSION_RANGE;
 	const { data } = await octokit.rest.repos.listReleases({
 		owner: "ocaml",
@@ -7300,8 +7300,8 @@ async function findLatestOpamRelease(octokit, allowPrerelease) {
 		}
 	}
 	throw new Error(`Failed to find opam binary for '${PLATFORM}' and '${ARCHITECTURE}'. Please check if this combination is supported by opam.`);
-}
-async function acquireOpam({ version, browserDownloadUrl, signatureBrowserDownloadUrl }) {
+};
+const acquireOpam = async ({ version, browserDownloadUrl, signatureBrowserDownloadUrl }) => {
 	await group("Installing opam", async () => {
 		const cachedPath = find("opam", version, ARCHITECTURE);
 		const opam = PLATFORM === "windows" ? "opam.exe" : "opam";
@@ -7323,8 +7323,8 @@ async function acquireOpam({ version, browserDownloadUrl, signatureBrowserDownlo
 			info("Added cached opam to the path");
 		}
 	});
-}
-async function initializeOpam(inputs, initialRepository) {
+};
+const initializeOpam = async (inputs, initialRepository) => {
 	await group("Initialising opam state", async () => {
 		if (PLATFORM === "windows" && inputs.windowsEnvironment === "msys2") await installMsys2Packages(inputs.windowsCompiler);
 		if (PLATFORM !== "windows") try {
@@ -7349,12 +7349,12 @@ async function initializeOpam(inputs, initialRepository) {
 			...initialRepository ?? []
 		]);
 	});
-}
-async function setupOpam(inputs, release, initialRepository) {
+};
+const setupOpam = async (inputs, release, initialRepository) => {
 	await acquireOpam(release);
 	await initializeOpam(inputs, initialRepository);
-}
-async function installOcaml(ocamlCompiler, windowsCompiler) {
+};
+const installOcaml = async (ocamlCompiler, windowsCompiler) => {
 	await group("Installing OCaml compiler", async () => {
 		const packages = [ocamlCompiler];
 		if (PLATFORM === "windows" && windowsCompiler === "msvc") packages.push("system-msvc");
@@ -7366,8 +7366,8 @@ async function installOcaml(ocamlCompiler, windowsCompiler) {
 			"."
 		]);
 	});
-}
-async function pin(fpaths) {
+};
+const pin = async (fpaths) => {
 	if (fpaths.length === 0) return;
 	await group("Pinning local packages", async () => {
 		for (const fpath of fpaths) {
@@ -7382,8 +7382,8 @@ async function pin(fpaths) {
 			], { cwd: dname });
 		}
 	});
-}
-async function repositoryAdd(name, address) {
+};
+const repositoryAdd = async (name, address) => {
 	await exec("opam", [
 		"repository",
 		"--all-switches",
@@ -7392,14 +7392,14 @@ async function repositoryAdd(name, address) {
 		name,
 		address
 	]);
-}
-async function repositoryAddAll(repositories) {
+};
+const repositoryAddAll = async (repositories) => {
 	if (repositories.length === 0) return;
 	await group("Initialising opam repositories", async () => {
 		for (const [name, address] of repositories) await repositoryAdd(name, address);
 	});
-}
-async function repositoryList() {
+};
+const repositoryList = async () => {
 	const repositoryList = await getExecOutput("opam", [
 		"repository",
 		"--all-switches",
@@ -7411,8 +7411,8 @@ async function repositoryList() {
 	});
 	if (repositoryList.exitCode === 0) return repositoryList.stdout.split("\n").map((repository) => repository.trim()).filter((repository) => repository.length > 0);
 	return [];
-}
-async function repositoryRemoveAll() {
+};
+const repositoryRemoveAll = async () => {
 	await group("Removing opam repositories", async () => {
 		const repositories = await repositoryList();
 		if (repositories.length > 0) await exec("opam", [
@@ -7422,27 +7422,27 @@ async function repositoryRemoveAll() {
 			...repositories
 		]);
 	});
-}
-async function update() {
+};
+const update = async () => {
 	await group("Updating opam repositories", async () => {
 		await exec("opam", ["update"]);
 	});
-}
+};
 
 //#endregion
 //#region src/version.ts
-function isSemverValidRange(semverVersion) {
+const isSemverValidRange = (semverVersion) => {
 	return import_semver.validRange(semverVersion, { loose: true }) !== null;
-}
-function parseCompilerVersion(packagePath) {
+};
+const parseCompilerVersion = (packagePath) => {
 	const opamVersion = path.basename(packagePath).replace("ocaml-base-compiler.", "");
 	const parsed = import_semver.parse(opamVersion.replace("~", "-"), { loose: true });
 	if (parsed === null) return;
 	const minor = parsed.major < 5 && parsed.minor < 10 ? `0${parsed.minor}` : parsed.minor;
 	const prerelease = parsed.prerelease.length > 0 ? `-${parsed.prerelease.join(".")}` : "";
 	return [`${parsed.major}.${minor}.${parsed.patch}${prerelease}`, opamVersion];
-}
-async function retrieveCompilerVersions(octokit, repo) {
+};
+const retrieveCompilerVersions = async (octokit, repo) => {
 	const { data: packages } = await octokit.rest.repos.getContent({
 		owner: "ocaml",
 		path: "packages/ocaml-base-compiler",
@@ -7450,8 +7450,8 @@ async function retrieveCompilerVersions(octokit, repo) {
 	});
 	if (!Array.isArray(packages)) return /* @__PURE__ */ new Map();
 	return new Map(packages.values().map(({ path }) => parseCompilerVersion(path)).filter((entry) => entry !== void 0));
-}
-function matchVersion(versions, semverVersion) {
+};
+const matchVersion = (versions, semverVersion) => {
 	const semverVersions = versions.keys().toArray();
 	const stableMatch = import_semver.maxSatisfying(semverVersions, semverVersion, { loose: true });
 	if (stableMatch !== null) {
@@ -7466,8 +7466,8 @@ function matchVersion(versions, semverVersion) {
 		const opamVersion = versions.get(prereleaseMatch);
 		if (opamVersion !== void 0) return opamVersion;
 	}
-}
-async function resolveVersion(octokit, semverVersion) {
+};
+const resolveVersion = async (octokit, semverVersion) => {
 	const versions = await retrieveCompilerVersions(octokit, "opam-repository");
 	const match = matchVersion(versions, semverVersion);
 	if (match !== void 0) return match;
@@ -7476,20 +7476,20 @@ async function resolveVersion(octokit, semverVersion) {
 	const archivedMatch = matchVersion(versions, semverVersion);
 	if (archivedMatch !== void 0) return archivedMatch;
 	throw new Error(`Could not find any OCaml compiler version matching '${semverVersion}' in the opam-repository or opam-repository-archive. Please check if you specified a valid version number or version range.`);
-}
-async function resolveCompiler(octokit, ocamlCompiler) {
+};
+const resolveCompiler = async (octokit, ocamlCompiler) => {
 	const semverInput = ocamlCompiler.replace("~", "-");
 	if (isSemverValidRange(semverInput)) return `ocaml-base-compiler.${await resolveVersion(octokit, semverInput)}`;
 	return ocamlCompiler;
-}
+};
 
 //#endregion
 //#region src/installer.ts
 const OPAM_SOLVER_TIMEOUT = 600;
-async function pathExists(filePath) {
+const pathExists = async (filePath) => {
 	return await promises$1.access(filePath).then(() => true, () => false);
-}
-function planOpamSetup({ cacheRestored, rootInitialized, switchInitialized }) {
+};
+const planOpamSetup = ({ cacheRestored, rootInitialized, switchInitialized }) => {
 	if (cacheRestored) return {
 		createSwitch: false,
 		initialiseWithFirstRepository: false,
@@ -7500,8 +7500,8 @@ function planOpamSetup({ cacheRestored, rootInitialized, switchInitialized }) {
 		initialiseWithFirstRepository: !rootInitialized,
 		repositories: rootInitialized || switchInitialized ? "replace-all" : "add-remaining"
 	};
-}
-async function syncRepositories(sync, repositories) {
+};
+const syncRepositories = async (sync, repositories) => {
 	switch (sync) {
 		case "add-remaining":
 			await repositoryAddAll(repositories.slice(1));
@@ -7515,8 +7515,8 @@ async function syncRepositories(sync, repositories) {
 			break;
 		default: throw new Error(`Unhandled repository sync: ${String(sync)}`);
 	}
-}
-async function installer(inputs) {
+};
+const installer = async (inputs) => {
 	const octokit = createOctokit(inputs.githubToken);
 	const [opamRelease, ocamlCompiler] = await Promise.all([findLatestOpamRelease(octokit, inputs.allowPrereleaseOpam), resolveCompiler(octokit, inputs.ocamlCompiler)]);
 	if (isDebug()) exportVariable("OPAMVERBOSE", 1);
@@ -7583,11 +7583,11 @@ async function installer(inputs) {
 		await pin(fnames);
 	}
 	await exec("opam", ["config", "report"]);
-}
+};
 
 //#endregion
 //#region src/index.ts
-async function run() {
+const run = async () => {
 	try {
 		const inputs = readInputs();
 		await installer(inputs);
@@ -7596,7 +7596,7 @@ async function run() {
 		if (error$1 instanceof Error) error(error$1.message);
 		process$2.exit(1);
 	}
-}
+};
 run();
 
 //#endregion

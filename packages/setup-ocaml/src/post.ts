@@ -6,7 +6,7 @@ import { DUNE_CACHE_KEY_STATE, saveDuneCache } from "./cache.js";
 import { trimDuneCache } from "./dune.js";
 import { createOctokit } from "./github-client.js";
 
-async function run() {
+const run = async () => {
   try {
     const duneCacheKey = core.getState(DUNE_CACHE_KEY_STATE);
     if (duneCacheKey) {
@@ -22,6 +22,6 @@ async function run() {
     // The post step should not fail if there is an error...
     process.exit(0);
   }
-}
+};
 
 void run();

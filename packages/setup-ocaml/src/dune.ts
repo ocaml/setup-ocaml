@@ -6,13 +6,13 @@ import type { Octokit } from "./github-client.js";
 
 const DUNE_CACHE_TOTAL_SIZE_MB = 5000;
 
-export async function installDune() {
+export const installDune = async () => {
   await core.group("Installing dune", async () => {
     await exec("opam", ["install", "dune"]);
   });
-}
+};
 
-export async function trimDuneCache(octokit: Octokit) {
+export const trimDuneCache = async (octokit: Octokit) => {
   await core.group("Clearing old dune cache files to save space", async () => {
     const {
       repo: { owner, repo },
@@ -35,4 +35,4 @@ export async function trimDuneCache(octokit: Octokit) {
       `--size=${cacheSize}MB`,
     ]);
   });
-}
+};

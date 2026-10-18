@@ -33,12 +33,12 @@ import { resolveCompiler } from "./version.js";
 // 10 minutes — the 0install solver can be slow on large dependency trees.
 const OPAM_SOLVER_TIMEOUT = 600;
 
-async function pathExists(filePath: string) {
+const pathExists = async (filePath: string) => {
   return await fs.access(filePath).then(
     () => true,
     () => false
   );
-}
+};
 
 interface OpamState {
   readonly cacheRestored: boolean;
@@ -54,11 +54,11 @@ interface OpamSetupPlan {
   readonly createSwitch: boolean;
 }
 
-function planOpamSetup({
+const planOpamSetup = ({
   cacheRestored,
   rootInitialized,
   switchInitialized,
-}: OpamState): OpamSetupPlan {
+}: OpamState): OpamSetupPlan => {
   if (cacheRestored) {
     return {
       createSwitch: false,
@@ -72,12 +72,12 @@ function planOpamSetup({
     repositories:
       rootInitialized || switchInitialized ? "replace-all" : "add-remaining",
   };
-}
+};
 
-async function syncRepositories(
+const syncRepositories = async (
   sync: RepositorySync,
   repositories: Inputs["opamRepositoriesLowestPriorityFirst"]
-) {
+) => {
   switch (sync) {
     case "add-remaining": {
       await repositoryAddAll(repositories.slice(1));
@@ -97,9 +97,9 @@ async function syncRepositories(
       throw new Error(`Unhandled repository sync: ${String(unreachable)}`);
     }
   }
-}
+};
 
-export async function installer(inputs: Inputs) {
+export const installer = async (inputs: Inputs) => {
   const octokit = createOctokit(inputs.githubToken);
   const [opamRelease, ocamlCompiler] = await Promise.all([
     findLatestOpamRelease(octokit, inputs.allowPrereleaseOpam),
@@ -186,4 +186,4 @@ export async function installer(inputs: Inputs) {
     await pin(fnames);
   }
   await exec("opam", ["config", "report"]);
-}
+};

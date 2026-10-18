@@ -12,13 +12,13 @@ import {
 
 import { createBuildTarget, OpamOutput } from "./opam-detector.js";
 
-async function retrieveOpamLocalPackages() {
+const retrieveOpamLocalPackages = async () => {
   const globber = await glob.create("*.opam");
   const fpaths = await globber.glob();
   return fpaths;
-}
+};
 
-export async function analysis() {
+export const analysis = async () => {
   const snapshot = new Snapshot({
     name: "ocaml/setup-ocaml/analysis",
     url: "https://github.com/ocaml/setup-ocaml/tree/master/analysis",
@@ -54,4 +54,4 @@ export async function analysis() {
     snapshot.addManifest(buildTarget);
   }
   await submitSnapshot(snapshot);
-}
+};

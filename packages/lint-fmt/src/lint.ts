@@ -1,5 +1,5 @@
 import { exec } from "@actions/exec";
 
-export async function checkFmt() {
+export const checkFmt = async () => {
   await exec("opam", ["exec", "--", "dune", "build", "@fmt"]);
-}
+};

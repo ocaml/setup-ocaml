@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
-export async function installOpamPackages() {
+export const installOpamPackages = async () => {
   await core.group("Installing opam dependencies", async () => {
     await exec("opam", [
       "install",
@@ -12,10 +12,10 @@ export async function installOpamPackages() {
       ".",
     ]);
   });
-}
+};
 
-export async function installDune() {
+export const installDune = async () => {
   await core.group("Installing dune", async () => {
     await exec("opam", ["install", "dune"]);
   });
-}
+};

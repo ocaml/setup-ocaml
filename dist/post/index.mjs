@@ -2,7 +2,7 @@ import { O as getInput, T as error, i as DUNE_CACHE_KEY_STATE, k as getState, r 
 import * as process$1 from "node:process";
 
 //#region src/post.ts
-async function run() {
+const run = async () => {
 	try {
 		const duneCacheKey = getState(DUNE_CACHE_KEY_STATE);
 		if (duneCacheKey) {
@@ -15,7 +15,7 @@ async function run() {
 		if (error$1 instanceof Error) error(error$1.message);
 		process$1.exit(0);
 	}
-}
+};
 run();
 
 //#endregion

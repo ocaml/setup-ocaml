@@ -1,9 +1,9 @@
 import * as core from "@actions/core";
 import { exec } from "@actions/exec";
 
-export async function installFormattingDependencies(
+export const installFormattingDependencies = async (
   ocamlformatVersion?: string
-) {
+) => {
   await core.group("Installing formatting dependencies", async () => {
     const packages = ["dune"];
     if (ocamlformatVersion) {
@@ -11,4 +11,4 @@ export async function installFormattingDependencies(
     }
     await exec("opam", ["install", ...packages]);
   });
-}
+};

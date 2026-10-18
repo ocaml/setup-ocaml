@@ -20,10 +20,10 @@ export const OpamOutput = z.object({
 });
 type OpamOutput = z.infer<typeof OpamOutput>;
 
-function parseDependencies(
+const parseDependencies = (
   cache: PackageCache,
   dependencies: OpamDependency[]
-): Package[] {
+): Package[] => {
   const packages = dependencies.map((dependency) => {
     const purl = new PackageURL(
       "opam",
@@ -40,9 +40,9 @@ function parseDependencies(
     return cache.package(purl).dependsOnPackages(pkgs.values().toArray());
   });
   return packages;
-}
+};
 
-export function createBuildTarget(output: OpamOutput, filePath: string) {
+export const createBuildTarget = (output: OpamOutput, filePath: string) => {
   const opamPackage = output.tree.at(0);
   if (!opamPackage) {
     throw new Error(
@@ -59,4 +59,4 @@ export function createBuildTarget(output: OpamOutput, filePath: string) {
     buildTarget.addBuildDependency(topLevelDependency);
   }
   return buildTarget;
-}
+};

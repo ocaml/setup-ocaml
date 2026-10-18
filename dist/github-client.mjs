@@ -84184,18 +84184,18 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports) => {
 //#endregion
 //#region src/paths.ts
 var import_lib = /* @__PURE__ */ __toESM(require_lib(), 1);
-function toMsysPath(windowsPath) {
+const toMsysPath = (windowsPath) => {
 	const { root } = path$1.win32.parse(windowsPath);
 	return `/${root.charAt(0).toLowerCase()}/${windowsPath.slice(root.length).replaceAll("\\", "/")}`;
-}
-function toCygwinPath(windowsPath) {
+};
+const toCygwinPath = (windowsPath) => {
 	return path$1.posix.join("/cygdrive", toMsysPath(windowsPath));
-}
+};
 
 //#endregion
 //#region src/cache.ts
 const DUNE_CACHE_KEY_STATE = "dune-cache-key";
-function composeDuneCacheKeys(cachePrefix, ocamlCompiler) {
+const composeDuneCacheKeys = (cachePrefix, ocamlCompiler) => {
 	const { workflow, job, runId } = context;
 	const plainKey = [
 		ocamlCompiler,
@@ -84214,16 +84214,16 @@ function composeDuneCacheKeys(cachePrefix, ocamlCompiler) {
 		key,
 		restoreKeys
 	};
-}
-async function getMsvcVersion() {
+};
+const getMsvcVersion = async () => {
 	const { stdout } = await getExecOutput("vswhere", [
 		"-latest",
 		"-property",
 		"installationVersion"
 	], { silent: true });
 	return stdout.trim();
-}
-async function composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler) {
+};
+const composeOpamCacheKeys = async (inputs, opamVersion, ocamlCompiler) => {
 	const sandbox = inputs.opamDisableSandboxing ? "nosandbox" : "sandbox";
 	const repositoryUrls = inputs.opamRepositoriesLowestPriorityFirst.map(([, value]) => value).join(",");
 	const osInfo = await import_lib.osInfo();
@@ -84252,11 +84252,11 @@ async function composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler) {
 		key,
 		restoreKeys
 	};
-}
-function composeDuneCachePaths() {
+};
+const composeDuneCachePaths = () => {
 	return [DUNE_CACHE_ROOT];
-}
-function composeOpamCachePaths(windowsEnvironment) {
+};
+const composeOpamCachePaths = (windowsEnvironment) => {
 	const opamLocalCachePath = path$1.join(GITHUB_WORKSPACE, "_opam");
 	const paths = [OPAM_ROOT, opamLocalCachePath];
 	if (PLATFORM === "windows") {
@@ -84264,8 +84264,8 @@ function composeOpamCachePaths(windowsEnvironment) {
 		if (windowsEnvironment === "cygwin") paths.push(toCygwinPath(opamLocalCachePath));
 	}
 	return paths;
-}
-async function restoreCache(key, restoreKeys, paths, options) {
+};
+const restoreCache = async (key, restoreKeys, paths, options) => {
 	if (!isFeatureAvailable()) {
 		info("Actions cache service feature is unavailable");
 		return;
@@ -84282,8 +84282,8 @@ async function restoreCache(key, restoreKeys, paths, options) {
 		warning(`Failed to restore cache: ${error instanceof Error ? error.message : String(error)}`);
 		return;
 	}
-}
-async function saveCache(key, paths) {
+};
+const saveCache = async (key, paths) => {
 	if (!isFeatureAvailable()) {
 		info("Actions cache service feature is unavailable");
 		return;
@@ -84293,26 +84293,29 @@ async function saveCache(key, paths) {
 	} catch (error) {
 		warning(`Failed to save cache: ${error instanceof Error ? error.message : String(error)}`);
 	}
-}
-async function restoreDuneCache(cachePrefix, ocamlCompiler) {
+};
+const restoreDuneCache = async (cachePrefix, ocamlCompiler) => {
 	await group("Restoring dune cache", async () => {
 		const { key, restoreKeys } = composeDuneCacheKeys(cachePrefix, ocamlCompiler);
 		saveState(DUNE_CACHE_KEY_STATE, key);
-		await restoreCache(key, restoreKeys, composeDuneCachePaths());
+		const paths = composeDuneCachePaths();
+		await restoreCache(key, restoreKeys, paths);
 	});
-}
-async function restoreOpamCache(inputs, opamVersion, ocamlCompiler) {
+};
+const restoreOpamCache = async (inputs, opamVersion, ocamlCompiler) => {
 	return await group("Restoring opam cache", async () => {
 		const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
-		return await restoreCache(key, restoreKeys, composeOpamCachePaths(inputs.windowsEnvironment));
+		const paths = composeOpamCachePaths(inputs.windowsEnvironment);
+		return await restoreCache(key, restoreKeys, paths);
 	});
-}
-async function saveDuneCache(key) {
+};
+const saveDuneCache = async (key) => {
 	await group("Saving dune cache", async () => {
-		await saveCache(key, composeDuneCachePaths());
+		const paths = composeDuneCachePaths();
+		await saveCache(key, paths);
 	});
-}
-async function saveOpamCache(inputs, opamVersion, ocamlCompiler) {
+};
+const saveOpamCache = async (inputs, opamVersion, ocamlCompiler) => {
 	await group("Saving opam cache", async () => {
 		const { key, restoreKeys } = await composeOpamCacheKeys(inputs, opamVersion, ocamlCompiler);
 		const paths = composeOpamCachePaths(inputs.windowsEnvironment);
@@ -84330,17 +84333,17 @@ async function saveOpamCache(inputs, opamVersion, ocamlCompiler) {
 			await saveCache(key, paths);
 		}
 	});
-}
+};
 
 //#endregion
 //#region src/dune.ts
 const DUNE_CACHE_TOTAL_SIZE_MB = 5e3;
-async function installDune() {
+const installDune = async () => {
 	await group("Installing dune", async () => {
 		await exec("opam", ["install", "dune"]);
 	});
-}
-async function trimDuneCache(octokit) {
+};
+const trimDuneCache = async (octokit) => {
 	await group("Clearing old dune cache files to save space", async () => {
 		const { repo: { owner, repo }, runId: run_id } = context;
 		const { data: { total_count: totalCount } } = await octokit.rest.actions.listJobsForWorkflowRun({
@@ -84358,7 +84361,7 @@ async function trimDuneCache(octokit) {
 			`--size=${cacheSize}MB`
 		]);
 	});
-}
+};
 
 //#endregion
 //#region node_modules/bottleneck/light.js
@@ -85598,9 +85601,9 @@ retry.VERSION = VERSION;
 
 //#endregion
 //#region src/github-client.ts
-function createOctokit(token) {
+const createOctokit = (token) => {
 	return getOctokit(token, void 0, retry);
-}
+};
 
 //#endregion
 export { group as A, __commonJSMin as B, addPath as C, getBooleanInput as D, exportVariable as E, getExecOutput as F, __toESM as H, cp as I, mkdirP as L, isDebug as M, notice as N, getInput as O, exec as P, rmRF as R, string as S, error$1 as T, __require as V, MSYS2_ROOT as _, restoreDuneCache as a, RUNNER_ENVIRONMENT as b, saveOpamCache as c, create as d, ARCHITECTURE as f, GITHUB_WORKSPACE as g, DUNE_CACHE_ROOT as h, DUNE_CACHE_KEY_STATE as i, info as j, getState as k, toMsysPath as l, CYGWIN_ROOT_BIN as m, installDune as n, restoreOpamCache as o, CYGWIN_BASH_ENV as p, trimDuneCache as r, saveDuneCache as s, createOctokit as t, require_semver as u, OPAM_ROOT as v, debug as w, record as x, PLATFORM as y, HttpClient as z };

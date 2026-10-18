@@ -4,12 +4,12 @@ import * as process from "node:process";
 
 import * as core from "@actions/core";
 
-function parseKeyValue(line: string): [string, string] {
+const parseKeyValue = (line: string): [string, string] => {
   const [key = "", value = ""] = line.split("=").map((s) => s.trim());
   return [key, value];
-}
+};
 
-async function parse() {
+const parse = async () => {
   const fpath = path.join(process.cwd(), ".ocamlformat");
   try {
     await fs.access(fpath, fs.constants.R_OK);
@@ -23,9 +23,9 @@ async function parse() {
       .values()
       .map(parseKeyValue)
   );
-}
+};
 
-export async function retrieveOcamlformatVersion() {
+export const retrieveOcamlformatVersion = async () => {
   const config = await parse();
   if (config === undefined) {
     core.warning(".ocamlformat file not found");
@@ -39,4 +39,4 @@ export async function retrieveOcamlformatVersion() {
     "No ocamlformat version found in .ocamlformat file. It's recommended to specify the version in your .ocamlformat file for better consistency."
   );
   return;
-}
+};
