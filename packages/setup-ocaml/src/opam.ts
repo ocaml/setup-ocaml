@@ -88,10 +88,16 @@ export const findLatestOpamRelease = async (
   allowPrerelease: boolean
 ): Promise<OpamRelease> => {
   const semverRange = allowPrerelease ? "*" : OPAM_STABLE_VERSION_RANGE;
-  const { data } = await octokit.rest.repos.listReleases({
+  const data = await octokit.paginate(octokit.rest.repos.listReleases, {
     owner: "ocaml",
+    per_page: 100,
     repo: "opam",
   });
+  if (data.length === 0) {
+    throw new Error(
+      "The GitHub API returned no releases for ocaml/opam. Retry the workflow and check GitHub's status if the problem persists."
+    );
+  }
   const releases = data
     .filter((release) =>
       semver.satisfies(release.tag_name, semverRange, {
@@ -104,7 +110,7 @@ export const findLatestOpamRelease = async (
     );
   if (releases.length === 0) {
     throw new Error(
-      "Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases."
+      `No opam release matched the built-in range '${semverRange}' (allow-prerelease-opam: ${allowPrerelease}, releases received: ${data.length}). Check opam releases and your setup-ocaml version.`
     );
   }
   const binarySuffix =
