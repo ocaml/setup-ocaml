@@ -7275,15 +7275,17 @@ const verifyOpamSignature = async (binaryPath, signaturePath, publicKeyPath) => 
 };
 const findLatestOpamRelease = async (octokit, allowPrerelease) => {
 	const semverRange = allowPrerelease ? "*" : OPAM_STABLE_VERSION_RANGE;
-	const { data } = await octokit.rest.repos.listReleases({
+	const data = await octokit.paginate(octokit.rest.repos.listReleases, {
 		owner: "ocaml",
+		per_page: 100,
 		repo: "opam"
 	});
+	if (data.length === 0) throw new Error("The GitHub API returned no releases for ocaml/opam. Retry the workflow and check GitHub's status if the problem persists.");
 	const releases = data.filter((release) => import_semver.satisfies(release.tag_name, semverRange, {
 		includePrerelease: allowPrerelease,
 		loose: true
 	})).toSorted(({ tag_name: v1 }, { tag_name: v2 }) => import_semver.rcompare(v1, v2, { loose: true }));
-	if (releases.length === 0) throw new Error("Failed to find any opam release that matches the specified version constraint. Please check your version requirements or consider allowing pre-releases.");
+	if (releases.length === 0) throw new Error(`No opam release matched the built-in range '${semverRange}' (allow-prerelease-opam: ${allowPrerelease}, releases received: ${data.length}). Check opam releases and your setup-ocaml version.`);
 	const binarySuffix = PLATFORM === "windows" ? `${ARCHITECTURE}-${PLATFORM}.exe` : `${ARCHITECTURE}-${PLATFORM}`;
 	for (const release of releases) {
 		const asset = release.assets.find((a) => a.name.endsWith(binarySuffix));
