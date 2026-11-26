@@ -100,7 +100,7 @@ jobs:
       - name: Checkout tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install dependencies
-        run: pacman -Sy --noconfirm bash bubblewrap ca-certificates coreutils curl diffutils gcc git gnupg make nano ncurses patch rsync sudo tar unzip xz
+        run: pacman -Syu --noconfirm bash bubblewrap ca-certificates coreutils curl diffutils gcc git gnupg make nano ncurses patch rsync sudo tar unzip xz
       - name: Set-up OCaml without cache
         uses: ./
         with:
